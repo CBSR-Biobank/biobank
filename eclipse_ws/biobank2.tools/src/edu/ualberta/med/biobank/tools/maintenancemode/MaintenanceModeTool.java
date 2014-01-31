@@ -15,9 +15,12 @@ import org.slf4j.LoggerFactory;
 import edu.ualberta.med.biobank.client.util.ServiceConnection;
 import edu.ualberta.med.biobank.client.util.TrustStore;
 import edu.ualberta.med.biobank.client.util.TrustStore.Cert;
+import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
+import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService.MaintenanceMode;
 import edu.ualberta.med.biobank.tools.GenericAppArgs;
 import edu.ualberta.med.biobank.tools.utils.HostUrl;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 /**
  * A tool that can be used to change or query the Biobank Server's Maintenante Mode setting. This
@@ -40,7 +43,7 @@ public class MaintenanceModeTool {
 
     private static final Logger log = LoggerFactory.getLogger(MaintenanceModeTool.class);
 
-    private final BiobankApplicationService appService;
+    private BiobankApplicationService appService;
 
     public static void main(String[] argv) {
         try {
@@ -63,26 +66,57 @@ public class MaintenanceModeTool {
     public MaintenanceModeTool(GenericAppArgs globalArgs) throws Exception {
         String hostUrl = HostUrl.getHostUrl(globalArgs.hostname, globalArgs.port);
 
-        checkCertificates(hostUrl);
+        try {
+            checkCertificates(hostUrl);
 
-        appService = ServiceConnection.getAppService(
-            hostUrl, globalArgs.username, globalArgs.password);
+            appService = ServiceConnection.getAppService(
+                hostUrl, globalArgs.username, globalArgs.password);
 
-        if (globalArgs.remainingArgs.length != 1) {
-            System.out.println("ERROR: invalid argument(s): "
-                + StringUtils.join(globalArgs.remainingArgs, " "));
-        } else if (globalArgs.remainingArgs[0].equals("query")) {
-            int mode = appService.maintenanceMode();
-            System.out.print("Server maintenance mode is ");
-            System.out.println(mode == 0 ? "disabled" : "enabled");
-        } else if (globalArgs.remainingArgs[0].equals("toggle")) {
-            int mode = 1 - appService.maintenanceMode();
-            appService.maintenanceMode(mode);
+            if (globalArgs.remainingArgs.length != 1) {
+                System.out.println("ERROR: invalid argument(s): "
+                    + StringUtils.join(globalArgs.remainingArgs, " "));
+            } else if (globalArgs.remainingArgs[0].equals("query")) {
+                maintenanceModeQuery();
+            } else if (globalArgs.remainingArgs[0].equals("toggle")) {
+                maintenanceModeQueryToggle();
+            } else {
+                System.out.println("ERROR: invalid argument(s): "
+                    + StringUtils.join(globalArgs.remainingArgs, " "));
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private void maintenanceModeQuery() {
+        MaintenanceMode mode = appService.maintenanceMode();
+        System.out.print("Server maintenance mode is ");
+        System.out.println(mode == MaintenanceMode.NONE ? "disabled" : "enabled");
+    }
+
+    private void maintenanceModeQueryToggle() {
+        MaintenanceMode mode = appService.maintenanceMode();
+        MaintenanceMode newMode;
+
+        switch (mode) {
+        case NONE:
+            newMode = MaintenanceMode.PREVENT_USER_LOGIN;
+            break;
+        case PREVENT_USER_LOGIN:
+            newMode = MaintenanceMode.NONE;
+            break;
+        default:
+            throw new IllegalStateException("server's maintenance mode is invalid: " + mode);
+        }
+
+        try {
+            appService.maintenanceMode(newMode);
             System.out.print("Server maintenance mode changed to ");
-            System.out.println(mode == 0 ? "disabled" : "enabled");
-        } else {
-            System.out.println("ERROR: invalid argument(s): "
-                + StringUtils.join(globalArgs.remainingArgs, " "));
+            System.out.println(newMode == MaintenanceMode.NONE ? "disabled" : "enabled");
+        } catch (LocalizedException e) {
+            System.out.println("ERROR: " + e.getLocalizedString());
+        } catch (ApplicationException e) {
+            System.out.println("ERROR: " + e.getLocalizedMessage());
         }
 
     }

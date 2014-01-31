@@ -675,14 +675,9 @@
             class="edu.ualberta.med.biobank.handlers.MaintenanceModeChangeHandler"
             commandId="edu.ualberta.med.biobank.commands.maintenanceModeChange">
          <activeWhen>
-            <and>
                <reference
-                     definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
+                     definitionId="edu.ualberta.med.biobank.gui.common.globalAdminPermission">
                </reference>
-               <reference
-                     definitionId="biobank.mainPerspectiveSelected">
-               </reference>
-            </and>
          </activeWhen>
       </handler>
       <handler
@@ -922,6 +917,11 @@
                       style="push">
                 </command>
                 <command
+                      commandId="edu.ualberta.med.biobank.commands.maintenanceModeChange"
+                      id="edu.ualberta.med.biobank.menu.maintenanceModeChange"
+                      style="push">
+                </command>
+                <command
                       commandId="edu.ualberta.med.biobank.commands.userManagement"
                       id="edu.ualberta.med.biobank.menu.userManagement"
                       style="push">
@@ -929,11 +929,6 @@
                 <command
                       commandId="edu.ualberta.med.biobank.commands.changePassword"
                       id="edu.ualberta.med.biobank.menu.changePassword"
-                      style="push">
-                </command>
-                <command
-                      commandId="edu.ualberta.med.biobank.commands.maintenanceModeChange"
-                      id="edu.ualberta.med.biobank.menu.maintenanceModeChange"
                       style="push">
                 </command>
          </menu>

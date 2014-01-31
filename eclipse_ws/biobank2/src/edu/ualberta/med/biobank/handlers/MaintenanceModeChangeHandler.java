@@ -10,6 +10,7 @@ import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService.MaintenanceMode;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class MaintenanceModeChangeHandler extends AbstractHandler {
@@ -22,11 +23,18 @@ public class MaintenanceModeChangeHandler extends AbstractHandler {
     @SuppressWarnings("nls")
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
-        final int serverMaintenanceMode = SessionManager.getAppService().maintenanceMode();
+        final MaintenanceMode serverMaintenanceMode = SessionManager.getAppService().maintenanceMode();
 
-        String message = (serverMaintenanceMode == 0)
-            ? i18n.tr("Maintenance mode is disabled. Do you want to enable it?")
-            : i18n.tr("Maintenance mode is enabled. Do you want to disable it?");
+        String message;
+        MaintenanceMode newMode;
+
+        if (serverMaintenanceMode == MaintenanceMode.PREVENT_USER_LOGIN) {
+            message = i18n.tr("Maintenance mode is enabled. Do you want to disable it?");
+            newMode = MaintenanceMode.NONE;
+        } else {
+            message = i18n.tr("Maintenance mode is disabled. Do you want to enable it?");
+            newMode = MaintenanceMode.PREVENT_USER_LOGIN;
+        }
 
         boolean confirm = MessageDialog.openConfirm(
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
@@ -35,7 +43,7 @@ public class MaintenanceModeChangeHandler extends AbstractHandler {
 
         if (confirm) {
             try {
-                SessionManager.getAppService().maintenanceMode(1 - serverMaintenanceMode);
+                SessionManager.getAppService().maintenanceMode(newMode);
             } catch (ApplicationException e) {
                 BgcPlugin.openAccessDeniedErrorMessage(e);
             }

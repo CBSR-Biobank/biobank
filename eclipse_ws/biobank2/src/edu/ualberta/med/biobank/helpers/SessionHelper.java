@@ -25,6 +25,7 @@ import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
+import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService.MaintenanceMode;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ClientVersionInvalidException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ServerVersionInvalidException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ServerVersionNewerException;
@@ -170,7 +171,7 @@ public class SessionHelper implements Runnable {
             String clientVersion = Platform.getProduct().getDefiningBundle().getVersion().toString();
             logger.debug("Check client version:" + clientVersion);
             appService.checkVersion(clientVersion);
-            if (serverMaintenanceCheck() == 0) {
+            if (serverMaintenanceCheck() == MaintenanceMode.NONE) {
                 user = UserWrapper.getUser(appService, userName);
             }
         } catch (ApplicationException exp) {
@@ -225,9 +226,9 @@ public class SessionHelper implements Runnable {
     }
 
     @SuppressWarnings("nls")
-    private int serverMaintenanceCheck() {
-        int mode = appService.maintenanceMode();
-        if (mode != 0) {
+    private MaintenanceMode serverMaintenanceCheck() {
+        MaintenanceMode mode = appService.maintenanceMode();
+        if (mode != MaintenanceMode.NONE) {
             BgcPlugin.openError(
                 // dialog title.
                 i18n.tr("Server maintenence"),

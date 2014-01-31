@@ -5,12 +5,14 @@ import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.reports.QueryCommand;
 import edu.ualberta.med.biobank.common.reports.QueryHandle;
+import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Report;
 import edu.ualberta.med.biobank.server.query.BiobankSQLCriteria;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -22,6 +24,11 @@ import java.util.List;
  * generated files.
  */
 public interface BiobankApplicationService extends WritableApplicationService {
+
+    public enum MaintenanceMode implements NotAProxy, Serializable {
+        NONE,
+        PREVENT_USER_LOGIN
+    }
 
     public <E> List<E> query(BiobankSQLCriteria sqlCriteria,
         String targetClassName) throws ApplicationException;
@@ -62,7 +69,7 @@ public interface BiobankApplicationService extends WritableApplicationService {
 
     public boolean isAllowed(Permission permission) throws ApplicationException;
 
-    public void maintenanceMode(int mode) throws ApplicationException;
+    public void maintenanceMode(MaintenanceMode mode) throws ApplicationException;
 
-    public int maintenanceMode();
+    public MaintenanceMode maintenanceMode();
 }

@@ -13,6 +13,7 @@ import edu.ualberta.med.biobank.common.reports.QueryHandleRequest;
 import edu.ualberta.med.biobank.common.reports.QueryHandleRequest.CommandType;
 import edu.ualberta.med.biobank.common.wrappers.actions.BiobankSessionAction;
 import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Report;
@@ -49,11 +50,11 @@ public class BiobankApplicationServiceImpl
 
     private static final Bundle bundle = new CommonBundle();
 
-    private int maintenanceMode;
+    private MaintenanceMode maintenanceMode;
 
     public BiobankApplicationServiceImpl(ClassCache classCache) {
         super(classCache);
-        this.maintenanceMode = 0;
+        this.maintenanceMode = MaintenanceMode.NONE;
     }
 
     /**
@@ -237,15 +238,22 @@ public class BiobankApplicationServiceImpl
         return ((BiobankORMDAOImpl) this.getWritableDAO(Site.class.getName())).isAllowed(permission);
     }
 
+    @SuppressWarnings("nls")
+    public static final LString MAINTENANCE_MODE_PERMISSION_ERROR =
+        bundle.tr("The user does not have the valid permissions to change the maintenance mode").format();
+
     @Override
-    public void maintenanceMode(int mode) throws ApplicationException {
+    public void maintenanceMode(MaintenanceMode mode) throws ApplicationException,
+        LocalizedException {
         if (isAllowed(new GlobalAdminPermission())) {
             maintenanceMode = mode;
+        } else {
+            throw new LocalizedException(MAINTENANCE_MODE_PERMISSION_ERROR);
         }
     }
 
     @Override
-    public int maintenanceMode() {
+    public MaintenanceMode maintenanceMode() {
         return maintenanceMode;
     }
 
