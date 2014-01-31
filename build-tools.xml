@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="biobank-tools" basedir=".">
+  <property file="build.properties" />
+
+  <property name="tools.build.dir" value="${eclipse.proj.dir.tools}/output" />
+
+
+  <target name="tools-prepare">
+    <mkdir dir="${tools.build.dir}" />
+  </target>
+
+  <target name="tools-compile" depends="build-common-project,tools-prepare" >
+    <copy includeemptydirs="false"
+          todir="${tools.build.dir}" overwrite="true">
+      <fileset dir="${eclipse.proj.dir.tests}/src">
+        <exclude name="**/*.launch" />
+        <exclude name="**/*.java" />
+      </fileset>
+    </copy>
+    <javac destdir="${tools.build.dir}"
+           debug="true"
+           debuglevel="lines,source"
+           includeantruntime="false">
+      <src path="${eclipse.proj.dir.tools}/src" />
+      <classpath>
+        <pathelement location="${eclipse.proj.dir.common}/output" />
+	<fileset dir="${eclipse.proj.dir.tools}/lib">
+	  <include name="*.jar" />
+	</fileset>
+      </classpath>
+      <classpath refid="biobank.common.build.classpath" />
+    </javac>
+  </target>
+
+  <path id="tools.run.classpath">
+    <fileset refid="biobank.common.server.build.classpath" />
+    <fileset refid="biobank.common.client.build.classpath" />
+    <pathelement location="${eclipse.proj.dir.common}/output" />
+    <pathelement location="${tools.build.dir}" />
+    <pathelement location="${eclipse.proj.dir.tools}/conf" />
+    <pathelement location="${eclipse.proj.dir.common}/conf" />
+    <fileset dir="${eclipse.proj.dir.tools}/lib">
+      <include name="*.jar" />
+    </fileset>
+  </path>
+
+  <target name="clean-tools">
+    <delete dir="${tools.build.dir}" />
+  </target>
+
+  <target name="test-config-create"
+	  depends="tools-compile"
+	  description="creates a testing configuration in the database. Uses db.properties to
+		       connect to the database.">
+    <java classname="edu.ualberta.med.biobank.tools.testconfig.TestConfigCreate"
+	  fork="true">
+      <sysproperty key="db.properties" value="db.properties"/>
+      <!--arg value="-h"/-->
+      <classpath refid="tools.run.classpath" />
+    </java>
+  </target>
+
+  <target name="server-maintenance-mode-query"
+	  depends="tools-compile"
+	  description="toggles the servers' maintenance mode.">
+    <input message="Enter host name"
+           addProperty="host.name"
+           defaultValue="localhost" />
+    <input message="Enter host port"
+           addProperty="host.port"
+           defaultValue="8443" />
+    <input message="Enter user name"
+           addProperty="biobank.user.name"
+           defaultValue="testuser" />
+    <input message="Enter user password"
+           addProperty="biobank.user.password"
+           defaultValue="">
+      <handler type="secure" />
+    </input>
+    <java classname="edu.ualberta.med.biobank.tools.maintenancemode.MaintenanceModeTool"
+	  fork="true">
+      <arg value="--hostname" />
+      <arg value="${host.name}" />
+      <arg value="--port" />
+      <arg value="${host.port}" />
+      <arg value="--user" />
+      <arg value="${biobank.user.name}" />
+      <arg value="--password" />
+      <arg value="${biobank.user.password}" />
+      <arg value="query" />
+      <classpath refid="tools.run.classpath" />
+    </java>
+  </target>
+
+  <target name="server-maintenance-mode-toggle"
+	  depends="tools-compile"
+	  description="toggles the servers' maintenance mode.">
+    <input message="Enter host name"
+           addProperty="host.name"
+           defaultValue="localhost" />
+    <input message="Enter host port"
+           addProperty="host.port"
+           defaultValue="8443" />
+    <input message="Enter user name"
+           addProperty="biobank.user.name"
+           defaultValue="testuser" />
+    <input message="Enter user password"
+           addProperty="biobank.user.password"
+           defaultValue="">
+      <handler type="secure" />
+    </input>
+    <java classname="edu.ualberta.med.biobank.tools.maintenancemode.MaintenanceModeTool"
+	  fork="true">
+      <arg value="--hostname" />
+      <arg value="${host.name}" />
+      <arg value="--port" />
+      <arg value="${host.port}" />
+      <arg value="--user" />
+      <arg value="${biobank.user.name}" />
+      <arg value="--password" />
+      <arg value="${biobank.user.password}" />
+      <arg value="toggle" />
+      <classpath refid="tools.run.classpath" />
+    </java>
+  </target>
+</project>
