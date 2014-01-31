@@ -62,7 +62,7 @@
 
   <target name="server-maintenance-mode-query"
 	  depends="tools-compile"
-	  description="toggles the servers' maintenance mode.">
+	  description="displays the current state for the servers' maintenance mode.">
     <input message="Enter host name"
            addProperty="host.name"
            defaultValue="localhost" />
