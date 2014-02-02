@@ -491,25 +491,27 @@ public class ReportEntryForm extends BiobankEntryForm {
         createFilterCombo(container);
 
         filtersWidget = new FilterSelectWidget(container, SWT.NONE, report);
-        filtersWidget
-            .addFilterChangedListener(new ChangeListener<FilterChangeEvent>() {
-                @Override
-                public void handleEvent(FilterChangeEvent event) {
-                    if (event.isDataChange()) {
-                        setDirty(true);
-                    }
-
-                    book.reflow(true);
-                    form.layout(true, true);
-
-                    EntityFilter entityFilter = event.getEntityFilter();
-                    if (event.isSelected()) {
-                        filterCombo.remove(entityFilter);
-                    } else {
-                        filterCombo.add(entityFilter);
-                    }
+        filtersWidget.addFilterChangedListener(new ChangeListener<FilterChangeEvent>() {
+            @Override
+            public void handleEvent(FilterChangeEvent event) {
+                if (event.isDataChange()) {
+                    setDirty(true);
                 }
-            });
+
+                book.reflow(true);
+                form.layout(true, true);
+
+                EntityFilter entityFilter = event.getEntityFilter();
+                if (event.isSelected()) {
+                    filterCombo.remove(entityFilter);
+                } else {
+                    filterCombo.add(entityFilter);
+                }
+
+                log.debug("createFiltersSection: handleEvent: added filter: "
+                    + entityFilter.getName());
+            }
+        });
 
         Collection<EntityFilter> entityFilters = getSortedEntityFilters(report,
             COMPARE_FILTERS_BY_NAME);
@@ -564,10 +566,9 @@ public class ReportEntryForm extends BiobankEntryForm {
                     .getSelection()).getFirstElement();
                 if (selection instanceof EntityFilter) {
                     EntityFilter entityFilter = (EntityFilter) selection;
-                    filterCombo.remove(entityFilter);
                     filtersWidget.addFilterRow(entityFilter);
 
-                    log.debug("filterCombo: addPostSelectionChangedListener: added filter: "
+                    log.debug("filterCombo: selectionChanged: added filter: "
                         + entityFilter.getName());
 
                     setDirty(true);
