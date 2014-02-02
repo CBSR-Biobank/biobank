@@ -508,8 +508,7 @@ public class ReportEntryForm extends BiobankEntryForm {
                     filterCombo.add(entityFilter);
                 }
 
-                log.debug("createFiltersSection: handleEvent: added filter: "
-                    + entityFilter.getName());
+                log.debug("createFiltersSection: handleEvent: " + entityFilter.getName());
             }
         });
 
@@ -562,15 +561,14 @@ public class ReportEntryForm extends BiobankEntryForm {
         filterCombo.addPostSelectionChangedListener(new ISelectionChangedListener() {
             @Override
             public void selectionChanged(SelectionChangedEvent event) {
-                Object selection = ((IStructuredSelection) filterCombo
-                    .getSelection()).getFirstElement();
+                Object selection = ((IStructuredSelection) filterCombo.getSelection()).getFirstElement();
                 if (selection instanceof EntityFilter) {
                     EntityFilter entityFilter = (EntityFilter) selection;
+                    filterCombo.remove(entityFilter);
                     filtersWidget.addFilterRow(entityFilter);
 
                     log.debug("filterCombo: selectionChanged: added filter: "
                         + entityFilter.getName());
-
                     setDirty(true);
                     form.layout(true, true);
                 }
