@@ -563,6 +563,7 @@ public class ReportEntryForm extends BiobankEntryForm {
             public void selectionChanged(SelectionChangedEvent event) {
                 Object selection = ((IStructuredSelection) filterCombo.getSelection()).getFirstElement();
                 if (selection instanceof EntityFilter) {
+                    filterCombo.setSelection(null);
                     EntityFilter entityFilter = (EntityFilter) selection;
                     filterCombo.remove(entityFilter);
                     filtersWidget.addFilterRow(entityFilter);
