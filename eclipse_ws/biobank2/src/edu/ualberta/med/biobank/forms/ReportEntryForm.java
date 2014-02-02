@@ -37,6 +37,8 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.Section;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
@@ -54,7 +56,6 @@ import edu.ualberta.med.biobank.export.DataExporter;
 import edu.ualberta.med.biobank.export.PdfDataExporter;
 import edu.ualberta.med.biobank.export.PrintPdfDataExporter;
 import edu.ualberta.med.biobank.forms.listener.ProgressMonitorDialogBusyListener;
-import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
@@ -76,18 +77,15 @@ import edu.ualberta.med.biobank.widgets.report.FilterChangeEvent;
 import edu.ualberta.med.biobank.widgets.report.FilterSelectWidget;
 
 public class ReportEntryForm extends BiobankEntryForm {
-    private static final I18n i18n = I18nFactory
-        .getI18n(ReportEntryForm.class);
+    private static final I18n i18n = I18nFactory.getI18n(ReportEntryForm.class);
 
-    private static BgcLogger logger = BgcLogger.getLogger(ReportEntryForm.class
-        .getName());
+    private static Logger log = LoggerFactory.getLogger(ReportEntryForm.class);
 
     private static ImageDescriptor SAVE_AS_NEW_ACTION_IMAGE = ImageDescriptor
         .createFromImage(BgcPlugin.getDefault().getImage(BgcPlugin.Image.SAVE_AS_NEW));
 
     @SuppressWarnings("nls")
-    public static final String ID =
-        "edu.ualberta.med.biobank.forms.ReportEntryForm";
+    public static final String ID = "edu.ualberta.med.biobank.forms.ReportEntryForm";
 
     private static final Comparator<EntityFilter> COMPARE_FILTERS_BY_NAME =
         new Comparator<EntityFilter>() {
@@ -439,8 +437,7 @@ public class ReportEntryForm extends BiobankEntryForm {
 
                         SessionManager.openViewForm(wrapper);
                     } catch (Exception e) {
-                        logger.error(
-                            "Error opening selection", e);
+                        log.error("Error opening selection", e);
                     }
                 }
             }
@@ -560,22 +557,24 @@ public class ReportEntryForm extends BiobankEntryForm {
             }
         });
 
-        filterCombo
-            .addPostSelectionChangedListener(new ISelectionChangedListener() {
-                @Override
-                public void selectionChanged(SelectionChangedEvent event) {
-                    Object selection = ((IStructuredSelection) filterCombo
-                        .getSelection()).getFirstElement();
-                    if (selection instanceof EntityFilter) {
-                        EntityFilter entityFilter = (EntityFilter) selection;
-                        filterCombo.remove(entityFilter);
-                        filtersWidget.addFilterRow(entityFilter);
+        filterCombo.addPostSelectionChangedListener(new ISelectionChangedListener() {
+            @Override
+            public void selectionChanged(SelectionChangedEvent event) {
+                Object selection = ((IStructuredSelection) filterCombo
+                    .getSelection()).getFirstElement();
+                if (selection instanceof EntityFilter) {
+                    EntityFilter entityFilter = (EntityFilter) selection;
+                    filterCombo.remove(entityFilter);
+                    filtersWidget.addFilterRow(entityFilter);
 
-                        setDirty(true);
-                        form.layout(true, true);
-                    }
+                    log.debug("filterCombo: addPostSelectionChangedListener: added filter: "
+                        + entityFilter.getName());
+
+                    setDirty(true);
+                    form.layout(true, true);
                 }
-            });
+            }
+        });
     }
 
     private static Collection<EntityFilter> getSortedEntityFilters(
