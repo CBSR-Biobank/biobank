@@ -580,7 +580,6 @@
 	  description="build the product">
     <!-- buildDirectory is the folder where the plugins and products are found and build -->
     <!-- plugins and features are copied into the buildDirectory -->
-    <echo message="here2" />
     <copy todir="${buildDirectory}/plugins/biobank2" verbose="true">
       <fileset dir="${eclipse.workspace.dir}/biobank2" />
     </copy>
