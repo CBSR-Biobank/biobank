@@ -49,8 +49,8 @@ public class Swt2DUtil {
         p1 = inverseTransformPoint(af, p1);
         dest.x = p1.x;
         dest.y = p1.y;
-        dest.width = (int) (src.width / af.getScaleX());
-        dest.height = (int) (src.height / af.getScaleY());
+        dest.width = src.width / af.getScaleX();
+        dest.height = src.height / af.getScaleY();
         return dest;
     }
 
