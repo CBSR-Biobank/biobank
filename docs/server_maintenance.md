@@ -5,7 +5,7 @@ logging into the server. Enabling this mode is useful when maintenance of the se
 start. When the maintenance mode is enabled, users who attempt to log in via the Biobank client will
 be informed that the server is under maintenance and to log it at a later time. This feature will
 not log out currently logged in users. Logged in users must be contacted individually and be
-requested to log off (logged in users can be determined by looking at the logs on the client).
+requested to log off (logged in users can be determined by looking at the logs using the client).
 
 ## Requirements
 
@@ -16,8 +16,11 @@ all studies and also have every permission enabled.
 
 ## Changing maintenance mode
 
-Changing the mode can done on any computer, connected to the internet, using a Linux shell in a
-terminal.  At the project's root directory, use the following commands to query and change the mode:
+Changing the mode can done on any computer connected to the internet, using a Linux shell in a
+terminal.  When the mode is **disabled** users can log in normally. When **enabled** user will be
+prevented from logging in.  At the project's root directory, use the following commands to query and
+change the mode:
+
 
 1. To query the current mode:
 
@@ -25,12 +28,13 @@ terminal.  At the project's root directory, use the following commands to query 
     ant server-maintenance-mode-query
 	```
 
-
 2. To change the mode:
 
     ```bash
     ant server-maintenance-mode-toggle
     ```
+
+    The new mode is displayed by the command.
 
 Both of these commands request the following paramters:
 
@@ -59,7 +63,7 @@ this text:*
 
 ...
 
-server-maintenance-mode-query:
+server-maintenance-mode-toggle:
     [input] Enter host name [localhost]
 aicml-med.cs.ualberta.ca
     [input] Enter host port [443]
@@ -67,7 +71,8 @@ aicml-med.cs.ualberta.ca
     [input] Enter user name [testuser]
 
 Enter user password []
-     [java] Server maintenance mode is disabled
+     [java] Server maintenance mode changed to enabled
+
 ```
 
 

@@ -60,9 +60,7 @@
     </java>
   </target>
 
-  <target name="server-maintenance-mode-query"
-	  depends="tools-compile"
-	  description="displays the current state for the servers' maintenance mode.">
+  <target name="get-maintenance-mode-params">
     <input message="Enter host name"
            addProperty="host.name"
            defaultValue="localhost" />
@@ -77,6 +75,11 @@
            defaultValue="">
       <handler type="secure" />
     </input>
+  </target>
+
+  <target name="server-maintenance-mode-query"
+	  depends="tools-compile,get-maintenance-mode-params"
+	  description="displays the current state for the servers' maintenance mode.">
     <java classname="edu.ualberta.med.biobank.tools.maintenancemode.MaintenanceModeTool"
 	  fork="true">
       <arg value="--hostname" />
@@ -93,22 +96,8 @@
   </target>
 
   <target name="server-maintenance-mode-toggle"
-	  depends="tools-compile"
+	  depends="tools-compile,get-maintenance-mode-params"
 	  description="toggles the servers' maintenance mode.">
-    <input message="Enter host name"
-           addProperty="host.name"
-           defaultValue="localhost" />
-    <input message="Enter host port"
-           addProperty="host.port"
-           defaultValue="8443" />
-    <input message="Enter user name"
-           addProperty="biobank.user.name"
-           defaultValue="testuser" />
-    <input message="Enter user password"
-           addProperty="biobank.user.password"
-           defaultValue="">
-      <handler type="secure" />
-    </input>
     <java classname="edu.ualberta.med.biobank.tools.maintenancemode.MaintenanceModeTool"
 	  fork="true">
       <arg value="--hostname" />
