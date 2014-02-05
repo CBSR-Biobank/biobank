@@ -31,6 +31,10 @@ For further information or to request a demonstration of the software you may em
 1. [BioBank Feature Overview](docs/feature_overview.md): An overview of the features provided by
    BioBank.
 
-3. [Thick Client Installation](docs/client_installation.md): Information for installing the Biobank
+2. [Thick Client Installation](docs/client_installation.md): Information for installing the Biobank
 client desktop application.
+
+3. [Server Maintenance Mode](docs/server_maintenance.md): Prevents users from logging in to a server
+   that is under maintenance.
+
 

@@ -68,7 +68,7 @@
            defaultValue="localhost" />
     <input message="Enter host port"
            addProperty="host.port"
-           defaultValue="8443" />
+           defaultValue="443" />
     <input message="Enter user name"
            addProperty="biobank.user.name"
            defaultValue="testuser" />
