@@ -25,12 +25,11 @@ import edu.ualberta.med.biobank.widgets.infotables.StudyContactInfoTable.ClinicC
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 /**
- * Used to display clinic and contact information. Meant to be used by
- * StudyViewForm only.
+ * Used to display clinic and contact information. Meant to be used by StudyViewForm only.
  */
 public class StudyContactInfoTable extends InfoTableWidget<ClinicContacts> {
-    public static final I18n i18n = I18nFactory
-        .getI18n(StudyContactInfoTable.class);
+
+    public static final I18n i18n = I18nFactory.getI18n(StudyContactInfoTable.class);
 
     protected static class TableRowData {
         ClinicContacts clinic;
@@ -44,10 +43,8 @@ public class StudyContactInfoTable extends InfoTableWidget<ClinicContacts> {
         public String toString() {
             return StringUtils.join(new String[] {
                 clinicNameShort,
-                (patientCount != null) ? patientCount.toString()
-                    : StringUtil.EMPTY_STRING,
-                (ceventCount != null) ? ceventCount.toString()
-                    : StringUtil.EMPTY_STRING,
+                (patientCount != null) ? patientCount.toString() : StringUtil.EMPTY_STRING,
+                (ceventCount != null) ? ceventCount.toString() : StringUtil.EMPTY_STRING,
                 contactNames }, "\t");
         }
     }
@@ -107,8 +104,7 @@ public class StudyContactInfoTable extends InfoTableWidget<ClinicContacts> {
     }
 
     public void setCollectionByStudy(StudyWrapper study) {
-        super.setList(new ArrayList<ClinicContacts>(processClinics(study
-            .getContactCollection(true))));
+        super.setList(new ArrayList<ClinicContacts>(processClinics(study.getContactCollection(true))));
     }
 
     private Collection<ClinicContacts> processClinics(
@@ -173,18 +169,15 @@ public class StudyContactInfoTable extends InfoTableWidget<ClinicContacts> {
         ClinicContacts cc = (ClinicContacts) o;
         info.clinic = cc;
         info.clinicNameShort = info.clinic.getClinic().getNameShort();
-        info.patientCount =
-            info.clinic.getClinic().getPatientCountForStudy(study);
-        info.ceventCount =
-            info.clinic.getClinic().getCollectionEventCountForStudy(study);
+        info.patientCount = info.clinic.getClinic().getPatientCountForStudy(study);
+        info.ceventCount = info.clinic.getClinic().getCollectionEventCountForStudy(study);
         info.contactNames = cc.getFormattedContacts();
         return info;
     }
 
     @Override
     protected String getCollectionModelObjectToString(Object o) {
-        if (o == null)
-            return null;
+        if (o == null) return null;
         return ((TableRowData) o).toString();
     }
 

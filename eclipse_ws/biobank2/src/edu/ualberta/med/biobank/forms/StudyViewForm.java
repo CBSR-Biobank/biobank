@@ -84,11 +84,10 @@ public class StudyViewForm extends BiobankViewForm {
     @SuppressWarnings("nls")
     @Override
     public void init() throws Exception {
-        Assert
-            .isTrue(
-                (adapter instanceof StudyAdapter || adapter instanceof StudyWithPatientAdapter),
-                "Invalid editor input: object of type {0}"
-                    + adapter.getClass().getName());
+        Assert.isTrue(
+            (adapter instanceof StudyAdapter || adapter instanceof StudyWithPatientAdapter),
+            "Invalid editor input: object of type {0}"
+                + adapter.getClass().getName());
 
         updateStudyInfo();
         setPartName(i18n.tr("Study {0}", study.getNameShort()));
@@ -96,9 +95,7 @@ public class StudyViewForm extends BiobankViewForm {
     }
 
     private void updateStudyInfo() throws Exception {
-        studyInfo =
-            SessionManager.getAppService().doAction(
-                new StudyGetInfoAction(adapter.getId()));
+        studyInfo = SessionManager.getAppService().doAction(new StudyGetInfoAction(adapter.getId()));
         Study s = studyInfo.getStudy();
         Set<AliquotedSpecimen> as = studyInfo.getAliquotedSpcs();
         Set<SourceSpecimen> ss = studyInfo.getSourceSpecimens();
@@ -157,39 +154,26 @@ public class StudyViewForm extends BiobankViewForm {
 
     private void createClinicSection() {
         @SuppressWarnings("nls")
-        Composite client =
-            createSectionWithClient(i18n.tr("Clinic Information"));
+        Composite client = createSectionWithClient(i18n.tr("Clinic Information"));
 
         contactsTable = new StudyContactInfoTable(client, study);
-        contactsTable
-            .addClickListener(new IInfoTableDoubleClickItemListener<ClinicContacts>() {
+        contactsTable.addClickListener(new IInfoTableDoubleClickItemListener<ClinicContacts>() {
 
-                @Override
-                public void doubleClick(InfoTableEvent<ClinicContacts> event) {
-                    ClinicWrapper c =
-                        ((ClinicContacts) ((InfoTableSelection) event
-                            .getSelection()).getObject()).getClinic();
-                    AdapterBase.openForm(
-                        new FormInput(
-                            new ClinicAdapter(null,
-                                c)),
-                        ClinicViewForm.ID);
-                }
-            });
-        contactsTable
-            .addEditItemListener(new IInfoTableEditItemListener<ClinicContacts>() {
-                @Override
-                public void editItem(InfoTableEvent<ClinicContacts> event) {
-                    ClinicWrapper c =
-                        ((ClinicContacts) ((InfoTableSelection) event
-                            .getSelection()).getObject()).getClinic();
-                    AdapterBase.openForm(
-                        new FormInput(
-                            new ClinicAdapter(null,
-                                c)),
-                        ClinicEntryForm.ID);
-                }
-            });
+            @Override
+            public void doubleClick(InfoTableEvent<ClinicContacts> event) {
+                ClinicWrapper c = ((ClinicContacts) ((InfoTableSelection) event.getSelection())
+                    .getObject()).getClinic();
+                AdapterBase.openForm(new FormInput(new ClinicAdapter(null, c)), ClinicViewForm.ID);
+            }
+        });
+        contactsTable.addEditItemListener(new IInfoTableEditItemListener<ClinicContacts>() {
+            @Override
+            public void editItem(InfoTableEvent<ClinicContacts> event) {
+                ClinicWrapper c = ((ClinicContacts) ((InfoTableSelection) event
+                    .getSelection()).getObject()).getClinic();
+                AdapterBase.openForm(new FormInput(new ClinicAdapter(null, c)), ClinicEntryForm.ID);
+            }
+        });
         contactsTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(contactsTable);
     }

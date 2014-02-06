@@ -75,10 +75,8 @@ public class StudyGetInfoAction implements Action<StudyInfo> {
         studyInfo.collectionEventCount = (Long) items[2];
         studyInfo.clinicInfos = getClinicInfo.run(context).getList();
         studyInfo.sourceSpcs = getSourceSpecimens.run(context).getSet();
-        studyInfo.aliquotedSpcs =
-            getAliquotedSpecimens.run(context).getSet();
-        studyInfo.studyEventAttrs =
-            getStudyEventAttrs.run(context).getSet();
+        studyInfo.aliquotedSpcs = getAliquotedSpecimens.run(context).getSet();
+        studyInfo.studyEventAttrs = getStudyEventAttrs.run(context).getSet();
 
         return studyInfo;
     }

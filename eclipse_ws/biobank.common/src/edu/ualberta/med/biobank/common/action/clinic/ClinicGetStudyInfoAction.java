@@ -18,9 +18,10 @@ import edu.ualberta.med.biobank.common.action.info.StudyCountInfo;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Study;
 
-public class ClinicGetStudyInfoAction implements
-    Action<ListResult<StudyCountInfo>> {
+public class ClinicGetStudyInfoAction implements Action<ListResult<StudyCountInfo>> {
     private static final long serialVersionUID = 1L;
+
+    // private static Logger log = LoggerFactory.getLogger(ClinicGetStudyInfoAction.class);
 
     @SuppressWarnings("nls")
     private static final String STUDY_INFO_HQL =
@@ -50,10 +51,17 @@ public class ClinicGetStudyInfoAction implements
         return true;
     }
 
+    /**
+     * Clinics can be associated by either:
+     * <ul>
+     * <li>shipments that contain patients from a study</li>
+     * <li>clinic contact to a study</li>
+     * </ul>
+     * Both are valid.
+     */
     @SuppressWarnings({ "unchecked", "nls" })
     @Override
-    public ListResult<StudyCountInfo> run(ActionContext context)
-        throws ActionException {
+    public ListResult<StudyCountInfo> run(ActionContext context) throws ActionException {
         List<Study> studies = context.getSession().createCriteria(Study.class, "study")
             .createAlias("study.contacts", "contacts")
             .createAlias("contacts.clinic", "clinic")
@@ -76,9 +84,6 @@ public class ClinicGetStudyInfoAction implements
             if (row[1] == null) continue;
 
             Study study = (Study) row[1];
-            if (!studiesForClinic.contains(study)) {
-                throw new IllegalStateException("study not associated with clinic");
-            }
             countInfoById.put(study, new StudyCountInfo(study, (Long) row[2], (Long) row[3]));
         }
 
