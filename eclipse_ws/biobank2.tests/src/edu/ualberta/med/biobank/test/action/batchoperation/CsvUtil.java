@@ -20,12 +20,15 @@ import edu.ualberta.med.biobank.model.Specimen;
  */
 public class CsvUtil {
 
+    public static void showErrorsInLog(Logger log, IllegalStateException e) {
+        log.error("ERROR: {}", e.getMessage());
+    }
+
     public static void showErrorsInLog(Logger log, BatchOpErrorsException e) {
         for (BatchOpException<LString> ie : e.getErrors()) {
             log.error("ERROR: line no {}: {}", ie.getLineNumber(),
                 ie.getMessage());
         }
-
     }
 
     public static void deleteSpecimen(Session session, Specimen parent) {

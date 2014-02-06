@@ -62,24 +62,20 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
         bundle.tr("specimen already exists").format();
 
     public static final Tr CSV_CEVENT_ERROR =
-        bundle.tr("collection event for patient {0} with "
-            + "visit number \"{1}\" does not exist");
+        bundle.tr("collection event for patient {0} with visit number \"{1}\" does not exist");
 
     private static final LString CSV_PARENT_SPC_ERROR =
-        bundle.tr("specimen declared a source specimen but parent " +
-            "inventory ID present").format();
+        bundle.tr("specimen declared a source specimen but parent inventory ID present").format();
 
     public static final Tr CSV_PARENT_SPC_INV_ID_ERROR =
         bundle.tr("parent inventory id does not exist: {0}");
 
     private static final LString CSV_ALIQ_SPC_PATIENT_CEVENT_MISSING_ERROR =
         bundle.tr("when parent inventory id is not specified, "
-            + "patient number, and visit number are required")
-            .format();
+            + "patient number, and visit number are required").format();
 
     private static final LString CSV_PALLET_POS_ERROR =
-        bundle.tr("pallet position defined but not product barcode or label")
-            .format();
+        bundle.tr("pallet position defined but not product barcode or label").format();
 
     private static final LString CSV_PROD_BARCODE_NO_POS_ERROR =
         bundle.tr("pallet product barcode defined but not position").format();
@@ -274,7 +270,11 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
 
         log.debug("SpecimenBatchOpAction: getting DB info");
         for (SpecimenBatchOpInputPojo pojo : pojos) {
-            pojoMap.put(pojo.getInventoryId(), pojo);
+            String inventoryId = pojo.getInventoryId();
+            if (pojoMap.containsKey(inventoryId)) {
+                throw new IllegalStateException("inventory ID found more than once: " + inventoryId);
+            }
+            pojoMap.put(inventoryId, pojo);
         }
 
         for (SpecimenBatchOpInputPojo pojo : pojos) {

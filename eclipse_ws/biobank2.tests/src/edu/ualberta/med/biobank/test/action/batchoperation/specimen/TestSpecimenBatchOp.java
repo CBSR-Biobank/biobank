@@ -786,12 +786,10 @@ public class TestSpecimenBatchOp extends TestAction {
             SpecimenBatchOpAction importAction = new SpecimenBatchOpAction(
                 factory.getDefaultSite(), csvInfos, new File(CSV_NAME));
             exec(importAction);
-        } catch (BatchOpErrorsException e) {
+            Assert.fail("CSV file contains duplicate inventory IDs, test should fail");
+        } catch (IllegalStateException e) {
             CsvUtil.showErrorsInLog(log, e);
-            Assert.fail("errors in CVS data: " + e.getMessage());
         }
-
-        checkCsvInfoAgainstDb(csvInfos);
     }
 
     private void checkCsvInfoAgainstDb(Set<SpecimenBatchOpInputPojo> csvInfos) {
