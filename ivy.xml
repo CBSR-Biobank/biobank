@@ -107,6 +107,7 @@
     <dependency org="org.slf4j" name="slf4j-api" rev="1.6.4" conf="biobank.webapp->default" />
     <dependency org="org.slf4j" name="slf4j-log4j12" rev="1.6.4" conf="biobank.webapp->default" />
     <dependency org="org.jdom" name="jdom" rev="1.1" conf="biobank.webapp->default" />
+    <dependency org="commons-lang" name="commons-lang" rev="2.4" conf="biobank.webapp->default" />
 
 
     <!-- for biobank.common.client -->

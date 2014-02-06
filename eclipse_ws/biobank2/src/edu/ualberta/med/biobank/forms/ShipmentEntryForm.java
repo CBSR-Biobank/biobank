@@ -519,27 +519,27 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             addedSpecimenIds.add(info.specimen.getId());
         }
         Set<Integer> removedSpecimenIds = new HashSet<Integer>();
-        for (SpecimenInfo info : specimenEntryWidget
-            .getRemovedSpecimens()) {
+        for (SpecimenInfo info : specimenEntryWidget.getRemovedSpecimens()) {
             removedSpecimenIds.add(info.specimen.getId());
         }
 
-        OriginInfoSaveInfo oiInfo =
-            new OriginInfoSaveInfo(originInfo.getId(), originInfo
-                .getReceiverCenter().getId(), originInfo.getCenter().getId(),
-                comment.getMessage() == null ? StringUtil.EMPTY_STRING
-                    : comment.getMessage(), addedSpecimenIds,
-                removedSpecimenIds);
-        ShipmentInfoSaveInfo siInfo =
-            new ShipmentInfoSaveInfo(shipmentInfo.getId(),
-                shipmentInfo.getBoxNumber(), originInfo
-                    .getShipmentInfo()
-                    .getPackedAt(),
-                shipmentInfo.getReceivedAt(), originInfo
-                    .getShipmentInfo().getWaybill(),
-                shipmentInfo.getShippingMethod().getId());
-        OriginInfoSaveAction save =
-            new OriginInfoSaveAction(oiInfo, siInfo);
+        OriginInfoSaveInfo oiInfo = new OriginInfoSaveInfo(
+            originInfo.getId(),
+            originInfo.getReceiverCenter().getId(),
+            originInfo.getCenter().getId(),
+            comment.getMessage() == null ? StringUtil.EMPTY_STRING : comment.getMessage(),
+            addedSpecimenIds,
+            removedSpecimenIds);
+
+        ShipmentInfoSaveInfo siInfo = new ShipmentInfoSaveInfo(
+            shipmentInfo.getId(),
+            shipmentInfo.getBoxNumber(),
+            originInfo.getShipmentInfo().getPackedAt(),
+            shipmentInfo.getReceivedAt(),
+            originInfo.getShipmentInfo().getWaybill(),
+            shipmentInfo.getShippingMethod().getId());
+
+        OriginInfoSaveAction save = new OriginInfoSaveAction(oiInfo, siInfo);
         originInfo.setId(SessionManager.getAppService().doAction(save).getId());
         ((AdapterBase) adapter).setModelObject(originInfo);
     }

@@ -64,6 +64,7 @@
     <include name="sdk-writable-core.jar" />
     <include name="spiffy-all.jar" />
     <include name="supercsv.jar" />
+    <include name="commons-lang.jar" />
   </fileset>
 
   <fileset id="biobank.common.client.build.classpath" dir="${eclipse.proj.dir.common}/lib/client">

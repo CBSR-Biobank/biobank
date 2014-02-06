@@ -14,9 +14,14 @@ public class OriginInfoSaveInfo implements ActionResult {
     public Set<Integer> removedSpecIds;
     public String comment;
 
-    public OriginInfoSaveInfo(Integer oiId, Integer siteId, Integer centerId,
-        String comment, Set<Integer> addedSpecimenIds,
+    public OriginInfoSaveInfo(
+        Integer oiId,
+        Integer siteId,
+        Integer centerId,
+        String comment,
+        Set<Integer> addedSpecimenIds,
         Set<Integer> removedSpecimenIds) {
+
         this.oiId = oiId;
         this.siteId = siteId;
         this.centerId = centerId;

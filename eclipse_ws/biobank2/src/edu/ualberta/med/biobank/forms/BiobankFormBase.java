@@ -38,6 +38,7 @@ import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.forms.BgcFormBase;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcWidgetCreator;
+import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankServerException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
@@ -217,20 +218,19 @@ public abstract class BiobankFormBase extends BgcFormBase {
             BgcPlugin.openAccessDeniedErrorMessage(ex);
             cancelSave(monitor);
         } else if (ex instanceof BiobankException) {
-            BgcPlugin.openAsyncError(SAVE_ERROR,
-                ex);
+            BgcPlugin.openAsyncError(SAVE_ERROR, ex);
+            cancelSave(monitor);
+        } else if (ex instanceof LocalizedException) {
+            BgcPlugin.openAsyncError(SAVE_ERROR, ex.getLocalizedMessage());
             cancelSave(monitor);
         } else if (ex instanceof BiobankServerException) {
-            BgcPlugin.openAsyncError(SAVE_ERROR,
-                ex);
+            BgcPlugin.openAsyncError(SAVE_ERROR, ex);
             cancelSave(monitor);
         } else if (ex instanceof BiobankSessionException) {
-            BgcPlugin.openAsyncError(SAVE_ERROR,
-                ex);
+            BgcPlugin.openAsyncError(SAVE_ERROR, ex);
             cancelSave(monitor);
         } else if (ex instanceof ActionException) {
-            BgcPlugin.openAsyncError(SAVE_ERROR,
-                ex);
+            BgcPlugin.openAsyncError(SAVE_ERROR, ex);
             cancelSave(monitor);
         } else if (ex instanceof ApplicationException) {
             if (ex.getCause() instanceof ConstraintViolationException) {

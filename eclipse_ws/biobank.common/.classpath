@@ -13,7 +13,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/client/commons-codec.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/commons-collections.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/commons-discovery.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/client/commons-lang.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/client/commons-lang.jar" sourcepath="lib/client/commons-lang-source.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/commons-logging.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/dom4j.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/ehcache.jar"/>

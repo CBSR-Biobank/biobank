@@ -84,6 +84,9 @@ public class ClinicGetStudyInfoAction implements Action<ListResult<StudyCountInf
             if (row[1] == null) continue;
 
             Study study = (Study) row[1];
+            if (!studiesForClinic.contains(study)) {
+                throw new IllegalStateException("study not associated with clinic");
+            }
             countInfoById.put(study, new StudyCountInfo(study, (Long) row[2], (Long) row[3]));
         }
 

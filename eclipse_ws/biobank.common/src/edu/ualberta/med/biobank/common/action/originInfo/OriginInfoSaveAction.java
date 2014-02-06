@@ -4,6 +4,8 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
+
 import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
@@ -15,73 +17,123 @@ import edu.ualberta.med.biobank.common.permission.shipment.OriginInfoUpdatePermi
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.LocalizedException;
+import edu.ualberta.med.biobank.i18n.Trnc;
 import edu.ualberta.med.biobank.model.Center;
+import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Comment;
+import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.ShipmentInfo;
 import edu.ualberta.med.biobank.model.ShippingMethod;
 import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.Study;
 
 /**
- * Used to save a shipment from a clinic that does not have access to the
- * Biobank software.
+ * Used to save a shipment from a clinic that does not have access to the Biobank software.
  * 
- * @author unknown
+ * @author Aaron Young
  * 
  */
 public class OriginInfoSaveAction implements Action<IdResult> {
     private static final long serialVersionUID = 1L;
+
     private static final Bundle bundle = new CommonBundle();
+
+    @SuppressWarnings("nls")
+    public static final Trnc INVALID_STUDY_ERRMSG =
+        bundle.trnc(
+            "error",
+            "This centre is not allowed to collect specimens from study: {0}",
+            "This centre is not allowed to collect specimens from studies: {0}");
 
     @SuppressWarnings("nls")
     public static final LString NULL_SPECIMEN_ID_ERRMSG =
         bundle.tr("Specimen id can not be null").format();
 
-    private final OriginInfoSaveInfo oiInfo;
-    private final ShipmentInfoSaveInfo siInfo;
+    private final OriginInfoSaveInfo originSaveInfo;
 
-    public OriginInfoSaveAction(OriginInfoSaveInfo oiInfo,
-        ShipmentInfoSaveInfo siInfo) {
-        this.oiInfo = oiInfo;
-        this.siInfo = siInfo;
+    private final ShipmentInfoSaveInfo shipmentSaveInfo;
+
+    public OriginInfoSaveAction(
+        OriginInfoSaveInfo originSaveInfo,
+        ShipmentInfoSaveInfo shipmentSaveInfo) {
+
+        this.originSaveInfo = originSaveInfo;
+        this.shipmentSaveInfo = shipmentSaveInfo;
     }
 
+    @SuppressWarnings("nls")
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return new OriginInfoUpdatePermission(oiInfo.siteId)
-            .isAllowed(context);
+        boolean allowed = new OriginInfoUpdatePermission(originSaveInfo.siteId).isAllowed(context);
+        if (!allowed) return false;
+
+        Clinic clinic = context.get(Clinic.class, originSaveInfo.centerId);
+        if (clinic != null) {
+            Set<Study> clinicStudies = new HashSet<Study>();
+
+            for (Contact contact : clinic.getContacts()) {
+                clinicStudies.addAll(contact.getStudies());
+            }
+
+            // get studies the added specimens come from
+            Set<Study> specimenStudies = new HashSet<Study>();
+
+            for (Integer specimenId : originSaveInfo.addedSpecIds) {
+                Specimen specimen = context.get(Specimen.class, specimenId);
+                specimenStudies.add(specimen.getCollectionEvent().getPatient().getStudy());
+            }
+
+            if (!clinicStudies.containsAll(specimenStudies)) {
+                Set<String> studyNames = new HashSet<String>();
+                for (Study study : specimenStudies) {
+                    if (!clinicStudies.contains(study)) {
+                        studyNames.add(study.getNameShort());
+                    }
+                }
+
+                LString msg;
+                String nameList = StringUtils.join(studyNames, ", ");
+                if (studyNames.size() == 1) {
+                    msg = INVALID_STUDY_ERRMSG.singular(nameList);
+                } else {
+                    msg = INVALID_STUDY_ERRMSG.plural(nameList);
+                }
+                throw new LocalizedException(msg);
+            }
+        }
+
+        return allowed;
     }
 
     @SuppressWarnings("nls")
     @Override
     public IdResult run(ActionContext context) throws ActionException {
-        OriginInfo oi =
-            context.get(OriginInfo.class, oiInfo.oiId, new OriginInfo());
+        OriginInfo oi = context.get(OriginInfo.class, originSaveInfo.oiId, new OriginInfo());
 
-        oi.setReceiverCenter(context.get(Center.class, oiInfo.siteId));
-        oi.setCenter(context.get(Center.class, oiInfo.centerId));
+        oi.setReceiverCenter(context.get(Center.class, originSaveInfo.siteId));
+        oi.setCenter(context.get(Center.class, originSaveInfo.centerId));
 
-        ShipmentInfo si =
-            context
-                .get(ShipmentInfo.class, siInfo.siId, new ShipmentInfo());
-        si.setBoxNumber(siInfo.boxNumber);
-        si.setPackedAt(siInfo.packedAt);
-        si.setReceivedAt(siInfo.receivedAt);
-        si.setWaybill(siInfo.waybill);
+        ShipmentInfo si = context.get(ShipmentInfo.class, shipmentSaveInfo.siId, new ShipmentInfo());
+        si.setBoxNumber(shipmentSaveInfo.boxNumber);
+        si.setPackedAt(shipmentSaveInfo.packedAt);
+        si.setReceivedAt(shipmentSaveInfo.receivedAt);
+        si.setWaybill(shipmentSaveInfo.waybill);
 
-        ShippingMethod sm = context.load(ShippingMethod.class,
-            siInfo.shippingMethodId);
+        ShippingMethod sm = context.load(ShippingMethod.class, shipmentSaveInfo.shippingMethodId);
 
         si.setShippingMethod(sm);
 
         // This stuff could be extracted to a util method. need to think about
         // how
-        if ((oiInfo.comment != null) && !oiInfo.comment.trim().equals("")) {
+        if ((originSaveInfo.comment != null) && !originSaveInfo.comment.trim().equals("")) {
             Set<Comment> comments = oi.getComments();
-            if (comments == null) comments = new HashSet<Comment>();
+            if (comments == null) {
+                comments = new HashSet<Comment>();
+            }
             Comment newComment = new Comment();
             newComment.setCreatedAt(new Date());
-            newComment.setMessage(oiInfo.comment);
+            newComment.setMessage(originSaveInfo.comment);
             newComment.setUser(context.getUser());
             context.getSession().saveOrUpdate(newComment);
 
@@ -94,13 +146,13 @@ public class OriginInfoSaveAction implements Action<IdResult> {
         context.getSession().saveOrUpdate(oi);
         context.getSession().flush();
 
-        if (oiInfo.removedSpecIds != null)
-            for (Integer specId : oiInfo.removedSpecIds) {
-                if (specId == null)
+        if (originSaveInfo.removedSpecIds != null) {
+            for (Integer specId : originSaveInfo.removedSpecIds) {
+                if (specId == null) {
                     throw new LocalizedException(NULL_SPECIMEN_ID_ERRMSG);
-                Specimen spec =
-                    context.load(Specimen.class, specId);
-                Center center = context.load(Center.class, oiInfo.siteId);
+                }
+                Specimen spec = context.load(Specimen.class, specId);
+                Center center = context.load(Center.class, originSaveInfo.siteId);
                 OriginInfo newOriginInfo = new OriginInfo();
                 newOriginInfo.setCenter(center);
                 spec.setOriginInfo(newOriginInfo);
@@ -108,16 +160,19 @@ public class OriginInfoSaveAction implements Action<IdResult> {
                 context.getSession().saveOrUpdate(newOriginInfo);
                 context.getSession().saveOrUpdate(spec);
             }
-        if (oiInfo.addedSpecIds != null)
-            for (Integer specId : oiInfo.addedSpecIds) {
-                if (specId == null)
+        }
+
+        if (originSaveInfo.addedSpecIds != null) {
+            for (Integer specId : originSaveInfo.addedSpecIds) {
+                if (specId == null) {
                     throw new LocalizedException(NULL_SPECIMEN_ID_ERRMSG);
-                Specimen spec =
-                    context.load(Specimen.class, specId);
+                }
+                Specimen spec = context.load(Specimen.class, specId);
                 spec.setOriginInfo(oi);
                 spec.setCurrentCenter(oi.getReceiverCenter());
                 context.getSession().saveOrUpdate(spec);
             }
+        }
 
         return new IdResult(oi.getId());
     }
