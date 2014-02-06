@@ -297,8 +297,7 @@ public class TestSpecimenBatchOp extends TestAction {
 
         // create a new specimen type for the aliquoted specimens
         factory.createSpecimenType();
-        Set<AliquotedSpecimen> aliquotedSpecimens =
-            new HashSet<AliquotedSpecimen>();
+        Set<AliquotedSpecimen> aliquotedSpecimens = new HashSet<AliquotedSpecimen>();
         aliquotedSpecimens.add(factory.createAliquotedSpecimen());
         aliquotedSpecimens.add(factory.createAliquotedSpecimen());
         aliquotedSpecimens.add(factory.createAliquotedSpecimen());
@@ -645,8 +644,7 @@ public class TestSpecimenBatchOp extends TestAction {
     }
 
     @Test
-    public void withExistingPevents() throws IOException,
-        NoSuchAlgorithmException {
+    public void withExistingPevents() throws IOException, NoSuchAlgorithmException {
         Set<Patient> patients = new HashSet<Patient>();
         Set<Specimen> parentSpecimens = new HashSet<Specimen>();
         Map<String, ProcessingEvent> peventMap = new HashMap<String, ProcessingEvent>();
@@ -702,8 +700,7 @@ public class TestSpecimenBatchOp extends TestAction {
     }
 
     @Test
-    public void aliquotsWithNoParentSpc() throws IOException,
-        NoSuchAlgorithmException {
+    public void aliquotsWithNoParentSpc() throws IOException, NoSuchAlgorithmException {
         Set<Patient> patients = new HashSet<Patient>();
 
         for (int i = 0; i < 3; i++) {
@@ -738,10 +735,68 @@ public class TestSpecimenBatchOp extends TestAction {
         checkCsvInfoAgainstDb(csvInfos);
     }
 
+    // This test should fail since a single aliquot cannot have to parent specimens
+    @Test
+    public void aliquotWithTwoParentSpc() throws IOException, NoSuchAlgorithmException {
+        Set<Patient> patients = new HashSet<Patient>();
+        Set<AliquotedSpecimen> aliquotedSpecimens = new HashSet<AliquotedSpecimen>();
+
+        Patient patient = factory.createPatient();
+        patients.add(patient);
+        factory.createSourceSpecimen();
+        aliquotedSpecimens.add(factory.createAliquotedSpecimen());
+        factory.createCollectionEvent();
+
+        // create a new specimen type for the aliquoted specimens
+        factory.createSpecimenType();
+        session.getTransaction().commit();
+
+        Set<SpecimenBatchOpInputPojo> parentSpecimenPojos = specimenCsvHelper.sourceSpecimensCreate(
+            originInfos, patients, factory.getDefaultStudy().getSourceSpecimens());
+
+        Assert.assertTrue(parentSpecimenPojos.size() > 2);
+
+        Set<SpecimenBatchOpInputPojo> childSpecimenPojos =
+            specimenCsvHelper.aliquotedSpecimensCreate(patients, aliquotedSpecimens);
+
+        Set<SpecimenBatchOpInputPojo> csvInfos = new HashSet<SpecimenBatchOpInputPojo>();
+        csvInfos.addAll(parentSpecimenPojos);
+
+        // modify the aliquot to point to the first parent specimen
+        List<SpecimenBatchOpInputPojo> parentSpecimenPojosList =
+            new ArrayList<SpecimenBatchOpInputPojo>(parentSpecimenPojos);
+
+        SpecimenBatchOpInputPojo childSpecimenPojo = childSpecimenPojos.iterator().next();
+        childSpecimenPojo.setParentInventoryId(parentSpecimenPojosList.get(0).getInventoryId());
+        csvInfos.addAll(childSpecimenPojos);
+
+        SpecimenBatchOpInputPojo newChildSpecimenPojo = new SpecimenBatchOpInputPojo();
+        newChildSpecimenPojo.setInventoryId(childSpecimenPojo.getInventoryId());
+        newChildSpecimenPojo.setParentInventoryId(childSpecimenPojo.getParentInventoryId());
+        newChildSpecimenPojo.setSpecimenType(childSpecimenPojo.getSpecimenType());
+        newChildSpecimenPojo.setCreatedAt(childSpecimenPojo.getCreatedAt());
+        newChildSpecimenPojo.setPatientNumber(childSpecimenPojo.getPatientNumber());
+        newChildSpecimenPojo.setVisitNumber(childSpecimenPojo.getVisitNumber());
+        newChildSpecimenPojo.setSourceSpecimen(false);
+        csvInfos.add(newChildSpecimenPojo);
+
+        SpecimenBatchOpCsvWriter.write(CSV_NAME, csvInfos);
+
+        try {
+            SpecimenBatchOpAction importAction = new SpecimenBatchOpAction(
+                factory.getDefaultSite(), csvInfos, new File(CSV_NAME));
+            exec(importAction);
+        } catch (BatchOpErrorsException e) {
+            CsvUtil.showErrorsInLog(log, e);
+            Assert.fail("errors in CVS data: " + e.getMessage());
+        }
+
+        checkCsvInfoAgainstDb(csvInfos);
+    }
+
     private void checkCsvInfoAgainstDb(Set<SpecimenBatchOpInputPojo> csvInfos) {
         for (SpecimenBatchOpInputPojo csvInfo : csvInfos) {
-            log.trace("checking specimen against db: inventory id {}",
-                csvInfo.getInventoryId());
+            log.trace("checking specimen against db: inventory id {}", csvInfo.getInventoryId());
 
             Specimen specimen = (Specimen) session.createCriteria(Specimen.class)
                 .add(Restrictions.eq("inventoryId", csvInfo.getInventoryId())).uniqueResult();

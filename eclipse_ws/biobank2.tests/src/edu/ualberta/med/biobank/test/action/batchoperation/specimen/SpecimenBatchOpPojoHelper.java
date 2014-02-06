@@ -61,11 +61,10 @@ class SpecimenBatchOpPojoHelper {
                 "study does not have any source specimens");
         }
 
-        Set<SpecimenBatchOpInputPojo> specimenInfos =
-            sourceSpecimensCreate(originInfos, patients, study.getSourceSpecimens());
+        Set<SpecimenBatchOpInputPojo> specimenInfos = sourceSpecimensCreate(
+            originInfos, patients, study.getSourceSpecimens());
 
-        Map<String, String> parentSpecimenInfoMap =
-            new HashMap<String, String>();
+        Map<String, String> parentSpecimenInfoMap = new HashMap<String, String>();
         for (SpecimenBatchOpInputPojo specimenInfo : specimenInfos) {
             parentSpecimenInfoMap.put(specimenInfo.getInventoryId(),
                 specimenInfo.getPatientNumber());

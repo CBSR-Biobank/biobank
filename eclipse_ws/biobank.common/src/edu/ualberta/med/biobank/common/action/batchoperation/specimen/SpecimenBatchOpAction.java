@@ -126,9 +126,12 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
 
     private final BatchOpInputErrorSet errorSet = new BatchOpInputErrorSet();
 
-    public SpecimenBatchOpAction(Center workingCenter,
-        Set<SpecimenBatchOpInputPojo> batchOpSpecimens, File inputFile)
+    public SpecimenBatchOpAction(
+        Center workingCenter,
+        Set<SpecimenBatchOpInputPojo> batchOpSpecimens,
+        File inputFile)
         throws NoSuchAlgorithmException, IOException {
+
         if (batchOpSpecimens.isEmpty()) {
             throw new IllegalArgumentException("pojo list is empty");
         }
@@ -388,8 +391,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
             }
         }
 
-        // check if only position defined and no label and no product
-        // barcode
+        // check if only position defined and no label and no product barcode
         if ((pojo.getPalletProductBarcode() == null)
             && (pojo.getPalletLabel() == null)
             && (pojo.getPalletPosition() != null)) {
