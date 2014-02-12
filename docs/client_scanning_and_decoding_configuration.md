@@ -161,7 +161,7 @@ processing specimens. In the sample configuration described above, plate 1 was g
 configurations during specimen processing.
 
 To test if your configuration yields valid decoded tubes, use **Scanning and Decoding -> Decode
-Plate** from the main menu.
+Image** from the main menu.
 
 
 [Back to top](../README.md)

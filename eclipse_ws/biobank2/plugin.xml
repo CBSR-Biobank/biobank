@@ -195,8 +195,8 @@
             name="%Print.command">
       </command>
       <command
-            id="edu.ualberta.med.biobank.commands.scanner.decodePlate"
-            name="%DecodePlate.command">
+            id="edu.ualberta.med.biobank.commands.scanner.decodeImage"
+            name="%DecodeImage.command">
       </command>
       <command
             categoryId="org.eclipse.ui.category.window"
@@ -623,7 +623,7 @@
       </handler>
       <handler
             class="edu.ualberta.med.biobank.handlers.DecodeImageHandler"
-            commandId="edu.ualberta.med.biobank.commands.scanner.decodePlate">
+            commandId="edu.ualberta.med.biobank.commands.scanner.decodeImage">
       </handler>
       <handler
             class="edu.ualberta.med.biobank.handlers.EditHandler"
@@ -1050,8 +1050,8 @@
                id="edu.ualberta.med.biobank.menu.scanning.decoding"
                label="%ScanningDecoding.menu">
             <command
-                  commandId="edu.ualberta.med.biobank.commands.scanner.decodePlate"
-                  id="edu.ualberta.med.biobank.menu.scanning.decoding.decodePlate"
+                  commandId="edu.ualberta.med.biobank.commands.scanner.decodeImage"
+                  id="edu.ualberta.med.biobank.menu.scanning.decoding.decodeImage"
                   style="push">
             </command>
          </menu>
