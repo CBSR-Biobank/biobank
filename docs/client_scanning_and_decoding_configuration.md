@@ -45,7 +45,7 @@ Each setting is described below:
 
 <table>
 <tr>
-<th width="30%">Setting</th>
+<th width="25%">Setting</th>
 <th>Description</th>
 </tr>
 <tr>
@@ -60,19 +60,20 @@ does not generate any output.
 <td valign="top">Edge Minimum Factor</td>
 <td>
 Pixel length of smallest expected edge in image  as a factor of the cell width or cell height
-(whichever is bigger).
+(whichever is bigger). The default values is 0.2.
 </td>
 </tr>
 <td valign="top">Edge Maximum Factor  </td>
 <td>
 Pixel length of largest expected edge in image  as a factor of the cell width or cell height
-(whichever is bigger).
+(whichever is bigger). The default values is 0.4.
 </td>
 </tr>
 <tr>
 <td valign="top">Scan Gap Factor</td>
 <td>
-The scan grid gap size as a factor of the cell width or cell height (whichever is bigger).
+The scan grid gap size as a factor of the cell width or cell height (whichever is bigger). The
+default value is 0.15.
 </td>
 </tr>
 <tr>
@@ -89,8 +90,9 @@ and recommended value is 5.
 <td valign="top">Square Deviation</td>
 <td>
 Maximum deviation (in degrees) from squareness between adjacent barcode sides. The default and
-recommended value is `N=15` and is meant for scanned images. Barcode regions found with corners
-`<(90-N)` or >`(90+N)` will be ignored by the decoder.
+recommended value is <code>N=15</code> and is meant for scanned images. Barcode regions found with
+corners <code>&lt;(90-N)</code> or <code>&gt;(90+N)</code> will be ignored by the decoder. The
+default value is 15.
 </td>
 </tr>
 <tr>
