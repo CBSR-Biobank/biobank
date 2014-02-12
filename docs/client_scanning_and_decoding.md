@@ -115,11 +115,11 @@ To define a plate position do the following after selecting a scanner as describ
 
 1. Place a pallet that contains tubes on the flatbed scanner. Ensure the top edge of the pallet is
    touching the top of the scanning region, and the right edge of the pallet is touching the right
-   margin. Ensure the 12 columns are vertical and the 8 rows are horizontal.
+   margin.
 
 1. Select the plate region you are going to define.  If it is the first select **Plate 1 Position**.
 
-1. Click on the **Enable* check box.
+1. Click on the **Enable** check box.
 
 1. Press the **Scan** button. Now wait for the scanner to scan the entire flatbed.
 
@@ -132,23 +132,30 @@ To define a plate position do the following after selecting a scanner as describ
    the mouse's wheel. After zooming in, you can drag the image by left clicking on the image
    anywhere outside the red region.
 
-1. You can adjust the size of the region using the mouse. If you move the mouse to one of the corners
-   or the midpoint of one of the edges you can resize the grid by left clicking on the mouse. The
-   whole grid can be moved by pressing the left mouse button while hovering inside the region.
+1. You can adjust the size of the region using the mouse. If the region is moved, the numbers
+   displayed for *Left*, *Top*, *Right*, and *Bottom* change. You can also enter numbers into
+   these values to change the position of the corresponding edge of the region.
 
-1. Once the grid cells are aligned with each tube press the **Apply** button.
+    If you move the mouse to one of the corners, or the midpoint of one of the edges, you can resize
+    the grid by left clicking on the mouse and moving it. The whole grid can be moved by pressing
+    the left mouse button while hovering inside the region.
+
+1. Once the region contains all the tubes press the **Apply** button. It is usually better to make
+   the region slightly larger than the edge of the tubes so as to not cut off the barcodes.
 
 1. Repeat from step 2 to define any more pallet scanning regions.
 
-1. Usually only one pallet scanning region is required for normal operation of the software.
+Usually only one pallet scanning region is required for normal operation of the software.
 
 The figure below shows an example of how **Plate 2** can be defined. Here Plate 2 is scanned in
 **Portrait** mode and is touching the top and the left margin of the of the flatbed region.
 
-You can assign a name to each plate region so that it is easier to remember it later when used in
-processing specimens.
-
 ![Defining a plate position](images/plate2_with_grid.png?raw=true "Defining another plate position")
+
+You can assign a name to each plate region so that it is easier to remember it later when used in
+processing specimens. In the sample configuration described above, plate 1 was given the name
+**8x12** and plate 2 **12x8**. By using different names it makes it easier to use different plate
+configurations during specimen processing.
 
 To test if your configuration yields valid decoded tubes, use **Scanning and Decoding -> Decode
 Plate** from the main menu.
