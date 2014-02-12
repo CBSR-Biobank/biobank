@@ -1,9 +1,10 @@
-# Client scanning and decoding preferences
+# Client scanning and decoding configuration
 
 The client has the capability of decoding [2D Data Matrix](http://en.wikipedia.org/wiki/Data_Matrix)
-barcodes on specimen tubes placed in a
-[microwell plate](http://en.wikipedia.org/wiki/Microwell_plate). Follow the instructions given below
-to configure the client to use a flatbed scanner to decode the barcodes on these types of plates.
+barcodes on located on specimen tubes. The barcodes of multiple tubes can be decoded when they
+placed in a [microwell plate](http://en.wikipedia.org/wiki/Microwell_plate). Follow the instructions
+given below to configure the client to use a flatbed scanner to decode the barcodes on these types
+of plates.
 
 ## Scanning and decoding
 

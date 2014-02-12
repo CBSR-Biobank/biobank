@@ -37,7 +37,8 @@ client desktop application.
 3. [Server Maintenance Mode](docs/server_maintenance.md): Prevents users from logging in to a server
    that is under maintenance.
 
-3. [Client decoding parameters](docs/client_scanning_and_decoding.md): How to configure the flatbed
-   scanner on the client to decode pallets containing tubes with 2D barcodes images.
+3. [Client scanning decoding configuration](docs/client_scanning_and_decoding_configuration.md): How
+   to configure the flatbed scanner on the client to decode pallets containing tubes with 2D
+   barcodes images.
 
 
