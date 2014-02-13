@@ -1,10 +1,9 @@
 # Client scanning and decoding configuration
 
-The client has the capability of decoding [2D Data Matrix](http://en.wikipedia.org/wiki/Data_Matrix)
-barcodes on located on specimen tubes. The barcodes of multiple tubes can be decoded when they
+The client has the capability to decode [2D Data Matrix](http://en.wikipedia.org/wiki/Data_Matrix)
+barcodes located on specimen tubes. The barcodes on many tubes can be decoded at once when they are
 placed in a [microwell plate](http://en.wikipedia.org/wiki/Microwell_plate). Follow the instructions
-given below to configure the client to use a flatbed scanner to decode the barcodes on these types
-of plates.
+given below to configure the client to use a flatbed scanner to decode tubes.
 
 ## Scanning and decoding
 
@@ -44,65 +43,64 @@ Decoding* item needs to be expanded). The dialog now looks similar to the one sh
 Each setting is described below:
 
 <table>
-<tr>
-<th width="25%">Setting</th>
-<th>Description</th>
+  <tr>
+    <th width="25%">Setting</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td valign="top">Library Debug Level</td>
+    <td>
+      Used to output debugging information when scanning and decoding images. Possible values are 0
+      through 9. The higher the value the more detailed the debugging information. A zero values
+      does not generate any output.
+    </td>
+  </tr>
+  <tr>
+    <td valign="top">Edge Minimum Factor</td>
+    <td>
+      Pixel length of smallest expected edge in image as a factor of the cell width or cell height
+      (whichever is bigger). The default values is 0.2.
+    </td>
+  </tr>
+  <td valign="top">Edge Maximum Factor  </td>
+  <td>
+    Pixel length of largest expected edge in image as a factor of the cell width or cell height
+    (whichever is bigger). The default values is 0.4.
+  </td>
 </tr>
 <tr>
-<td valign="top">Library Debug Level</td>
-<td>
-Used to output debugging information when scanning and decoding images. Possible values are 0
-through 9. The higher the value the more detailed the debugging information. A zero values
-does not generate any output.
-</td>
+  <td valign="top">Scan Gap Factor</td>
+  <td>
+    The scan grid gap size as a factor of the cell width or cell height (whichever is bigger). The
+    default value is 0.15.
+  </td>
 </tr>
 <tr>
-<td valign="top">Edge Minimum Factor</td>
-<td>
-Pixel length of smallest expected edge in image  as a factor of the cell width or cell height
-(whichever is bigger). The default values is 0.2.
-</td>
-</tr>
-<td valign="top">Edge Maximum Factor  </td>
-<td>
-Pixel length of largest expected edge in image  as a factor of the cell width or cell height
-(whichever is bigger). The default values is 0.4.
-</td>
+  <td valign="top">Edge Threshold</td>
+  <td>
+    Set the minimum edge threshold as a percentage of maximum.  For example, an edge between a pure
+    white and pure black pixel would have an intensity of 100. Edges with intensities below the
+    indicated threshold will be ignored by the decoding process. Lowering the threshold will
+    increase the amount of work to be done, but may be necessary for low contrast or blurry
+    images. The default and recommended value is 5.
+  </td>
 </tr>
 <tr>
-<td valign="top">Scan Gap Factor</td>
-<td>
-The scan grid gap size as a factor of the cell width or cell height (whichever is bigger). The
-default value is 0.15.
-</td>
+  <td valign="top">Square Deviation</td>
+  <td>
+    Maximum deviation (in degrees) from squareness between adjacent barcode sides. The default and
+    recommended value is <code>N=15</code> and is meant for scanned images. Barcode regions found
+    with corners <code>&lt;(90-N)</code> or <code>&gt;(90+N)</code> will be ignored by the
+    decoder. The default value is 15.
+  </td>
 </tr>
 <tr>
-<td valign="top">Edge Threshold</td>
-<td>
-Set the minimum edge threshold as a percentage of maximum.  For example, an edge between a pure
-white and pure black pixel would have an intensity of 100. Edges with intensities below the
-indicated threshold will be ignored by the decoding process. Lowering the threshold will increase
-the amount of work to be done, but may be necessary for low contrast or blurry images. The default
-and recommended value is 5.
-</td>
-</tr>
-<tr>
-<td valign="top">Square Deviation</td>
-<td>
-Maximum deviation (in degrees) from squareness between adjacent barcode sides. The default and
-recommended value is <code>N=15</code> and is meant for scanned images. Barcode regions found with
-corners <code>&lt;(90-N)</code> or <code>&gt;(90+N)</code> will be ignored by the decoder. The
-default value is 15.
-</td>
-</tr>
-<tr>
-<td valign="top">Corrections</td>
-<td>
-The number of corrections to make while decoding. The default and recommended value is 10.
-</td>
+  <td valign="top">Corrections</td>
+  <td>
+    The number of corrections to make while decoding. The default and recommended value is 10.
+  </td>
 </tr>
 </table>
-
 ## Plate position
 
 Plate positions can be configured to decode different sized well plates. For example, the first
@@ -114,13 +112,13 @@ Decoding* item needs to be expanded). The dialog now looks similar to the one sh
 ![Defining a plate](images/plate1_definition.png?raw=true "Scanning and decoding
  preferences")
 
-To define a plate position do the following after selecting a scanner as described above:
+To define a plate region do the following after selecting a scanner as described above:
 
 1. Place a pallet that contains tubes on the flatbed scanner. Ensure the top edge of the pallet is
    touching the top of the scanning region, and the right edge of the pallet is touching the right
    margin.
 
-1. Select the plate region you are going to define.  If it is the first select **Plate 1 Position**.
+1. Select the plate position you are going to define.  If it is the first select **Plate 1 Position**.
 
 1. Click on the **Enable** check box.
 
@@ -163,5 +161,57 @@ configurations during specimen processing.
 To test if your configuration yields valid decoded tubes, use **Scanning and Decoding -> Decode
 Image** from the main menu.
 
+### Keyboard and mouse actions
+
+Here is a list of keyboard keys that can be used to manipulate the image and the region.
+
+<table>
+  <tr>
+    <th width="35%">Key(s)</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td valign="top">Direction keys: up, down, left, right</td>
+    <td valign="top">
+      Moves the scan region in the corresponding direction by one pixel. Hold down to repeat.
+    </td>
+  </tr>
+</table>
+
+Here is a list of mouse actions that can be used to manipulate the image and the region.
+
+<table>
+  <tr>
+    <th width="35%">Action</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td valign="top">Left click and drag, outside region</td>
+    <td>
+      Scrolls the image.
+    </td>
+  </tr>
+  <tr>
+    <td valign="top">Left click and drag, inside region</td>
+    <td>
+      Moves the region.
+    </td>
+  </tr>
+  <tr>
+    <td valign="top">Left click on resize handle and drag</td>
+    <td>
+      Resizes the region. Note that there are eight resize handles on the region, one on each
+      corner, and one on each edge midpoint.
+    </td>
+  </tr>
+  <tr>
+    <td valign="top">Hold <code>Ctrl</code> key and move mouse wheel.</td>
+    <td>
+      Zooms into or out of the image.
+    </td>
+  </tr>
+</table>
+
+****
 
 [Back to top](../README.md)

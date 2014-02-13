@@ -233,7 +233,9 @@ public class ImageCanvas extends Canvas {
 
         mouseDragInfo = new MouseDragInfo(
             new Point2D.Double(e.x, e.y),
-            new Point2D.Double(sourceImageToCanvasTransform.getTranslateX(), sourceImageToCanvasTransform.getTranslateY()));
+            new Point2D.Double(
+                sourceImageToCanvasTransform.getTranslateX(),
+                sourceImageToCanvasTransform.getTranslateY()));
     }
 
     @SuppressWarnings("unused")
