@@ -1,16 +1,9 @@
 # Client scanning and decoding configuration
 
-The client has the capability to decode [2D Data Matrix](http://en.wikipedia.org/wiki/Data_Matrix)
-barcodes located on specimen tubes. The barcodes on many tubes can be decoded at once when they are
-placed in a [microwell plate](http://en.wikipedia.org/wiki/Microwell_plate). Follow the instructions
-given below to configure the client to use a flatbed scanner to decode tubes.
-
-## Scanning and decoding
-
 From the client main menu, select **Configuration -> Preferences** to open the *Preferences* dialog
 box. Select and expand the **Scanning and Decoding** item on the left hand side and you will see a
 dialog box similar to the one shown below.  Note that you do not have to be logged into the Biobank
-server to peform these steps.
+server to perform these steps.
 
 ![Scanning and decoding](images/prefs_scanning_and_decoding.png?raw=true "Scanning and decoding
  preferences")
@@ -25,7 +18,7 @@ sometimes the the correct type is not selected. Use the check boxes here to over
 selection if it was incorrect.  For best results, always use the
 [WIA](http://en.wikipedia.org/wiki/Windows_Image_Acquisition) driver type.
 
-The values in **Brightness** and **Constract** allow these setting to be adjusted when an image is
+The values in **Brightness** and **Contrast** allow these setting to be adjusted when an image is
 scanned. However, these parameters do not work on Hewlett-Packard scanners when using the WIA based
 driver, so these values can be left at zero.
 
@@ -104,7 +97,8 @@ Each setting is described below:
 ## Plate position
 
 Plate positions can be configured to decode different sized well plates. For example, the first
-plate can be configured to scan 96 well plates, the second for 81 well boxes, etc.
+plate can be configured to scan 96 well plates, the second for 81 well boxes, etc. Plate regions
+configure which are on the flatbed scanner will be scanned when processing specimens.
 
 Select **Plate 1 Position** from the *Preferences* dialog box (note that the *Scanning and
 Decoding* item needs to be expanded). The dialog now looks similar to the one shown below:
@@ -126,12 +120,9 @@ To define a plate region do the following after selecting a scanner as described
 
     ![Defining a plate position](images/plate1_with_grid.png?raw=true "Defining a plate position")
 
-1. Once the scan is done, you will see something similar to the figure shown above. The image shown
-   is the scanned image and superimposed is a *region* shown in red. The region in red will be
-   scanned when decoding a plate when processing specimens. Note that you can zoom into and out of
-   the image by holding the `Ctrl` key on the keyboard and at the same time scrolling up or down on
-   the mouse's wheel. After zooming in, you can drag the image by left clicking on the image
-   anywhere outside the red region.
+1. Once the scan is done, you will see something similar to the figure shown above. The figure shows
+   the scanned image after zooming in, and superimposed is a *region* shown in red. The region in
+   red will be scanned when decoding a plate during specimen processing.
 
 1. You can adjust the size of the region using the mouse. If the region is moved, the numbers
    displayed for *Left*, *Top*, *Right*, and *Bottom* change. You can also enter numbers into
@@ -139,7 +130,9 @@ To define a plate region do the following after selecting a scanner as described
 
     If you move the mouse to one of the corners, or the midpoint of one of the edges, you can resize
     the grid by left clicking on the mouse and moving it. The whole grid can be moved by pressing
-    the left mouse button while hovering inside the region.
+    the left mouse button while hovering inside the region.  See section
+    [Keyboard and mouse actions](#keboard_and_mouse) for instructions on how to manipulate the
+    region and the scanned image.
 
 1. Once the region contains all the tubes press the **Apply** button. It is usually better to make
    the region slightly larger than the edge of the tubes so as to not cut off the barcodes.
@@ -153,15 +146,15 @@ The figure below shows an example of how **Plate 2** can be defined. Here Plate 
 
 ![Defining a plate position](images/plate2_with_grid.png?raw=true "Defining another plate position")
 
-You can assign a name to each plate region so that it is easier to remember it later when used in
-processing specimens. In the sample configuration described above, plate 1 was given the name
-**8x12** and plate 2 **12x8**. By using different names it makes it easier to use different plate
-configurations during specimen processing.
+You can assign a name to each plate region so that it is easier to remember it later when processing
+specimens. In the sample configuration described above, plate 1 was given the name **8x12** and
+plate 2 **12x8**. By using different names it makes it easier to use different plate configurations
+during specimen processing.
 
 To test if your configuration yields valid decoded tubes, use **Scanning and Decoding -> Decode
 Image** from the main menu.
 
-### Keyboard and mouse actions
+### <a name="keboard_and_mouse">Keyboard and mouse actions</a>
 
 Here is a list of keyboard keys that can be used to manipulate the image and the region.
 
@@ -213,5 +206,7 @@ Here is a list of mouse actions that can be used to manipulate the image and the
 </table>
 
 ****
+
+[Back to parent document](client_scanning_and_decoding.md)
 
 [Back to top](../README.md)

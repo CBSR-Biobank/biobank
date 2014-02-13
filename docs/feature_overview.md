@@ -15,7 +15,7 @@ The top level features of the software are:
 
 These features are discussed in more details in the following Sections
 
-### COLLECTION PROTOCOLS
+### Collection Protocols
 
 Collection protocols in BioBank are referred to as *Studies* and multiple studies can be
 defined. Studies can be configured to receive biological specimens from multiple clinics. The
@@ -32,7 +32,7 @@ can add or remove the aliquots / derivatives at any time.
 The study can define the patient information to be collected on each visit. This information can be
 also updated / changed during the course of the study.
 
-### SPECIMEN PROCESSING
+### Specimen Processing
 
 Specimen processing is a two stage process that involves nurses / technicians at the collecting
 clinic and technicians at the repository site. First the nurse / technician at the collecting clinic
@@ -77,7 +77,7 @@ specimen types being stored.
 The specimen link and specimen assign features give the user the option of printing a log of what
 was done for record keeping purposes.
 
-### SPECIMEN ORDER
+### Specimen Order
 
 The specimen order web client feature allows researchers or members of a research group to request
 aliquots and / or derived specimens from their studies. All order requests can be configured to
@@ -89,7 +89,7 @@ the research group member.
 The software will allow for research groups to be defined and authorizations given to group
 members. Research groups can be associated with one or more studies.
 
-### REPOSITORY SITE CONFIGURATION
+### Repository Site Configuration
 
 In the BioBank Thick Client, the following can be configured for repository sites: studies, clinics,
 and storage. Sites can be configured to participate in a subset of the studies defined in the
@@ -97,7 +97,7 @@ system. Sites can be configured to define the subset of clinics that can send di
 them. Storage containers can be configured to be of any dimension and container hierarchies can be
 defined. Containers can also define the specimen types that they will hold.
 
-### REPORTS
+### Reports
 
 The Biobank Thick Client supports 2 types of reports: hard coded and user defined. Hard coded
 reports are some of the reports currently required by CBSR. For example, some of the reports are
@@ -105,13 +105,13 @@ patients per clinic per study, patient visits per patient per study, etc. With u
 the user can specify what he /she would like to see by selecting from the various tables in the
 database.
 
-### FUTURE DEVELOPMENT
+### Future Development
 
 A Web Client will provide functionality to researchers and administrators. Researchers will be able
 to order specimens that have been stored for them based on criteria they define. Administrators will
 be able to generate reports detailing the operation of repository sites.
 
-### BIOBANK THICK CLIENT REQUIREMENTS
+### Biobank Thick Client Requirements
 
 The client software runs on Microsoft Windows 7, Microsoft Windows XP, Mac OSX, and Linux. The
 Flatbed scanning feature is only available on Microsoft Windows 7 and Microsoft Windows XP. The
@@ -119,7 +119,7 @@ computer running the client needs a working internet connection. On Microsoft Wi
 comes bundled with it’s own version of the Java Runtime Environment and will not interfere with a
 previously installed version of Java.
 
-### BIOBANK SERVER REQUIREMENTS
+### Biobank Server Requirements
 
 A BioBank server can run on a dedicated server or on a virtual host. The server requires
 at least 2 Gigabytes of RAM and the following software must be installed:
@@ -155,10 +155,13 @@ at least 2 Gigabytes of RAM and the following software must be installed:
 If you are using BioBank in association with The Canadian BioSample Repository (CBSR) is is not
 required that you run your own BioBank server.
 
-### FURTHER INFORMATION
+### Further Information
 
 For further information you may email The Canadian BioSample Repository (CBSR) at
 <help@biosample.ca>. You may also like to visit the web site at:
 
 * [http://biosample.ca/](http://biosample.ca/)
 
+****
+
+[Back to top](../README.md)
