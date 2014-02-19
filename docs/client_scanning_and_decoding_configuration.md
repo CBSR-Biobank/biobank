@@ -94,6 +94,7 @@ Each setting is described below:
   </td>
 </tr>
 </table>
+
 ## Plate position
 
 Plate positions can be configured to decode different sized well plates. For example, the first
