@@ -245,4 +245,5 @@ Here is a list of mouse actions that can be used to manipulate the image and the
 </table>
 
 ****
+
 [Back to top](../README.md)

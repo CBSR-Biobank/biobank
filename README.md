@@ -38,6 +38,6 @@ client desktop application.
    that is under maintenance.
 
 3. [Client scanning decoding](docs/client_scanning_and_decoding.md): How to use the client to decode
-   microplate images containing tubes with 2D barcodes.
+   microwell plate images that contain tubes with 2D barcodes.
 
 
