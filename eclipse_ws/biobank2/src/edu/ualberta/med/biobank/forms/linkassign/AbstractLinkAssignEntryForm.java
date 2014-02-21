@@ -443,6 +443,9 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
             rows,
             cols);
 
+        palletWidget.setLayout(new GridLayout(1, false));
+        palletWidget.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
+
         toolkit.adapt(palletWidget);
         palletWidget.addMouseListener(new MouseAdapter() {
             @Override
