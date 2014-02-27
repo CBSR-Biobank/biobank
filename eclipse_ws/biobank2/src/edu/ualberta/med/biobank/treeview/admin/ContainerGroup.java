@@ -35,11 +35,9 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 
 public class ContainerGroup extends AdapterBase {
-    private static final I18n i18n = I18nFactory
-        .getI18n(ContainerGroup.class);
+    private static final I18n i18n = I18nFactory.getI18n(ContainerGroup.class);
 
-    private static BgcLogger log = BgcLogger.getLogger(ContainerGroup.class
-        .getName());
+    private static BgcLogger log = BgcLogger.getLogger(ContainerGroup.class.getName());
 
     private List<Container> topContainers = null;
 
@@ -158,11 +156,11 @@ public class ContainerGroup extends AdapterBase {
                     site);
             if (top.size() == 0) {
                 BgcPlugin
-                .openError(
-                    // dialog title.
-                    i18n.tr("Unable to create container"),
-                    // dialog message.
-                    i18n.tr("You must define a top-level container type before initializing storage."));
+                    .openError(
+                        // dialog title.
+                        i18n.tr("Unable to create container"),
+                        // dialog message.
+                        i18n.tr("You must define a top-level container type before initializing storage."));
             } else {
                 ContainerWrapper c = new ContainerWrapper(
                     SessionManager.getAppService());

@@ -13,6 +13,12 @@ import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.request.ReceivingRequestGroup;
 
+/**
+ * Used to display dispatches in transit state at the site the dispatch it is being sent to.
+ *
+ * @author Aaron
+ *
+ */
 public class IncomingNode extends AdapterBase {
     private static final I18n i18n = I18nFactory.getI18n(IncomingNode.class);
 
