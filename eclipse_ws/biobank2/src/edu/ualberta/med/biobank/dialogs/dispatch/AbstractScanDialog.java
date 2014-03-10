@@ -325,18 +325,17 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
 
     private PalletWidget createScanPalletWidget(Composite contents) {
         final Composite composite = new Composite(contents, SWT.NONE);
-
-        GridLayout layout = new GridLayout(1, false);
-        composite.setLayout(layout);
-
-        GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
-        composite.setLayoutData(gd);
+        composite.setLayout(new GridLayout(1, false));
+        composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         PalletWidget palletWidget = new PalletWidget(
             composite,
             getPalletCellStatus(),
             SbsLabeling.ROW_DEFAULT,
             SbsLabeling.COL_DEFAULT);
+
+        palletWidget.setLayout(new GridLayout(1, false));
+        palletWidget.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         palletWidget.addMouseListener(new MouseAdapter() {
             @Override
@@ -346,12 +345,6 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
             }
         });
         palletWidget.setVisible(false);
-
-        layout = new GridLayout(1, false);
-        palletWidget.setLayout(layout);
-
-        gd = new GridData(SWT.FILL, SWT.FILL, true, true);
-        palletWidget.setLayoutData(gd);
         return palletWidget;
     }
 

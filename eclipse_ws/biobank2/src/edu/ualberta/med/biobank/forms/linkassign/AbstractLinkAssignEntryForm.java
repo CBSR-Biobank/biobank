@@ -163,11 +163,7 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
         gl.horizontalSpacing = 0;
         gl.verticalSpacing = 0;
         mainComposite.setLayout(gl);
-        GridData gd = new GridData();
-        gd.grabExcessHorizontalSpace = true;
-        gd.grabExcessVerticalSpace = true;
-        gd.horizontalAlignment = SWT.FILL;
-        gd.verticalAlignment = SWT.TOP;
+        GridData gd = new GridData(SWT.FILL, SWT.TOP, true, true);
         mainComposite.setLayoutData(gd);
 
         createLeftSection(mainComposite);
@@ -443,8 +439,7 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
             rows,
             cols);
 
-        palletWidget.setLayout(new GridLayout(1, false));
-        palletWidget.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
+        // to prevent scrollbars, do not add a GridLayout or GridData to this widget
 
         toolkit.adapt(palletWidget);
         palletWidget.addMouseListener(new MouseAdapter() {
