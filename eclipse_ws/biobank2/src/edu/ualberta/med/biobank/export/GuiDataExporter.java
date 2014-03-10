@@ -12,6 +12,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.PlatformUI;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
@@ -111,7 +112,7 @@ public abstract class GuiDataExporter implements DataExporter {
             display.syncExec(new Runnable() {
                 @Override
                 public void run() {
-                    Shell shell = Display.getDefault().getActiveShell();
+                    Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
                     if (shell != null) {
                         FileDialog fd = new FileDialog(shell, SWT.SAVE);
                         fd.setOverwrite(true);
