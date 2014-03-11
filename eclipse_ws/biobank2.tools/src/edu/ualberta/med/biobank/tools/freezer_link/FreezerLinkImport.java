@@ -46,15 +46,14 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 /**
  * Fixes issue #520.
  * 
- * Some aliquots in the freezer_link table of the BBPDB database were not
- * imported into BioBank.
+ * Some aliquots in the freezer_link table of the BBPDB database were not imported into BioBank.
  * 
- * Note: time zone conversions are not required. The BBPDB database has times
- * stored as Canada Mountain time. Biobank is accessed via the JBoss server
- * which converts the times to Canada Mountain time for us.
+ * Note: time zone conversions are not required. The BBPDB database has times stored as Canada
+ * Mountain time. Biobank is accessed via the JBoss server which converts the times to Canada
+ * Mountain time for us.
  * 
- * RUN AS: java -Dlog4j.configuration=file:///apth/log4j.properties -jar
- * bbpdb_freezer_link.jar OPTIONS
+ * RUN AS: java -Dlog4j.configuration=file:///apth/log4j.properties -jar bbpdb_freezer_link.jar
+ * OPTIONS
  * 
  * @author Nelson
  * 
@@ -121,7 +120,8 @@ public class FreezerLinkImport {
 
     public static void main(String[] argv) {
         try {
-            GenericAppArgs args = new GenericAppArgs(argv);
+            GenericAppArgs args = new GenericAppArgs();
+            args.parse(argv);
             if (args.help) {
                 System.out.println(USAGE);
                 System.exit(0);

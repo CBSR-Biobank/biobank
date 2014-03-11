@@ -10,12 +10,11 @@ import edu.ualberta.med.biobank.tools.GenericAppArgs;
 import edu.ualberta.med.biobank.tools.utils.HostUrl;
 
 /**
- * The Calgary techs for the HEART study were adding PAXgene tubes to collection
- * events, unaware that they should not be doing this. These source specimens
- * must be set back to active activity status.
+ * The Calgary techs for the HEART study were adding PAXgene tubes to collection events, unaware
+ * that they should not be doing this. These source specimens must be set back to active activity
+ * status.
  * 
- * The list of PAXgene source specimens were sent in an email to Elizabeth
- * Taylor on Dec 2, 2011.
+ * The list of PAXgene source specimens were sent in an email to Elizabeth Taylor on Dec 2, 2011.
  * 
  */
 @SuppressWarnings("nls")
@@ -99,7 +98,8 @@ public class CalgaryPaxgeneFix {
 
     public static void main(String[] argv) {
         try {
-            GenericAppArgs args = new GenericAppArgs(argv);
+            GenericAppArgs args = new GenericAppArgs();
+            args.parse(argv);
             if (args.help) {
                 System.out.println(USAGE);
                 System.exit(0);

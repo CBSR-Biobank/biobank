@@ -74,7 +74,8 @@ public class TestConfigCreate {
 
     public static void main(String[] argv) {
         try {
-            GenericAppArgs args = new GenericAppArgs(argv);
+            GenericAppArgs args = new GenericAppArgs();
+            args.parse(argv);
             if (args.help) {
                 System.out.println(USAGE);
                 System.exit(0);
@@ -92,9 +93,8 @@ public class TestConfigCreate {
         sessionProvider = new SessionProvider(Mode.RUN);
         session = sessionProvider.openSession();
 
-        globalAdminUser =
-            (User) session.createCriteria(User.class)
-                .add(Restrictions.eq("login", globalAdminUserLogin)).uniqueResult();
+        globalAdminUser = (User) session.createCriteria(User.class)
+            .add(Restrictions.eq("login", globalAdminUserLogin)).uniqueResult();
 
         if (globalAdminUser == null) {
             throw new RuntimeException(globalAdminUserLogin + " user not found");

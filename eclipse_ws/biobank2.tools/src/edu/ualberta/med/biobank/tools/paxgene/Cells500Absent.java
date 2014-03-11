@@ -24,11 +24,10 @@ import edu.ualberta.med.biobank.tools.utils.HostUrl;
 /**
  * Matthe Klassen sent the following email on Jan 10, 2011:
  * 
- * On the weekend we finished pulling all Cells500 samples from our freezer 1
- * and 2 however there are still 470 samples still listed in biobank as in
- * freezer 1 & 2. I have personally verified that all of these aliquots are no
- * longer in the freezer. Would you be able to change the activity status of all
- * the samples in the attached list to closed and add the comment
+ * On the weekend we finished pulling all Cells500 samples from our freezer 1 and 2 however there
+ * are still 470 samples still listed in biobank as in freezer 1 & 2. I have personally verified
+ * that all of these aliquots are no longer in the freezer. Would you be able to change the activity
+ * status of all the samples in the attached list to closed and add the comment
  * "Sample was absent during Cell Pull MK."
  * 
  * Thanks
@@ -279,7 +278,8 @@ public class Cells500Absent {
     };
 
     public Cells500Absent(GenericAppArgs appArgs) throws Exception {
-        if (appArgs.remainingArgs.length != 1) {
+        String[] remainingArgs = appArgs.getRemainingArgs();
+        if (remainingArgs.length != 1) {
             System.out.println("CSV file not specified");
             return;
         }
@@ -291,7 +291,7 @@ public class Cells500Absent {
         appService = ServiceConnection.getAppService(hostUrl, appArgs.username,
             appArgs.password);
 
-        processSpecimens(parseCsv(appArgs.remainingArgs[0]));
+        processSpecimens(parseCsv(remainingArgs[0]));
     }
 
     private void processSpecimens(List<SpecimenData> specimenDataList)
@@ -391,7 +391,8 @@ public class Cells500Absent {
 
     public static void main(String[] argv) {
         try {
-            GenericAppArgs args = new GenericAppArgs(argv);
+            GenericAppArgs args = new GenericAppArgs();
+            args.parse(argv);
             if (args.help) {
                 System.out.println(USAGE);
                 System.exit(0);

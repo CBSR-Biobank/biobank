@@ -22,7 +22,7 @@ import edu.ualberta.med.biobank.tools.SessionProvider.Mode;
  * On January 3, 2013, CBSR requested that all specimens in Freezer 02 be closed.
  * 
  * @author Nelson Loyola
- *
+ * 
  */
 @SuppressWarnings("nls")
 public class Fr02Close {
@@ -56,7 +56,8 @@ public class Fr02Close {
 
     public static void main(String[] argv) {
         try {
-            GenericAppArgs args = new GenericAppArgs(argv);
+            GenericAppArgs args = new GenericAppArgs();
+            args.parse(argv);
             if (args.help) {
                 System.out.println(USAGE);
                 System.exit(0);

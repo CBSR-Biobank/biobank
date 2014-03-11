@@ -6,29 +6,39 @@ import jargs.gnu.CmdLineParser.OptionException;
 
 @SuppressWarnings("nls")
 public class GenericAppArgs {
+    protected final CmdLineParser parser;
+
     public boolean help = false;
     public boolean verbose = false;
     public String hostname = "localhost";
     public String username = "testuser";
     public String password = "test";
     public int port = 443;
-    public String[] remainingArgs;
     public boolean error = false;
     public String errorMsg;
 
-    /*
-     * Parses the command line arguments and returns them in an AppArgs object.
+    private final Option helpOpt;
+    private final Option hostnameOpt;
+    private final Option portOpt;
+    private final Option usernameOpt;
+    private final Option verboseOpt;
+    private final Option passwordOpt;
+
+    /**
+     * Parses the command line arguments.
      */
-    public GenericAppArgs(String argv[]) {
+    public GenericAppArgs() {
+        parser = new CmdLineParser();
 
-        CmdLineParser parser = new CmdLineParser();
-        Option helpOpt = parser.addBooleanOption('h', "help");
-        Option hostnameOpt = parser.addStringOption('H', "hostname");
-        Option portOpt = parser.addIntegerOption('p', "port");
-        Option usernameOpt = parser.addStringOption('u', "user");
-        Option verboseOpt = parser.addBooleanOption('v', "verbose");
-        Option passwordOpt = parser.addStringOption('w', "password");
+        helpOpt = parser.addBooleanOption('h', "help");
+        hostnameOpt = parser.addStringOption('H', "hostname");
+        portOpt = parser.addIntegerOption('p', "port");
+        usernameOpt = parser.addStringOption('u', "user");
+        verboseOpt = parser.addBooleanOption('v', "verbose");
+        passwordOpt = parser.addStringOption('w', "password");
+    }
 
+    public void parse(String[] argv) {
         try {
             parser.parse(argv);
         } catch (OptionException e) {
@@ -65,15 +75,23 @@ public class GenericAppArgs {
         if (username != null) {
             this.username = username;
         }
+    }
 
-        remainingArgs = parser.getRemainingArgs();
+    public String[] getRemainingArgs() {
+        return parser.getRemainingArgs();
     }
 
     @Override
     public String toString() {
-        return "h: " + hostname + ", p: " + port + ", u: " + username + ", w: "
-            + password + ", rArgs: " + remainingArgs.toString() + ", errmsg"
-            + errorMsg;
+        StringBuffer buf = new StringBuffer();
+
+        buf.append("h: ").append(hostname);
+        buf.append(", p: ").append(port);
+        buf.append(", u: ").append(username);
+        buf.append(", w: ").append(password);
+        buf.append(", errmsg").append(errorMsg);
+
+        return buf.toString();
     }
 
 }
