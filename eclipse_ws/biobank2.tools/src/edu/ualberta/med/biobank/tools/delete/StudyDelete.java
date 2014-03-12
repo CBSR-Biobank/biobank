@@ -257,9 +257,13 @@ public class StudyDelete {
                 cevent.getVisitNumber());
 
             for (EventAttr eventAttr : cevent.getEventAttrs()) {
+                log.debug("deleteCollectionEvents: deleting event attr: {} - {}",
+                    eventAttr.getId(),
+                    eventAttr.getStudyEventAttr().getGlobalEventAttr().getLabel());
                 session.delete(eventAttr);
             }
 
+            cevent.getEventAttrs().clear();
             session.delete(cevent);
         }
         patient.getCollectionEvents().clear();
@@ -299,6 +303,7 @@ public class StudyDelete {
             for (StudyEventAttr studyEventAttrs : study.getStudyEventAttrs()) {
                 session.delete(studyEventAttrs);
             }
+            study.getStudyEventAttrs().clear();
 
             for (Domain domain : domains) {
                 domain.getStudies().remove(study);
