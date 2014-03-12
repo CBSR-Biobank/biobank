@@ -2,11 +2,8 @@ package edu.ualberta.med.biobank.tools.delete;
 
 import jargs.gnu.CmdLineParser.Option;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -16,8 +13,13 @@ import org.slf4j.LoggerFactory;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.DispatchSpecimen;
+import edu.ualberta.med.biobank.model.Domain;
+import edu.ualberta.med.biobank.model.EventAttr;
 import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.model.StudyEventAttr;
 import edu.ualberta.med.biobank.tools.GenericAppArgs;
 import edu.ualberta.med.biobank.tools.SessionProvider;
 import edu.ualberta.med.biobank.tools.SessionProvider.Mode;
@@ -95,15 +97,17 @@ public class StudyDelete {
         if (appArgs.queriesOnly) {
             getPatientCount();
             getCeventCount();
-            getSpecimenCount();
+            getParentSpecimenCount();
+            getChildSpecimenCount();
+            getDispatchCount();
             getDispatchSpecimenCount();
         } else {
             deleteDispatches();
-            deleteSpecimens();
+            deleteStudy();
         }
     }
 
-    private Number getSpecimenCount() {
+    private Number getParentSpecimenCount() {
         Number count = (Number) session.createCriteria(Specimen.class, "specimen")
             .createAlias("specimen.collectionEvent", "cevent")
             .createAlias("cevent.patient", "patient")
@@ -111,15 +115,45 @@ public class StudyDelete {
             .add(Restrictions.eq("study.nameShort", studyShortName))
             .setProjection(Projections.rowCount())
             .uniqueResult();
-        log.debug("getSpecimenCount: study: {}, count: {}", studyShortName, count);
+        log.debug("getParentSpecimenCount: study: {}, count: {}", studyShortName, count);
         return count;
+    }
+
+    private Number getChildSpecimenCount() {
+        Number count = (Number) session.createCriteria(Specimen.class, "specimen")
+            .createAlias("specimen.parentSpecimen", "pspecimen")
+            .createAlias("pspecimen.collectionEvent", "cevent")
+            .createAlias("cevent.patient", "patient")
+            .createAlias("patient.study", "study")
+            .add(Restrictions.eq("study.nameShort", studyShortName))
+            .setProjection(Projections.rowCount())
+            .uniqueResult();
+        log.debug("getChildSpecimenCount: study: {}, count: {}", studyShortName, count);
+        return count;
+    }
+
+    private Number getDispatchCount() {
+        @SuppressWarnings("unchecked")
+        List<Dispatch> dispatches = session.createCriteria(Dispatch.class, "dispatch")
+            .createAlias("dispatch.dispatchSpecimens", "dspecimens")
+            .createAlias("dspecimens.specimen", "specimen")
+            .createAlias("specimen.parentSpecimen", "pspecimen")
+            .createAlias("pspecimen.collectionEvent", "cevent")
+            .createAlias("cevent.patient", "patient")
+            .createAlias("patient.study", "study")
+            .add(Restrictions.eq("study.nameShort", studyShortName))
+            .setProjection(Projections.distinct(Projections.property("dispatch.id")))
+            .list();
+        log.debug("getDispatchCount: study: {}, count: {}", studyShortName, dispatches.size());
+        return dispatches.size();
     }
 
     private Number getDispatchSpecimenCount() {
         Number count = (Number) session.createCriteria(DispatchSpecimen.class, "dspecimen")
             .createAlias("dspecimen.specimen", "specimen")
-            .createAlias("specimen.collectionEvent", "cevent")
-            .createAlias("cevent.patient", "patient")
+            .createAlias("specimen.parentSpecimen", "pspecimen")
+            .createAlias("pspecimen.originalCollectionEvent", "ocevent")
+            .createAlias("ocevent.patient", "patient")
             .createAlias("patient.study", "study")
             .add(Restrictions.eq("study.nameShort", studyShortName))
             .setProjection(Projections.rowCount())
@@ -152,61 +186,126 @@ public class StudyDelete {
     /**
      * Deletes the dispatches, dispatch specimens and any comments.
      */
+    @SuppressWarnings("unchecked")
     private void deleteDispatches() {
-        @SuppressWarnings("unchecked")
-        List<Dispatch> dispatches = session.createCriteria(Dispatch.class, "dispatch")
+        // get list of child specimens in a dispatch
+        List<Integer> dispatchIds = session.createCriteria(Dispatch.class, "dispatch")
             .createAlias("dispatch.dispatchSpecimens", "dspecimens")
             .createAlias("dspecimens.specimen", "specimen")
-            .createAlias("specimen.collectionEvent", "cevent")
+            .createAlias("specimen.parentSpecimen", "pspecimen")
+            .createAlias("pspecimen.collectionEvent", "cevent")
             .createAlias("cevent.patient", "patient")
             .createAlias("patient.study", "study")
             .add(Restrictions.eq("study.nameShort", studyShortName))
-            .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
+            .setProjection(Projections.distinct(Projections.property("dispatch.id")))
             .list();
 
+        // aggregate list of parentc specimens in a dispatch
+        dispatchIds.addAll(
+            session.createCriteria(Dispatch.class, "dispatch")
+                .createAlias("dispatch.dispatchSpecimens", "dspecimens")
+                .createAlias("dspecimens.specimen", "specimen")
+                .createAlias("specimen.originalCollectionEvent", "cevent")
+                .createAlias("cevent.patient", "patient")
+                .createAlias("patient.study", "study")
+                .add(Restrictions.eq("study.nameShort", studyShortName))
+                .setProjection(Projections.distinct(Projections.property("dispatch.id")))
+                .list());
+
         session.beginTransaction();
-        for (Dispatch dispatch : dispatches) {
-            log.debug("deleteDispatches: dipatch: {}", dispatch.getId());
+        for (Integer dispatchId : dispatchIds) {
+            log.debug("deleteDispatches: dipatch: {}", dispatchId);
+            Dispatch dispatch = (Dispatch) session.load(Dispatch.class, dispatchId);
             session.delete(dispatch);
         }
         session.getTransaction().commit();
     }
 
-    private void deleteSpecimens(Set<Specimen> specimens) {
-        session.beginTransaction();
-        for (Specimen specimen : specimens) {
+    private void deleteChildSpecimens(Specimen parentSpecimen) {
+        log.debug("deleteChildSpecimens: deleting child specimens for parent specimen: {}", parentSpecimen.getInventoryId());
+        for (Specimen specimen : parentSpecimen.getChildSpecimens()) {
             log.debug("deleteSpecimens: specimen: {}", specimen.getInventoryId());
             session.delete(specimen);
         }
-        session.flush();
+        parentSpecimen.getChildSpecimens().clear();
+    }
+
+    private void deleteParentSpecimens(CollectionEvent cevent) {
+        session.beginTransaction();
+        for (Specimen specimen : cevent.getOriginalSpecimens()) {
+            deleteChildSpecimens(specimen);
+        }
+        session.getTransaction().commit();
+
+        session.beginTransaction();
+        for (Specimen specimen : cevent.getOriginalSpecimens()) {
+            log.debug("deleteParentSpecimens: specimen: {}", specimen.getInventoryId());
+            session.delete(specimen);
+        }
+        cevent.getOriginalSpecimens().clear();
         session.getTransaction().commit();
     }
 
-    /**
-     * Deletes only the specimens.
-     */
-    private void deleteSpecimens() {
-        @SuppressWarnings("unchecked")
-        List<Specimen> allSpecimens = session.createCriteria(Specimen.class, "specimen")
-            .createAlias("specimen.collectionEvent", "cevent")
-            .createAlias("cevent.patient", "patient")
-            .createAlias("patient.study", "study")
-            .add(Restrictions.eq("study.nameShort", studyShortName))
-            .list();
-
-        Set<Specimen> parentSpecimens = new HashSet<Specimen>();
-        Set<Specimen> childSpecimens = new HashSet<Specimen>();
-
-        for (Specimen specimen : allSpecimens) {
-            if (specimen.getParentSpecimen() == null) {
-                parentSpecimens.add(specimen);
-            } else {
-                childSpecimens.add(specimen);
-            }
+    private void deleteCollectionEvents(Patient patient) {
+        for (CollectionEvent cevent : patient.getCollectionEvents()) {
+            deleteParentSpecimens(cevent);
         }
 
-        deleteSpecimens(childSpecimens);
-        deleteSpecimens(parentSpecimens);
+        session.beginTransaction();
+        for (CollectionEvent cevent : patient.getCollectionEvents()) {
+            log.debug("deleteCollectionEvents: deleting collection event: {}",
+                cevent.getVisitNumber());
+
+            for (EventAttr eventAttr : cevent.getEventAttrs()) {
+                session.delete(eventAttr);
+            }
+
+            session.delete(cevent);
+        }
+        patient.getCollectionEvents().clear();
+        session.getTransaction().commit();
     }
 
+    private void deletePatients(Study study) {
+        for (Patient patient : study.getPatients()) {
+            deleteCollectionEvents(patient);
+        }
+
+        session.beginTransaction();
+        for (Patient patient : study.getPatients()) {
+            log.debug("deletePatients: deleting patient: {}", patient.getPnumber());
+            session.delete(patient);
+        }
+        study.getPatients().clear();
+        session.getTransaction().commit();
+    }
+
+    private void deleteStudy() {
+        Study study = (Study) session.createCriteria(Study.class)
+            .add(Restrictions.eq("nameShort", studyShortName)).uniqueResult();
+        if (study != null) {
+            deletePatients(study);
+
+            @SuppressWarnings("unchecked")
+            List<Domain> domains = session.createCriteria(Domain.class, "domain")
+                .createAlias("domain.studies", "study")
+                .add(Restrictions.eq("study.nameShort", studyShortName)).list();
+
+            session.beginTransaction();
+            for (Site site : study.getSites()) {
+                site.getStudies().remove(study);
+            }
+
+            for (StudyEventAttr studyEventAttrs : study.getStudyEventAttrs()) {
+                session.delete(studyEventAttrs);
+            }
+
+            for (Domain domain : domains) {
+                domain.getStudies().remove(study);
+            }
+
+            session.delete(study);
+            session.getTransaction().commit();
+        }
+    }
 }
