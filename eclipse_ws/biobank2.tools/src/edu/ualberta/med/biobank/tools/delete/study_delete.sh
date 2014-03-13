@@ -39,4 +39,4 @@ echo ""
 
 read -p "Enter the study's short name: " STUDY_NAME_SHORT
 
-$JAVA -Ddatabase.host=$DBHOST -Ddatabase.name=$DBNAME -Ddatabase.user=$DBUSER -Ddatabase.password=$DBPWD -jar $JAR $STUDY_NAME_SHORT
+$JAVA -Ddatabase.host=$DBHOST -Ddatabase.name=$DBNAME -Ddatabase.user=$DBUSER -Ddatabase.password=$DBPWD -jar $JAR "$STUDY_NAME_SHORT"
