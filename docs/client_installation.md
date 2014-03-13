@@ -22,9 +22,10 @@ If you are connecting to CBSR's Biobank server you have to use the following ver
 
 ## Installation
 
-MS Windows, Mac or Linux, can manually install the client.
-MS Windows users may choose this option if they do not have administrator rights on their user
-account.
+MS Windows, Mac or Linux, users can manually install the client.  MS Windows users may choose this
+option if they do not have administrator rights on their user account. Alternatively, depending on
+the version of the client, the installer program may be available. See the sections below for more
+information.
 
 ### Manual
 
@@ -32,13 +33,11 @@ Follow the instructions on this page to install: [Manual Installation](client_ma
 
 ### Installer
 
-For Biobank version 3.2.3, Microsoft Windows users have the option to use the Installer
-Program.
-
 **_NOTE: On Windows 7, administrator rights (UAC) are required to install this software. If you do
 not have administrator rights, please contact your IT department for assistance._**
 
-It can be downloaded from here:
+For Biobank version 3.2.3, MS Windows users have the option to use the Installer Program. It can be
+downloaded from here:
 
 * [Biobank v3.2.3 Installer](http://aicml-med.cs.ualberta.ca/CBSR/BioBank_v3.2.3/BioBankInstaller-3.2.3_with_jre.exe)
 
