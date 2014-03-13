@@ -7,6 +7,7 @@ import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.exception.SQLGrammarException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +34,7 @@ import edu.ualberta.med.biobank.tools.SessionProvider.Mode;
 public class StudyDelete {
 
     private static String USAGE = "Usage: study_delete [options] STUDY_SHORT_NAME\n\n"
-        + "\tReads options from db.properties file.";
+        + "\tReads options from db.properties file or from system properties.";
 
     private static final Logger log = LoggerFactory.getLogger(StudyDelete.class);
 
@@ -84,12 +85,12 @@ public class StudyDelete {
                 System.exit(-1);
             }
             new StudyDelete(remainingArgs[0], args);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (SQLGrammarException e) {
+            System.out.println(e.getMessage());
         }
     }
 
-    private StudyDelete(String studyShortName, AppArgs appArgs) throws Exception {
+    private StudyDelete(String studyShortName, AppArgs appArgs) {
         sessionProvider = new SessionProvider(Mode.RUN);
         session = sessionProvider.openSession();
         this.studyShortName = studyShortName;
@@ -312,6 +313,9 @@ public class StudyDelete {
 
             session.delete(study);
             session.getTransaction().commit();
+        } else {
+            System.out.println("Error: study " + studyShortName + " not found in database.");
         }
+
     }
 }

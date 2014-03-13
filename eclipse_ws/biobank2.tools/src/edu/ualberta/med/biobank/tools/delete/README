@@ -1,0 +1,4 @@
+This class can be exported as a runnable JAR using Eclipse.
+
+The bash script named "study_delete.sh" will execute the runnable JAR and
+provide the JAR with valid input.
