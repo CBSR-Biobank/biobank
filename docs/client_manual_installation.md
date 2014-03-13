@@ -1,4 +1,4 @@
-# Biobank thick client manual installation
+# Biobank client manual installation
 
 Please follow these instructions to manually install the Biobank thick client. These instructions
 apply for the following operating systems: Microsoft Windows, Apple Mac OSX, and Linux. Also, ensure
@@ -7,6 +7,11 @@ the operating system.
 
 **_If you have not downloaded the client software file for your operating system, please go back
 to the previous document and download the client by selecting the appropriate link._**
+
+**_If you are using the client for Biobank version 3.9.0 or later on Microsoft Widnwos, you need to
+download and install the
+[Microsoft Visual C++ 2010 SP1 Redistributable Package (x86)](http://www.microsoft.com/en-us/download/details.aspx?id=8328)
+first._**
 
 1. Create a directory to hold the contents of the client software. This directory is referred to
 as the **client directory** below.
@@ -21,19 +26,10 @@ as the **client directory** below.
    *I.e. on Windows you will now have the `C:\Users\_userid_\BioBank\BioBank`.  On Linux you will
    have `/opt/BioBank/BioBank`.*
 
-3. This step depends on the operating system you are using.
+3. This step depends on the operating system you are using. If you are using Microsoftw Windows,
+   skip this step.
 
-  1. If you are installing on MS Windows, download the following ZIP archive file and put it in the
-     `BioBank` sub directory.
-
-    http://aicml-med.cs.ualberta.ca/CBSR/jre.win32.x86.zip
-
-    Extract `jre.win32.x86.zip` into the `BioBank` sub directory.
-
-    *After unzipping, you should have the following directory:
-     `C:\Users\_userid_\BioBank\BioBank\jre`.*
-
-  2. Mac and Linux users need to install a Java 6 runtime environment that corresponds to their
+  1. Mac and Linux users need to install a Java 6 runtime environment that corresponds to their
   operating system. Please see the following web page for download instructions:
   [Java SE Runtime Environment 6 Downloads](http://www.oracle.com/technetwork/java/javase/downloads/jre6-downloads-1637595.html).
 

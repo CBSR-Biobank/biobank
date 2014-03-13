@@ -28,7 +28,7 @@ account.
 
 ### Manual
 
-Follow the instructions on this page to install: [Manual Installation](manual_installation.md).
+Follow the instructions on this page to install: [Manual Installation](client_manual_installation.md).
 
 ### Installer
 
