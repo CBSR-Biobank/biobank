@@ -48,7 +48,8 @@ public class MaintenanceModeTool {
     public static void main(String[] argv) {
         try {
             log.trace("args: " + StringUtils.join(argv, " "));
-            GenericAppArgs args = new GenericAppArgs(argv);
+            GenericAppArgs args = new GenericAppArgs();
+            args.parse(argv);
 
             if (args.help) {
                 System.out.println(USAGE);
@@ -63,25 +64,27 @@ public class MaintenanceModeTool {
         }
     }
 
-    public MaintenanceModeTool(GenericAppArgs globalArgs) throws Exception {
-        String hostUrl = HostUrl.getHostUrl(globalArgs.hostname, globalArgs.port);
+    public MaintenanceModeTool(GenericAppArgs appArgs) throws Exception {
+        String hostUrl = HostUrl.getHostUrl(appArgs.hostname, appArgs.port);
 
         try {
             checkCertificates(hostUrl);
 
             appService = ServiceConnection.getAppService(
-                hostUrl, globalArgs.username, globalArgs.password);
+                hostUrl, appArgs.username, appArgs.password);
 
-            if (globalArgs.remainingArgs.length != 1) {
+            String[] remainingArgs = appArgs.getRemainingArgs();
+
+            if (remainingArgs.length != 1) {
                 System.out.println("ERROR: invalid argument(s): "
-                    + StringUtils.join(globalArgs.remainingArgs, " "));
-            } else if (globalArgs.remainingArgs[0].equals("query")) {
+                    + StringUtils.join(remainingArgs, " "));
+            } else if (remainingArgs[0].equals("query")) {
                 maintenanceModeQuery();
-            } else if (globalArgs.remainingArgs[0].equals("toggle")) {
+            } else if (remainingArgs[0].equals("toggle")) {
                 maintenanceModeQueryToggle();
             } else {
                 System.out.println("ERROR: invalid argument(s): "
-                    + StringUtils.join(globalArgs.remainingArgs, " "));
+                    + StringUtils.join(remainingArgs, " "));
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());
