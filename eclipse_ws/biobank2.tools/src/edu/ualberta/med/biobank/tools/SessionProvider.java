@@ -25,7 +25,7 @@ public class SessionProvider {
         RUN;
     }
 
-    private final SessionFactory sessionFactory;
+    private SessionFactory sessionFactory = null;
 
     public SessionProvider(Mode mode) {
         setupDatasource();
@@ -64,26 +64,43 @@ public class SessionProvider {
 
             ic.createSubcontext("java:");
 
-            String dbPropertiesFilename = System.getProperty("db.properties", "../../db.properties");
+            String dbHost, dbName, dbUser, dbPassword;
 
+            // system properties override db.properties file
+            dbHost = System.getProperty("database.host");
+            dbName = System.getProperty("database.name");
+            dbUser = System.getProperty("database.user");
+            dbPassword = System.getProperty("database.password");
+
+            // attempt to read db.properties file
+            String dbPropertiesFilename = System.getProperty("db.properties", "../../db.properties");
             File dbPropertiesFile = new File(dbPropertiesFilename);
-            if (!dbPropertiesFile.exists()) {
-                System.err.println("db.properties file does not exist at "
-                    + dbPropertiesFile.getAbsolutePath());
+            if (dbPropertiesFile.exists()) {
+                Properties dbProperties = new Properties();
+                dbProperties.load(new FileInputStream(dbPropertiesFile));
+
+                if (dbHost.isEmpty()) {
+                    dbHost = dbProperties.getProperty("database.host", "localhost");
+                }
+
+                if (dbName.isEmpty()) {
+                    dbName = dbProperties.getProperty("database.name", "biobank");
+                }
+                if (dbUser.isEmpty()) {
+                    dbUser = dbProperties.getProperty("database.user", "dummy");
+                }
+                if (dbPassword.isEmpty()) {
+                    dbPassword = dbProperties.getProperty("database.password", "ozzy498");
+                }
             }
 
-            Properties dbProperties = new Properties();
-            dbProperties.load(new FileInputStream(dbPropertiesFile));
-
-            String url = MessageFormat.format("jdbc:mysql://{0}:3306/{1}",
-                dbProperties.getProperty("database.host"),
-                dbProperties.getProperty("database.name"));
+            String url = MessageFormat.format("jdbc:mysql://{0}:3306/{1}", dbHost, dbName);
 
             // Construct DataSource
             MysqlConnectionPoolDataSource ds = new MysqlConnectionPoolDataSource();
             ds.setUrl(url);
-            ds.setUser(dbProperties.getProperty("database.username"));
-            ds.setPassword(dbProperties.getProperty("database.password"));
+            ds.setUser(dbUser);
+            ds.setPassword(dbPassword);
 
             ic.bind("java:/biobank", ds);
         } catch (NamingException ex) {

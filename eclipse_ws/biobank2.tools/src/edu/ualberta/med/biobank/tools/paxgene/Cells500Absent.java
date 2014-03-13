@@ -278,7 +278,8 @@ public class Cells500Absent {
     };
 
     public Cells500Absent(GenericAppArgs appArgs) throws Exception {
-        if (appArgs.remainingArgs.length != 1) {
+        String[] remainingArgs = appArgs.getRemainingArgs();
+        if (remainingArgs.length != 1) {
             System.out.println("CSV file not specified");
             return;
         }
@@ -290,7 +291,7 @@ public class Cells500Absent {
         appService = ServiceConnection.getAppService(hostUrl, appArgs.username,
             appArgs.password);
 
-        processSpecimens(parseCsv(appArgs.remainingArgs[0]));
+        processSpecimens(parseCsv(remainingArgs[0]));
     }
 
     private void processSpecimens(List<SpecimenData> specimenDataList)
@@ -390,7 +391,8 @@ public class Cells500Absent {
 
     public static void main(String[] argv) {
         try {
-            GenericAppArgs args = new GenericAppArgs(argv);
+            GenericAppArgs args = new GenericAppArgs();
+            args.parse(argv);
             if (args.help) {
                 System.out.println(USAGE);
                 System.exit(0);

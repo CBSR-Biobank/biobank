@@ -62,7 +62,8 @@ public class BbpdbLogging {
 
     public static void main(String[] argv) {
         try {
-            GenericAppArgs args = new GenericAppArgs(argv);
+            GenericAppArgs args = new GenericAppArgs();
+            args.parse(argv);
             if (args.error) {
                 System.out.println(args.errorMsg + "\n" + USAGE);
                 System.exit(-1);
