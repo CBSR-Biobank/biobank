@@ -295,6 +295,7 @@ public class StudyDelete {
                 .createAlias("domain.studies", "study")
                 .add(Restrictions.eq("study.nameShort", studyShortName)).list();
 
+            log.debug("deletePatients: deleting study: {}", study.getName());
             session.beginTransaction();
             for (Site site : study.getSites()) {
                 site.getStudies().remove(study);
