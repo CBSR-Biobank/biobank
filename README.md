@@ -34,13 +34,13 @@ For further information or to request a demonstration of the software you may em
 1. [Server Maintenance Mode](docs/server_maintenance.md): Prevents users from logging in to a server
    that is under maintenance.
 
+1. [Building the client](docs/client_build.md): Information for building the client for different
+   platforms.
+
 1. [Client Installation](docs/client_installation.md): Information for installing the Biobank
 client desktop application.
 
 1. [Client scanning decoding](docs/client_scanning_and_decoding.md): How to use the client to decode
    microwell plate images that contain tubes with 2D barcodes.
-
-1. [Building the client](docs/client_build.md): Information for building the client for different
-   platforms.
 
 

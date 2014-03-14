@@ -1,27 +1,21 @@
 # Biobank client
 
-## Requirements
+A computer running Linux to is required to install the software packages listed below. Ubuntu is
+recommended.
 
-1. The
-   [Eclipse Delta Pack](http://archive.eclipse.org/eclipse/downloads/drops/R-3.7.2-201202080800/#DeltaPack)
-   is required to build the client for the different operating systems. The delta pack version must
-   match the version of Eclipse being used. At the moment
-   [Eclipse Indigo SR2](http://www.eclipse.org/downloads/packages/release/indigo/sr2) is the latest
-   version that can be used.
+## Development Environment
 
-2. The Microsoft Windows version of Java Rutime Environment (JRE). It can be downloaded from the
-   [Java Oracle](http://www.oracle.com/technetwork/java/javase/downloads/java-archive-downloads-javase6-419409.html)
-   web site. Once it is installed on a MS Windows computer, the `jre` folder can be copied to the
-   Linux computer where the clients are being built.
-
-3. The `java.client.version.num` in `build.properties` has been updated to the correct version
-   number.
+Ensure your computer has been set up to build clients by following these
+[instructions](development_environment.md).
 
 ## Client build instructions
 
 Follow these instructions to build the client on a Linux machine.
 
-1. Use the following command at the project's root directory.
+1.  Ensure that the `java.client.version.num` in file `build.properties` has the correct version
+    number.
+
+1.  Use the following command at the project's root directory.
 
     ```bash
 	ant product
@@ -52,5 +46,9 @@ Follow these instructions to build the client on a Linux machine.
     Where `ms_windows_jre` is the directory containing the MS Windows version of the JRE.
 
 The ZIP files can now be placed where users can download the files.
+
+****
+
+[Back to top](../README.md)
 
 
