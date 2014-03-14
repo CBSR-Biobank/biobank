@@ -1,14 +1,12 @@
 package edu.ualberta.med.biobank.tools.pnumberprob;
 
-import jargs.gnu.CmdLineParser;
-import jargs.gnu.CmdLineParser.Option;
-import jargs.gnu.CmdLineParser.OptionException;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
+
+import edu.ualberta.med.biobank.tools.GenericAppArgs;
 
 @SuppressWarnings("nls")
 public class PnumberProb {
@@ -17,7 +15,7 @@ public class PnumberProb {
         "Usage: pnumberprob PNUMBER1 PNUMBER2 ... PNUMBERn";
 
     @SuppressWarnings("unused")
-    private boolean verbose = false;
+    private final boolean verbose = false;
 
     private static Map<String, Double> pnumberProbMap;
     static {
@@ -47,29 +45,16 @@ public class PnumberProb {
     }
 
     public PnumberProb(String argv[]) {
+        GenericAppArgs args = new GenericAppArgs();
+        args.parse(argv);
 
-        CmdLineParser parser = new CmdLineParser();
-        Option verboseOpt = parser.addBooleanOption('v', "verbose");
-
-        try {
-            parser.parse(argv);
-        } catch (OptionException e) {
-            System.out.println(e.getMessage());
-            System.exit(-1);
-        }
-
-        Boolean boleanOptVal = (Boolean) parser.getOptionValue(verboseOpt);
-        if (boleanOptVal != null) {
-            verbose = boleanOptVal.booleanValue();
-        }
-
-        String[] args = parser.getRemainingArgs();
-        if (args.length < 1) {
+        String[] remainingArgs = args.getRemainingArgs();
+        if (remainingArgs.length < 1) {
             System.out.println("Error: invalid arguments\n" + USAGE);
             System.exit(-1);
         }
 
-        for (String pnumber : args) {
+        for (String pnumber : remainingArgs) {
 
             String pnumberRegEx = pnumber.replace("x", ".");
             Pattern pattern = Pattern.compile(pnumberRegEx);

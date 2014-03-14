@@ -34,21 +34,16 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 @SuppressWarnings("nls")
 public class BbpdbConsent {
 
-    private static String USAGE =
-        "Usage: bbpdbconsent [options]\n\n"
+    private static final String APP_NAME = "bbpdbconsent";
+
+    private static final String USAGE =
+        "Usage: " + APP_NAME + " [options]\n\n"
             + "Used to fix the consent given by a patient on the BBPSP study.\n"
             + "When the database was imported from MS Access to MySQL, the\n"
             + "consent was incorrectly assigned. The consent that was labeled\n"
             + "as \"consent_genetics\" in the MS Access database should have been\n"
             + "converted to \"genetic mutation\". Instead it was converted as\n"
-            + "\"genetic predisposition\".\n\n"
-            + "Options\n"
-            + "  -H, --host       hostname for BioBank server and MySQL server\n"
-            + "  -p, --port       port number for BioBank server\n"
-            + "  -u, --user       user name to log into BioBank server\n"
-            + "  -w, --password   password to log into BioBank server\n"
-            + "  -v, --verbose    shows verbose output\n"
-            + "  -h, --help       shows this text\n"; //$NON-NLS-1$
+            + "\"genetic predisposition\".\n\n";
 
     private static final Logger LOGGER = Logger.getLogger(BbpdbConsent.class
         .getName());
@@ -74,7 +69,7 @@ public class BbpdbConsent {
             GenericAppArgs args = new GenericAppArgs();
             args.parse(argv);
             if (args.help) {
-                System.out.println(USAGE);
+                args.printHelp(APP_NAME);
                 System.exit(0);
             } else if (args.error) {
                 System.out.println(args.errorMsg + "\n" + USAGE);

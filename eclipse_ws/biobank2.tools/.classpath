@@ -4,7 +4,7 @@
 	<classpathentry kind="src" path="conf"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/biobank.common"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry exported="true" kind="lib" path="lib/jargs.jar"/>
 	<classpathentry kind="lib" path="lib/naming-common.jar"/>
+	<classpathentry kind="lib" path="lib/commons-cli.jar" sourcepath="lib/commons-cli-source.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

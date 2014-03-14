@@ -1,9 +1,5 @@
 package edu.ualberta.med.biobank.tools.heartproblem;
 
-import jargs.gnu.CmdLineParser;
-import jargs.gnu.CmdLineParser.Option;
-import jargs.gnu.CmdLineParser.OptionException;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -25,22 +21,23 @@ import edu.ualberta.med.biobank.common.wrappers.helpers.SiteQuery;
 import edu.ualberta.med.biobank.common.wrappers.util.WrapperUtil;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
+import edu.ualberta.med.biobank.tools.GenericAppArgs;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 /**
- * Fixes Issue #1487 - the HEART study problem where the tech's in Calgary
- * entered processing information into the cbsr-training server instead of the
- * production server.
+ * Fixes Issue #1487 - the HEART study problem where the tech's in Calgary entered processing
+ * information into the cbsr-training server instead of the production server.
  * 
- * See the PNUMBERS array below for the patient numbers who's information must
- * be copied over.
+ * See the PNUMBERS array below for the patient numbers who's information must be copied over.
  * 
  */
 @SuppressWarnings("nls")
 @Deprecated
 public class ProblemFixer {
 
-    private static String USAGE = "Usage: heartprobfix [options]\n\n"
+    private static final String APP_NAME = "heartprobfix";
+
+    private static final String USAGE = "Usage: " + APP_NAME + " [options]\n\n"
         + "Options\n" + "  -v, --verbose    Shows verbose output";
 
     private static final Logger LOGGER = Logger.getLogger(ProblemFixer.class
@@ -410,29 +407,24 @@ public class ProblemFixer {
     private static AppArgs parseCommandLine(String argv[]) {
         AppArgs appArgs = new AppArgs();
 
-        CmdLineParser parser = new CmdLineParser();
-        Option verboseOpt = parser.addBooleanOption('v', "verbose");
-
-        try {
-            parser.parse(argv);
-        } catch (OptionException e) {
-            LOGGER.info(e.getMessage());
+        GenericAppArgs args = new GenericAppArgs();
+        args.parse(argv);
+        if (args.help) {
+            args.printHelp(APP_NAME);
+            System.exit(0);
+        } else if (args.error) {
+            System.out.println(args.errorMsg + "\n" + USAGE);
             System.exit(-1);
         }
 
-        Boolean verbose = (Boolean) parser.getOptionValue(verboseOpt);
-        if (verbose != null) {
-            appArgs.verbose = verbose.booleanValue();
-        }
-
-        String[] args = parser.getRemainingArgs();
-        if (args.length != 2) {
+        String[] remainingArgs = args.getRemainingArgs();
+        if (remainingArgs.length != 2) {
             LOGGER.info("Error: invalid arguments\n" + USAGE);
             System.exit(-1);
         }
 
-        appArgs.username = args[0];
-        appArgs.password = args[1];
+        appArgs.username = remainingArgs[0];
+        appArgs.password = remainingArgs[1];
 
         return appArgs;
     }
