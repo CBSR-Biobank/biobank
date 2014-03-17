@@ -1,12 +1,28 @@
 package edu.ualberta.med.biobank.tools;
 
-import jargs.gnu.CmdLineParser;
-import jargs.gnu.CmdLineParser.Option;
-import jargs.gnu.CmdLineParser.OptionException;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 
 @SuppressWarnings("nls")
 public class GenericAppArgs {
-    protected final CmdLineParser parser;
+
+    public static final String OPT_HELP = "h";
+    public static final String OPT_HOST = "H";
+    public static final String OPT_PORT = "p";
+    public static final String OPT_USER = "u";
+    public static final String OPT_PWD = "w";
+    public static final String OPT_VERBOSE = "v";
+
+    protected final Options options;
+    protected final CommandLineParser parser;
+    protected CommandLine line;
+    public boolean error = false;
+    public String errorMsg;
 
     public boolean help = false;
     public boolean verbose = false;
@@ -14,71 +30,72 @@ public class GenericAppArgs {
     public String username = "testuser";
     public String password = "test";
     public int port = 443;
-    public boolean error = false;
-    public String errorMsg;
-
-    private final Option helpOpt;
-    private final Option hostnameOpt;
-    private final Option portOpt;
-    private final Option usernameOpt;
-    private final Option verboseOpt;
-    private final Option passwordOpt;
 
     /**
      * Parses the command line arguments.
      */
+    @SuppressWarnings("static-access")
     public GenericAppArgs() {
-        parser = new CmdLineParser();
+        options = new Options();
+        parser = new GnuParser();
 
-        helpOpt = parser.addBooleanOption('h', "help");
-        hostnameOpt = parser.addStringOption('H', "hostname");
-        portOpt = parser.addIntegerOption('p', "port");
-        usernameOpt = parser.addStringOption('u', "user");
-        verboseOpt = parser.addBooleanOption('v', "verbose");
-        passwordOpt = parser.addStringOption('w', "password");
+        options.addOption(OPT_HELP, "help", false, "Displays this help text.");
+        options.addOption(OPT_HOST, "hostname", true, "The host name for the Biobank server.");
+        options.addOption(OPT_USER, "user", true, "The user name on Biobank server.");
+        options.addOption(OPT_VERBOSE, "verbose", false, "Use to enable debug information.");
+        options.addOption(OPT_PWD, "password", true, "The user's password.");
+
+        options.addOption(OptionBuilder.withLongOpt("port")
+            .withType(Number.class)
+            .hasArg()
+            .withDescription("The port number used by the Biobank server.")
+            .withArgName(OPT_PORT)
+            .create());
     }
 
     public void parse(String[] argv) {
         try {
-            parser.parse(argv);
-        } catch (OptionException e) {
-            System.out.println(e.getMessage());
-            System.exit(-1);
-        }
+            line = parser.parse(options, argv);
 
-        Boolean help = (Boolean) parser.getOptionValue(helpOpt);
-        if (help != null) {
-            this.help = help.booleanValue();
-        }
+            if (line.hasOption(OPT_HELP)) {
+                this.help = true;
+            }
 
-        Boolean verbose = (Boolean) parser.getOptionValue(verboseOpt);
-        if (verbose != null) {
-            this.verbose = verbose.booleanValue();
-        }
+            if (line.hasOption(OPT_VERBOSE)) {
+                this.verbose = true;
+            }
 
-        String hostname = (String) parser.getOptionValue(hostnameOpt);
-        if (hostname != null) {
-            this.hostname = hostname;
-        }
+            if (line.hasOption(OPT_HOST)) {
+                this.hostname = line.getOptionValue(OPT_HOST);
+            }
 
-        Integer port = (Integer) parser.getOptionValue(portOpt);
-        if (port != null) {
-            this.port = port.intValue();
-        }
+            if (line.hasOption(OPT_PORT)) {
+                this.port = ((Number) line.getParsedOptionValue(OPT_PORT)).intValue();
+            }
 
-        String password = (String) parser.getOptionValue(passwordOpt);
-        if (password != null) {
-            this.password = password;
-        }
+            if (line.hasOption(OPT_USER)) {
+                this.username = line.getOptionValue(OPT_USER);
+            }
 
-        String username = (String) parser.getOptionValue(usernameOpt);
-        if (username != null) {
-            this.username = username;
+            if (line.hasOption(OPT_PWD)) {
+                this.password = line.getOptionValue(OPT_PWD);
+            }
+        } catch (ParseException e) {
+            error = true;
+            errorMsg = e.getMessage();
         }
     }
 
     public String[] getRemainingArgs() {
-        return parser.getRemainingArgs();
+        if (error) {
+            throw new IllegalStateException("parsing was not successful");
+        }
+        return line.getArgs();
+    }
+
+    public void printHelp(String name) {
+        HelpFormatter fmt = new HelpFormatter();
+        fmt.printHelp(name, options);
     }
 
     @Override

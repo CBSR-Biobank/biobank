@@ -11,10 +11,9 @@
 #
 
 JAVA=/usr/lib/jvm/jdk1.6.0_45/bin/java
-JAR=study_delete.jar
+JAR=db_delete_tool.jar
 DFLT_DBHOST=localhost
 DFLT_DBNAME=biobank
-
 
 if [[ ! -f "$JAVA" ]]; then
    echo "Error: Java JRE not found at $JAVA"
@@ -37,6 +36,9 @@ read -p "Enter user name for MySQL server: " DBUSER
 read -s -p "Enter user's password: " DBPWD
 echo ""
 
-read -p "Enter the study's short name: " STUDY_NAME_SHORT
+read -p "Enter delete command: " COMMAND
 
-$JAVA -Ddatabase.host=$DBHOST -Ddatabase.name=$DBNAME -Ddatabase.user=$DBUSER -Ddatabase.password=$DBPWD -jar $JAR "$STUDY_NAME_SHORT"
+eval ARGS=($COMMAND)
+
+$JAVA -Ddatabase.host=$DBHOST -Ddatabase.name=$DBNAME -Ddatabase.user=$DBUSER -Ddatabase.password=$DBPWD -jar $JAR "${ARGS[0]}" "${ARGS[1]}"
+
