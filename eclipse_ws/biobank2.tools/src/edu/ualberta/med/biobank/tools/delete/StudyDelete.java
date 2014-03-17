@@ -40,6 +40,7 @@ public class StudyDelete {
             deletePatients(session, study);
 
             session.beginTransaction();
+            log.debug("deleteStudy: deleting study: {}", study.getName());
             for (Site site : study.getSites()) {
                 site.getStudies().remove(study);
             }
@@ -53,8 +54,6 @@ public class StudyDelete {
                 domain.getStudies().remove(study);
             }
 
-            log.debug("study patient count: {}", study.getPatients().size());
-
             session.delete(study);
             session.getTransaction().commit();
         } else {
@@ -62,12 +61,14 @@ public class StudyDelete {
         }
     }
 
-    public static void deletePatients(Session session, String pnumber) {
+    public static void deletePatient(Session session, String pnumber) {
         Patient patient = (Patient) session.createCriteria(Patient.class)
             .add(Restrictions.eq("pnumber", pnumber)).uniqueResult();
 
         if (patient != null) {
+            session.beginTransaction();
             deleteCollectionEvents(session, patient);
+            session.getTransaction().commit();
         } else {
             System.out.println("Error: patient " + pnumber + " not found in database.");
         }
@@ -75,11 +76,11 @@ public class StudyDelete {
     }
 
     private static void deletePatients(Session session, Study study) {
+        session.beginTransaction();
         for (Patient patient : study.getPatients()) {
             deleteCollectionEvents(session, patient);
         }
 
-        session.beginTransaction();
         for (Patient patient : study.getPatients()) {
             log.debug("deletePatients: deleting patient: {}", patient.getPnumber());
             session.delete(patient);
@@ -130,40 +131,31 @@ public class StudyDelete {
         log.debug("deleteChildSpecimens: deleting child specimens for parent specimen: {}", parentSpecimen.getInventoryId());
         for (Specimen specimen : parentSpecimen.getChildSpecimens()) {
             log.debug("deleteSpecimens: specimen: {}", specimen.getInventoryId());
-
-            // specimen.setTopSpecimen(null);
-            // specimen.getCollectionEvent().getAllSpecimens().remove(specimen);
-            // specimen.getProcessingEvent().getSpecimens().remove(specimen);
-            // specimen.getDispatchSpecimens();
-
             session.delete(specimen);
         }
         parentSpecimen.getChildSpecimens().clear();
     }
 
     private static void deleteParentSpecimens(Session session, CollectionEvent cevent) {
-        session.beginTransaction();
         for (Specimen specimen : cevent.getOriginalSpecimens()) {
             deleteChildSpecimens(session, specimen);
         }
-        session.getTransaction().commit();
+        session.flush();
 
-        session.beginTransaction();
         for (Specimen specimen : cevent.getOriginalSpecimens()) {
             log.debug("deleteParentSpecimens: specimen: {}", specimen.getInventoryId());
             session.delete(specimen);
         }
         cevent.getOriginalSpecimens().clear();
-        // cevent.getAllSpecimens().clear();
-        session.getTransaction().commit();
+        session.flush();
     }
 
     private static void deleteCollectionEvents(Session session, Patient patient) {
         for (CollectionEvent cevent : patient.getCollectionEvents()) {
             deleteParentSpecimens(session, cevent);
         }
+        session.flush();
 
-        session.beginTransaction();
         for (CollectionEvent cevent : patient.getCollectionEvents()) {
             log.debug("deleteCollectionEvents: deleting collection event: {}",
                 cevent.getVisitNumber());
@@ -180,6 +172,6 @@ public class StudyDelete {
             session.delete(cevent);
         }
         patient.getCollectionEvents().clear();
-        session.getTransaction().commit();
+        session.flush();
     }
 }

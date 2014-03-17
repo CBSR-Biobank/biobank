@@ -1,19 +1,8 @@
 package edu.ualberta.med.biobank.tools.delete;
 
-import java.util.List;
-
 import org.hibernate.Session;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
 import org.hibernate.exception.SQLGrammarException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import edu.ualberta.med.biobank.model.CollectionEvent;
-import edu.ualberta.med.biobank.model.Dispatch;
-import edu.ualberta.med.biobank.model.DispatchSpecimen;
-import edu.ualberta.med.biobank.model.Patient;
-import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.tools.GenericAppArgs;
 import edu.ualberta.med.biobank.tools.SessionProvider;
 import edu.ualberta.med.biobank.tools.SessionProvider.Mode;
@@ -31,7 +20,7 @@ public class DbDeleteTool {
     private static String APP_DESCRIPTION =
         "Reads options from db.properties file or from system properties.";
 
-    private static final Logger log = LoggerFactory.getLogger(DbDeleteTool.class);
+    // private static final Logger log = LoggerFactory.getLogger(DbDeleteTool.class);
 
     private static class AppArgs extends GenericAppArgs {
 
@@ -55,19 +44,12 @@ public class DbDeleteTool {
 
     private final Session session;
 
-    private final String studyShortName;
+    private final AppArgs options;
 
     public static void main(String[] argv) {
         try {
             AppArgs args = new AppArgs();
             args.parse(argv);
-
-            String[] remainingArgs = args.getRemainingArgs();
-            if (remainingArgs.length < 1) {
-                System.out.println("Error: study short name not specified.\n\n");
-                System.out.println(APP_DESCRIPTION);
-                System.exit(0);
-            }
 
             if (args.help) {
                 System.out.println(APP_NAME);
@@ -78,103 +60,46 @@ public class DbDeleteTool {
                 System.out.println(args.errorMsg + "\n" + APP_DESCRIPTION);
                 System.exit(-1);
             }
-            new DbDeleteTool(remainingArgs[0], args);
+
+            new DbDeleteTool(args.getRemainingArgs(), args);
         } catch (SQLGrammarException e) {
             System.out.println(e.getMessage());
         }
     }
 
-    private DbDeleteTool(String studyShortName, AppArgs appArgs) {
+    private DbDeleteTool(String[] args, AppArgs options) {
+        this.options = options;
         sessionProvider = new SessionProvider(Mode.RUN);
         session = sessionProvider.openSession();
-        this.studyShortName = studyShortName;
 
-        if (appArgs.queriesOnly) {
-            getPatientCount();
-            getCeventCount();
-            getParentSpecimenCount();
-            getChildSpecimenCount();
-            getDispatchCount();
-            getDispatchSpecimenCount();
+        if (args.length != 2) {
+            System.out.println("Error: invalid command:\n\n");
+            System.exit(0);
+        } else if (args[0].equals("study")) {
+            studyCmd(args[1]);
+        } else if (args[0].equals("patient")) {
+            patientCmd(args[1]);
+        } else {
+            System.out.println("Error: invalid command:\n\n");
+            System.exit(0);
+        }
+    }
+
+    private void studyCmd(String studyShortName) {
+        if (options.queriesOnly) {
+            StudyCounts.getPatientCount(session, studyShortName);
+            StudyCounts.getCeventCount(session, studyShortName);
+            StudyCounts.getParentSpecimenCount(session, studyShortName);
+            StudyCounts.getChildSpecimenCount(session, studyShortName);
+            StudyCounts.getDispatchCount(session, studyShortName);
+            StudyCounts.getDispatchSpecimenCount(session, studyShortName);
         } else {
             StudyDelete.deleteStudy(session, studyShortName);
         }
     }
 
-    private Number getParentSpecimenCount() {
-        Number count = (Number) session.createCriteria(Specimen.class, "specimen")
-            .createAlias("specimen.collectionEvent", "cevent")
-            .createAlias("cevent.patient", "patient")
-            .createAlias("patient.study", "study")
-            .add(Restrictions.eq("study.nameShort", studyShortName))
-            .setProjection(Projections.rowCount())
-            .uniqueResult();
-        log.debug("getParentSpecimenCount: study: {}, count: {}", studyShortName, count);
-        return count;
-    }
-
-    private Number getChildSpecimenCount() {
-        Number count = (Number) session.createCriteria(Specimen.class, "specimen")
-            .createAlias("specimen.parentSpecimen", "pspecimen")
-            .createAlias("pspecimen.collectionEvent", "cevent")
-            .createAlias("cevent.patient", "patient")
-            .createAlias("patient.study", "study")
-            .add(Restrictions.eq("study.nameShort", studyShortName))
-            .setProjection(Projections.rowCount())
-            .uniqueResult();
-        log.debug("getChildSpecimenCount: study: {}, count: {}", studyShortName, count);
-        return count;
-    }
-
-    private Number getDispatchCount() {
-        @SuppressWarnings("unchecked")
-        List<Dispatch> dispatches = session.createCriteria(Dispatch.class, "dispatch")
-            .createAlias("dispatch.dispatchSpecimens", "dspecimens")
-            .createAlias("dspecimens.specimen", "specimen")
-            .createAlias("specimen.parentSpecimen", "pspecimen")
-            .createAlias("pspecimen.collectionEvent", "cevent")
-            .createAlias("cevent.patient", "patient")
-            .createAlias("patient.study", "study")
-            .add(Restrictions.eq("study.nameShort", studyShortName))
-            .setProjection(Projections.distinct(Projections.property("dispatch.id")))
-            .list();
-        log.debug("getDispatchCount: study: {}, count: {}", studyShortName, dispatches.size());
-        return dispatches.size();
-    }
-
-    private Number getDispatchSpecimenCount() {
-        Number count = (Number) session.createCriteria(DispatchSpecimen.class, "dspecimen")
-            .createAlias("dspecimen.specimen", "specimen")
-            .createAlias("specimen.parentSpecimen", "pspecimen")
-            .createAlias("pspecimen.originalCollectionEvent", "ocevent")
-            .createAlias("ocevent.patient", "patient")
-            .createAlias("patient.study", "study")
-            .add(Restrictions.eq("study.nameShort", studyShortName))
-            .setProjection(Projections.rowCount())
-            .uniqueResult();
-        log.debug("getDispatchSpecimenCount: study: {}, count: {}", studyShortName, count);
-        return count;
-    }
-
-    private Number getCeventCount() {
-        Number count = (Number) session.createCriteria(CollectionEvent.class, "cevent")
-            .createAlias("cevent.patient", "patient")
-            .createAlias("patient.study", "study")
-            .add(Restrictions.eq("study.nameShort", studyShortName))
-            .setProjection(Projections.rowCount())
-            .uniqueResult();
-        log.debug("getCeventCount: study: {}, count: {}", studyShortName, count);
-        return count;
-    }
-
-    private Number getPatientCount() {
-        Number count = (Number) session.createCriteria(Patient.class, "patient")
-            .createAlias("patient.study", "study")
-            .add(Restrictions.eq("study.nameShort", studyShortName))
-            .setProjection(Projections.rowCount())
-            .uniqueResult();
-        log.debug("getPatientCount: study: {}, count: {}", studyShortName, count);
-        return count;
+    private void patientCmd(String pnumber) {
+        StudyDelete.deletePatient(session, pnumber);
     }
 
 }
