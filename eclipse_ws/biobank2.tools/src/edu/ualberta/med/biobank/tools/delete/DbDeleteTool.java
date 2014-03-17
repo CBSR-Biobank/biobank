@@ -12,13 +12,8 @@ import org.slf4j.LoggerFactory;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.DispatchSpecimen;
-import edu.ualberta.med.biobank.model.Domain;
-import edu.ualberta.med.biobank.model.EventAttr;
 import edu.ualberta.med.biobank.model.Patient;
-import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Specimen;
-import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.model.StudyEventAttr;
 import edu.ualberta.med.biobank.tools.GenericAppArgs;
 import edu.ualberta.med.biobank.tools.SessionProvider;
 import edu.ualberta.med.biobank.tools.SessionProvider.Mode;
@@ -102,8 +97,7 @@ public class DbDeleteTool {
             getDispatchCount();
             getDispatchSpecimenCount();
         } else {
-            deleteDispatches();
-            deleteStudy();
+            StudyDelete.deleteStudy(session, studyShortName);
         }
     }
 
@@ -183,138 +177,4 @@ public class DbDeleteTool {
         return count;
     }
 
-    /**
-     * Deletes the dispatches, dispatch specimens and any comments.
-     */
-    @SuppressWarnings("unchecked")
-    private void deleteDispatches() {
-        // get list of child specimens in a dispatch
-        List<Integer> dispatchIds = session.createCriteria(Dispatch.class, "dispatch")
-            .createAlias("dispatch.dispatchSpecimens", "dspecimens")
-            .createAlias("dspecimens.specimen", "specimen")
-            .createAlias("specimen.parentSpecimen", "pspecimen")
-            .createAlias("pspecimen.collectionEvent", "cevent")
-            .createAlias("cevent.patient", "patient")
-            .createAlias("patient.study", "study")
-            .add(Restrictions.eq("study.nameShort", studyShortName))
-            .setProjection(Projections.distinct(Projections.property("dispatch.id")))
-            .list();
-
-        // aggregate list of parentc specimens in a dispatch
-        dispatchIds.addAll(
-            session.createCriteria(Dispatch.class, "dispatch")
-                .createAlias("dispatch.dispatchSpecimens", "dspecimens")
-                .createAlias("dspecimens.specimen", "specimen")
-                .createAlias("specimen.originalCollectionEvent", "cevent")
-                .createAlias("cevent.patient", "patient")
-                .createAlias("patient.study", "study")
-                .add(Restrictions.eq("study.nameShort", studyShortName))
-                .setProjection(Projections.distinct(Projections.property("dispatch.id")))
-                .list());
-
-        session.beginTransaction();
-        for (Integer dispatchId : dispatchIds) {
-            log.debug("deleteDispatches: dipatch: {}", dispatchId);
-            Dispatch dispatch = (Dispatch) session.load(Dispatch.class, dispatchId);
-            session.delete(dispatch);
-        }
-        session.getTransaction().commit();
-    }
-
-    private void deleteChildSpecimens(Specimen parentSpecimen) {
-        log.debug("deleteChildSpecimens: deleting child specimens for parent specimen: {}", parentSpecimen.getInventoryId());
-        for (Specimen specimen : parentSpecimen.getChildSpecimens()) {
-            log.debug("deleteSpecimens: specimen: {}", specimen.getInventoryId());
-            session.delete(specimen);
-        }
-        parentSpecimen.getChildSpecimens().clear();
-    }
-
-    private void deleteParentSpecimens(CollectionEvent cevent) {
-        session.beginTransaction();
-        for (Specimen specimen : cevent.getOriginalSpecimens()) {
-            deleteChildSpecimens(specimen);
-        }
-        session.getTransaction().commit();
-
-        session.beginTransaction();
-        for (Specimen specimen : cevent.getOriginalSpecimens()) {
-            log.debug("deleteParentSpecimens: specimen: {}", specimen.getInventoryId());
-            session.delete(specimen);
-        }
-        cevent.getOriginalSpecimens().clear();
-        session.getTransaction().commit();
-    }
-
-    private void deleteCollectionEvents(Patient patient) {
-        for (CollectionEvent cevent : patient.getCollectionEvents()) {
-            deleteParentSpecimens(cevent);
-        }
-
-        session.beginTransaction();
-        for (CollectionEvent cevent : patient.getCollectionEvents()) {
-            log.debug("deleteCollectionEvents: deleting collection event: {}",
-                cevent.getVisitNumber());
-
-            for (EventAttr eventAttr : cevent.getEventAttrs()) {
-                log.debug("deleteCollectionEvents: deleting event attr: {} - {}",
-                    eventAttr.getId(),
-                    eventAttr.getStudyEventAttr().getGlobalEventAttr().getLabel());
-                session.delete(eventAttr);
-            }
-
-            cevent.getEventAttrs().clear();
-            session.delete(cevent);
-        }
-        patient.getCollectionEvents().clear();
-        session.getTransaction().commit();
-    }
-
-    private void deletePatients(Study study) {
-        for (Patient patient : study.getPatients()) {
-            deleteCollectionEvents(patient);
-        }
-
-        session.beginTransaction();
-        for (Patient patient : study.getPatients()) {
-            log.debug("deletePatients: deleting patient: {}", patient.getPnumber());
-            session.delete(patient);
-        }
-        study.getPatients().clear();
-        session.getTransaction().commit();
-    }
-
-    private void deleteStudy() {
-        Study study = (Study) session.createCriteria(Study.class)
-            .add(Restrictions.eq("nameShort", studyShortName)).uniqueResult();
-        if (study != null) {
-            deletePatients(study);
-
-            @SuppressWarnings("unchecked")
-            List<Domain> domains = session.createCriteria(Domain.class, "domain")
-                .createAlias("domain.studies", "study")
-                .add(Restrictions.eq("study.nameShort", studyShortName)).list();
-
-            log.debug("deletePatients: deleting study: {}", study.getName());
-            session.beginTransaction();
-            for (Site site : study.getSites()) {
-                site.getStudies().remove(study);
-            }
-
-            for (StudyEventAttr studyEventAttrs : study.getStudyEventAttrs()) {
-                session.delete(studyEventAttrs);
-            }
-            study.getStudyEventAttrs().clear();
-
-            for (Domain domain : domains) {
-                domain.getStudies().remove(study);
-            }
-
-            session.delete(study);
-            session.getTransaction().commit();
-        } else {
-            System.out.println("Error: study " + studyShortName + " not found in database.");
-        }
-
-    }
 }

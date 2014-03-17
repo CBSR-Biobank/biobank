@@ -3,8 +3,6 @@
     <resolvers>
         <chain name="chain" returnFirst="true"  dual="true">
             <ibiblio name="central" m2compatible="true"/>
-            <ibiblio name="clamshellcli.repo" m2compatible="true"
-		 root="http://s3.amazonaws.com/repo.clamshellcli.org/release" />
         </chain>
         <ibiblio name="aicml-med" m2compatible="true"
 		 root="http://aicml-med.cs.ualberta.ca/biobank_maven2_repo/" />
@@ -23,6 +21,5 @@
         <module organisation="org.xnap.commons" resolver="gettext"/>
         <module organisation="com.pietschy.gwt" resolver="maven.pietschy.com"/>
         <module organisation="net.sf" name="jargs" resolver="jboss-thirdparty-releases"/>
-        <module organisation="org.clamshellcli" name="clamshell-api" resolver="clamshellcli.repo"/>
     </modules>
 </ivysettings>
