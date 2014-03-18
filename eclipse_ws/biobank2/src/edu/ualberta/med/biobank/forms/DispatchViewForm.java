@@ -129,7 +129,7 @@ public class DispatchViewForm extends BiobankViewForm {
             dateString = dispatch.getFormattedPackedAt();
         }
         if (dateString == null) {
-            form.setText(i18n.tr("Dispatch created for {1}", dateString,
+            form.setText(i18n.tr("Dispatch created for {0}",
                 dispatch.getSenderCenter().getNameShort()));
         } else {
             form.setText(i18n.tr("Dispatch sent on {0} from {1}",

@@ -21,9 +21,12 @@ public class ProcessingEventAddHandler extends AbstractHandler {
         ProcessingEventWrapper pe = new ProcessingEventWrapper(
             SessionManager.getAppService());
         pe.setCenter(SessionManager.getUser().getCurrentWorkingCenter());
-        ProcessingEventAdapter node = new ProcessingEventAdapter(ProcessingView
-            .getCurrent().getProcessingNode(), pe);
-        node.openEntryForm();
+
+        ProcessingView view = ProcessingView.getCurrent();
+        if (view != null) {
+            ProcessingEventAdapter node = new ProcessingEventAdapter(view.getProcessingNode(), pe);
+            node.openEntryForm();
+        }
         return null;
     }
 

@@ -39,12 +39,11 @@ public class DispatchInfoTable extends InfoTableWidget<Dispatch> {
         @SuppressWarnings("nls")
         @Override
         public String toString() {
-            return StringUtils
-                .join(
-                    new String[] { sender,
-                        DateFormatter.formatAsDate(dispatchTime), receiver,
-                        DateFormatter.formatAsDate(dateReceived), waybill,
-                        dstatus }, "\t");
+            return StringUtils.join(
+                new String[] { sender,
+                    DateFormatter.formatAsDate(dispatchTime), receiver,
+                    DateFormatter.formatAsDate(dateReceived), waybill,
+                    dstatus }, "\t");
         }
     }
 
@@ -160,22 +159,31 @@ public class DispatchInfoTable extends InfoTableWidget<Dispatch> {
     @Override
     protected Boolean canEdit(Dispatch target)
         throws ApplicationException {
-        return SessionManager.getAppService().isAllowed(
-            new DispatchUpdatePermission(target.getId()));
+        if (target != null) {
+            return SessionManager.getAppService().isAllowed(
+                new DispatchUpdatePermission(target.getId()));
+        }
+        return false;
     }
 
     @Override
     protected Boolean canDelete(Dispatch target)
         throws ApplicationException {
-        return SessionManager.getAppService().isAllowed(
-            new DispatchDeletePermission(target.getId()));
+        if (target != null) {
+            return SessionManager.getAppService().isAllowed(
+                new DispatchDeletePermission(target.getId()));
+        }
+        return false;
     }
 
     @Override
     protected Boolean canView(Dispatch target)
         throws ApplicationException {
-        return SessionManager.getAppService().isAllowed(
-            new DispatchReadPermission(target.getId()));
+        if (target != null) {
+            return SessionManager.getAppService().isAllowed(
+                new DispatchReadPermission(target.getId()));
+        }
+        return false;
     }
 
 }
