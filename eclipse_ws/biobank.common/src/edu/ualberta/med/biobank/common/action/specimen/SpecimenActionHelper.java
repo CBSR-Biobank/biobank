@@ -12,7 +12,6 @@ import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
-import edu.ualberta.med.biobank.model.BatchOperation;
 import edu.ualberta.med.biobank.model.BatchOperationSpecimen;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Container;
@@ -231,11 +230,11 @@ public class SpecimenActionHelper {
             }
         }
 
-        BatchOperation batch = (BatchOperation) context.getSession()
+        BatchOperationSpecimen batchSpecimen = (BatchOperationSpecimen) context.getSession()
             .createCriteria(BatchOperationSpecimen.class)
             .add(Restrictions.eq("specimen.id", specimen.getId())).uniqueResult();
 
-        return new SpecimenBriefInfo(specimen, parents, batch);
+        return new SpecimenBriefInfo(specimen, parents, batchSpecimen.getBatch());
     }
 
     /**

@@ -18,6 +18,8 @@ import org.hibernate.cfg.Environment;
 
 import com.mysql.jdbc.jdbc2.optional.MysqlConnectionPoolDataSource;
 
+import edu.ualberta.med.biobank.common.util.StringUtil;
+
 @SuppressWarnings("nls")
 public class SessionProvider {
     public enum Mode {
@@ -67,10 +69,10 @@ public class SessionProvider {
             String dbHost, dbName, dbUser, dbPassword;
 
             // system properties override db.properties file
-            dbHost = System.getProperty("database.host");
-            dbName = System.getProperty("database.name");
-            dbUser = System.getProperty("database.user");
-            dbPassword = System.getProperty("database.password");
+            dbHost = System.getProperty("database.host", StringUtil.EMPTY_STRING);
+            dbName = System.getProperty("database.name", StringUtil.EMPTY_STRING);
+            dbUser = System.getProperty("database.user", StringUtil.EMPTY_STRING);
+            dbPassword = System.getProperty("database.password", StringUtil.EMPTY_STRING);
 
             // attempt to read db.properties file
             String dbPropertiesFilename = System.getProperty("db.properties", "../../db.properties");
