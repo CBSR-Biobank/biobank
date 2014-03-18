@@ -27,6 +27,8 @@
   <property name="product.dir" location="product" />
   <property name="buildDirectory" value="${product.dir}/buildDirectory" />
 
+  <property name="branding" value="cbsr" />
+
   <path id="flyway.lib.path">
     <fileset dir="${lib.dir}/flyway" includes="*.jar"/>
   </path>
@@ -576,8 +578,20 @@
     <delete dir="${buildDirectory}" />
   </target>
 
+  <target name="branding-cbsr" if="branding.cbsr">
+    <copy file="branding/cbsr_splash.bmp"
+          tofile="${eclipse.proj.dir}/splash.bmp" overwrite="true" />
+  </target>
+
+  <target name="branding-stanford" if="branding.stanford">
+    <copy file="branding/stanford_splash.bmp"
+          tofile="${eclipse.proj.dir}/splash.bmp" overwrite="true" />
+  </target>
+
+  <target name="branding" depends="branding-cbsr,branding-stanford" />
+
   <target name="product"
-	  depends="clean-product,versions-update,deploy"
+	  depends="clean-product,versions-update,deploy,branding"
 	  description="build the product">
     <!-- buildDirectory is the folder where the plugins and products are found and build -->
     <!-- plugins and features are copied into the buildDirectory -->
