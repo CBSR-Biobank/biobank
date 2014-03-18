@@ -206,8 +206,12 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
         if (tryAgain) {
             tryAgain = false;
             confirm();
-        } else
-            SpecimenTransitView.getCurrent().reload();
+        } else {
+            SpecimenTransitView view = SpecimenTransitView.getCurrent();
+            if (view != null) {
+                SpecimenTransitView.getCurrent().reload();
+            }
+        }
     }
 
     protected abstract void reloadSpecimens();
