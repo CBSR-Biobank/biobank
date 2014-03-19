@@ -72,7 +72,7 @@ public abstract class AbstractReportGroup extends AdapterBase {
         return searchChildren(searchedClass, objectId);
     }
 
-    protected abstract Collection<ReportWrapper> getReports();
+    protected abstract Collection<ReportWrapper> getReports() throws Exception;
 
     protected Collection<Entity> getEntities() {
         if (entities == null) {

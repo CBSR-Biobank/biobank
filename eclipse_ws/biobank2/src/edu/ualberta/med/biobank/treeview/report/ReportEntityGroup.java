@@ -102,8 +102,7 @@ public class ReportEntityGroup extends AdapterBase {
     }
 
     @Override
-    protected List<? extends ModelWrapper<?>> getWrapperChildren()
-        throws Exception {
+    protected List<? extends ModelWrapper<?>> getWrapperChildren() throws Exception {
         List<ReportWrapper> reports = new ArrayList<ReportWrapper>();
         for (ReportWrapper report : parent.getReports()) {
             if (entity.getId().equals(report.getEntity().getId())) {
