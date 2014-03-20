@@ -92,19 +92,14 @@ public class ReportAdapter extends AdapterBase {
 
     private void copyReport() {
         if (SessionManager.getInstance().isConnected()) {
-            ReportWrapper report = new ReportWrapper(
-                (ReportWrapper) getModelObject());
+            ReportWrapper report = new ReportWrapper((ReportWrapper) getModelObject());
 
             @SuppressWarnings("nls")
-            String reportCopyName =
-                i18n.tr("{0} Report Copy", report.getName());
+            String reportCopyName = i18n.tr("{0} Report Copy", report.getName());
+
             report.setName(reportCopyName);
-
-            int userId = SessionManager.getUser().getId().intValue();
-            report.setUserId(userId);
-
-            ReportAdapter reportAdapter =
-                new ReportAdapter(getParent(), report);
+            report.setUser(SessionManager.getUser());
+            ReportAdapter reportAdapter = new ReportAdapter(getParent(), report);
             reportAdapter.openEntryForm();
         }
     }

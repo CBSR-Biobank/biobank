@@ -651,8 +651,7 @@ public class ReportEntryForm extends BiobankEntryForm {
 
                 closeEntryOpenView(false, false);
 
-                int userId = SessionManager.getUser().getId().intValue();
-                report.setUserId(userId);
+                report.setUser(SessionManager.getUser());
 
                 ReportAdapter reportAdapter = new ReportAdapter(
                     (AdapterBase) getAdapter().getParent(), report);

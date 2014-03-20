@@ -123,7 +123,7 @@ public class ReportEntityGroup extends AdapterBase {
                 SessionManager.getAppService());
 
             Report rawReport = report.getWrappedObject();
-            rawReport.setUserId(SessionManager.getUser().getId().intValue());
+            rawReport.setUser(SessionManager.getUser().getWrappedObject());
             rawReport.setEntity(entity);
 
             ReportAdapter reportAdapter = new ReportAdapter(this, report);

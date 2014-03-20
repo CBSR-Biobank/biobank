@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.treeview.report;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -9,7 +8,6 @@ import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.reports.AdvancedReportGetSharedAction;
-import edu.ualberta.med.biobank.common.permission.reports.ReportsPermission;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ReportWrapper;
 import edu.ualberta.med.biobank.model.Report;
@@ -27,27 +25,18 @@ public class SharedReportsGroup extends AbstractReportGroup {
         super(parent, id, NODE_NAME);
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected Collection<ReportWrapper> getReports() throws ApplicationException {
-        List<ReportWrapper> reports = new ArrayList<ReportWrapper>();
-
-        if (SessionManager.getInstance().isConnected()) {
-            try {
-                if (!SessionManager.getAppService().isAllowed(new ReportsPermission())) {
-                    return reports;
-                }
-            } catch (ApplicationException e2) {
-                return reports;
-            }
-
-            User user = SessionManager.getUser().getWrappedObject();
-
-            List<Report> rawReports = SessionManager.getAppService()
-                .doAction(new AdvancedReportGetSharedAction(user)).getList();
-            reports.addAll(ModelWrapper.wrapModelCollection(
-                SessionManager.getAppService(), rawReports, ReportWrapper.class));
-
+        if (!SessionManager.getInstance().isConnected()) {
+            throw new IllegalStateException("should only be called when user is logged in");
         }
+
+        User user = SessionManager.getUser().getWrappedObject();
+        List<Report> rawReports = SessionManager.getAppService()
+            .doAction(new AdvancedReportGetSharedAction(user)).getList();
+        List<ReportWrapper> reports = ModelWrapper.wrapModelCollection(
+            SessionManager.getAppService(), rawReports, ReportWrapper.class);
 
         return reports;
     }

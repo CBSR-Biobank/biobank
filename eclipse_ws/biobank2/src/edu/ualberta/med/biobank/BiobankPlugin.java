@@ -73,6 +73,10 @@ import edu.ualberta.med.biobank.treeview.patient.CollectionEventAdapter;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.processing.ProcessingEventAdapter;
 import edu.ualberta.med.biobank.treeview.processing.ProcessingEventGroup;
+import edu.ualberta.med.biobank.treeview.report.PrivateReportsGroup;
+import edu.ualberta.med.biobank.treeview.report.ReportAdapter;
+import edu.ualberta.med.biobank.treeview.report.ReportEntityGroup;
+import edu.ualberta.med.biobank.treeview.report.SharedReportsGroup;
 import edu.ualberta.med.biobank.treeview.request.ReceivingRequestGroup;
 import edu.ualberta.med.biobank.treeview.request.RequestAdapter;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
@@ -130,6 +134,12 @@ public class BiobankPlugin extends AbstractUIPlugin {
         classToImageKey.put(DispatchAdapter.class.getName(), BgcPlugin.Image.DISPATCH_SHIPMENT);
         classToImageKey.put(DispatchCenterAdapter.class.getName(), BgcPlugin.Image.SITE);
         classToImageKey.put(ReceivingRequestGroup.class.getName(), BgcPlugin.Image.REQUEST_SHIPPED);
+
+        classToImageKey.put(ReportAdapter.class.getName(), BgcPlugin.Image.REPORT);
+        classToImageKey.put(ReportEntityGroup.class.getName(), BgcPlugin.Image.REPORTS_GROUP);
+        classToImageKey.put(PrivateReportsGroup.class.getName(), BgcPlugin.Image.REPORTS_GROUP);
+        classToImageKey.put(SharedReportsGroup.class.getName(), BgcPlugin.Image.REPORTS_GROUP);
+
         classToImageKey.put(RequestAdapter.class.getName(), BgcPlugin.Image.REQUEST);
         classToImageKey.put(SpecimenAdapter.class.getName(), BgcPlugin.Image.SPECIMEN);
         classToImageKey.put(ProcessingEventAdapter.class.getName(), BgcPlugin.Image.PROCESSING_EVENT);

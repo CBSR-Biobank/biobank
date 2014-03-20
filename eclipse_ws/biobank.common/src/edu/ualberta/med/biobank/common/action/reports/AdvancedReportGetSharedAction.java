@@ -12,13 +12,8 @@ import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.reports.ReportsPermission;
-import edu.ualberta.med.biobank.model.Entity;
-import edu.ualberta.med.biobank.model.EntityColumn;
-import edu.ualberta.med.biobank.model.EntityProperty;
 import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.model.Report;
-import edu.ualberta.med.biobank.model.ReportColumn;
-import edu.ualberta.med.biobank.model.ReportFilter;
 import edu.ualberta.med.biobank.model.User;
 
 /**
@@ -62,23 +57,8 @@ public class AdvancedReportGetSharedAction implements Action<ListResult<Report>>
             .list();
 
         for (Report report : reports) {
-            if (userIdsInGroup.contains(report.getUserId())) {
-                // load associations
-                for (ReportColumn reportColumn : report.getReportColumns()) {
-                    reportColumn.getPosition();
-                }
-                for (ReportFilter reportFilter : report.getReportFilters()) {
-                    reportFilter.getPosition();
-                }
-                Entity entity = report.getEntity();
-                if (entity != null) {
-                    for (EntityProperty entityProperty : entity.getEntityProperties()) {
-                        for (EntityColumn entityColumn : entityProperty.getEntityColumns()) {
-                            entityColumn.getName();
-                        }
-                    }
-                }
-
+            if (userIdsInGroup.contains(report.getUser().getId())) {
+                AdvancedReportsGetAction.loadAssociations(report);
                 results.add(report);
             }
         }

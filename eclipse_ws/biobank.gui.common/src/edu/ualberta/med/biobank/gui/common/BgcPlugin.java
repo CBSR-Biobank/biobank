@@ -88,6 +88,8 @@ public class BgcPlugin extends AbstractUIPlugin {
         RECEIVED("received.png"),
         RELOAD_FORM("reload.png"),
         REMOVE("remove.png"),
+        REPORT("report.png"),
+        REPORTS_GROUP("reportsGroup.png"),
         REQUEST("request.png"),
         REQUEST_EDIT("request_edit.png"),
         REQUEST_FILLED("request_filled.png"),
