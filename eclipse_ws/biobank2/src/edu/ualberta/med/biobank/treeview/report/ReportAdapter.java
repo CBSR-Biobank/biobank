@@ -9,15 +9,20 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
+import org.springframework.remoting.RemoteConnectFailureException;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.reports.AdvancedReportDeleteAction;
+import edu.ualberta.med.biobank.common.action.reports.AdvancedReportGetAction;
+import edu.ualberta.med.biobank.common.action.reports.AdvancedReportGetAction.ReportData;
 import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ReportWrapper;
 import edu.ualberta.med.biobank.forms.ReportEntryForm;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.Report;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
@@ -25,8 +30,12 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.views.AdvancedReportsView;
 
 public class ReportAdapter extends AdapterBase {
-    private static final I18n i18n = I18nFactory
-        .getI18n(ReportAdapter.class);
+    private static final I18n i18n = I18nFactory.getI18n(ReportAdapter.class);
+
+    private static BgcLogger logger = BgcLogger.getLogger(ReportAdapter.class.getName());
+
+    @SuppressWarnings("nls")
+    private static final String COPY_FAILED_TITLE = i18n.tr("Copy Failed");
 
     public ReportAdapter(AdapterBase parent, ReportWrapper report) {
         super(parent, report);
@@ -90,17 +99,36 @@ public class ReportAdapter extends AdapterBase {
         });
     }
 
+    @SuppressWarnings("nls")
     private void copyReport() {
-        if (SessionManager.getInstance().isConnected()) {
-            ReportWrapper report = new ReportWrapper((ReportWrapper) getModelObject());
+        if (!SessionManager.getInstance().isConnected()) {
+            throw new IllegalStateException("user is not logged in");
+        }
 
-            @SuppressWarnings("nls")
+        try {
+            ReportWrapper reportToCopy = (ReportWrapper) getModelObject();
+
+            ReportData reportData = SessionManager.getAppService().doAction(
+                new AdvancedReportGetAction(reportToCopy.getWrappedObject()));
+
+            ReportWrapper originalReport = new ReportWrapper(
+                SessionManager.getAppService(), reportData.report);
+
+            ReportWrapper report = new ReportWrapper(originalReport);
+
             String reportCopyName = i18n.tr("{0} Report Copy", report.getName());
 
             report.setName(reportCopyName);
             report.setUser(SessionManager.getUser());
             ReportAdapter reportAdapter = new ReportAdapter(getParent(), report);
             reportAdapter.openEntryForm();
+        } catch (final RemoteConnectFailureException exp) {
+            BgcPlugin.openRemoteConnectErrorMessage(exp);
+        } catch (ActionException e) {
+            BgcPlugin.openAsyncError(COPY_FAILED_TITLE, e);
+        } catch (Exception e) {
+            BgcPlugin.openAsyncError(COPY_FAILED_TITLE, e);
+            logger.error("ReportAdapter.copyReport Error", e);
         }
     }
 

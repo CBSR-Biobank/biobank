@@ -1,23 +1,31 @@
 package edu.ualberta.med.biobank.common.action.reports;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.hibernate.criterion.Restrictions;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
-import edu.ualberta.med.biobank.common.action.ListResult;
+import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
+import edu.ualberta.med.biobank.common.action.reports.AdvancedReportsGetAction.AdvancedReportsData;
 import edu.ualberta.med.biobank.common.permission.reports.ReportsPermission;
-import edu.ualberta.med.biobank.model.Entity;
-import edu.ualberta.med.biobank.model.EntityColumn;
-import edu.ualberta.med.biobank.model.EntityProperty;
+import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.model.Report;
-import edu.ualberta.med.biobank.model.ReportColumn;
-import edu.ualberta.med.biobank.model.ReportFilter;
 import edu.ualberta.med.biobank.model.User;
 
-public class AdvancedReportsGetAction implements Action<ListResult<Report>> {
+/**
+ * Returns the reports belonging to a user. Both the user's private reports and those shared by the
+ * groups he/she is in are returned.
+ * 
+ * @author loyola
+ * 
+ */
+public class AdvancedReportsGetAction implements Action<AdvancedReportsData> {
     private static final long serialVersionUID = 1L;
 
     private final Integer userId;
@@ -25,7 +33,7 @@ public class AdvancedReportsGetAction implements Action<ListResult<Report>> {
     @SuppressWarnings("nls")
     public AdvancedReportsGetAction(User user) {
         if (user == null) {
-            throw new IllegalArgumentException("null user");
+            throw new IllegalArgumentException("user is null");
         }
         this.userId = user.getId();
     }
@@ -35,37 +43,64 @@ public class AdvancedReportsGetAction implements Action<ListResult<Report>> {
         return new ReportsPermission().isAllowed(context);
     }
 
-    @SuppressWarnings({ "unchecked", "nls" })
+    @SuppressWarnings("nls")
     @Override
-    public ListResult<Report> run(ActionContext context) throws ActionException {
+    public AdvancedReportsData run(ActionContext context) throws ActionException {
+        if (userId == null) {
+            throw new IllegalStateException("user id is null");
+        }
+
+        List<Report> userReports = getUserReports(context);
+        List<Report> sharedReports = getSharedReports(context);
+
+        return new AdvancedReportsData(userReports, sharedReports);
+    }
+
+    @SuppressWarnings({ "nls", "unchecked" })
+    private List<Report> getUserReports(ActionContext context) {
         List<Report> reports = context.getSession().createCriteria(Report.class, "report")
             .createAlias("report.user", "user")
             .add(Restrictions.eq("user.id", userId))
+            .add(Restrictions.eq("isPublic", false))
             .list();
 
-        for (Report report : reports) {
-            AdvancedReportsGetAction.loadAssociations(report);
-        }
-
-        return new ListResult<Report>(reports);
+        return reports;
     }
 
-    public static void loadAssociations(Report report) {
-        for (ReportColumn reportColumn : report.getReportColumns()) {
-            reportColumn.getPosition();
-        }
-        for (ReportFilter reportFilter : report.getReportFilters()) {
-            reportFilter.getPosition();
-        }
-        Entity entity = report.getEntity();
-        if (entity != null) {
-            for (EntityProperty entityProperty : entity.getEntityProperties()) {
-                for (EntityColumn entityColumn : entityProperty.getEntityColumns()) {
-                    entityColumn.getName();
-                }
+    @SuppressWarnings({ "unchecked", "nls" })
+    private List<Report> getSharedReports(ActionContext context) {
+        User user = context.load(User.class, userId);
+        Set<Integer> userIdsInGroup = new HashSet<Integer>();
+        for (Group group : user.getGroups()) {
+            for (User ug : group.getUsers()) {
+                userIdsInGroup.add(ug.getId());
             }
         }
 
+        List<Report> results = new ArrayList<Report>();
+        List<Report> reports = context.getSession().createCriteria(Report.class)
+            .add(Restrictions.eq("isPublic", true))
+            .list();
+
+        for (Report report : reports) {
+            if (userIdsInGroup.contains(report.getUser().getId())) {
+                results.add(report);
+            }
+        }
+
+        return results;
+    }
+
+    public static class AdvancedReportsData implements ActionResult {
+        private static final long serialVersionUID = 1L;
+
+        public final List<Report> userReports;
+        public final List<Report> sharedReports;
+
+        public AdvancedReportsData(List<Report> userReports, List<Report> sharedReports) {
+            this.userReports = Collections.unmodifiableList(userReports);
+            this.sharedReports = Collections.unmodifiableList(sharedReports);
+        }
     }
 
 }
