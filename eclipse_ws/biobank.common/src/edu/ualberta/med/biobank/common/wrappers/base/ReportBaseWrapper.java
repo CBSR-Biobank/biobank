@@ -11,6 +11,7 @@ import edu.ualberta.med.biobank.common.peer.ReportPeer;
 import edu.ualberta.med.biobank.common.wrappers.EntityWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.Property;
+import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.model.Report;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
@@ -31,7 +32,7 @@ public class ReportBaseWrapper extends ModelWrapper<Report> {
     }
 
     @Override
-   protected Report getNewObject() throws Exception {
+    protected Report getNewObject() throws Exception {
         Report newObject = super.getNewObject();
         newObject.setIsCount(false);
         newObject.setIsPublic(false);
@@ -65,12 +66,12 @@ public class ReportBaseWrapper extends ModelWrapper<Report> {
         setProperty(ReportPeer.DESCRIPTION, trimmed);
     }
 
-    public Integer getUserId() {
-        return getProperty(ReportPeer.USER_ID);
+    public UserWrapper getUser() {
+        return getWrappedProperty(ReportPeer.USER, UserWrapper.class);
     }
 
-    public void setUserId(Integer userId) {
-        setProperty(ReportPeer.USER_ID, userId);
+    public void setUser(UserWrapper user) {
+        setWrappedProperty(ReportPeer.USER, user);
     }
 
     public String getName() {
@@ -93,14 +94,16 @@ public class ReportBaseWrapper extends ModelWrapper<Report> {
     public EntityWrapper getEntity() {
         boolean notCached = !isPropertyCached(ReportPeer.ENTITY);
         EntityWrapper entity = getWrappedProperty(ReportPeer.ENTITY, EntityWrapper.class);
-        if (entity != null && notCached) ((EntityBaseWrapper) entity).addToReportCollectionInternal(Arrays.asList(this));
+        if (entity != null && notCached)
+            ((EntityBaseWrapper) entity).addToReportCollectionInternal(Arrays.asList(this));
         return entity;
     }
 
     public void setEntity(EntityBaseWrapper entity) {
         if (isInitialized(ReportPeer.ENTITY)) {
             EntityBaseWrapper oldEntity = getEntity();
-            if (oldEntity != null) oldEntity.removeFromReportCollectionInternal(Arrays.asList(this));
+            if (oldEntity != null)
+                oldEntity.removeFromReportCollectionInternal(Arrays.asList(this));
         }
         if (entity != null) entity.addToReportCollectionInternal(Arrays.asList(this));
         setWrappedProperty(ReportPeer.ENTITY, entity);

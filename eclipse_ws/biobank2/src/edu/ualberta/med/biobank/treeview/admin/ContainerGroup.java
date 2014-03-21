@@ -172,7 +172,7 @@ public class ContainerGroup extends AdapterBase {
         } catch (final RemoteConnectFailureException exp) {
             BgcPlugin.openRemoteConnectErrorMessage(exp);
         } catch (Exception e) {
-            log.error("BioBankFormBase.createPartControl Error", e);
+            log.error("ContainerGroup.addContainer Error", e);
         }
     }
 

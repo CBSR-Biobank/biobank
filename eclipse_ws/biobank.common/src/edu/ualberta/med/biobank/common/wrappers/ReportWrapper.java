@@ -24,10 +24,8 @@ public class ReportWrapper extends ReportBaseWrapper {
     public static final String PROPERTY_IS_COUNT = "isCount"; //$NON-NLS-1$
     public static final String PROPERTY_IS_PUBLIC = "isPublic"; //$NON-NLS-1$
     public static final String PROPERTY_USER_ID = "userId"; //$NON-NLS-1$
-    public static final String REPORT_COLUMN_COLLECTION_CACHE_KEY =
-        "reportColumns"; //$NON-NLS-1$
-    public static final String REPORT_FILTER_COLLECTION_CACHE_KEY =
-        "reportFilterCollection"; //$NON-NLS-1$
+    public static final String REPORT_COLUMN_COLLECTION_CACHE_KEY = "reportColumns"; //$NON-NLS-1$
+    public static final String REPORT_FILTER_COLLECTION_CACHE_KEY = "reportFilterCollection"; //$NON-NLS-1$
 
     public ReportWrapper(WritableApplicationService appService, Report report) {
         super(appService, report);
@@ -54,7 +52,7 @@ public class ReportWrapper extends ReportBaseWrapper {
 
         wrappedObject.setId(null);
         wrappedObject.setEntity(report.wrappedObject.getEntity());
-        wrappedObject.setUserId(report.wrappedObject.getUserId());
+        wrappedObject.setUser(report.wrappedObject.getUser());
 
         Collection<ReportColumn> reportColumns = new ArrayList<ReportColumn>();
         for (ReportColumn column : notNull(report.wrappedObject

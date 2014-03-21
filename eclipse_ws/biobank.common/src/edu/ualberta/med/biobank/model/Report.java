@@ -41,7 +41,7 @@ public class Report extends AbstractBiobankModel
 
     private String name;
     private String description;
-    private Integer userId;
+    private User user;
     private boolean isPublic;
     private boolean isCount;
     private Set<ReportColumn> reportColumns = new HashSet<ReportColumn>(0);
@@ -69,13 +69,15 @@ public class Report extends AbstractBiobankModel
         this.description = description;
     }
 
-    @Column(name = "USER_ID")
-    public Integer getUserId() {
-        return this.userId;
+    @NotNull(message = "{edu.ualberta.med.biobank.model.Report.user.NotNull}")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "USER_ID", nullable = false)
+    public User getUser() {
+        return this.user;
     }
 
-    public void setUserId(Integer userId) {
-        this.userId = userId;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     @Column(name = "IS_PUBLIC", nullable = false)

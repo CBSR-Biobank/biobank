@@ -1,93 +1,30 @@
 package edu.ualberta.med.biobank.treeview.report;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
-import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.permission.reports.ReportsPermission;
 import edu.ualberta.med.biobank.common.wrappers.ReportWrapper;
-import edu.ualberta.med.biobank.model.Report;
-import edu.ualberta.med.biobank.server.query.BiobankSQLCriteria;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import gov.nih.nci.system.applicationservice.ApplicationException;
-import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class SharedReportsGroup extends AbstractReportGroup {
-    private static final I18n i18n = I18nFactory
-        .getI18n(SharedReportsGroup.class);
+    private static final I18n i18n = I18nFactory.getI18n(SharedReportsGroup.class);
 
     @SuppressWarnings("nls")
     private static final String NODE_NAME = i18n.tr("Shared Reports");
-    @SuppressWarnings("nls")
-    private static final String USER_ID_TOKEN = "{userId}";
-    @SuppressWarnings("nls")
-    private static final String USER_ID_LIST_TOKEN = "{userIds}";
-    @SuppressWarnings("nls")
-    private static final String HQL_REPORT_OF_USER = "from "
-        + Report.class.getName() + " where isPublic <> 0 and userId in ("
-        + USER_ID_LIST_TOKEN + ")";
-    @SuppressWarnings("nls")
-    private static final String SQL_USERS_IN_SAME_GROUP =
-        "SELECT CONVERT(u2.user_id, CHAR) FROM csm_user u2";
 
-    public SharedReportsGroup(AdapterBase parent, int id) {
+    private final List<ReportWrapper> reports;
+
+    public SharedReportsGroup(AdapterBase parent, int id, List<ReportWrapper> sharedReports) {
         super(parent, id, NODE_NAME);
+        this.reports = sharedReports;
     }
 
-    @SuppressWarnings("nls")
     @Override
-    protected Collection<ReportWrapper> getReports() {
-        List<ReportWrapper> reports = new ArrayList<ReportWrapper>();
-
-        if (SessionManager.getInstance().isConnected()) {
-            String userId = SessionManager.getUser().getId().toString();
-
-            try {
-                if (!SessionManager.getAppService().isAllowed(
-                    new ReportsPermission()))
-                    return reports;
-            } catch (ApplicationException e2) {
-                return reports;
-            }
-            String sqlString = SQL_USERS_IN_SAME_GROUP.replace(USER_ID_TOKEN,
-                userId);
-            BiobankSQLCriteria sqlCriteria = new BiobankSQLCriteria(sqlString);
-            List<Object> userIds = Arrays.asList();
-
-            try {
-                userIds = SessionManager.getAppService().query(sqlCriteria,
-                    Report.class.getName());
-            } catch (ApplicationException e1) {
-                e1.printStackTrace();
-            }
-
-            if (!userIds.isEmpty()) {
-                String userIdList = StringUtils.join(userIds.toArray(), ",");
-
-                String hqlString = HQL_REPORT_OF_USER.replace(
-                    USER_ID_LIST_TOKEN, userIdList);
-
-                HQLCriteria hqlCriteria = new HQLCriteria(hqlString,
-                    Arrays.asList(new Object[] {}));
-                try {
-                    List<Report> rawReports = SessionManager.getAppService()
-                        .query(hqlCriteria);
-                    for (Report rawReport : rawReports) {
-                        reports.add(new ReportWrapper(SessionManager
-                            .getAppService(), rawReport));
-                    }
-                } catch (ApplicationException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
+    protected Collection<ReportWrapper> getReports() throws ApplicationException {
         return reports;
     }
 }

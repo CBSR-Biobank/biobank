@@ -102,8 +102,7 @@ public class ReportEntityGroup extends AdapterBase {
     }
 
     @Override
-    protected List<? extends ModelWrapper<?>> getWrapperChildren()
-        throws Exception {
+    protected List<? extends ModelWrapper<?>> getWrapperChildren() throws Exception {
         List<ReportWrapper> reports = new ArrayList<ReportWrapper>();
         for (ReportWrapper report : parent.getReports()) {
             if (entity.getId().equals(report.getEntity().getId())) {
@@ -124,7 +123,7 @@ public class ReportEntityGroup extends AdapterBase {
                 SessionManager.getAppService());
 
             Report rawReport = report.getWrappedObject();
-            rawReport.setUserId(SessionManager.getUser().getId().intValue());
+            rawReport.setUser(SessionManager.getUser().getWrappedObject());
             rawReport.setEntity(entity);
 
             ReportAdapter reportAdapter = new ReportAdapter(this, report);
