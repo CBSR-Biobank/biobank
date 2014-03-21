@@ -117,18 +117,20 @@ public class ReportEntityGroup extends AdapterBase {
         return null;
     }
 
+    @SuppressWarnings("nls")
     private void openNewReport() {
-        if (SessionManager.getInstance().isConnected()) {
-            ReportWrapper report = new ReportWrapper(
-                SessionManager.getAppService());
-
-            Report rawReport = report.getWrappedObject();
-            rawReport.setUser(SessionManager.getUser().getWrappedObject());
-            rawReport.setEntity(entity);
-
-            ReportAdapter reportAdapter = new ReportAdapter(this, report);
-            reportAdapter.openEntryForm();
+        if (!SessionManager.getInstance().isConnected()) {
+            throw new IllegalStateException("user is not logged in");
         }
+
+        ReportWrapper report = new ReportWrapper(SessionManager.getAppService());
+
+        Report rawReport = report.getWrappedObject();
+        rawReport.setUser(SessionManager.getUser().getWrappedObject());
+        rawReport.setEntity(entity);
+
+        ReportAdapter reportAdapter = new ReportAdapter(this, report);
+        reportAdapter.openEntryForm();
     }
 
     @Override

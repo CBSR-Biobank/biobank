@@ -16,6 +16,8 @@ public class PrivateReportsGroup extends AbstractReportGroup {
     @SuppressWarnings("nls")
     private static final String NODE_NAME = i18n.tr("My Reports");
 
+    private final int NODE_ID = 100;
+
     private final List<ReportWrapper> reports;
 
     public PrivateReportsGroup(AdapterBase parent, int id, List<ReportWrapper> userReports) {
@@ -26,6 +28,11 @@ public class PrivateReportsGroup extends AbstractReportGroup {
     @Override
     protected Collection<ReportWrapper> getReports() throws ApplicationException {
         return reports;
+    }
+
+    @Override
+    protected int getStartNodeId() {
+        return NODE_ID;
     }
 
 }

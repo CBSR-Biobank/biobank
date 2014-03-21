@@ -43,6 +43,9 @@ import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.reports.AdvancedReportGetAction;
+import edu.ualberta.med.biobank.common.action.reports.AdvancedReportGetAction.ReportData;
+import edu.ualberta.med.biobank.common.action.reports.AdvancedReportSaveAction;
 import edu.ualberta.med.biobank.common.reports.filters.FilterOperator;
 import edu.ualberta.med.biobank.common.util.AbstractBiobankListProxy;
 import edu.ualberta.med.biobank.common.util.ReportListProxy;
@@ -114,13 +117,14 @@ public class ReportEntryForm extends BiobankEntryForm {
 
     private PrintPdfDataExporter printPdfDataExporter;
 
-    @SuppressWarnings("deprecation")
     @Override
     protected void init() throws Exception {
         reportAdapter = (ReportAdapter) adapter;
-        report = (ReportWrapper) getModelObject();
-        report.reload();
 
+        ReportData reportData = SessionManager.getAppService().doAction(
+            new AdvancedReportGetAction(reportAdapter.getId()));
+
+        report = new ReportWrapper(SessionManager.getAppService(), reportData.report);
         updatePartName();
     }
 
@@ -140,7 +144,9 @@ public class ReportEntryForm extends BiobankEntryForm {
             }
         });
 
-        report.persist();
+        SessionManager.getAppService().doAction(
+            new AdvancedReportSaveAction(reportAdapter.getId()));
+
         reportAdapter.getParent().performExpand();
     }
 

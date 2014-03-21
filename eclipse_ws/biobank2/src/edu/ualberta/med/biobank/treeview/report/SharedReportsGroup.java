@@ -16,6 +16,8 @@ public class SharedReportsGroup extends AbstractReportGroup {
     @SuppressWarnings("nls")
     private static final String NODE_NAME = i18n.tr("Shared Reports");
 
+    private final int NODE_ID = 200;
+
     private final List<ReportWrapper> reports;
 
     public SharedReportsGroup(AdapterBase parent, int id, List<ReportWrapper> sharedReports) {
@@ -26,5 +28,10 @@ public class SharedReportsGroup extends AbstractReportGroup {
     @Override
     protected Collection<ReportWrapper> getReports() throws ApplicationException {
         return reports;
+    }
+
+    @Override
+    protected int getStartNodeId() {
+        return NODE_ID;
     }
 }

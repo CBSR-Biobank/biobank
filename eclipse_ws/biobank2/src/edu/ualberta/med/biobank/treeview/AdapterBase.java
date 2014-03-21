@@ -322,9 +322,9 @@ public abstract class AdapterBase extends AbstractAdapterBase {
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     protected int internalCompareTo(AbstractAdapterBase o) {
-        if (getModelObject() != null)
-            return getModelObject().compareTo(
-                (ModelWrapper) ((AdapterBase) o).getModelObject());
+        if (getModelObject() != null) {
+            return getModelObject().compareTo((ModelWrapper) ((AdapterBase) o).getModelObject());
+        }
         return 0;
     }
 

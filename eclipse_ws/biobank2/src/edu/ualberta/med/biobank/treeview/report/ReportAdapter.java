@@ -49,7 +49,7 @@ public class ReportAdapter extends AdapterBase {
         String label = StringUtil.EMPTY_STRING;
 
         ReportWrapper report = (ReportWrapper) getModelObject();
-        if (report != null && report.getName() != null) {
+        if ((report != null) && (report.getName() != null)) {
             label = report.getName();
         }
 
@@ -78,17 +78,15 @@ public class ReportAdapter extends AdapterBase {
         mi.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                boolean delete =
-                    BgcPlugin.openConfirm(
-                        i18n.tr("Delete Report"),
-                        i18n.tr(
-                            "Are you sure you want to delete the report named ''{0}''? This action cannot be undone.",
-                            ((ReportWrapper) getModelObject()).getName()));
+                boolean delete = BgcPlugin.openConfirm(
+                    i18n.tr("Delete Report"),
+                    i18n.tr(
+                        "Are you sure you want to delete the report named ''{0}''? This action cannot be undone.",
+                        ((ReportWrapper) getModelObject()).getName()));
                 if (delete) {
                     try {
-                        AdvancedReportDeleteAction action =
-                            new AdvancedReportDeleteAction(getModelObject()
-                                .getId());
+                        AdvancedReportDeleteAction action = new AdvancedReportDeleteAction(
+                            getModelObject().getId());
                         SessionManager.getAppService().doAction(action);
                         parent.removeChild(ReportAdapter.this);
                         AdvancedReportsView.getCurrent().reload();
@@ -143,8 +141,7 @@ public class ReportAdapter extends AdapterBase {
     }
 
     @Override
-    protected List<? extends ModelWrapper<?>> getWrapperChildren()
-        throws Exception {
+    protected List<? extends ModelWrapper<?>> getWrapperChildren() throws Exception {
         return null;
     }
 
@@ -160,8 +157,9 @@ public class ReportAdapter extends AdapterBase {
 
     @Override
     public int compareTo(AbstractAdapterBase o) {
-        if (o instanceof ReportAdapter)
+        if (o instanceof ReportAdapter) {
             return internalCompareTo(o);
+        }
         return 0;
     }
 

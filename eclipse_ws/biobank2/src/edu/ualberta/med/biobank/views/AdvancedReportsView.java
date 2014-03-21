@@ -129,8 +129,7 @@ public class AdvancedReportsView extends AbstractAdministrationView {
 
             RootNode reportsRootNode = (RootNode) rootNode;
 
-            AbstractReportGroup adapter =
-                new PrivateReportsGroup(reportsRootNode, 0, userReports);
+            AbstractReportGroup adapter = new PrivateReportsGroup(reportsRootNode, 0, userReports);
             adapter.setParent(rootNode);
             adapter.setModifiable(true);
             rootNode.addChild(adapter);

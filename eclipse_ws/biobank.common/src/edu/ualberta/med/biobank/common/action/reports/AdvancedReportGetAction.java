@@ -26,6 +26,10 @@ public class AdvancedReportGetAction implements Action<ReportData> {
         this.reportId = report.getId();
     }
 
+    public AdvancedReportGetAction(Integer reportId) {
+        this.reportId = reportId;
+    }
+
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
         return new ReportsPermission().isAllowed(context);
