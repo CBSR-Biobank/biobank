@@ -8,7 +8,12 @@ import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.reports.ReportSaveInput.ReportColumnSaveInput;
+import edu.ualberta.med.biobank.common.action.reports.ReportSaveInput.ReportFilterSaveInput;
+import edu.ualberta.med.biobank.common.action.reports.ReportSaveInput.ReportFilterValueSaveInput;
+import edu.ualberta.med.biobank.common.permission.reports.ReportsPermission;
 import edu.ualberta.med.biobank.model.Entity;
+import edu.ualberta.med.biobank.model.EntityColumn;
+import edu.ualberta.med.biobank.model.PropertyModifier;
 import edu.ualberta.med.biobank.model.Report;
 import edu.ualberta.med.biobank.model.ReportColumn;
 import edu.ualberta.med.biobank.model.ReportFilter;
@@ -27,51 +32,74 @@ public class AdvancedReportSaveAction implements Action<IdResult> {
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return false;
+        return new ReportsPermission().isAllowed(context);
     }
 
     @Override
     public IdResult run(ActionContext context) throws ActionException {
         Report report = context.load(Report.class, info.getReportId(), new Report());
 
-        
-        report.setName(info.getName()); 
+        report.setName(info.getName());
         report.setDescription(info.getDescription());
-        report.setIsCount(info.isCount()); 
+        report.setIsCount(info.isCount());
         report.setIsPublic(info.isPublic());
-        
+
         Entity entity = context.load(Entity.class, info.getEntityId());
         report.setEntity(entity);
-        
+
         User user = context.load(User.class, info.getUserId());
         report.setUser(user);
-        
-        Set<ReportColumn> reportColumns = new HashSet<ReportColumn>(); 
-        for (ReportColumnSaveInput input : info.getReportColumnInput()) {
-            
-            ReportColumn columnCopy = new ReportColumn();
-            columnCopy.setEntityColumn(column.getEntityColumn());
-        columnCopy.setPosition(column.getPosition());
-        columnCopy.setPropertyModifier(column.getPropertyModifier());
-                reportColumns.add(columnCopy); 
-                } 
-        report.setReportColumns(reportColumns);
-        
-        Set<ReportFilter> reportFilters = new HashSet<ReportFilter>(); for (ReportFilter filter :
-        notNull(info.reportFilters) { ReportFilter filterCopy = new ReportFilter();
-        filterCopy.setEntityFilter(filter.getEntityFilter());
-        filterCopy.setOperator(filter.getOperator());
-        filterCopy.setPosition(filter.getPosition());
-        
-        Set<ReportFilterValue> values = new HashSet<ReportFilterValue>(); for (ReportFilterValue
-        value : notNull(filter .getReportFilterValues())) { ReportFilterValue valueCopy = new
-        ReportFilterValue(); valueCopy.setPosition(value.getPosition());
-        valueCopy.setValue(value.getValue()); valueCopy.setSecondValue(value.getSecondValue());
-        
-        values.add(valueCopy); } filterCopy.setReportFilterValues(values);
-        
-        reportFilters.add(filterCopy); } report.setReportFilters(reportFilters);
-        
-        return new IdResult(2);
+
+        Set<ReportColumn> reportColumns = new HashSet<ReportColumn>();
+        for (ReportColumnSaveInput columnInput : info.getReportColumnInput()) {
+            ReportColumn column = new ReportColumn();
+            column.setPosition(columnInput.getPosition());
+
+            Integer propertyModifierId = columnInput.getPropertyModifierId();
+
+            if (propertyModifierId != null) {
+                PropertyModifier modifier = context.load(
+                    PropertyModifier.class, columnInput.getPropertyModifierId());
+
+                column.setPropertyModifier(modifier);
+            }
+
+            EntityColumn entityColumn = context.load(
+                EntityColumn.class, columnInput.getEntityColumnId());
+
+            column.setEntityColumn(entityColumn);
+            column.setReport(report);
+            reportColumns.add(column);
+        }
+
+        report.getReportColumns().clear();
+        report.getReportColumns().addAll(reportColumns);
+
+        Set<ReportFilter> reportFilters = new HashSet<ReportFilter>();
+        for (ReportFilterSaveInput filterInput : info.getReportFilterInput()) {
+            ReportFilter filter = new ReportFilter();
+            filter.setPosition(filterInput.getPosition());
+            filter.setOperator(filterInput.getOperator());
+
+            Set<ReportFilterValue> filterValues = new HashSet<ReportFilterValue>();
+
+            for (ReportFilterValueSaveInput filterValueInput : filterInput.getFilterValues()) {
+                ReportFilterValue filterValue = new ReportFilterValue();
+                filterValue.setPosition(filterValueInput.getPosition());
+                filterValue.setValue(filterValueInput.getValue());
+                filterValue.setSecondValue(filterValueInput.getSecondValue());
+                filterValues.add(filterValue);
+            }
+            filter.getReportFilterValues().clear();
+            filter.getReportFilterValues().addAll(filterValues);
+            filter.setReport(report);
+            reportFilters.add(filter);
+        }
+
+        report.getReportFilters().clear();
+        report.getReportFilters().addAll(reportFilters);
+        context.getSession().saveOrUpdate(report);
+
+        return new IdResult(report.getId());
     }
 }

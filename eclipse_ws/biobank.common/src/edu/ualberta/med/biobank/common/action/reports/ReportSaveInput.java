@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.action.security.Action2p0.ActionInput;
+import edu.ualberta.med.biobank.model.PropertyModifier;
 import edu.ualberta.med.biobank.model.Report;
 import edu.ualberta.med.biobank.model.ReportColumn;
 import edu.ualberta.med.biobank.model.ReportFilter;
@@ -94,7 +95,12 @@ public class ReportSaveInput implements ActionInput {
 
         public ReportColumnSaveInput(ReportColumn reportColumn) {
             this.position = reportColumn.getPosition();
-            this.propertyModifierId = reportColumn.getPropertyModifier().getId();
+            PropertyModifier propertyModifier = reportColumn.getPropertyModifier();
+            if (propertyModifier != null) {
+                this.propertyModifierId = reportColumn.getPropertyModifier().getId();
+            } else {
+                this.propertyModifierId = null;
+            }
             this.entityColumnId = reportColumn.getEntityColumn().getId();
         }
 

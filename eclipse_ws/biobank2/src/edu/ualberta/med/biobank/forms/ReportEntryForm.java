@@ -46,6 +46,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.reports.AdvancedReportGetAction;
 import edu.ualberta.med.biobank.common.action.reports.AdvancedReportGetAction.ReportData;
 import edu.ualberta.med.biobank.common.action.reports.AdvancedReportSaveAction;
+import edu.ualberta.med.biobank.common.action.reports.ReportSaveInput;
 import edu.ualberta.med.biobank.common.reports.filters.FilterOperator;
 import edu.ualberta.med.biobank.common.util.AbstractBiobankListProxy;
 import edu.ualberta.med.biobank.common.util.ReportListProxy;
@@ -133,7 +134,6 @@ public class ReportEntryForm extends BiobankEntryForm {
         AdvancedReportsView.getCurrent().reload();
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     protected void saveForm() throws Exception {
         form.getDisplay().syncExec(new Runnable() {
@@ -145,7 +145,7 @@ public class ReportEntryForm extends BiobankEntryForm {
         });
 
         SessionManager.getAppService().doAction(
-            new AdvancedReportSaveAction(reportAdapter.getId()));
+            new AdvancedReportSaveAction(new ReportSaveInput(report.getWrappedObject())));
 
         reportAdapter.getParent().performExpand();
     }
