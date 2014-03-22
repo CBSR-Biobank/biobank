@@ -7,6 +7,7 @@ import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
+import edu.ualberta.med.biobank.common.action.reports.ReportSaveInput.ReportColumnSaveInput;
 import edu.ualberta.med.biobank.model.Entity;
 import edu.ualberta.med.biobank.model.Report;
 import edu.ualberta.med.biobank.model.ReportColumn;
@@ -46,12 +47,14 @@ public class AdvancedReportSaveAction implements Action<IdResult> {
         report.setUser(user);
         
         Set<ReportColumn> reportColumns = new HashSet<ReportColumn>(); 
-        for (Integer columId : info.getReportColumnIds()) {
+        for (ReportColumnSaveInput input : info.getReportColumnInput()) {
+            
             ReportColumn columnCopy = new ReportColumn();
             columnCopy.setEntityColumn(column.getEntityColumn());
         columnCopy.setPosition(column.getPosition());
         columnCopy.setPropertyModifier(column.getPropertyModifier());
-                reportColumns.add(columnCopy); } 
+                reportColumns.add(columnCopy); 
+                } 
         report.setReportColumns(reportColumns);
         
         Set<ReportFilter> reportFilters = new HashSet<ReportFilter>(); for (ReportFilter filter :
