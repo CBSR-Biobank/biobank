@@ -3,6 +3,8 @@ package edu.ualberta.med.biobank.common.action.reports;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.hibernate.Session;
+
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
@@ -13,6 +15,7 @@ import edu.ualberta.med.biobank.common.action.reports.ReportSaveInput.ReportFilt
 import edu.ualberta.med.biobank.common.permission.reports.ReportsPermission;
 import edu.ualberta.med.biobank.model.Entity;
 import edu.ualberta.med.biobank.model.EntityColumn;
+import edu.ualberta.med.biobank.model.EntityFilter;
 import edu.ualberta.med.biobank.model.PropertyModifier;
 import edu.ualberta.med.biobank.model.Report;
 import edu.ualberta.med.biobank.model.ReportColumn;
@@ -37,6 +40,7 @@ public class AdvancedReportSaveAction implements Action<IdResult> {
 
     @Override
     public IdResult run(ActionContext context) throws ActionException {
+        Session session = context.getSession();
         Report report = context.load(Report.class, info.getReportId(), new Report());
 
         report.setName(info.getName());
@@ -69,6 +73,7 @@ public class AdvancedReportSaveAction implements Action<IdResult> {
 
             column.setEntityColumn(entityColumn);
             column.setReport(report);
+            session.save(column);
             reportColumns.add(column);
         }
 
@@ -81,6 +86,10 @@ public class AdvancedReportSaveAction implements Action<IdResult> {
             filter.setPosition(filterInput.getPosition());
             filter.setOperator(filterInput.getOperator());
 
+            EntityFilter entityFilter = context.load(
+                EntityFilter.class, filterInput.getEntityFilterId());
+            filter.setEntityFilter(entityFilter);
+
             Set<ReportFilterValue> filterValues = new HashSet<ReportFilterValue>();
 
             for (ReportFilterValueSaveInput filterValueInput : filterInput.getFilterValues()) {
@@ -88,17 +97,19 @@ public class AdvancedReportSaveAction implements Action<IdResult> {
                 filterValue.setPosition(filterValueInput.getPosition());
                 filterValue.setValue(filterValueInput.getValue());
                 filterValue.setSecondValue(filterValueInput.getSecondValue());
+                session.save(filterValue);
                 filterValues.add(filterValue);
             }
             filter.getReportFilterValues().clear();
             filter.getReportFilterValues().addAll(filterValues);
             filter.setReport(report);
+            session.save(filter);
             reportFilters.add(filter);
         }
 
         report.getReportFilters().clear();
         report.getReportFilters().addAll(reportFilters);
-        context.getSession().saveOrUpdate(report);
+        session.saveOrUpdate(report);
 
         return new IdResult(report.getId());
     }

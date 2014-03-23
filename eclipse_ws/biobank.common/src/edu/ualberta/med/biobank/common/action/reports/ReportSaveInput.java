@@ -46,7 +46,8 @@ public class ReportSaveInput implements ActionInput {
         }
 
         for (ReportFilter reportFilter : report.getReportFilters()) {
-            new ReportFilterSaveInput(reportFilter);
+            ReportFilterSaveInput input = new ReportFilterSaveInput(reportFilter);
+            reportFilterInput.add(input);
         }
     }
 
@@ -123,27 +124,17 @@ public class ReportSaveInput implements ActionInput {
         private final Integer position;
         private final Integer operator;
         private final Set<ReportFilterValueSaveInput> filterValues;
-
-        public ReportFilterSaveInput(
-            Integer position,
-            Integer operator,
-            Set<ReportFilterValue> filterValues) {
-            this.position = position;
-            this.operator = operator;
-            this.filterValues = new HashSet<ReportFilterValueSaveInput>(filterValues.size());
-            for (ReportFilterValue filterValue : filterValues) {
-                this.filterValues.add(new ReportFilterValueSaveInput(filterValue));
-            }
-        }
+        private final Integer entityFilterId;
 
         public ReportFilterSaveInput(ReportFilter reportFilter) {
             this.position = reportFilter.getPosition();
             this.operator = reportFilter.getOperator();
-            this.filterValues =
-                new HashSet<ReportFilterValueSaveInput>(reportFilter.getReportFilterValues().size());
+            this.filterValues = new HashSet<ReportFilterValueSaveInput>(
+                reportFilter.getReportFilterValues().size());
             for (ReportFilterValue filterValue : reportFilter.getReportFilterValues()) {
                 this.filterValues.add(new ReportFilterValueSaveInput(filterValue));
             }
+            this.entityFilterId = reportFilter.getEntityFilter().getId();
         }
 
         public Integer getPosition() {
@@ -156,6 +147,10 @@ public class ReportSaveInput implements ActionInput {
 
         public Set<ReportFilterValueSaveInput> getFilterValues() {
             return filterValues;
+        }
+
+        public Integer getEntityFilterId() {
+            return entityFilterId;
         }
     }
 

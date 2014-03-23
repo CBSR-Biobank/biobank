@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.test.action;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.hibernate.criterion.Restrictions;
@@ -115,10 +116,24 @@ public class TestAdvancedReports extends TestAction {
         Assert.assertEquals(report.getIsPublic(), dbReport.getIsPublic());
         Assert.assertEquals(report.getIsCount(), dbReport.getIsCount());
         Assert.assertEquals(report.getEntity().getId(), dbReport.getEntity().getId());
-        Assert.assertEquals(report.getReportColumns().size(), dbReport.getReportColumns().size());
-        Assert.assertEquals(report.getReportFilters().size(), dbReport.getReportFilters().size());
 
-        for (ReportFilter filter : dbReport.getReportFilters()) {
+        @SuppressWarnings("unchecked")
+        List<ReportFilter> dbColumns = session.createCriteria(ReportColumn.class, "reportColumn")
+            .createAlias("reportColumn.report", "report")
+            .add(Restrictions.eq("report.id", idResult.getId()))
+            .list();
+
+        Assert.assertEquals(report.getReportColumns().size(), dbColumns.size());
+
+        @SuppressWarnings("unchecked")
+        List<ReportFilter> dbFilters = session.createCriteria(ReportFilter.class, "reportFilter")
+            .createAlias("reportFilter.report", "report")
+            .add(Restrictions.eq("report.id", idResult.getId()))
+            .list();
+
+        Assert.assertEquals(report.getReportFilters().size(), dbFilters.size());
+
+        for (ReportFilter filter : dbFilters) {
             Assert.assertEquals(1, filter.getReportFilterValues().size());
         }
     }
