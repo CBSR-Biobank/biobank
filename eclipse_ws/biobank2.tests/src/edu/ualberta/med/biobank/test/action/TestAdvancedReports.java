@@ -137,4 +137,37 @@ public class TestAdvancedReports extends TestAction {
             Assert.assertEquals(1, filter.getReportFilterValues().size());
         }
     }
+
+    @Test
+    public void resave() {
+        String name = getMethodNameR();
+        Report report = createReport(name, name);
+        IdResult idResult = exec(new AdvancedReportSaveAction(new ReportSaveInput(report)));
+
+        String name2 = getMethodNameR();
+        report = (Report) session.load(Report.class, idResult.getId());
+        report.setName(name2);
+        IdResult idResult2 = exec(new AdvancedReportSaveAction(new ReportSaveInput(report)));
+
+        Assert.assertEquals(idResult.getId(), idResult2.getId());
+
+        Report dbReport = (Report) session.load(Report.class, idResult.getId());
+        Assert.assertEquals(name2, dbReport.getName());
+
+        @SuppressWarnings("unchecked")
+        List<ReportFilter> dbColumns = session.createCriteria(ReportColumn.class, "reportColumn")
+            .createAlias("reportColumn.report", "report")
+            .add(Restrictions.eq("report.id", idResult.getId()))
+            .list();
+
+        Assert.assertEquals(report.getReportColumns().size(), dbColumns.size());
+
+        @SuppressWarnings("unchecked")
+        List<ReportFilter> dbFilters = session.createCriteria(ReportFilter.class, "reportFilter")
+            .createAlias("reportFilter.report", "report")
+            .add(Restrictions.eq("report.id", idResult.getId()))
+            .list();
+
+        Assert.assertEquals(report.getReportFilters().size(), dbFilters.size());
+    }
 }

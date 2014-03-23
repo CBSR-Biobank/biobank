@@ -54,6 +54,12 @@ public class AdvancedReportSaveAction implements Action<IdResult> {
         User user = context.load(User.class, info.getUserId());
         report.setUser(user);
 
+        // delete old report columns
+        for (ReportColumn column : report.getReportColumns()) {
+            session.delete(column);
+        }
+        report.getReportColumns().clear();
+
         Set<ReportColumn> reportColumns = new HashSet<ReportColumn>();
         for (ReportColumnSaveInput columnInput : info.getReportColumnInput()) {
             ReportColumn column = new ReportColumn();
@@ -77,8 +83,16 @@ public class AdvancedReportSaveAction implements Action<IdResult> {
             reportColumns.add(column);
         }
 
-        report.getReportColumns().clear();
         report.getReportColumns().addAll(reportColumns);
+
+        // delete old report filters
+        for (ReportFilter filter : report.getReportFilters()) {
+            for (ReportFilterValue filterValue : filter.getReportFilterValues()) {
+                session.delete(filterValue);
+            }
+            session.delete(filter);
+        }
+        report.getReportFilters().clear();
 
         Set<ReportFilter> reportFilters = new HashSet<ReportFilter>();
         for (ReportFilterSaveInput filterInput : info.getReportFilterInput()) {
@@ -107,7 +121,6 @@ public class AdvancedReportSaveAction implements Action<IdResult> {
             reportFilters.add(filter);
         }
 
-        report.getReportFilters().clear();
         report.getReportFilters().addAll(reportFilters);
         session.saveOrUpdate(report);
 
