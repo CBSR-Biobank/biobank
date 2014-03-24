@@ -46,6 +46,8 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.reports.AdvancedReportGetAction;
 import edu.ualberta.med.biobank.common.action.reports.AdvancedReportGetAction.ReportData;
 import edu.ualberta.med.biobank.common.action.reports.AdvancedReportSaveAction;
+import edu.ualberta.med.biobank.common.action.reports.EntityGetAction;
+import edu.ualberta.med.biobank.common.action.reports.EntityGetAction.EntityData;
 import edu.ualberta.med.biobank.common.action.reports.ReportSaveInput;
 import edu.ualberta.med.biobank.common.reports.filters.FilterOperator;
 import edu.ualberta.med.biobank.common.util.AbstractBiobankListProxy;
@@ -63,6 +65,7 @@ import edu.ualberta.med.biobank.forms.listener.ProgressMonitorDialogBusyListener
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.model.EntityColumn;
 import edu.ualberta.med.biobank.model.EntityFilter;
 import edu.ualberta.med.biobank.model.HasName;
 import edu.ualberta.med.biobank.model.Log;
@@ -118,15 +121,56 @@ public class ReportEntryForm extends BiobankEntryForm {
 
     private PrintPdfDataExporter printPdfDataExporter;
 
+    private ReportData reportData;
+
+    private List<EntityFilter> entityFilters;
+
+    private List<EntityColumn> entityColumns;
+
     @Override
     protected void init() throws Exception {
         reportAdapter = (ReportAdapter) adapter;
-
-        ReportData reportData = SessionManager.getAppService().doAction(
-            new AdvancedReportGetAction(reportAdapter.getId()));
-
-        report = new ReportWrapper(SessionManager.getAppService(), reportData.report);
+        updateReportInfo(adapter.getId());
         updatePartName();
+    }
+
+    @SuppressWarnings("deprecation")
+    private void updateReportInfo(Integer id) throws Exception {
+        if (id != null) {
+            reportData = SessionManager.getAppService().doAction(
+                new AdvancedReportGetAction(reportAdapter.getId()));
+            report = new ReportWrapper(SessionManager.getAppService(), reportData.report);
+        } else {
+            reportData = new ReportData();
+            report = (ReportWrapper) getModelObject();
+        }
+
+        EntityData entityData = SessionManager.getAppService().doAction(
+            new EntityGetAction(report.getEntity().getWrappedObject()));
+        entityFilters = entityData.getFilters();
+        Collections.sort(entityFilters, COMPARE_FILTERS_BY_NAME);
+
+        entityColumns = entityData.getColumns();
+    }
+
+    @SuppressWarnings("nls")
+    private void updatePartName() {
+        String entityName = report.getEntity().getName();
+
+        String tabName;
+        if (report.isNew()) {
+            tabName = i18n.tr("New {0} Report", entityName);
+            report.setName(tabName);
+        } else {
+            String reportName = report.getName();
+            if (reportName == null || reportName.isEmpty()) {
+                tabName = i18n.tr("Unnamed {0} Report", entityName);
+            } else {
+                tabName = reportName;
+            }
+        }
+
+        setPartName(tabName);
     }
 
     @Override
@@ -169,26 +213,6 @@ public class ReportEntryForm extends BiobankEntryForm {
     @Override
     public String getNextOpenedFormId() {
         return ReportEntryForm.ID;
-    }
-
-    @SuppressWarnings("nls")
-    private void updatePartName() {
-        String entityName = report.getEntity().getName();
-
-        String tabName;
-        if (report.isNew()) {
-            tabName = i18n.tr("New {0} Report", entityName);
-            report.setName(tabName);
-        } else {
-            String reportName = report.getName();
-            if (reportName == null || reportName.isEmpty()) {
-                tabName = i18n.tr("Unnamed {0} Report", entityName);
-            } else {
-                tabName = reportName;
-            }
-        }
-
-        setPartName(tabName);
     }
 
     @SuppressWarnings("nls")
@@ -298,8 +322,7 @@ public class ReportEntryForm extends BiobankEntryForm {
                         @Override
                         public void run() {
                             results = (List<Object>) new ReportListProxy(
-                                SessionManager.getAppService(), rawReport)
-                                .init();
+                                SessionManager.getAppService(), rawReport).init();
 
                             if (results instanceof AbstractBiobankListProxy)
                                 ((AbstractBiobankListProxy<?>) results)
@@ -518,8 +541,6 @@ public class ReportEntryForm extends BiobankEntryForm {
             }
         });
 
-        Collection<EntityFilter> entityFilters = getSortedEntityFilters(report,
-            COMPARE_FILTERS_BY_NAME);
         for (EntityFilter entityFilter : entityFilters) {
             if (filtersWidget.getFilterRow(entityFilter) == null) {
                 filterCombo.add(entityFilter);
@@ -583,16 +604,6 @@ public class ReportEntryForm extends BiobankEntryForm {
         });
     }
 
-    private static Collection<EntityFilter> getSortedEntityFilters(
-        ReportWrapper report, Comparator<EntityFilter> comparator) {
-        List<EntityFilter> sortedFilters = new ArrayList<EntityFilter>();
-
-        sortedFilters.addAll(report.getEntityFilterCollection());
-        Collections.sort(sortedFilters, comparator);
-
-        return sortedFilters;
-    }
-
     @SuppressWarnings("nls")
     private void createOptionsSection() {
         Section section = createSection(i18n.tr("Options"));
@@ -618,7 +629,8 @@ public class ReportEntryForm extends BiobankEntryForm {
         columnsLabel.setText(i18n.tr("Columns:"));
         columnsLabel.setLayoutData(layoutData);
 
-        columnsWidget = new ColumnSelectWidget(options, SWT.NONE, report);
+        columnsWidget = new ColumnSelectWidget(
+            options, SWT.NONE, entityColumns, report.getReportColumnCollection());
         columnsWidget
             .addColumnChangeListener(new ChangeListener<ColumnChangeEvent>() {
                 @Override

@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.widgets.report;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -38,26 +36,29 @@ import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.util.StringUtil;
-import edu.ualberta.med.biobank.common.wrappers.ReportWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.EntityColumn;
 import edu.ualberta.med.biobank.model.PropertyModifier;
 import edu.ualberta.med.biobank.model.ReportColumn;
 
 public class ColumnSelectWidget extends Composite {
-    private static final I18n i18n = I18nFactory
-        .getI18n(ColumnSelectWidget.class);
+    private static final I18n i18n = I18nFactory.getI18n(ColumnSelectWidget.class);
 
     private static final ViewerSorter DISPLAYED_COLUMNS_VIEWER_SORTER =
         new DisplayedColumnsViewerSorter();
+
     private static final LabelProvider DISPLAYED_COLUMNS_LABEL_PROVIDER =
         new DisplayedColumnsLabelProvider();
+
     private static final LabelProvider AVAILABLE_COLUMNS_LABEL_PROVIDER =
         new AvailableColumnsLabelProvider();
+
     private static final ITreeContentProvider AVAILABLE_COLUMNS_TREE_CONTENT_PROVIDER =
         new AvailableColumnsTreeContentProvider();
+
     @SuppressWarnings("nls")
     private static final Object AVAILABLE_COLUMNS_ROOT_OBJECT = "root";
+
     private static final Comparator<ReportColumnWrapper> REPORT_COLUMN_WRAPER_COMPARTOR =
         new Comparator<ReportColumnWrapper>() {
             @Override
@@ -68,7 +69,6 @@ public class ColumnSelectWidget extends Composite {
             }
         };
 
-    private final ReportWrapper report;
     private final Collection<ChangeListener<ColumnChangeEvent>> listeners =
         new ArrayList<ChangeListener<ColumnChangeEvent>>();
     private Composite container;
@@ -76,24 +76,22 @@ public class ColumnSelectWidget extends Composite {
     private TableViewer displayed;
     private Button leftButton, rightButton, upButton, downButton;
 
-    public ColumnSelectWidget(Composite parent, int style, ReportWrapper report) {
+    private final List<EntityColumn> entityColumns;
+
+    private final List<ReportColumn> reportColumns;
+
+    public ColumnSelectWidget(
+        Composite parent,
+        int style,
+        List<EntityColumn> entityColumns,
+        List<ReportColumn> reportColumns) {
         super(parent, style);
 
-        this.report = report;
+        this.entityColumns = entityColumns;
+        this.reportColumns = reportColumns;
 
         init();
         createContainer();
-
-        report.addPropertyChangeListener(
-            ReportWrapper.REPORT_COLUMN_COLLECTION_CACHE_KEY,
-            new PropertyChangeListener() {
-                @Override
-                public void propertyChange(PropertyChangeEvent arg0) {
-                    if (!isDisposed()) {
-                        createContainer();
-                    }
-                }
-            });
     }
 
     public Collection<ReportColumn> getReportColumns() {
@@ -188,7 +186,7 @@ public class ColumnSelectWidget extends Composite {
         available.setContentProvider(AVAILABLE_COLUMNS_TREE_CONTENT_PROVIDER);
         available.setInput(AVAILABLE_COLUMNS_ROOT_OBJECT);
 
-        for (EntityColumn entityColumn : report.getEntityColumnCollection()) {
+        for (EntityColumn entityColumn : entityColumns) {
             addAvailable(entityColumn);
         }
     }
@@ -197,8 +195,7 @@ public class ColumnSelectWidget extends Composite {
     private void createDisplayedTable() {
         Composite subContainer = new Composite(container, SWT.NONE);
         subContainer.setLayout(new GridLayout(1, false));
-        subContainer
-            .setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+        subContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         createLabel(subContainer, i18n.tr("Displayed Columns"));
 
@@ -214,7 +211,7 @@ public class ColumnSelectWidget extends Composite {
         displayed.setSorter(DISPLAYED_COLUMNS_VIEWER_SORTER);
         displayed.setLabelProvider(DISPLAYED_COLUMNS_LABEL_PROVIDER);
 
-        for (ReportColumn reportColumn : report.getReportColumnCollection()) {
+        for (ReportColumn reportColumn : reportColumns) {
             displayColumn(reportColumn);
         }
 

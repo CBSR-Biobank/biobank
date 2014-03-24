@@ -15,7 +15,6 @@ public class ReportColumn extends AbstractBiobankModel {
     private Integer position;
     private PropertyModifier propertyModifier;
     private EntityColumn entityColumn;
-    private Report report;
 
     @Column(name = "POSITION")
     public Integer getPosition() {
@@ -44,15 +43,5 @@ public class ReportColumn extends AbstractBiobankModel {
 
     public void setEntityColumn(EntityColumn entityColumn) {
         this.entityColumn = entityColumn;
-    }
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "REPORT_ID")
-    public Report getReport() {
-        return report;
-    }
-
-    public void setReport(Report report) {
-        this.report = report;
     }
 }

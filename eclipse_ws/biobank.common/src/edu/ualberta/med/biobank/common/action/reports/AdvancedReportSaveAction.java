@@ -78,7 +78,6 @@ public class AdvancedReportSaveAction implements Action<IdResult> {
                 EntityColumn.class, columnInput.getEntityColumnId());
 
             column.setEntityColumn(entityColumn);
-            column.setReport(report);
             session.save(column);
             reportColumns.add(column);
         }
@@ -116,7 +115,6 @@ public class AdvancedReportSaveAction implements Action<IdResult> {
             }
             filter.getReportFilterValues().clear();
             filter.getReportFilterValues().addAll(filterValues);
-            filter.setReport(report);
             session.save(filter);
             reportFilters.add(filter);
         }

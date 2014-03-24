@@ -67,6 +67,10 @@ public class AdvancedReportGetAction implements Action<ReportData> {
             this.report = report;
         }
 
+        public ReportData() {
+            this.report = null;
+        }
+
     }
 
 }
