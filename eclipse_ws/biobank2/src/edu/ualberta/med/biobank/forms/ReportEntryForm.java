@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.Action;
@@ -147,6 +148,7 @@ public class ReportEntryForm extends BiobankEntryForm {
 
         EntityData entityData = SessionManager.getAppService().doAction(
             new EntityGetAction(report.getEntity().getWrappedObject()));
+        report.getWrappedObject().setEntity(entityData.getEntity());
         entityFilters = entityData.getFilters();
         Collections.sort(entityFilters, COMPARE_FILTERS_BY_NAME);
 
@@ -199,10 +201,11 @@ public class ReportEntryForm extends BiobankEntryForm {
         // anything listening to the wrapper (for example, the
         // FilterSelectWidget and the ColumnSelectWidget).
         Report nakedReport = report.getWrappedObject();
-        nakedReport.setReportColumns(new HashSet<ReportColumn>(
-            columnsWidget.getReportColumns()));
-        nakedReport.setReportFilters(new HashSet<ReportFilter>(
-            filtersWidget.getReportFilters()));
+        nakedReport.getReportColumns().clear();
+        nakedReport.getReportColumns().addAll(new HashSet<ReportColumn>(columnsWidget.getReportColumns()));
+        nakedReport.getReportFilters().clear();
+        Set<ReportFilter> reportFilters = new HashSet<ReportFilter>(filtersWidget.getReportFilters());
+        nakedReport.getReportFilters().addAll(reportFilters);
     }
 
     @Override
@@ -224,9 +227,7 @@ public class ReportEntryForm extends BiobankEntryForm {
         createProperties();
         createFiltersSection();
         createOptionsSection();
-
         createButtons();
-
         createResultsArea();
     }
 
