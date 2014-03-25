@@ -12,6 +12,7 @@ import edu.ualberta.med.biobank.model.EntityProperty;
 import edu.ualberta.med.biobank.model.Report;
 import edu.ualberta.med.biobank.model.ReportColumn;
 import edu.ualberta.med.biobank.model.ReportFilter;
+import edu.ualberta.med.biobank.model.ReportFilterValue;
 
 public class AdvancedReportGetAction implements Action<ReportData> {
     private static final long serialVersionUID = 1L;
@@ -45,7 +46,9 @@ public class AdvancedReportGetAction implements Action<ReportData> {
             reportColumn.getPosition();
         }
         for (ReportFilter reportFilter : report.getReportFilters()) {
-            reportFilter.getPosition();
+            for (ReportFilterValue filterValue : reportFilter.getReportFilterValues()) {
+                filterValue.getValue();
+            }
         }
         Entity entity = report.getEntity();
         if (entity != null) {

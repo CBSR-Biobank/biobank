@@ -53,6 +53,7 @@ public class AdvancedReportSaveAction implements Action<IdResult> {
 
         User user = context.load(User.class, info.getUserId());
         report.setUser(user);
+        session.saveOrUpdate(report);
 
         // delete old report columns
         for (ReportColumn column : report.getReportColumns()) {
@@ -78,6 +79,7 @@ public class AdvancedReportSaveAction implements Action<IdResult> {
                 EntityColumn.class, columnInput.getEntityColumnId());
 
             column.setEntityColumn(entityColumn);
+            column.setReport(report);
             session.save(column);
             reportColumns.add(column);
         }
@@ -98,10 +100,12 @@ public class AdvancedReportSaveAction implements Action<IdResult> {
             ReportFilter filter = new ReportFilter();
             filter.setPosition(filterInput.getPosition());
             filter.setOperator(filterInput.getOperator());
+            filter.setReport(report);
 
             EntityFilter entityFilter = context.load(
                 EntityFilter.class, filterInput.getEntityFilterId());
             filter.setEntityFilter(entityFilter);
+            session.save(filter);
 
             Set<ReportFilterValue> filterValues = new HashSet<ReportFilterValue>();
 
@@ -110,12 +114,13 @@ public class AdvancedReportSaveAction implements Action<IdResult> {
                 filterValue.setPosition(filterValueInput.getPosition());
                 filterValue.setValue(filterValueInput.getValue());
                 filterValue.setSecondValue(filterValueInput.getSecondValue());
+                filterValue.setReportFilter(filter);
                 session.save(filterValue);
                 filterValues.add(filterValue);
             }
             filter.getReportFilterValues().clear();
             filter.getReportFilterValues().addAll(filterValues);
-            session.save(filter);
+            session.saveOrUpdate(filter);
             reportFilters.add(filter);
         }
 

@@ -294,20 +294,18 @@ public class UserEditDialog extends AbstractSecurityEditDialog {
                 pw = pwText;
             }
 
-            UserSaveOutput res = SessionManager.getAppService()
-                .doAction(new UserSaveAction(
-                    new UserSaveInput(user, membershipContext, pw)));
+            UserSaveOutput res = SessionManager.getAppService().doAction(
+                new UserSaveAction(new UserSaveInput(user, membershipContext, pw)));
             user.setId(res.getUserId());
             user.setCsmUserId(res.getCsmUserId());
 
             if (SessionManager.getUser().equals(user)) {
                 // if the User is making changes to himself, logout
-                BgcPlugin
-                    .openInformation(
-                        // TR: information dialog title
-                        i18n.tr("User Information Saved"),
-                        // TR: information dialog message
-                        i18n.tr("Your information has been successfully updated. You will be logged out and have to reconnect."));
+                BgcPlugin.openInformation(
+                    // TR: information dialog title
+                    i18n.tr("User Information Saved"),
+                    // TR: information dialog message
+                    i18n.tr("Your information has been successfully updated. You will be logged out and have to reconnect."));
 
                 LogoutHandler lh = new LogoutHandler();
                 try {
