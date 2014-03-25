@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.widgets.report;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -28,17 +29,20 @@ public class TextFilterValueWidget implements FilterValueWidget {
             i18n.tr("For string values, use '%' as a wildcard character"));
     }
 
+    @SuppressWarnings("nls")
     @Override
     public Collection<ReportFilterValue> getValues() {
-        Collection<ReportFilterValue> values =
-            new ArrayList<ReportFilterValue>();
+        Collection<ReportFilterValue> values = new ArrayList<ReportFilterValue>();
         if (!text.isDisposed() && text.getText() != null) {
             String string = text.getText().trim();
             if (!string.isEmpty()) {
-                ReportFilterValue value = new ReportFilterValue();
-                value.setPosition(0);
-                value.setValue(string);
-                values.add(value);
+                String[] items = StringUtils.split(string, ",");
+                for (String item : items) {
+                    ReportFilterValue value = new ReportFilterValue();
+                    value.setPosition(0);
+                    value.setValue(item);
+                    values.add(value);
+                }
             }
         }
         return values;
