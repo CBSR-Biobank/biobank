@@ -1,10 +1,7 @@
 package edu.ualberta.med.biobank.server.reports;
 
-import java.io.Serializable;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -14,7 +11,6 @@ import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
-import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.criterion.Projection;
 import org.hibernate.criterion.ProjectionList;
@@ -22,14 +18,21 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.impl.CriteriaImpl;
 import org.hibernate.type.StandardBasicTypes;
 import org.hibernate.type.Type;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import edu.ualberta.med.biobank.common.action.reports.ReportInput;
+import edu.ualberta.med.biobank.common.action.reports.ReportInput.ReportColumnInput;
+import edu.ualberta.med.biobank.common.action.reports.ReportInput.ReportFilterInput;
+import edu.ualberta.med.biobank.common.action.reports.ReportInput.ReportFilterValueInput;
 import edu.ualberta.med.biobank.common.reports.ReportsUtil;
 import edu.ualberta.med.biobank.common.reports.filters.FilterOperator;
 import edu.ualberta.med.biobank.common.reports.filters.FilterType;
 import edu.ualberta.med.biobank.common.reports.filters.FilterTypes;
+import edu.ualberta.med.biobank.model.Entity;
+import edu.ualberta.med.biobank.model.EntityColumn;
 import edu.ualberta.med.biobank.model.EntityFilter;
 import edu.ualberta.med.biobank.model.PropertyModifier;
-import edu.ualberta.med.biobank.model.Report;
 import edu.ualberta.med.biobank.model.ReportColumn;
 import edu.ualberta.med.biobank.model.ReportFilter;
 import edu.ualberta.med.biobank.model.ReportFilterValue;
@@ -37,12 +40,19 @@ import edu.ualberta.med.biobank.server.applicationservice.ReportData;
 
 @SuppressWarnings("nls")
 public class ReportRunner {
+
+    private static Logger log = LoggerFactory.getLogger(ReportRunner.class);
+
     private static final String ID_COLUMN_NAME = "id";
+
     private static final String PROPERTY_DELIMITER = ".";
+
     private static final String ALIAS_DELIMITER = "__";
+
     private static final String PROPERTY_VALUE_TOKEN = "{value}";
-    private static final String MODIFIED_PROPERTY_ALIAS =
-        "_modifiedPropertyAlias";
+
+    private static final String MODIFIED_PROPERTY_ALIAS = "_modifiedPropertyAlias";
+
     private static final Comparator<ReportColumn> COMPARE_REPORT_COLUMN_POSITION =
         new Comparator<ReportColumn>() {
             @Override
@@ -52,12 +62,14 @@ public class ReportRunner {
         };
 
     private final Session session;
-    private final Report report;
+
+    private final ReportInput reportInput;
+
     private final Criteria criteria;
 
     public ReportRunner(Session session, ReportData data) {
         this.session = session;
-        this.report = data.getReport();
+        this.reportInput = data.getReportInput();
 
         criteria = createCriteria();
 
@@ -76,73 +88,120 @@ public class ReportRunner {
             return Arrays.asList();
         }
 
-        return criteria.list();
+        List<?> results = criteria.list();
+        log.info("run: results size: {}", results.size());
+        return results;
     }
 
-    private Collection<ReportColumn> getOrderedReportColumns() {
-        List<ReportColumn> orderedCols = new ArrayList<ReportColumn>();
+    private Set<ReportColumn> getReportColumns() {
+        Set<ReportColumn> columns = new HashSet<ReportColumn>();
 
-        loadProperty(report, "reportColumns");
-        Collection<ReportColumn> reportCols = report
-            .getReportColumns();
-        if (reportCols != null) {
-            orderedCols.addAll(reportCols);
+        Set<ReportColumnInput> columnInputs = reportInput.getReportColumnInputs();
+        if (columnInputs == null) {
+            throw new IllegalStateException("column input is null");
         }
 
-        Collections.sort(orderedCols, COMPARE_REPORT_COLUMN_POSITION);
+        for (ReportColumnInput columnInput : columnInputs) {
+            ReportColumn column = new ReportColumn();
+            column.setPosition(columnInput.getPosition());
 
-        return orderedCols;
+            PropertyModifier propertyModifier = null;
+            Integer propertyModifierId = columnInput.getPropertyModifierId();
+            if (propertyModifierId != null) {
+                propertyModifier = (PropertyModifier) session.load(
+                    PropertyModifier.class, columnInput.getPropertyModifierId());
+            }
+            column.setPropertyModifier(propertyModifier);
+
+            EntityColumn entityColumn = (EntityColumn) session.load(
+                EntityColumn.class, columnInput.getEntityColumnId());
+            column.setEntityColumn(entityColumn);
+
+            log.trace("getReportColumns: {}", column);
+            columns.add(column);
+        }
+
+        return columns;
     }
 
-    private boolean isCount() {
-        Boolean isCount = report.getIsCount();
-        return isCount == null ? false : isCount;
+    private Set<ReportFilter> getReportFilters() {
+        Set<ReportFilter> filters = new HashSet<ReportFilter>();
+
+        Set<ReportFilterInput> filterInputs = reportInput.getReportFilterInputs();
+        if (filterInputs == null) {
+            throw new IllegalStateException("filter input is null");
+        }
+
+        for (ReportFilterInput filterInput : filterInputs) {
+            ReportFilter filter = new ReportFilter();
+
+            EntityFilter entityFilter = (EntityFilter) session.load(
+                EntityFilter.class, filterInput.getEntityFilterId());
+
+            filter.setPosition(filterInput.getPosition());
+            filter.setOperator(filterInput.getOperator());
+            filter.setEntityFilter(entityFilter);
+
+            Set<ReportFilterValueInput> filterValueInputs = filterInput.getFilterValueInputs();
+            Set<ReportFilterValue> filterValues =
+                new HashSet<ReportFilterValue>(filterValueInputs.size());
+
+            for (ReportFilterValueInput valueInput : filterValueInputs) {
+                ReportFilterValue filterValue = new ReportFilterValue();
+                filterValue.setPosition(valueInput.getPosition());
+                filterValue.setValue(valueInput.getValue());
+                filterValue.setSecondValue(valueInput.getSecondValue());
+                filterValues.add(filterValue);
+            }
+
+            filter.setReportFilterValues(filterValues);
+            log.trace("getReportFilters: {}", filter);
+            filters.add(filter);
+        }
+        return filters;
     }
 
     private Criteria createCriteria() {
-        loadProperty(report, "reportColumns");
-        if (!isCount() && report.getReportColumns().isEmpty()) {
+        if (!reportInput.isCount() && reportInput.getReportColumnInputs().isEmpty()) {
             return null;
         }
 
-        loadProperty(report, "entity");
-        Criteria criteria = session.createCriteria(report.getEntity()
-            .getClassName());
+        Entity entity = (Entity) session.load(Entity.class, reportInput.getEntityId());
+        Criteria criteria = session.createCriteria(entity.getClassName());
 
-        createAssociations(criteria);
+        Set<ReportColumn> reportColumns = getReportColumns();
+        Set<ReportFilter> reportFilters = getReportFilters();
+        createAssociations(criteria, reportColumns, reportFilters);
 
         ProjectionList pList = Projections.projectionList();
 
-        if (!isCount()) {
+        if (!reportInput.isCount()) {
             pList.add(Projections.property(ID_COLUMN_NAME));
         } else {
             // need to provide an alias for the column to be included in the
             // results
-            pList.add(Projections.sqlProjection("NULL as null_value_",
+            pList.add(Projections.sqlProjection(
+                "NULL as null_value_",
                 new String[] { "null_value_" },
                 new Type[] { StandardBasicTypes.INTEGER }));
         }
 
+        List<ReportColumn> orderedColumns = new ArrayList<ReportColumn>(reportColumns);
+        Collections.sort(orderedColumns, COMPARE_REPORT_COLUMN_POSITION);
         int colNum = 1;
-        for (ReportColumn reportColumn : getOrderedReportColumns()) {
-            loadProperty(reportColumn, "entityColumn");
-            loadProperty(reportColumn.getEntityColumn(), "entityProperty");
-            String path = reportColumn.getEntityColumn().getEntityProperty()
-                .getProperty();
+        for (ReportColumn reportColumn : orderedColumns) {
+            String path = reportColumn.getEntityColumn().getEntityProperty().getProperty();
             String aliasedProperty = getAliasedProperty(path);
 
             Projection projection = null;
-            PropertyModifier propertyModifier = reportColumn
-                .getPropertyModifier();
+            PropertyModifier propertyModifier = reportColumn.getPropertyModifier();
             if (propertyModifier != null) {
-                String sqlColumn = ReportsUtil.getSqlColumn(criteria,
-                    aliasedProperty);
+                String sqlColumn = ReportsUtil.getSqlColumn(criteria, aliasedProperty);
                 String modifier = propertyModifier.getPropertyModifier();
-                String modifiedProperty = modifier.replace(
-                    PROPERTY_VALUE_TOKEN, sqlColumn);
+                String modifiedProperty = modifier.replace(PROPERTY_VALUE_TOKEN, sqlColumn);
                 String sqlAlias = MODIFIED_PROPERTY_ALIAS + colNum;
 
-                if (isCount()) {
+                if (reportInput.isCount()) {
                     projection = Projections.sqlGroupProjection(
                         modifiedProperty + " as " + sqlAlias, sqlAlias,
                         new String[] { sqlAlias },
@@ -153,7 +212,7 @@ public class ReportRunner {
                         new Type[] { StandardBasicTypes.STRING });
                 }
             } else {
-                if (isCount()) {
+                if (reportInput.isCount()) {
                     projection = Projections.groupProperty(aliasedProperty);
                 } else {
                     projection = Projections.property(aliasedProperty);
@@ -164,125 +223,51 @@ public class ReportRunner {
             colNum++;
         }
 
-        if (isCount()) {
+        if (reportInput.isCount()) {
             pList.add(Projections.countDistinct(ID_COLUMN_NAME));
         }
 
         criteria.setProjection(pList);
 
-        loadProperty(report, "reportFilters");
-        Collection<ReportFilter> rfCollection = report
-            .getReportFilters();
-        if (rfCollection != null) {
-            for (ReportFilter reportFilter : rfCollection) {
-                loadProperty(reportFilter, "entityFilter");
-                loadProperty(reportFilter.getEntityFilter(), "entityProperty");
+        Set<ReportFilterInput> filterInputs = reportInput.getReportFilterInputs();
+        if (filterInputs == null) {
+            throw new IllegalStateException("filter input is null");
+        }
 
-                EntityFilter filter = reportFilter.getEntityFilter();
-                FilterType filterType = FilterTypes.getFilterType(filter
-                    .getFilterType());
-                String propertyPath = filter.getEntityProperty().getProperty();
-                String aliasedProperty = getAliasedProperty(propertyPath);
+        for (ReportFilter reportFilter : reportFilters) {
+            EntityFilter entityFilter = reportFilter.getEntityFilter();
+            FilterType filterType = FilterTypes.getFilterType(entityFilter.getFilterType());
+            String propertyPath = entityFilter.getEntityProperty().getProperty();
+            String aliasedProperty = getAliasedProperty(propertyPath);
 
-                Collection<ReportFilterValue> rfvCollection = reportFilter
-                    .getReportFilterValues();
+            FilterOperator op = FilterOperator.getFilterOperator(reportFilter.getOperator());
 
-                if (rfvCollection == null) {
-                    rfvCollection = new HashSet<ReportFilterValue>();
-                }
-
-                FilterOperator op = null;
-
-                if (reportFilter.getOperator() != null) {
-                    op = FilterOperator.getFilterOperator(reportFilter
-                        .getOperator());
-                }
-
-                filterType.addCriteria(criteria, aliasedProperty, op,
-                    new ArrayList<ReportFilterValue>(rfvCollection));
-            }
+            filterType.addCriteria(criteria, aliasedProperty, op,
+                new ArrayList<ReportFilterValue>(reportFilter.getReportFilterValues()));
         }
 
         return criteria;
     }
 
-    /**
-     * Read the property of the given <code>Object</code>. If the property
-     * exists and is an uninitialized Hibernate proxy object, then replace it
-     * with a copy from the database.
-     * 
-     * @param object
-     * @param property
-     */
-    private void loadProperty(Object object, String property) {
-        try {
-            Class<?> objectKlazz = object.getClass();
-
-            String methodSuffix = Character.toUpperCase(property.charAt(0))
-                + property.substring(1);
-
-            Method getProperty = objectKlazz.getMethod("get" + methodSuffix);
-
-            Class<?> propertyKlazz = getProperty.getReturnType();
-
-            Method setProperty = objectKlazz.getMethod("set" + methodSuffix,
-                propertyKlazz);
-
-            Object propertyValue = getProperty.invoke(object);
-
-            if (Hibernate.isInitialized(propertyValue)) {
-                return;
-            }
-
-            // TODO: treat Collection-s differently
-            Class<?> proxyKlazz = propertyValue.getClass();
-            Method getId = proxyKlazz.getMethod("getId");
-            Serializable id = (Serializable) getId.invoke(propertyValue);
-
-            Object databaseObject = null;
-            if (id != null) {
-                databaseObject = session.load(propertyKlazz, id);
-            }
-
-            setProperty.invoke(object, databaseObject);
-        } catch (Exception e) {
-            // TODO: log this?
-        }
-    }
-
-    private void createAssociations(Criteria criteria) {
+    private void createAssociations(
+        Criteria criteria,
+        Set<ReportColumn> reportColumns,
+        Set<ReportFilter> reportFilters) {
         Set<String> createdPoperties = new HashSet<String>();
 
-        loadProperty(report, "reportColumns");
-        Collection<ReportColumn> cols = report.getReportColumns();
-        if (cols != null) {
-            for (ReportColumn reportColumn : cols) {
-                loadProperty(reportColumn, "entityColumn");
-                loadProperty(reportColumn.getEntityColumn(), "entityProperty");
-
-                String property = reportColumn.getEntityColumn()
-                    .getEntityProperty().getProperty();
-                createAssociations(criteria, property, createdPoperties);
-            }
+        for (ReportColumn reportColumn : reportColumns) {
+            String property = reportColumn.getEntityColumn().getEntityProperty().getProperty();
+            createAssociations(criteria, property, createdPoperties);
         }
 
-        loadProperty(report, "reportFilters");
-        Collection<ReportFilter> filters = report.getReportFilters();
-        if (filters != null) {
-            for (ReportFilter filter : filters) {
-                loadProperty(filter, "entityFilter");
-                loadProperty(filter.getEntityFilter(), "entityProperty");
-
-                String property = filter.getEntityFilter().getEntityProperty()
-                    .getProperty();
-                createAssociations(criteria, property, createdPoperties);
-            }
+        for (ReportFilter filter : reportFilters) {
+            String property = filter.getEntityFilter().getEntityProperty().getProperty();
+            createAssociations(criteria, property, createdPoperties);
         }
     }
 
     public static void createAssociations(Criteria criteria, String property) {
         Set<String> createdProperties = getCreatedAssociations(criteria);
-
         createAssociations(criteria, property, createdProperties);
     }
 
@@ -302,15 +287,19 @@ public class ReportRunner {
         return createdProperties;
     }
 
-    private static void createAssociations(Criteria criteria, String property,
+    private static void createAssociations(
+        Criteria criteria,
+        String property,
         Set<String> createdProperties) {
+
         String parentProperty = getParentProperty(property);
         while (parentProperty != null) {
             if (!createdProperties.contains(parentProperty)) {
-                // Always use a left join to support the "is not set" option of
-                // many filters.
-                criteria.createCriteria(parentProperty,
-                    getPropertyAlias(parentProperty), Criteria.LEFT_JOIN);
+                // Always use a left join to support the "is not set" option of many filters.
+                criteria.createCriteria(
+                    parentProperty,
+                    getPropertyAlias(parentProperty),
+                    Criteria.LEFT_JOIN);
                 createdProperties.add(parentProperty);
             }
             parentProperty = getParentProperty(parentProperty);
@@ -318,8 +307,7 @@ public class ReportRunner {
     }
 
     private static String getPropertyAlias(String property) {
-        // TODO: do we need to swap delimiters? Can the alias name just include
-        // the period?
+        // TODO: do we need to swap delimiters? Can the alias name just include the period?
         return property == null ? null : property.replace(PROPERTY_DELIMITER,
             ALIAS_DELIMITER);
     }

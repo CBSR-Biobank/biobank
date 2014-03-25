@@ -2,18 +2,18 @@ package edu.ualberta.med.biobank.server.applicationservice;
 
 import java.io.Serializable;
 
-import edu.ualberta.med.biobank.model.Report;
+import edu.ualberta.med.biobank.common.action.reports.ReportInput;
 
 public class ReportData implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private final Report report;
+    private final ReportInput reportInput;
     private int maxResults;
     private int timeout;
     private int firstRow;
 
-    public ReportData(Report report) {
-        this.report = report;
+    public ReportData(ReportInput reportInput) {
+        this.reportInput = reportInput;
     }
 
     public int getMaxResults() {
@@ -40,7 +40,7 @@ public class ReportData implements Serializable {
         this.firstRow = firstRow;
     }
 
-    public Report getReport() {
-        return report;
+    public ReportInput getReportInput() {
+        return reportInput;
     }
 }

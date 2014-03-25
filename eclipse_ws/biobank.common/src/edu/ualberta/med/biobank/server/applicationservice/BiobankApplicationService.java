@@ -2,12 +2,12 @@ package edu.ualberta.med.biobank.server.applicationservice;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionResult;
+import edu.ualberta.med.biobank.common.action.reports.ReportInput;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.reports.QueryCommand;
 import edu.ualberta.med.biobank.common.reports.QueryHandle;
 import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.model.Log;
-import edu.ualberta.med.biobank.model.Report;
 import edu.ualberta.med.biobank.server.query.BiobankSQLCriteria;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -47,7 +47,7 @@ public interface BiobankApplicationService extends WritableApplicationService {
 
     public void unlockUser(String userNameToUnlock) throws ApplicationException;
 
-    public List<Object> runReport(Report report, int maxResults, int firstRow,
+    public List<Object> runReport(ReportInput reportInput, int maxResults, int firstRow,
         int timeout) throws ApplicationException;
 
     public void checkVersion(String clientVersion) throws ApplicationException;

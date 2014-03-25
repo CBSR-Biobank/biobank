@@ -10,7 +10,7 @@ import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.reports.AdvancedReportSaveAction;
-import edu.ualberta.med.biobank.common.action.reports.ReportSaveInput;
+import edu.ualberta.med.biobank.common.action.reports.ReportInput;
 import edu.ualberta.med.biobank.common.reports.filters.FilterOperator;
 import edu.ualberta.med.biobank.model.Entity;
 import edu.ualberta.med.biobank.model.EntityColumn;
@@ -107,7 +107,7 @@ public class TestAdvancedReports extends TestAction {
         String description = getMethodNameR();
         Report report = createReport(name, description);
 
-        IdResult idResult = exec(new AdvancedReportSaveAction(new ReportSaveInput(report)));
+        IdResult idResult = exec(new AdvancedReportSaveAction(new ReportInput(report)));
 
         Report dbReport = (Report) session.load(Report.class, idResult.getId());
 
@@ -142,12 +142,12 @@ public class TestAdvancedReports extends TestAction {
     public void resave() {
         String name = getMethodNameR();
         Report report = createReport(name, name);
-        IdResult idResult = exec(new AdvancedReportSaveAction(new ReportSaveInput(report)));
+        IdResult idResult = exec(new AdvancedReportSaveAction(new ReportInput(report)));
 
         String name2 = getMethodNameR();
         report = (Report) session.load(Report.class, idResult.getId());
         report.setName(name2);
-        IdResult idResult2 = exec(new AdvancedReportSaveAction(new ReportSaveInput(report)));
+        IdResult idResult2 = exec(new AdvancedReportSaveAction(new ReportInput(report)));
 
         Assert.assertEquals(idResult.getId(), idResult2.getId());
 

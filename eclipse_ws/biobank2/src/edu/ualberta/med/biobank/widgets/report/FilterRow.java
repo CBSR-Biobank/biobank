@@ -32,6 +32,7 @@ import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.reports.ReportInput;
 import edu.ualberta.med.biobank.common.reports.filters.FilterOperator;
 import edu.ualberta.med.biobank.common.reports.filters.FilterType;
 import edu.ualberta.med.biobank.common.reports.filters.FilterTypes;
@@ -461,8 +462,8 @@ class FilterRow extends Composite {
         long start = System.currentTimeMillis();
         List<Object> results = null;
         try {
-            results = SessionManager.getAppService().runReport(report,
-                MAX_SUGGESTIONS, 0, MAX_QUERY_TIME);
+            results = SessionManager.getAppService().runReport(
+                new ReportInput(report), MAX_SUGGESTIONS, 0, MAX_QUERY_TIME);
 
             if (results.size() >= MAX_SUGGESTIONS) {
                 BgcPlugin

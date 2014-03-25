@@ -15,6 +15,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import edu.ualberta.med.biobank.common.action.reports.ReportInput;
 import edu.ualberta.med.biobank.common.reports.filters.FilterOperator;
 import edu.ualberta.med.biobank.common.reports.filters.FilterType;
 import edu.ualberta.med.biobank.common.reports.filters.FilterTypes;
@@ -194,9 +195,9 @@ public class TestAdvancedReports extends TestDatabase {
         int maxResults = 2, firstRow = 0, timeout = 0;
 
         report.setIsCount(true);
-        appService.runReport(report, maxResults, firstRow, timeout);
+        appService.runReport(new ReportInput(report), maxResults, firstRow, timeout);
 
         report.setIsCount(false);
-        appService.runReport(report, maxResults, firstRow, timeout);
+        appService.runReport(new ReportInput(report), maxResults, firstRow, timeout);
     }
 }

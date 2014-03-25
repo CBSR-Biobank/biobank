@@ -9,9 +9,9 @@ import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.reports.ReportSaveInput.ReportColumnSaveInput;
-import edu.ualberta.med.biobank.common.action.reports.ReportSaveInput.ReportFilterSaveInput;
-import edu.ualberta.med.biobank.common.action.reports.ReportSaveInput.ReportFilterValueSaveInput;
+import edu.ualberta.med.biobank.common.action.reports.ReportInput.ReportColumnInput;
+import edu.ualberta.med.biobank.common.action.reports.ReportInput.ReportFilterInput;
+import edu.ualberta.med.biobank.common.action.reports.ReportInput.ReportFilterValueInput;
 import edu.ualberta.med.biobank.common.permission.reports.ReportsPermission;
 import edu.ualberta.med.biobank.model.Entity;
 import edu.ualberta.med.biobank.model.EntityColumn;
@@ -27,9 +27,9 @@ public class AdvancedReportSaveAction implements Action<IdResult> {
 
     private static final long serialVersionUID = 1L;
 
-    private final ReportSaveInput info;
+    private final ReportInput info;
 
-    public AdvancedReportSaveAction(ReportSaveInput input) {
+    public AdvancedReportSaveAction(ReportInput input) {
         this.info = input;
     }
 
@@ -61,7 +61,7 @@ public class AdvancedReportSaveAction implements Action<IdResult> {
         report.getReportColumns().clear();
 
         Set<ReportColumn> reportColumns = new HashSet<ReportColumn>();
-        for (ReportColumnSaveInput columnInput : info.getReportColumnInput()) {
+        for (ReportColumnInput columnInput : info.getReportColumnInputs()) {
             ReportColumn column = new ReportColumn();
             column.setPosition(columnInput.getPosition());
 
@@ -94,7 +94,7 @@ public class AdvancedReportSaveAction implements Action<IdResult> {
         report.getReportFilters().clear();
 
         Set<ReportFilter> reportFilters = new HashSet<ReportFilter>();
-        for (ReportFilterSaveInput filterInput : info.getReportFilterInput()) {
+        for (ReportFilterInput filterInput : info.getReportFilterInputs()) {
             ReportFilter filter = new ReportFilter();
             filter.setPosition(filterInput.getPosition());
             filter.setOperator(filterInput.getOperator());
@@ -105,7 +105,7 @@ public class AdvancedReportSaveAction implements Action<IdResult> {
 
             Set<ReportFilterValue> filterValues = new HashSet<ReportFilterValue>();
 
-            for (ReportFilterValueSaveInput filterValueInput : filterInput.getFilterValues()) {
+            for (ReportFilterValueInput filterValueInput : filterInput.getFilterValueInputs()) {
                 ReportFilterValue filterValue = new ReportFilterValue();
                 filterValue.setPosition(filterValueInput.getPosition());
                 filterValue.setValue(filterValueInput.getValue());

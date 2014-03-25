@@ -4,6 +4,7 @@ import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
+import edu.ualberta.med.biobank.common.action.reports.ReportInput;
 import edu.ualberta.med.biobank.common.peer.UserPeer;
 import edu.ualberta.med.biobank.common.permission.GlobalAdminPermission;
 import edu.ualberta.med.biobank.common.permission.Permission;
@@ -116,13 +117,13 @@ public class BiobankApplicationServiceImpl
 
     @Override
     public List<Object> runReport(
-        Report report,
+        ReportInput reportInput,
         int maxResults,
         int firstRow,
         int timeout)
         throws ApplicationException {
 
-        ReportData reportData = new ReportData(report);
+        ReportData reportData = new ReportData(reportInput);
         reportData.setMaxResults(maxResults);
         reportData.setFirstRow(firstRow);
         reportData.setTimeout(timeout);
@@ -213,8 +214,7 @@ public class BiobankApplicationServiceImpl
     }
 
     @Override
-    public <T extends ActionResult> T doAction(Action<T> action)
-        throws ApplicationException {
+    public <T extends ActionResult> T doAction(Action<T> action) throws ApplicationException {
         try {
             Request request = new Request(new AppServiceAction<T>(action, this));
             request.setDomainObjectName(Site.class.getName());

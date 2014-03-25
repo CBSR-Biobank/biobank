@@ -10,7 +10,7 @@ import edu.ualberta.med.biobank.model.ReportColumn;
 import edu.ualberta.med.biobank.model.ReportFilter;
 import edu.ualberta.med.biobank.model.ReportFilterValue;
 
-public class ReportSaveInput implements ActionInput {
+public class ReportInput implements ActionInput {
     private static final long serialVersionUID = 1L;
 
     private final Integer reportId;
@@ -19,12 +19,12 @@ public class ReportSaveInput implements ActionInput {
     private final Integer userId;
     private final boolean isPublic;
     private final boolean isCount;
-    private final Set<ReportColumnSaveInput> reportColumnInput;
+    private final Set<ReportColumnInput> reportColumnInputs;
     private final Integer entityId;
-    private final Set<ReportFilterSaveInput> reportFilterInput;
+    private final Set<ReportFilterInput> reportFilterInputs;
 
     @SuppressWarnings("nls")
-    public ReportSaveInput(Report report) {
+    public ReportInput(Report report) {
         if (report == null) {
             throw new IllegalArgumentException("report is null");
         }
@@ -37,17 +37,17 @@ public class ReportSaveInput implements ActionInput {
         this.isCount = report.getIsCount();
         this.entityId = report.getEntity().getId();
 
-        this.reportColumnInput = new HashSet<ReportColumnSaveInput>(0);
-        this.reportFilterInput = new HashSet<ReportFilterSaveInput>(0);
+        this.reportColumnInputs = new HashSet<ReportColumnInput>(0);
+        this.reportFilterInputs = new HashSet<ReportFilterInput>(0);
 
         for (ReportColumn reportColumn : report.getReportColumns()) {
-            ReportColumnSaveInput input = new ReportColumnSaveInput(reportColumn);
-            reportColumnInput.add(input);
+            ReportColumnInput input = new ReportColumnInput(reportColumn);
+            reportColumnInputs.add(input);
         }
 
         for (ReportFilter reportFilter : report.getReportFilters()) {
-            ReportFilterSaveInput input = new ReportFilterSaveInput(reportFilter);
-            reportFilterInput.add(input);
+            ReportFilterInput input = new ReportFilterInput(reportFilter);
+            reportFilterInputs.add(input);
         }
     }
 
@@ -55,12 +55,12 @@ public class ReportSaveInput implements ActionInput {
         return reportId;
     }
 
-    public Set<ReportColumnSaveInput> getReportColumnInput() {
-        return reportColumnInput;
+    public Set<ReportColumnInput> getReportColumnInputs() {
+        return reportColumnInputs;
     }
 
-    public Set<ReportFilterSaveInput> getReportFilterInput() {
-        return reportFilterInput;
+    public Set<ReportFilterInput> getReportFilterInputs() {
+        return reportFilterInputs;
     }
 
     public String getName() {
@@ -87,14 +87,14 @@ public class ReportSaveInput implements ActionInput {
         return entityId;
     }
 
-    public static class ReportColumnSaveInput implements ActionInput {
+    public static class ReportColumnInput implements ActionInput {
         private static final long serialVersionUID = 1L;
 
         private final Integer position;
         private final Integer propertyModifierId;
         private final Integer entityColumnId;
 
-        public ReportColumnSaveInput(ReportColumn reportColumn) {
+        public ReportColumnInput(ReportColumn reportColumn) {
             this.position = reportColumn.getPosition();
             PropertyModifier propertyModifier = reportColumn.getPropertyModifier();
             if (propertyModifier != null) {
@@ -118,21 +118,21 @@ public class ReportSaveInput implements ActionInput {
         }
     }
 
-    public static class ReportFilterSaveInput implements ActionInput {
+    public static class ReportFilterInput implements ActionInput {
         private static final long serialVersionUID = 1L;
 
         private final Integer position;
         private final Integer operator;
-        private final Set<ReportFilterValueSaveInput> filterValues;
+        private final Set<ReportFilterValueInput> filterValues;
         private final Integer entityFilterId;
 
-        public ReportFilterSaveInput(ReportFilter reportFilter) {
+        public ReportFilterInput(ReportFilter reportFilter) {
             this.position = reportFilter.getPosition();
             this.operator = reportFilter.getOperator();
-            this.filterValues = new HashSet<ReportFilterValueSaveInput>(
+            this.filterValues = new HashSet<ReportFilterValueInput>(
                 reportFilter.getReportFilterValues().size());
             for (ReportFilterValue filterValue : reportFilter.getReportFilterValues()) {
-                this.filterValues.add(new ReportFilterValueSaveInput(filterValue));
+                this.filterValues.add(new ReportFilterValueInput(filterValue));
             }
             this.entityFilterId = reportFilter.getEntityFilter().getId();
         }
@@ -145,7 +145,7 @@ public class ReportSaveInput implements ActionInput {
             return operator;
         }
 
-        public Set<ReportFilterValueSaveInput> getFilterValues() {
+        public Set<ReportFilterValueInput> getFilterValueInputs() {
             return filterValues;
         }
 
@@ -154,14 +154,14 @@ public class ReportSaveInput implements ActionInput {
         }
     }
 
-    public static class ReportFilterValueSaveInput implements ActionInput {
+    public static class ReportFilterValueInput implements ActionInput {
         private static final long serialVersionUID = 1L;
 
         private final Integer position;
         private final String value;
         private final String secondValue;
 
-        public ReportFilterValueSaveInput(ReportFilterValue filterValue) {
+        public ReportFilterValueInput(ReportFilterValue filterValue) {
             this.position = filterValue.getPosition();
             this.value = filterValue.getValue();
             this.secondValue = filterValue.getSecondValue();

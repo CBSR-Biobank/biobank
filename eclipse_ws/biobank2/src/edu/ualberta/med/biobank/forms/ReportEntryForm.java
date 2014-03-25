@@ -49,7 +49,7 @@ import edu.ualberta.med.biobank.common.action.reports.AdvancedReportGetAction.Re
 import edu.ualberta.med.biobank.common.action.reports.AdvancedReportSaveAction;
 import edu.ualberta.med.biobank.common.action.reports.EntityGetAction;
 import edu.ualberta.med.biobank.common.action.reports.EntityGetAction.EntityData;
-import edu.ualberta.med.biobank.common.action.reports.ReportSaveInput;
+import edu.ualberta.med.biobank.common.action.reports.ReportInput;
 import edu.ualberta.med.biobank.common.reports.filters.FilterOperator;
 import edu.ualberta.med.biobank.common.util.AbstractBiobankListProxy;
 import edu.ualberta.med.biobank.common.util.ReportListProxy;
@@ -191,7 +191,7 @@ public class ReportEntryForm extends BiobankEntryForm {
         });
 
         SessionManager.getAppService().doAction(
-            new AdvancedReportSaveAction(new ReportSaveInput(report.getWrappedObject())));
+            new AdvancedReportSaveAction(new ReportInput(report.getWrappedObject())));
 
         reportAdapter.getParent().performExpand();
     }
@@ -323,7 +323,9 @@ public class ReportEntryForm extends BiobankEntryForm {
                         @Override
                         public void run() {
                             results = (List<Object>) new ReportListProxy(
-                                SessionManager.getAppService(), rawReport).init();
+                                SessionManager.getAppService(),
+                                new ReportInput(rawReport))
+                                .init();
 
                             if (results instanceof AbstractBiobankListProxy)
                                 ((AbstractBiobankListProxy<?>) results)
