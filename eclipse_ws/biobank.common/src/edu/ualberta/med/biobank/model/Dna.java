@@ -27,7 +27,7 @@ public class Dna extends AbstractBiobankModel {
 
     @NotNull(message = "{edu.ualberta.med.biobank.model.Dna.specimen.NotNull}")
     @OneToOne(fetch = FetchType.LAZY)
-    @ForeignKey(name = "FK_Dna_specimen")
+    @ForeignKey(name = "FK_Dna_Specimen")
     @JoinColumn(name = "SPECIMEN_ID", nullable = false, unique = true)
     public Specimen getSpecimen() {
         return this.specimen;

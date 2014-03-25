@@ -34,5 +34,10 @@ public class V1_5__Biobank_v390 implements SpringJdbcMigration {
             + "FOREIGN KEY FK8FDF4934B9634A05 (USER_ID) REFERENCES principal (ID) "
             + "ON UPDATE NO ACTION ON DELETE NO ACTION");
 
+        // update the database so that it matches with the Hibernate config
+        jdbcTemplate.execute("ALTER TABLE container_labeling_scheme CHANGE"
+            + " has_multiple_layout HAS_MULTIPLE_LAYOUT TINYINT(1) NULL DEFAULT NULL COMMENT ''");
+        jdbcTemplate.execute("ALTER TABLE dna COLLATE=latin1_general_cs");
+        jdbcTemplate.execute("ALTER TABLE batch_operation_event_attr COLLATE=latin1_general_cs");
     }
 }
