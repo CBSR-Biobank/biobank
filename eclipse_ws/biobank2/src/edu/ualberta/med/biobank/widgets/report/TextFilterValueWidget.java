@@ -40,7 +40,7 @@ public class TextFilterValueWidget implements FilterValueWidget {
                 for (String item : items) {
                     ReportFilterValue value = new ReportFilterValue();
                     value.setPosition(0);
-                    value.setValue(item);
+                    value.setValue(item.trim());
                     values.add(value);
                 }
             }
