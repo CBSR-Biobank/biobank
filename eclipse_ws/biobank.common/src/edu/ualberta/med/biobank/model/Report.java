@@ -98,8 +98,7 @@ public class Report extends AbstractBiobankModel
         this.isCount = isCount;
     }
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "REPORT_ID", nullable = false)
+    @OneToMany(mappedBy = "report", cascade = CascadeType.ALL)
     public Set<ReportColumn> getReportColumns() {
         return this.reportColumns;
     }
@@ -119,8 +118,7 @@ public class Report extends AbstractBiobankModel
         this.entity = entity;
     }
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "REPORT_ID", nullable = false)
+    @OneToMany(mappedBy = "report", cascade = CascadeType.ALL)
     public Set<ReportFilter> getReportFilters() {
         return this.reportFilters;
     }
