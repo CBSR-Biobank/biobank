@@ -1,12 +1,22 @@
 # Biobank client
 
-A computer running Linux to is required to install the software packages listed below. Ubuntu is
-recommended.
+Here are instructions to build the Biobank client for MS Windows, Mac OSX and Linux. A computer
+running Linux is required to install the software packages listed below. Ubuntu is recommended.
 
 ## Development Environment
 
 Ensure your computer has been set up to build clients by following these
 [instructions](development_environment.md).
+
+## Client branding
+
+The Biobank client can be built to display a customized splash image during startup. At the moment
+the available splash images are for:
+
+* [CBSR](http://biosample.ca/)
+* [HIMC](http://iti.stanford.edu/himc/)
+
+The instructions below state how to select the splash image.
 
 ## Client build instructions
 
@@ -15,10 +25,18 @@ Follow these instructions to build the client on a Linux machine.
 1.  Ensure that the `java.client.version.num` in file `build.properties` has the correct version
     number.
 
-1.  Use the following command at the project's root directory.
+1.  Use the following command at the project's root directory to build the client with the default
+    branding ([CBSR](http://biosample.ca/)).
 
     ```bash
 	ant product
+    ```
+
+    Or, if you would like to customize the client for [HIMC](http://iti.stanford.edu/himc/) use the
+    following command:
+
+    ```bash
+	ant -Dclient.branding=stanford product
     ```
 
     This creates the following files in `<proj_root>/product/buildDirectory/I.Product`.

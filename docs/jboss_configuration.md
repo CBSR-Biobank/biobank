@@ -106,17 +106,10 @@ following:
 Assumes `$JBOSS_HOME` is where JBoss AS is installed to and that user account `jboss` has already
 been created.
 
-1.  Create symbolic link from `/usr/local/jboss` to `$JBOSS_HOME`.
-
-    ```bash
-    $ ln -s $JBOSS_HOME /usr/local/jboss
-    ```
-
 1.  Change user and group ownership to jboss.
 
     ```bash
-    $ chown jboss:jboss /usr/local/jboss
-    $ chown -R jboss:jboss $JBOSS_HOME
+    $ chown jboss:jboss /opt/jboss
     ```
 
 1.  Get JBoss AS init script.
@@ -132,6 +125,8 @@ been created.
     $ chown root:root /etc/init.d/jboss
     $ chmod a+rwx /etc/init.d/jboss
     ```
+
+1.  Edit the script to change the location of $JBOSS_HOME to `/opt/jboss/jboss-4.0.5.GA`.
 
 1.  Add JBoss AS to init system
 

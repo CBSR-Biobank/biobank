@@ -1,14 +1,14 @@
 # Biobank client manual installation
 
-Please follow these instructions to manually install the Biobank thick client. These instructions
+Please follow these instructions to manually install the Biobank client software. These instructions
 apply for the following operating systems: Microsoft Windows, Apple Mac OSX, and Linux. Also, ensure
-that you use the correct version for your operating system if you are running the 64 bit version of
+that you use the correct version for your Mac OSX or Linux if you are running the 64 bit version of
 the operating system.
 
 **_If you have not downloaded the client software file for your operating system, please go back
 to the previous document and download the client by selecting the appropriate link._**
 
-**_If you are using the client for Biobank version 3.9.0 or later on Microsoft Widnwos, you need to
+**_If you are using the client for Biobank version 3.9.0 or later on Microsoft Windows, you need to
 download and install the
 [Microsoft Visual C++ 2010 SP1 Redistributable Package (x86)](http://www.microsoft.com/en-us/download/details.aspx?id=8328)
 first._**
@@ -26,8 +26,7 @@ as the **client directory** below.
    *I.e. on Windows you will now have the `C:\Users\_userid_\BioBank\BioBank`.  On Linux you will
    have `/opt/BioBank/BioBank`.*
 
-3. This step depends on the operating system you are using. If you are using Microsoftw Windows,
-   skip this step.
+3. This step applies only to Mac OSX or Linux. If you are using Microsoft Windows, skip this step.
 
   1. Mac and Linux users need to install a Java 6 runtime environment that corresponds to their
   operating system. Please see the following web page for download instructions:
