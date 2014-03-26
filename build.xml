@@ -27,8 +27,6 @@
   <property name="product.dir" location="product" />
   <property name="buildDirectory" value="${product.dir}/buildDirectory" />
 
-  <property name="branding" value="cbsr" />
-
   <path id="flyway.lib.path">
     <fileset dir="${lib.dir}/flyway" includes="*.jar"/>
   </path>
@@ -285,7 +283,7 @@
 	  description="--> update version strings on server and client">
   </target>
 
-  <target name="deploy-eclipse" depends="resolve,create-messages-jar,biobank-version-modify"
+  <target name="deploy-eclipse" depends="resolve,client-branding,create-messages-jar,biobank-version-modify"
 	  description="--> retrieve dependencies for eclipse projects">
     <copy file="${lib.dir}/messages.jar" todir="${eclipse.proj.dir}/lib"/>
     <copy file="${lib.dir}/messages.jar" todir="${eclipse.proj.dir.common}/lib/client"/>
@@ -441,14 +439,18 @@
     </exec>
   </target>
 
-
   <target name="check-deploy-jboss-required"
 	  unless="check.deploy.jboss.skip">
     <antcall target="check-deploy-jboss" />
   </target>
 
+  <target name="jboss.home.env">
+    <fail unless="env.JBOSS_HOME"
+          message="JBOSS_HOME environment variable not defined" />
+  </target>
+
   <target name="deploy-jboss"
-          depends="check-deploy-jboss-required,update-db-config,package-webapp,check-jboss-uptodate,keystore-copy"
+          depends="jboss.home.env,check-deploy-jboss-required,update-db-config,package-webapp,check-jboss-uptodate,keystore-copy"
           description="deploys the caCORE SDK webapp to JBoss"
           unless="jboss.uptodate">
     <copy file="${secu-log.dir}/jboss/login-config.xml"
@@ -578,20 +580,41 @@
     <delete dir="${buildDirectory}" />
   </target>
 
-  <target name="branding-cbsr" if="branding.cbsr">
+  <condition property="client.branding.cbsr">
+    <equals arg1="${client.branding}" arg2="cbsr" />
+  </condition>
+
+  <condition property="client.branding.stanford">
+    <equals arg1="${client.branding}" arg2="stanford" />
+  </condition>
+
+  <target name="client-branding-cbsr" if="client.branding.cbsr">
     <copy file="branding/cbsr_splash.bmp"
           tofile="${eclipse.proj.dir}/splash.bmp" overwrite="true" />
   </target>
 
-  <target name="branding-stanford" if="branding.stanford">
+  <target name="client-branding-stanford" if="client.branding.stanford">
     <copy file="branding/stanford_splash.bmp"
           tofile="${eclipse.proj.dir}/splash.bmp" overwrite="true" />
   </target>
 
-  <target name="branding" depends="branding-cbsr,branding-stanford" />
+  <target name="client-branding" depends="client-branding-cbsr,client-branding-stanford">
+    <fail message="Client branding is invalid: ${client.branding}">
+      <condition>
+	<and>
+	  <not>
+	    <isset property="client.branding.cbsr" />
+	  </not>
+	  <not>
+	    <isset property="client.branding.stanford" />
+	  </not>
+	</and>
+      </condition>
+    </fail>
+  </target>
 
   <target name="product"
-	  depends="clean-product,versions-update,deploy,branding"
+	  depends="clean-product,versions-update,deploy,client-branding"
 	  description="build the product">
     <!-- buildDirectory is the folder where the plugins and products are found and build -->
     <!-- plugins and features are copied into the buildDirectory -->
