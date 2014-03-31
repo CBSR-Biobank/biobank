@@ -5,6 +5,9 @@
 #
 #
 
+# TODO:
+# 1. modify console passwords
+
 if [[ ! -d "$HOME/jboss-4.0.5.GA" ]]; then
    echo "Error: JBoss directory not found in home directory."
    exit 1
@@ -48,7 +51,7 @@ DBURL="jdbc:mysql:\/\/$DBHOST:3306\/$DBNAME"
 BIOBANK_WAR_UNZIP_DIR=biobank_war
 
 mkdir -p $BIOBANK_WAR_UNZIP_DIR
-unzip -o $BIOBANK_WAR -d BIOBANK_WAR_UNZIP_DIR
+unzip -o $BIOBANK_WAR -d $BIOBANK_WAR_UNZIP_DIR &> /dev/null
 
 for f in "${TEMPLATES[@]}"
 do
@@ -62,20 +65,20 @@ do
        application-config.xml.template)
            DEST=biobank_war/WEB-INF/classes/application-config.xml
            ;;
+       log4j.xml.template)
+           DEST=biobank_war/WEB-INF/classes/log4j.xml
+           ;;
+       V1__Base_version.sql.template)
+           DEST=biobank_war/db/migration/V1__Base_version.sql
+           ;;
        biobank-ds.xml.template)
            DEST=$HOME/jboss-4.0.5.GA/server/default/deploy/biobank-ds.xml
            ;;
        login-config.xml.template)
            DEST=$HOME/jboss-4.0.5.GA/server/default/conf/login-config.xml
            ;;
-       log4j.xml.template)
-           DEST=biobank_war/WEB-INF/classes/log4j.xml
-           ;;
        upt-ds.xml.template)
            DEST=$HOME/jboss-4.0.5.GA/server/default/deploy/upt-ds.xml
-           ;;
-       V1__Base_version.sql.template)
-           DEST=biobank_war/db/migration/V1__Base_version.sql
            ;;
    esac
 
@@ -83,4 +86,8 @@ do
 
 done
 
-cd $BIOBANK_WAR_UNZIP_DIR && zip -r $BIOBANK_WAR *
+cd $BIOBANK_WAR_UNZIP_DIR && zip -r $BIOBANK_WAR . &> /dev/null
+cd ..
+rm -rf $BIOBANK_WAR_UNZIP_DIR
+
+echo "Biobank server is now ready to start"
