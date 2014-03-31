@@ -25,14 +25,16 @@ deployed web application is secured.
 
  1. Edit `server/default/conf/props/jmx-console-users.properties` and add `username=password` pairs.
 
- 1. Edit `jmx-console-roles.properties` to assign the necessary roles to those users. In particular,
- the JBossAdmin role is the role to edit for the JMX console.
+ 1. Edit `server/default/conf/props/jmx-console-roles.properties` to assign the necessary roles to
+    those users. In particular, the JBossAdmin role is the role to edit for the JMX console.
 
 1.  Set passwords for the administration web console:
 
  1. Edit `server/default/deploy/management/console-mgr.sar/web-console.war/WEB-INF/classes/web-console-users.properties`.
 
- 1. Edit `web-console-roles.properties` in the same way to secure the web console.
+ 1. Edit
+    `server/default/deploy/management/console-mgr.sar/web-console.war/WEB-INF/classes/web-console-roles.properties`
+    in the same way to secure the web console.
 
 Accessing https://localhost:8443/jmx-console/ and https://localhost:8443/web-console/ should now
 ask for identification.
