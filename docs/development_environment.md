@@ -8,7 +8,7 @@ for Biobank.
 1.  Using the Ubuntu package manager install the required packages.
 
     ```bash
-	sudo apt-get install ant git-core zip
+	sudo apt-get install ant git-core zip unzip
 	```
 
 1.  Follow these [instructions](ubuntu_java_install.md) to install the Java Standard Edition 6
