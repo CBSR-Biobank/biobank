@@ -431,26 +431,13 @@
           overwrite="false" />
   </target>
 
-  <target name="check-deploy-jboss"
-	  depends="db-properties-copy,check-db-user">
-    <echo message="to skip this check set the check.deploy.jboss.skip property on the command line" />
-    <exec dir="" executable="${perl}" failonerror="true">
-      <arg line="scripts/chkconfig -d ${database.name} --host ${database.host} -u ${database.exec.username} -p ${database.exec.password}"/>
-    </exec>
-  </target>
-
-  <target name="check-deploy-jboss-required"
-	  unless="check.deploy.jboss.skip">
-    <antcall target="check-deploy-jboss" />
-  </target>
-
   <target name="jboss.home.env">
     <fail unless="env.JBOSS_HOME"
           message="JBOSS_HOME environment variable not defined" />
   </target>
 
   <target name="deploy-jboss"
-          depends="jboss.home.env,check-deploy-jboss-required,update-db-config,package-webapp,check-jboss-uptodate,keystore-copy"
+          depends="jboss.home.env,update-db-config,package-webapp,check-jboss-uptodate,keystore-copy"
           description="deploys the caCORE SDK webapp to JBoss"
           unless="jboss.uptodate">
     <copy file="${secu-log.dir}/jboss/login-config.xml"
@@ -752,6 +739,11 @@
     <delete dir="docs/doxygen/xml" />
   </target>
 
+  <target name="clean-package-jaboss">
+    <delete dir="${package.jboss.target.dir}" />
+    <delete dir="${package.jboss.root.dir}/templates" />
+  </target>
+
   <target name="package-jboss"
 	  depends="deploy-jboss"
 	  description="Generates an Ubuntu package file for the Biobank server.">
@@ -802,7 +794,7 @@
 	  tofile="${package.jboss.root.dir}/templates/upt-ds.xml.template"
 	  overwrite="true" />
 
-    <copy file="db/migration/V1__Base_version.sql.template"
+    <copy file="db/empty_db.sql.template"
 	  tofile="${package.jboss.root.dir}/templates/V1__Base_version.sql.template"
 	  overwrite="true" />
 
@@ -820,12 +812,6 @@
 
     <copy file="${lib.dir}/build/mysql-connector-java.jar"
           tofile="${package.jboss.target.dir}/server/default/lib/mysql-connector-java.jar"
-          overwrite="true" verbose="true" />
-
-    <mkdir dir="${package.jboss.root.dir}/db"/>
-
-    <copy file="db/empty_db.sql"
-          tofile="${package.jboss.root.dir}/db/empty_db.sql"
           overwrite="true" verbose="true" />
 
     <exec executable="dpkg" dir="package-jboss">

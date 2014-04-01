@@ -33,7 +33,7 @@ TEMPLATES=(
     login-config.xml.template
     log4j.xml.template
     upt-ds.xml.template
-    V1__Base_version.sql.template)
+    empty_db.sql.template)
 
 read -p "Enter host name for MySQL server: [$DFLT_DBHOST] " DBHOST
 DBHOST=${DBHOST:-$DFLT_DBHOST}
@@ -68,8 +68,8 @@ do
        log4j.xml.template)
            DEST=biobank_war/WEB-INF/classes/log4j.xml
            ;;
-       V1__Base_version.sql.template)
-           DEST=biobank_war/db/migration/V1__Base_version.sql
+       empty_db.sql.template)
+           DEST=empty_db.sql
            ;;
        biobank-ds.xml.template)
            DEST=$HOME/jboss-4.0.5.GA/server/default/deploy/biobank-ds.xml
@@ -86,9 +86,9 @@ do
 
 done
 
-mysql -h $DBHOST -u$DBUSER -p$DBPWD $DBNAME < db/empty_db.sql
+mysql -h $DBHOST -u$DBUSER -p$DBPWD $DBNAME < empty_db.sql
 cd $BIOBANK_WAR_UNZIP_DIR && zip -r $BIOBANK_WAR . &> /dev/null
 cd ..
-rm -rf $BIOBANK_WAR_UNZIP_DIR
+rm -rf $BIOBANK_WAR_UNZIP_DIR empty_db.sql
 
 echo "Biobank server is now ready to start"
