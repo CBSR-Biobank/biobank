@@ -822,6 +822,12 @@
           tofile="${package.jboss.target.dir}/server/default/lib/mysql-connector-java.jar"
           overwrite="true" verbose="true" />
 
+    <mkdir dir="${package.jboss.root.dir}/db"/>
+
+    <copy file="db/empty_db.sql"
+          tofile="${package.jboss.root.dir}/db/empty_db.sql"
+          overwrite="true" verbose="true" />
+
     <exec executable="dpkg" dir="package-jboss">
       <arg line="--build debian" />
     </exec>

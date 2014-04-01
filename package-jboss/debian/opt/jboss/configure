@@ -86,6 +86,7 @@ do
 
 done
 
+mysql -h $DBHOST -u$DBUSER -p$DBPWD $DBNAME < db/empty_db.sql
 cd $BIOBANK_WAR_UNZIP_DIR && zip -r $BIOBANK_WAR . &> /dev/null
 cd ..
 rm -rf $BIOBANK_WAR_UNZIP_DIR
