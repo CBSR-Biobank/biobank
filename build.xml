@@ -792,14 +792,11 @@
     <copy file="${secu-log.dir}/jboss/biobank-ds.xml.template"
 	  tofile="${package.jboss.root.dir}/templates/biobank-ds.xml.template"
 	  overwrite="true" />
-    <copy file="${scripts.proj.dir}/ssl/cert.cnf.template"
-	  tofile="${package.jboss.root.dir}/templates/cert.cnf.template"
+    <copy file="${secu-log.dir}/jboss/login-config.xml.template"
+	  tofile="${package.jboss.root.dir}/templates/login-config.xml.template"
 	  overwrite="true" />
     <copy file="${secu-log.dir}/jboss/log4j.xml.template"
 	  tofile="${package.jboss.root.dir}/templates/log4j.xml.template"
-	  overwrite="true" />
-    <copy file="${secu-log.dir}/jboss/login-config.xml.template"
-	  tofile="${package.jboss.root.dir}/templates/login-config.xml.template"
 	  overwrite="true" />
     <copy file="${secu-log.dir}/jboss/upt-ds.xml.template"
 	  tofile="${package.jboss.root.dir}/templates/upt-ds.xml.template"
@@ -809,9 +806,21 @@
 	  tofile="${package.jboss.root.dir}/templates/V1__Base_version.sql.template"
 	  overwrite="true" />
 
+    <copy file="${scripts.proj.dir}/ssl/cert.cnf.template"
+	  tofile="${package.jboss.root.dir}/templates/cert.cnf.template"
+	  overwrite="true" />
+
     <copy file="${war.file}"
 	  tofile="${package.jboss.target.dir}/server/default/deploy/biobank.war"
 	  overwrite="true" />
+
+    <copy file="${war.file}"
+	  tofile="${package.jboss.target.dir}/server/default/deploy/biobank.war"
+	  overwrite="true" />
+
+    <copy file="${lib.dir}/build/mysql-connector-java.jar"
+          tofile="${package.jboss.target.dir}/server/default/lib/mysql-connector-java.jar"
+          overwrite="true" verbose="true" />
 
     <exec executable="dpkg" dir="package-jboss">
       <arg line="--build debian" />
