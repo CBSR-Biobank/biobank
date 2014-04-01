@@ -86,7 +86,16 @@ do
 
 done
 
-mysql -h $DBHOST -u$DBUSER -p$DBPWD $DBNAME < empty_db.sql
+DBOUT=`mysql -h $DBHOST -u$DBUSER -p$DBPWD $DBNAME -B -e "select count(*) from information_schema.tables where table_schema='biobank_v390' and table_name='csm_application'"`
+DBOUT_ARR=(${DBOUT//;/ })
+
+if [ "${DBOUT_ARR[1]}"!="1" ]; then
+    read -p "Databse not fully initialized. Do you want to initialize it? [y/n] " CREATE
+    if [ "$CREATE"=="y" ]; then
+        mysql -h $DBHOST -u$DBUSER -p$DBPWD $DBNAME < empty_db.sql
+    fi
+fi
+
 cd $BIOBANK_WAR_UNZIP_DIR && zip -r $BIOBANK_WAR . &> /dev/null
 cd ..
 rm -rf $BIOBANK_WAR_UNZIP_DIR empty_db.sql

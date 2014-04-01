@@ -150,15 +150,6 @@
       <replacefilter token="@database.password@" value="${database.password}"/>
     </replace>
 
-    <copy file="db/migration/V1__Base_version.sql.template"
-	  tofile="db/migration/V1__Base_version.sql"/>
-    <replace file="db/migration/V1__Base_version.sql">
-      <replacefilter token="@database.url@" value="${database.url}"/>
-      <replacefilter token="@database.driver@" value="${database.driver}"/>
-      <replacefilter token="@database.username@" value="${database.username}"/>
-      <replacefilter token="@database.password@" value="${database.password}"/>
-    </replace>
-
     <jar destfile="${lib.dir}/flyway/migrations.jar"
 	 basedir="."
 	 includes="db/migration/**">
@@ -739,12 +730,13 @@
     <delete dir="docs/doxygen/xml" />
   </target>
 
-  <target name="clean-package-jaboss">
+  <target name="clean-package-biobank-server">
     <delete dir="${package.jboss.target.dir}" />
     <delete dir="${package.jboss.root.dir}/templates" />
+    <delete dir="${package.jboss.root.dir}/tools" />
   </target>
 
-  <target name="package-jboss"
+  <target name="package-biobank-server"
 	  depends="deploy-jboss"
 	  description="Generates an Ubuntu package file for the Biobank server.">
     <unzip src="${env.JBOSS_HOME}/../jboss-4.0.5.GA.zip"
@@ -795,7 +787,7 @@
 	  overwrite="true" />
 
     <copy file="db/empty_db.sql.template"
-	  tofile="${package.jboss.root.dir}/templates/V1__Base_version.sql.template"
+	  tofile="${package.jboss.root.dir}/templates/empty_db.sql.template"
 	  overwrite="true" />
 
     <copy file="${scripts.proj.dir}/ssl/cert.cnf.template"

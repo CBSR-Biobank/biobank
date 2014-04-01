@@ -23,7 +23,7 @@ chkconfig [OPTIONS]
   --host DBHOST      The hostname of the machine running the MySQL server. Defaults to
                      localhost if not specified.
   --user DBUSER      The user to use on the MySQL server.
-  --passwrd PWD      The password to use on the MySQL server. If not specified the
+  --password PWD     The password to use on the MySQL server. If not specified the
                      user will be prompted to enter it.
   --help             Help text.
   --man              Full documentation.
@@ -35,8 +35,8 @@ no strict 'refs';
 my $MYSQL = "/usr/bin/mysql";
 my $GREP = "/bin/grep";
 my $SED = "/bin/sed";
-my $DBHOST = "localhost";
-my $DBNAME = "biobank";
+my $DBHOST = "";
+my $DBNAME = "";
 my $DBUSER = "";
 my $DBPASSWORD = "";
 my $RESULT = 1;
@@ -44,22 +44,59 @@ my $help = 0;
 my $man = 0;
 my @tests = ();
 
-my $parseCmdLine = GetOptions ('database=s' => \$DBNAME,
-            'host=s' => \$DBHOST,
-            'user=s' => \$DBUSER,
-            'password=s' => \$DBPASSWORD,
-            'man' => \$man,
-            'help|?'   => \$help);
+my $parseCmdLine = GetOptions (
+                               'database=s' => \$DBNAME,
+                               'host=s' => \$DBHOST,
+                               'user=s' => \$DBUSER,
+                               'password=s' => \$DBPASSWORD,
+                               'man' => \$man,
+                               'help|?'   => \$help);
 
 if ($havePodUsage) {
     Pod::Usage->import();
     $parseCmdLine or pod2usage(2);
-pod2usage(1) if $help;
-pod2usage(-exitstatus => 0, -verbose => 2) if $man;
+    pod2usage(1) if $help;
+    pod2usage(-exitstatus => 0, -verbose => 2) if $man;
+}
+
+sub userInput {
+    my $msg = shift;
+    my $dflt = shift || '';
+    my $value;
+
+    print "$msg: ";
+
+    if ($dflt ne "") {
+        print "[$dflt] ";
+    }
+
+    $value = <>;
+    chomp $value;
+    if ($value eq "" && $dflt ne "") {
+        $value = $dflt;
+    }
+    return $value;
+}
+
+if ($DBHOST eq "") {
+    $DBHOST = userInput("Enter host name for MySQL server", "localhost");
+    if ($DBHOST eq "") {
+        die "ERROR: database host name not specified\n";
+    }
+}
+
+if ($DBNAME eq "") {
+    $DBNAME = userInput("Enter database name for the Biobank application", "biobank");
+    if ($DBNAME eq "") {
+        die "ERROR: database name not specified\n";
+    }
 }
 
 if ($DBUSER eq "") {
-    die "ERROR: database user name not specified\n";
+    $DBUSER = userInput("Enter database executor's username (to execute database commands)");
+    if ($DBUSER eq "") {
+        die "ERROR: database user name not specified\n";
+    }
 }
 
 if ($DBPASSWORD eq "") {
@@ -74,6 +111,8 @@ if ($DBPASSWORD eq "") {
 if ($DBPASSWORD eq "") {
     die "ERROR: database user password not specified\n";
 }
+
+print "\n";
 
 sub createTestResult {
     my $t = new TestResult->new(shift, shift);
@@ -118,32 +157,12 @@ $testResult = createTestResult("checking MySQL for lower case table names...", 1
 $testResult->{result} = (`$MYSQL -h$DBHOST -u$DBUSER -p$DBPASSWORD -e "show variables" $DBNAME |
         $GREP -e "^lower_case_table_names"` =~ /1$/);
 
-# checkJbossHomeEnv
-$testResult = createTestResult("checking if JBOSS_HOME environment variable defined and valid...", 1);
-$testResult->{result} = defined($ENV{'JBOSS_HOME'}) && (-d "$ENV{'JBOSS_HOME'}");
-
-
-# checkEclipseHomeEnv
-$testResult = createTestResult("checking if ECLIPSE_HOME environment variable defined and valid...", 0);
-$testResult->{result} = defined($ENV{'ECLIPSE_HOME'}) && (-d "$ENV{'ECLIPSE_HOME'}");
-
-
-# checkEclipseDeltaPack
-$testResult = createTestResult("checking for Eclipse delta pack...",  0);
-my $present = 0;
-if (defined($ENV{'ECLIPSE_HOME'})) {
-    my $path = $ENV{'ECLIPSE_HOME'}
-        . "/plugins/org.eclipse.swt.win32.win32.x86.source_3.7.2.v3740f.jar";
-    $present = 1 if (-f "$path");
-}
-$testResult->{result} = $present;
-
 # checkKeystoreFile
 $testResult = createTestResult("checking for SSL certificate file...", 1);
-$testResult->{result} = (-f "security-logs/jboss/biobank.keystore");
+$testResult->{result} = (-f "jboss-4.0.5.GA/server/default/conf/biobank.keystore");
 
 # checkDbExists()
-$testResult = createTestResult("checking for databse $DBNAME...", $present, 1);
+$testResult = createTestResult("checking for databse $DBNAME...", 1);
 my $cmd = "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA "
     . "WHERE SCHEMA_NAME = '$DBNAME'";
 $testResult->{result} = (mysqlCmd('biobank', $cmd) =~ /^$DBNAME$/);
@@ -164,10 +183,10 @@ foreach (@tests) {
     my $testResult = $_;
 
     (! $testResult->{required}) && print "OPTIONAL ";
-    print $testResult->{msg}, "\n", ($testResult->{result} ? "[PASS]" : "[FAIL]"), "\n";
+    printf("%-50s %9s\n", $testResult->{msg}, ($testResult->{result} ? "[PASS]" : "[FAIL]"));
 
     foreach ( @{ $testResult->{extraMsgs} } ) {
-        print $_, "\n";
+        print "\t", $_, "\n";
     }
 
     ($testResult->{required}) && ($RESULT &= $testResult->{result});
