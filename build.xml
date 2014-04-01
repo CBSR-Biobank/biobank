@@ -752,6 +752,86 @@
     <delete dir="docs/doxygen/xml" />
   </target>
 
+  <target name="package-jboss"
+	  depends="deploy-jboss"
+	  description="Generates an Ubuntu package file for the Biobank server.">
+    <unzip src="${env.JBOSS_HOME}/../jboss-4.0.5.GA.zip"
+	   dest="${package.jboss.root.dir}/"
+	   overwrite="true" />
+    <copy file="${secu-log.dir}/jboss/overwrite/server/default/conf/jboss-service.xml"
+	  tofile="${package.jboss.target.dir}/server/default/conf/jboss-service.xml"
+	  overwrite="true" />
+
+    <copy file="${secu-log.dir}/jboss/overwrite/server/default/deploy/jbossweb-tomcat55.sar/server.xml"
+	  tofile="${package.jboss.target.dir}/server/default/deploy/jbossweb-tomcat55.sar/server.xml"
+	  overwrite="true" />
+    <copy file="${secu-log.dir}/jboss/overwrite/server/default/deploy/jmx-console.war/WEB-INF/jboss-web.xml"
+	  tofile="${package.jboss.target.dir}/server/default/deploy/jmx-console.war/WEB-INF/jboss-web.xml"
+	  overwrite="true" />
+    <copy file="${secu-log.dir}/jboss/overwrite/server/default/deploy/jmx-console.war/WEB-INF/web.xml"
+	  tofile="${package.jboss.target.dir}/server/default/deploy/jmx-console.war/WEB-INF/web.xml"
+	  overwrite="true" />
+    <copy file="${secu-log.dir}/jboss/overwrite/server/default/deploy/management/console-mgr.sar/web-console.war/WEB-INF/jboss-web.xml"
+	  tofile="${package.jboss.target.dir}/server/default/deploy/management/console-mgr.sar/web-console.war/WEB-INF/jboss-web.xml"
+	  overwrite="true" />
+    <copy file="${secu-log.dir}/jboss/overwrite/server/default/deploy/management/console-mgr.sar/web-console.war/WEB-INF/web.xml"
+	  tofile="${package.jboss.target.dir}/server/default/deploy/management/console-mgr.sar/web-console.war/WEB-INF/web.xml"
+	  overwrite="true" />
+
+    <mkdir dir="${package.jboss.root.dir}/tools"/>
+
+    <copy file="${scripts.proj.dir}/ssl/ImportKey.class"
+	  tofile="${package.jboss.root.dir}/tools/ImportKey.class"
+	  overwrite="true" />
+
+    <mkdir dir="${package.jboss.root.dir}/templates"/>
+
+    <copy file="${secu-log.dir}/jboss/application-config.xml.template"
+	  tofile="${package.jboss.root.dir}/templates/application-config.xml.template"
+	  overwrite="true" />
+    <copy file="${secu-log.dir}/jboss/biobank-ds.xml.template"
+	  tofile="${package.jboss.root.dir}/templates/biobank-ds.xml.template"
+	  overwrite="true" />
+    <copy file="${scripts.proj.dir}/ssl/cert.cnf.template"
+	  tofile="${package.jboss.root.dir}/templates/cert.cnf.template"
+	  overwrite="true" />
+    <copy file="${secu-log.dir}/jboss/log4j.xml.template"
+	  tofile="${package.jboss.root.dir}/templates/log4j.xml.template"
+	  overwrite="true" />
+    <copy file="${secu-log.dir}/jboss/login-config.xml.template"
+	  tofile="${package.jboss.root.dir}/templates/login-config.xml.template"
+	  overwrite="true" />
+    <copy file="${secu-log.dir}/jboss/upt-ds.xml.template"
+	  tofile="${package.jboss.root.dir}/templates/upt-ds.xml.template"
+	  overwrite="true" />
+
+    <copy file="db/migration/V1__Base_version.sql.template"
+	  tofile="${package.jboss.root.dir}/templates/V1__Base_version.sql.template"
+	  overwrite="true" />
+
+    <copy file="${war.file}"
+	  tofile="${package.jboss.target.dir}/server/default/deploy/biobank.war"
+	  overwrite="true" />
+
+    <exec executable="dpkg" dir="package-jboss">
+      <arg line="--build debian" />
+    </exec>
+
+    <move file="package-jboss/debian.deb"
+	  tofile="biobank-server-${server.version.num}.deb"
+	  overwrite="true" />
+
+    <!-- instead of copy file, the password should be changed
+    <copy file="${secu-log.dir}/jboss/overwrite/server/default/conf/props/jmx-console-users.properties"
+	  tofile="${package.jboss.target.dir}/server/default/conf/props/jmx-console-users.properties"
+	  overwrite="true" />
+    <copy file="${secu-log.dir}/jboss/overwrite/server/default/deploy/management/console-mgr.sar/web-console.war/WEB-INF/classes/web-console-users.properties"
+	  tofile="${package.jboss.target.dir}/server/default/deploy/management/console-mgr.sar/web-console.war/WEB-INF/classes/web-console-users.properties"
+	  overwrite="true" />
+    -->
+
+  </target>
+
 <!-- (setq nxml-slash-auto-complete-flag t) -->
 
 
