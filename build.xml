@@ -540,7 +540,7 @@
   </target>
 
   <target name="clean"
-          depends="clean-tests,clean-tools,clean-jars,clean-product,clean-doxygen"
+          depends="clean-tests,clean-tools,clean-jars,clean-product,clean-doxygen,clean-package-biobank-server"
           description="cleans project output, tests, and jars">
     <delete dir="${eclipse.proj.dir.common}/output" />
     <delete dir="${eclipse.proj.dir.tools}/output" />

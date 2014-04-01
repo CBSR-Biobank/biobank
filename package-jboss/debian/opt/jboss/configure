@@ -86,7 +86,7 @@ do
            ;;
    esac
 
-   $SED "s/@database.driver@/$DFLT_DB_DRIVER/g;s/@database.url@/$DBURL/g;s/@database.username@/$DBUSER/g;s/@database.password@/$DBPWD/g" "templates/$f" > "$DEST"
+   $SED "s/@database.driver@/$DFLT_DB_DRIVER/g;s/@database.url@/$DBURL/g;s/@database.username@/$DBUSER/g;s/@database.password@/$DBPWD/g" "templates/$f" >$DEST
 
 done
 
