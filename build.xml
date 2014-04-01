@@ -782,6 +782,9 @@
     <copy file="${secu-log.dir}/jboss/log4j.xml.template"
 	  tofile="${package.jboss.root.dir}/templates/log4j.xml.template"
 	  overwrite="true" />
+    <copy file="${secu-log.dir}/jboss/biobank.csm.new.hibernate.cfg.xml.template"
+	  tofile="${package.jboss.root.dir}/templates/biobank.csm.new.hibernate.cfg.xml.template"
+	  overwrite="true" />
     <copy file="${secu-log.dir}/jboss/upt-ds.xml.template"
 	  tofile="${package.jboss.root.dir}/templates/upt-ds.xml.template"
 	  overwrite="true" />

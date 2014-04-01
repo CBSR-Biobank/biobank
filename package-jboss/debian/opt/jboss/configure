@@ -30,6 +30,7 @@ DFLT_DB_DRIVER="com.mysql.jdbc.Driver"
 TEMPLATES=(
     application-config.xml.template
     biobank-ds.xml.template
+    biobank.csm.new.hibernate.cfg.xml.template
     login-config.xml.template
     log4j.xml.template
     upt-ds.xml.template
@@ -64,6 +65,9 @@ do
    case $f in
        application-config.xml.template)
            DEST=biobank_war/WEB-INF/classes/application-config.xml
+           ;;
+       biobank.csm.new.hibernate.cfg.xml.template)
+           DEST=biobank_war/WEB-INF/classes/biobank.csm.new.hibernate.cfg.xml
            ;;
        log4j.xml.template)
            DEST=biobank_war/WEB-INF/classes/log4j.xml
