@@ -390,7 +390,9 @@
           description="copies db configuration information from db.properties to various config files">
 
     <copy todir="${secu-log.dir}/jboss" overwrite="true">
-      <fileset dir="${secu-log.dir}/jboss"/>
+      <fileset dir="${secu-log.dir}/jboss">
+	<exclude name="**/console/**" />
+      </fileset>
       <globmapper from="*.template" to="*"/>
       <filterset>
         <filter token="database.url" value="${database.url}"/>
@@ -802,11 +804,11 @@
 	  overwrite="true" />
 
 
-    <copy file="${secu-log.dir}/jboss/jmx-console-users.properties.template"
+    <copy file="${secu-log.dir}/jboss/console/jmx-console-users.properties.template"
 	  tofile="${package.jboss.root.dir}/templates/jmx-console-users.properties.template"
 	  overwrite="true" />
 
-    <copy file="${secu-log.dir}/jboss//web-console-users.properties.template"
+    <copy file="${secu-log.dir}/jboss/console/web-console-users.properties.template"
  	  tofile="${package.jboss.root.dir}/templates/web-console-users.properties.template"
 	  overwrite="true" />
 
