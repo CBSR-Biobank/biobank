@@ -57,7 +57,6 @@ public class OriginInfoSaveAction implements Action<IdResult> {
     public OriginInfoSaveAction(
         OriginInfoSaveInfo originSaveInfo,
         ShipmentInfoSaveInfo shipmentSaveInfo) {
-
         this.originSaveInfo = originSaveInfo;
         this.shipmentSaveInfo = shipmentSaveInfo;
     }
@@ -79,9 +78,15 @@ public class OriginInfoSaveAction implements Action<IdResult> {
             // get studies the added specimens come from
             Set<Study> specimenStudies = new HashSet<Study>();
 
-            for (Integer specimenId : originSaveInfo.addedSpecIds) {
-                Specimen specimen = context.get(Specimen.class, specimenId);
-                specimenStudies.add(specimen.getCollectionEvent().getPatient().getStudy());
+            if (originSaveInfo.addedSpecIds != null) {
+                for (Integer specimenId : originSaveInfo.addedSpecIds) {
+                    if (specimenId != null) {
+                        Specimen specimen = context.get(Specimen.class, specimenId);
+                        if (specimen != null) {
+                            specimenStudies.add(specimen.getCollectionEvent().getPatient().getStudy());
+                        }
+                    }
+                }
             }
 
             if (!clinicStudies.containsAll(specimenStudies)) {

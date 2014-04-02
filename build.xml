@@ -734,6 +734,7 @@
     <delete dir="${package.jboss.target.dir}" />
     <delete dir="${package.jboss.root.dir}/templates" />
     <delete dir="${package.jboss.root.dir}/tools" />
+    <delete file="biobank-server-${server.version.num}.deb"/>
   </target>
 
   <target name="package-biobank-server"

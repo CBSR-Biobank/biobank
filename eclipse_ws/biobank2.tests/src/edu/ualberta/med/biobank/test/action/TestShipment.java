@@ -18,6 +18,7 @@ import edu.ualberta.med.biobank.common.action.shipment.ShipmentGetInfoAction;
 import edu.ualberta.med.biobank.common.action.site.SiteGetInfoAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.model.Center;
+import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Specimen;
@@ -38,6 +39,8 @@ public class TestShipment extends TestAction {
         session.beginTransaction();
         site = factory.createSite();
         clinic = factory.createClinic();
+        Contact contact = factory.createContact();
+        factory.getDefaultStudy().getContacts().add(contact);
         patient = factory.createPatient();
         session.getTransaction().commit();
     }
@@ -51,7 +54,7 @@ public class TestShipment extends TestAction {
             ShipmentInfoHelper.createRandomShipmentInfo(getExecutor());
 
         for (Integer specimenId : oisave.addedSpecIds) {
-            Specimen spc = (Specimen) session.load(Specimen.class, specimenId); 
+            Specimen spc = (Specimen) session.load(Specimen.class, specimenId);
             Assert.assertEquals(site.getId(), spc.getOriginInfo().getCenter().getId());
         }
 
@@ -66,7 +69,7 @@ public class TestShipment extends TestAction {
             Assert.assertTrue(oisave.addedSpecIds.contains(spec.specimen
                 .getId()));
             Assert.assertEquals(clinic.getId(), spec.specimen.getOriginInfo().getCenter().getId());
-            Assert.assertEquals(site.getId(), 
+            Assert.assertEquals(site.getId(),
                 spec.specimen.getOriginInfo().getReceiverCenter().getId());
             Assert.assertEquals(site.getId(), spec.specimen.getCurrentCenter().getId());
         }
@@ -175,5 +178,10 @@ public class TestShipment extends TestAction {
         info =
             exec(new ShipmentGetInfoAction(id));
         Assert.assertEquals(3, info.originInfo.getComments().size());
+    }
+
+    @Test
+    public void shipmentsNotAllowed() {
+
     }
 }

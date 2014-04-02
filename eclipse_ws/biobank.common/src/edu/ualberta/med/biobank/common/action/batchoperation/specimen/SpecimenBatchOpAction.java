@@ -482,7 +482,6 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
                     CSV_PATIENT_NUMBER_INVALID_ERROR.format());
                 return null;
             }
-
             pojoData.setPatient(patient);
 
             log.debug("retrieving patient for specimen: invId={} pnumber={}",
@@ -498,14 +497,27 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
                 return null;
             }
         } else {
-            Set<SpecimenType> siteAliquotedSpecimenTypes =
-                BatchOpActionUtil.getSiteAliquotedSpecimenTypes(patient.getStudy());
+            // ensure child specimen type is allowed for study
+            if (inputPojo.getPatientNumber() != null) {
+                patient = BatchOpActionUtil.getPatient(
+                    context.getSession(), inputPojo.getPatientNumber());
+            } else if (parentSpecimen != null) {
+                patient = parentSpecimen.getCollectionEvent().getPatient();
+            } else if (parentInputPojo != null) {
+                patient = BatchOpActionUtil.getPatient(
+                    context.getSession(), parentInputPojo.getPatientNumber());
+            }
 
-            if (!siteAliquotedSpecimenTypes.contains(spcType)) {
-                errorSet.addError(inputPojo.getLineNumber(),
-                    CSV_STUDY_ALIQUOTED_SPC_TYPE_ERROR.format(
-                        spcType.getName(), patient.getStudy().getNameShort()));
-                return null;
+            if (patient != null) {
+                Set<SpecimenType> siteAliquotedSpecimenTypes =
+                    BatchOpActionUtil.getSiteAliquotedSpecimenTypes(patient.getStudy());
+
+                if (!siteAliquotedSpecimenTypes.contains(spcType)) {
+                    errorSet.addError(inputPojo.getLineNumber(),
+                        CSV_STUDY_ALIQUOTED_SPC_TYPE_ERROR.format(
+                            spcType.getName(), patient.getStudy().getNameShort()));
+                    return null;
+                }
             }
         }
 
