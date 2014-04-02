@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.common.action.batchoperation;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.hibernate.Criteria;
@@ -11,6 +12,7 @@ import org.hibernate.criterion.Restrictions;
 import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.BatchOperation;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.CollectionEvent;
@@ -24,6 +26,7 @@ import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.ShippingMethod;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.Study;
@@ -112,6 +115,22 @@ public class BatchOpActionUtil {
             .add(Restrictions.eq("nameShort", nameShort));
 
         return (Site) c.uniqueResult();
+    }
+
+    public static Set<SpecimenType> getSiteSourceSpecimenTypes(Study study) {
+        Set<SpecimenType> result = new HashSet<SpecimenType>();
+        for (SourceSpecimen sourceSpecimen : study.getSourceSpecimens()) {
+            result.add(sourceSpecimen.getSpecimenType());
+        }
+        return result;
+    }
+
+    public static Set<SpecimenType> getSiteAliquotedSpecimenTypes(Study study) {
+        Set<SpecimenType> result = new HashSet<SpecimenType>();
+        for (AliquotedSpecimen sourceSpecimen : study.getAliquotedSpecimens()) {
+            result.add(sourceSpecimen.getSpecimenType());
+        }
+        return result;
     }
 
     public static Container getContainer(Session session, String label) {

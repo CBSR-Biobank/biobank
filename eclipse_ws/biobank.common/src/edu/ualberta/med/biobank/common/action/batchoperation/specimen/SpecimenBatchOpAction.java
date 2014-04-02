@@ -93,7 +93,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
         bundle.tr("container with label \"{0}\" does not exist");
 
     private static final Tr CSV_SPECIMEN_LABEL_ERROR =
-        bundle.tr("specimen position with label \"{0}\" is invalid");
+        bundle.tr("specimen position \"{0}\" in container with label \"{1}\" is invalid");
 
     public static final Tr CSV_PATIENT_NUMBER_INVALID_ERROR =
         bundle.tr("patient number is invalid");
@@ -105,6 +105,16 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
     private static final Tr CSV_CEVENT_MATCH_ERROR =
         bundle.tr("collection event with visit number \"{0}\" "
             + "does match the source specimen's collection event");
+
+    private static final Tr CSV_STUDY_SOURCE_SPC_TYPE_ERROR =
+        bundle.tr("specimen type \"{0}\" is invalid for parent specimens in study \"{1}\"");
+
+    private static final Tr CSV_STUDY_ALIQUOTED_SPC_TYPE_ERROR =
+        bundle.tr("specimen type \"{0}\" is invalid for child specimens in study \"{1}\"");
+
+    private static final Tr CSV_CONTAINER_SPC_TYPE_ERROR =
+        bundle.tr("specimen type \"{0}\" "
+            + "cannot be stored in this container");
 
     private final Integer workingCenterId;
 
@@ -439,8 +449,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
             return null;
         }
 
-        SpecimenBatchOpPojoData pojoData =
-            new SpecimenBatchOpPojoData(inputPojo, parentInputPojo);
+        SpecimenBatchOpPojoData pojoData = new SpecimenBatchOpPojoData(inputPojo, parentInputPojo);
         pojoData.setUser(context.getUser());
 
         Specimen parentSpecimen = null;
@@ -457,6 +466,15 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
             }
         }
 
+        SpecimenType spcType = BatchOpActionUtil.getSpecimenType(context.getSession(),
+            inputPojo.getSpecimenType());
+        if (spcType == null) {
+            errorSet.addError(inputPojo.getLineNumber(),
+                CSV_SPECIMEN_TYPE_ERROR.format(inputPojo.getSpecimenType()));
+        } else {
+            pojoData.setSpecimenType(spcType);
+        }
+
         if (pojoData.isSourceSpecimen()) {
             patient = BatchOpActionUtil.getPatient(context.getSession(), inputPojo.getPatientNumber());
             if (patient == null) {
@@ -464,13 +482,34 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
                     CSV_PATIENT_NUMBER_INVALID_ERROR.format());
                 return null;
             }
+
+            pojoData.setPatient(patient);
+
             log.debug("retrieving patient for specimen: invId={} pnumber={}",
                 inputPojo.getInventoryId(), inputPojo.getPatientNumber());
-            pojoData.setPatient(patient);
+
+            Set<SpecimenType> siteSourceSpecimenTypes =
+                BatchOpActionUtil.getSiteSourceSpecimenTypes(patient.getStudy());
+
+            if (!siteSourceSpecimenTypes.contains(spcType)) {
+                errorSet.addError(inputPojo.getLineNumber(),
+                    CSV_STUDY_SOURCE_SPC_TYPE_ERROR.format(
+                        spcType.getName(), patient.getStudy().getNameShort()));
+                return null;
+            }
+        } else {
+            Set<SpecimenType> siteAliquotedSpecimenTypes =
+                BatchOpActionUtil.getSiteAliquotedSpecimenTypes(patient.getStudy());
+
+            if (!siteAliquotedSpecimenTypes.contains(spcType)) {
+                errorSet.addError(inputPojo.getLineNumber(),
+                    CSV_STUDY_ALIQUOTED_SPC_TYPE_ERROR.format(
+                        spcType.getName(), patient.getStudy().getNameShort()));
+                return null;
+            }
         }
 
-        CollectionEvent cevent =
-            getAndVerifyCollectionEvent(context, inputPojo, parentSpecimen);
+        CollectionEvent cevent = getAndVerifyCollectionEvent(context, inputPojo, parentSpecimen);
 
         if (cevent == null) {
             // only aliquoted specimens with no parent require a collection
@@ -509,35 +548,38 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
             }
         }
 
-        SpecimenType spcType = BatchOpActionUtil.getSpecimenType(context.getSession(),
-            inputPojo.getSpecimenType());
-        if (spcType == null) {
-            errorSet.addError(inputPojo.getLineNumber(),
-                CSV_SPECIMEN_TYPE_ERROR.format(inputPojo.getSpecimenType()));
-        } else {
-            pojoData.setSpecimenType(spcType);
-        }
-
         // TODO: replace with pallet product barcode?
 
         // only get container information if defined for this row
         if (pojoData.hasPosition()) {
-            Container container = BatchOpActionUtil.getContainer(context.getSession(),
-                inputPojo.getPalletLabel());
+            Container container = BatchOpActionUtil.getContainer(
+                context.getSession(), inputPojo.getPalletLabel());
             if (container == null) {
-                errorSet.addError(inputPojo.getLineNumber(),
+                errorSet.addError(
+                    inputPojo.getLineNumber(),
                     CSV_CONTAINER_LABEL_ERROR.format(inputPojo.getPalletLabel()));
-            } else {
-                pojoData.setContainer(container);
+                return null;
+            }
+
+            pojoData.setContainer(container);
+
+            if (!container.getContainerType().getSpecimenTypes().contains(spcType)) {
+                errorSet.addError(
+                    inputPojo.getLineNumber(),
+                    CSV_CONTAINER_SPC_TYPE_ERROR.format(spcType.getName()));
+                return null;
             }
 
             try {
-                RowColPos pos =
-                    container.getPositionFromLabelingScheme(inputPojo.getPalletPosition());
+                RowColPos pos = container.getPositionFromLabelingScheme(
+                    inputPojo.getPalletPosition());
                 pojoData.setSpecimenPos(pos);
             } catch (Exception e) {
                 errorSet.addError(inputPojo.getLineNumber(),
-                    CSV_SPECIMEN_LABEL_ERROR.format(inputPojo.getPalletLabel()));
+                    CSV_SPECIMEN_LABEL_ERROR.format(
+                        inputPojo.getPalletPosition(),
+                        inputPojo.getPalletLabel()));
+                return null;
             }
         }
 
