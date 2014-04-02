@@ -146,6 +146,18 @@ Start the biobank server with the command:
 sudo /etc/init.d/jboss start
 ```
 
+You can test that the server is running by opening the following URL in your browser:
+
+```bash
+https://_IP_or_DN_/biobank
+```
+
+Where `_IP_or_DN_` is the IP address or domain name for your server. You should see a web page
+similar to the one shown below:
+
+![Biobank Server Web Page](images/biobank_server_web_page.jpg?raw=true "Biobank Server Web Page")
+
+
 ****
 
 [Back to top](../README.md)

@@ -741,15 +741,15 @@
 	  description="Generates an Ubuntu package file for the Biobank server.">
 
     <!-- Use command line unzip to keep file permissions -->
-    <exec executable="unzip" spawn="true">
-      <arg line="-o ${env.JBOSS_HOME}/../jboss-4.0.5.GA.zip -d ${package.jboss.root.dir}" />
+    <exec executable="unzip">
+      <arg line="-q -o ${env.JBOSS_HOME}/../jboss-4.0.5.GA.zip -d ${package.jboss.root.dir}" />
     </exec>
 
     <copy file="${secu-log.dir}/jboss/overwrite/server/default/conf/jboss-service.xml"
 	  tofile="${package.jboss.target.dir}/server/default/conf/jboss-service.xml"
-	  overwrite="true" />
+	  overwrite="true" verbose="true"/>
 
-    <copy file="${secu-log.dir}/jboss/overwrite/server/default/deploy/jbossweb-tomcat55.sar/server.xml"
+    <copy file="${secu-log.dir}/jboss/server.xml"
 	  tofile="${package.jboss.target.dir}/server/default/deploy/jbossweb-tomcat55.sar/server.xml"
 	  overwrite="true" />
     <copy file="${secu-log.dir}/jboss/overwrite/server/default/deploy/jmx-console.war/WEB-INF/jboss-web.xml"
@@ -800,6 +800,15 @@
 	  tofile="${package.jboss.root.dir}/templates/cert.cnf.template"
 	  overwrite="true" />
 
+
+    <copy file="${secu-log.dir}/jboss/jmx-console-users.properties.template"
+	  tofile="${package.jboss.root.dir}/templates/jmx-console-users.properties.template"
+	  overwrite="true" />
+
+    <copy file="${secu-log.dir}/jboss//web-console-users.properties.template"
+ 	  tofile="${package.jboss.root.dir}/templates/web-console-users.properties.template"
+	  overwrite="true" />
+
     <copy file="${war.file}"
 	  tofile="${package.jboss.target.dir}/server/default/deploy/biobank.war"
 	  overwrite="true" />
@@ -820,14 +829,6 @@
 	  tofile="biobank-server-${server.version.num}.deb"
 	  overwrite="true" />
 
-    <!-- instead of copy file, the password should be changed
-    <copy file="${secu-log.dir}/jboss/overwrite/server/default/conf/props/jmx-console-users.properties"
-	  tofile="${package.jboss.target.dir}/server/default/conf/props/jmx-console-users.properties"
-	  overwrite="true" />
-    <copy file="${secu-log.dir}/jboss/overwrite/server/default/deploy/management/console-mgr.sar/web-console.war/WEB-INF/classes/web-console-users.properties"
-	  tofile="${package.jboss.target.dir}/server/default/deploy/management/console-mgr.sar/web-console.war/WEB-INF/classes/web-console-users.properties"
-	  overwrite="true" />
-    -->
 
   </target>
 

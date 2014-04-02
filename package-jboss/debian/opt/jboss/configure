@@ -34,7 +34,9 @@ TEMPLATES=(
     login-config.xml.template
     log4j.xml.template
     upt-ds.xml.template
-    empty_db.sql.template)
+    empty_db.sql.template
+    jmx-console-users.properties.template
+    web-console-users.properties.template)
 
 read -p "Enter host name for MySQL server: [$DFLT_DBHOST] " DBHOST
 DBHOST=${DBHOST:-$DFLT_DBHOST}
@@ -45,6 +47,9 @@ DBNAME=${DBNAME:-$DFLT_DBNAME}
 read -p "Enter user name for MySQL server: " DBUSER
 
 read -s -p "Enter user's password: " DBPWD
+echo ""
+
+read -s -p "Enter JBoss web console password: " WEB_CONSOLE_PWD
 echo ""
 
 DBURL="jdbc:mysql:\/\/$DBHOST:3306\/$DBNAME"
@@ -84,16 +89,22 @@ do
        upt-ds.xml.template)
            DEST=$HOME/jboss-4.0.5.GA/server/default/deploy/upt-ds.xml
            ;;
+       jmx-console-users.properties.template)
+           DEST=$HOME/jboss-4.0.5.GA/server/default/conf/props/jmx-console-users.properties
+           ;;
+       web-console-users.properties.template)
+           DEST=$HOME/jboss-4.0.5.GA/server/default/deploy/management/console-mgr.sar/web-console.war/WEB-INF/classes/web-console-users.properties
+           ;;
    esac
 
-   $SED "s/@database.driver@/$DFLT_DB_DRIVER/g;s/@database.url@/$DBURL/g;s/@database.username@/$DBUSER/g;s/@database.password@/$DBPWD/g" "templates/$f" >$DEST
+   $SED "s/@database.driver@/$DFLT_DB_DRIVER/g;s/@database.url@/$DBURL/g;s/@database.username@/$DBUSER/g;s/@database.password@/$DBPWD/g;s/@@web.console.password@@/$WEB_CONSOLE_PWD/g" "templates/$f" >$DEST
 
 done
 
-DBOUT=`mysql -h $DBHOST -u$DBUSER -p$DBPWD $DBNAME -B -e "select count(*) from information_schema.tables where table_schema='biobank_v390' and table_name='csm_application'"`
+DBOUT=`mysql -h $DBHOST -u$DBUSER -p$DBPWD $DBNAME -B -e "select count(*) from information_schema.tables where table_schema='$DBNAME' and table_name='csm_application'"`
 DBOUT_ARR=(${DBOUT//;/ })
 
-if [ "${DBOUT_ARR[1]}"!="1" ]; then
+if [ "${DBOUT_ARR[1]}" != "1" ]; then
     read -p "Databse not fully initialized. Do you want to initialize it? [y/n] " CREATE
     if [ "$CREATE"=="y" ]; then
         mysql -h $DBHOST -u$DBUSER -p$DBPWD $DBNAME < empty_db.sql
