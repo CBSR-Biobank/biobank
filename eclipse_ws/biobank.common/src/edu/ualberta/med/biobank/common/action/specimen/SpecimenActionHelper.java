@@ -234,7 +234,11 @@ public class SpecimenActionHelper {
             .createCriteria(BatchOperationSpecimen.class)
             .add(Restrictions.eq("specimen.id", specimen.getId())).uniqueResult();
 
-        return new SpecimenBriefInfo(specimen, parents, batchSpecimen.getBatch());
+        if (batchSpecimen != null) {
+            return new SpecimenBriefInfo(specimen, parents, batchSpecimen.getBatch());
+        }
+
+        return new SpecimenBriefInfo(specimen, parents, null);
     }
 
     /**
