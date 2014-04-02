@@ -739,9 +739,12 @@
   <target name="package-biobank-server"
 	  depends="deploy-jboss"
 	  description="Generates an Ubuntu package file for the Biobank server.">
-    <unzip src="${env.JBOSS_HOME}/../jboss-4.0.5.GA.zip"
-	   dest="${package.jboss.root.dir}/"
-	   overwrite="true" />
+
+    <!-- Use command line unzip to keep file permissions -->
+    <exec executable="unzip" spawn="true">
+      <arg line="-o ${env.JBOSS_HOME}/../jboss-4.0.5.GA.zip -d ${package.jboss.root.dir}" />
+    </exec>
+
     <copy file="${secu-log.dir}/jboss/overwrite/server/default/conf/jboss-service.xml"
 	  tofile="${package.jboss.target.dir}/server/default/conf/jboss-service.xml"
 	  overwrite="true" />
