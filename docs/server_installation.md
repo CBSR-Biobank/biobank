@@ -134,6 +134,8 @@ Prior to deploying a server, the following software packages have to be installe
 
  1. The password for the user name.
 
+ 1. The password for the Jboss Web Console and JMX Console. They will both use the same password.
+
  1. If the database has not been initialized you will prompted to do so.
 
 1.  Run the `/opt/jboss/chkconfig` script to test your configuration. The script runs a series of
@@ -157,6 +159,14 @@ similar to the one shown below:
 
 ![Biobank Server Web Page](images/biobank_server_web_page.jpg?raw=true "Biobank Server Web Page")
 
+You can log into the **JMX Console** and **JBoss Web Console** by opening this URL in your browser:
+
+```bash
+https://_IP_or_DN_/
+```
+
+and selecting the appropriate link. The user name is **admin** and the password is what was entered
+into the `configure` script when it was run.
 
 ****
 
