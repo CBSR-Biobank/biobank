@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><?pde version="3.5"?><product name="BioBank" id="biobank.product" application="biobank.biobank" version="3.9.0.rc7" useFeatures="true" includeLaunchers="true">
+<?xml version="1.0" encoding="UTF-8"?><?pde version="3.5"?><product name="BioBank" id="biobank.product" application="biobank.biobank" version="3.9.0.rc8" useFeatures="true" includeLaunchers="true">
 
    <aboutInfo>
       <image path="/biobank2/icons/about.png"/>
