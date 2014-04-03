@@ -208,10 +208,7 @@ public class ContainerViewForm extends BiobankViewForm {
 
         createCommentsSection();
         setContainerValues();
-
-        if (!container.getContainerType().getChildContainerTypes().isEmpty()) {
-            createVisualizeContainer();
-        }
+        createVisualizeContainer();
     }
 
     private void createCommentsSection() {
@@ -273,6 +270,7 @@ public class ContainerViewForm extends BiobankViewForm {
     }
 
     protected void createVisualizeContainer() {
+
         @SuppressWarnings("nls")
         Section section = createSection(
             // section label.
@@ -294,12 +292,30 @@ public class ContainerViewForm extends BiobankViewForm {
         toolkit.adapt(client);
         sc.setContent(client);
         section.setClient(containerSection);
+
+        if (container.getContainerType().getChildContainerTypes().isEmpty()) {
+            @SuppressWarnings("nls")
+            Label label = toolkit.createLabel(
+                client,
+                i18n.tr("There are no child container types defined for this container."));
+            label.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+        } else {
+            createVisualization(client, containerSection, sc);
+        }
+    }
+
+    private void createVisualization(
+        Composite client,
+        Composite containerSection,
+        ScrolledComposite sc) {
+
         if (!childrenOk) {
             @SuppressWarnings("nls")
             Label label = toolkit.createLabel(client,
                 i18n.tr("Error in container children : can't display those initialized"));
             label.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
         }
+
         containerWidget = new ContainerDisplayWidget(
             client,
             null,
@@ -353,8 +369,7 @@ public class ContainerViewForm extends BiobankViewForm {
         childrenActionSection.setLayout(new GridLayout(3, false));
 
         if (canCreate || canDelete) {
-            List<ContainerTypeWrapper> containerTypes =
-                getChildContainerTypes();
+            List<ContainerTypeWrapper> containerTypes = getChildContainerTypes();
             if (canCreate) {
                 // Initialisation action for selection
                 initSelectionCv = createComboViewer(
