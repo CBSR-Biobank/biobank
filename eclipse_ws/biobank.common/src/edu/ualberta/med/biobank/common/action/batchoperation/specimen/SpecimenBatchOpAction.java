@@ -106,10 +106,10 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
         bundle.tr("collection event with visit number \"{0}\" "
             + "does match the source specimen's collection event");
 
-    private static final Tr CSV_STUDY_SOURCE_SPC_TYPE_ERROR =
+    public static final Tr CSV_STUDY_SOURCE_SPC_TYPE_ERROR =
         bundle.tr("specimen type \"{0}\" is invalid for parent specimens in study \"{1}\"");
 
-    private static final Tr CSV_STUDY_ALIQUOTED_SPC_TYPE_ERROR =
+    public static final Tr CSV_STUDY_ALIQUOTED_SPC_TYPE_ERROR =
         bundle.tr("specimen type \"{0}\" is invalid for child specimens in study \"{1}\"");
 
     private static final Tr CSV_CONTAINER_SPC_TYPE_ERROR =

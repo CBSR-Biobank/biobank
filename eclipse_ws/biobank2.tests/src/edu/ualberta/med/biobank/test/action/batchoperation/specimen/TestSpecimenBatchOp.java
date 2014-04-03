@@ -926,4 +926,86 @@ public class TestSpecimenBatchOp extends TestAction {
 
         Assert.assertEquals(csvInfos.size(), batchOpResult.getModelObjects().size());
     }
+
+    /**
+     * Parent specimens should not be imported if the specimen type is not in the list of source
+     * specimens for a study.
+     * 
+     * @throws IOException
+     * @throws NoSuchAlgorithmException
+     */
+    @Test
+    public void studySourceSpecimens() throws IOException, NoSuchAlgorithmException {
+        Set<Patient> patients = new HashSet<Patient>();
+        patients.add(factory.createPatient());
+        factory.createSourceSpecimen();
+        SpecimenType specimenType = factory.createSpecimenType();
+
+        session.getTransaction().commit();
+
+        Set<SpecimenBatchOpInputPojo> csvInfos = specimenCsvHelper.sourceSpecimensCreate(
+            originInfos,
+            patients,
+            factory.getDefaultStudy().getSourceSpecimens());
+
+        // change the specimen type
+        for (SpecimenBatchOpInputPojo csvInfo : csvInfos) {
+            csvInfo.setSpecimenType(specimenType.getNameShort());
+        }
+
+        SpecimenBatchOpCsvWriter.write(CSV_NAME, csvInfos);
+
+        try {
+            SpecimenBatchOpAction importAction = new SpecimenBatchOpAction(
+                factory.getDefaultSite(), csvInfos, new File(CSV_NAME));
+            exec(importAction);
+            Assert.fail("should fail");
+        } catch (BatchOpErrorsException e) {
+            CsvUtil.showErrorsInLog(log, e);
+            new AssertBatchOpException().withMessage(
+                SpecimenBatchOpAction.CSV_STUDY_SOURCE_SPC_TYPE_ERROR.format());
+        }
+    }
+
+    /**
+     * Child specimens should not be imported if the specimen type is not in the list of aliquoted
+     * specimens for a study.
+     * 
+     * @throws IOException
+     * @throws NoSuchAlgorithmException
+     */
+    @Test
+    public void studyAliquotedSpecimens() throws Exception {
+        // the parent specimens will not exist in this test
+        Set<Patient> patients = new HashSet<Patient>();
+        Set<Specimen> parentSpecimens = new HashSet<Specimen>();
+
+        patients.add(factory.createPatient());
+        factory.createSourceSpecimen();
+        factory.createAliquotedSpecimen();
+        parentSpecimens.add(factory.createParentSpecimen());
+        SpecimenType specimenType = factory.createSpecimenType();
+        session.getTransaction().commit();
+
+        Set<SpecimenBatchOpInputPojo> inputPojos = specimenCsvHelper.createAliquotedSpecimens(
+            factory.getDefaultStudy(), parentSpecimens);
+
+        // change the parent's inventory id to something that does not exist
+        for (SpecimenBatchOpInputPojo inputPojo : inputPojos) {
+            inputPojo.setSpecimenType(specimenType.getNameShort());
+        }
+
+        SpecimenBatchOpCsvWriter.write(CSV_NAME, inputPojos);
+
+        try {
+            SpecimenBatchOpAction importAction = new SpecimenBatchOpAction(
+                factory.getDefaultSite(), inputPojos, new File(CSV_NAME));
+            exec(importAction);
+            Assert.fail("should fail");
+        } catch (BatchOpErrorsException e) {
+            CsvUtil.showErrorsInLog(log, e);
+            new AssertBatchOpException().withMessage(
+                SpecimenBatchOpAction.CSV_STUDY_ALIQUOTED_SPC_TYPE_ERROR.format());
+        }
+    }
 }
