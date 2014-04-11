@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.tools.v360doubleentry;
+package edu.ualberta.med.biobank.tools.v390doubleentry;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -11,19 +11,19 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * The databases "biobank_v320_de" and "biobank_v360_de" must first be populated on the host machine
+ * The databases "biobank_v320_de" and "biobank_v390_de" must first be populated on the host machine
  * prior to running this code. A database dump of the production database goes into
  * "biobank_v320_de", and a database dump of the test environment database goes into
- * "biobank_v360_de".
+ * "biobank_v390_de".
  * 
  * @author Nelson Loyola
  * 
  */
-public class V360DoubleEntryStats {
+public class V390DoubleEntryStats {
 
     public static final String DB_NAME_PRODUCTION = "biobank_v320_de";
 
-    public static final String DB_NAME_TEST = "biobank_v360_de";
+    public static final String DB_NAME_TEST = "biobank_v390_de";
 
     public static final String BASE_QRY = " FROM specimen spc"
         + " LEFT JOIN specimen pspc on pspc.id=spc.parent_specimen_id"
@@ -49,9 +49,9 @@ public class V360DoubleEntryStats {
     public static final String ORDER_BY_CLAUSE =
         " ORDER BY s.name_short,p.pnumber,spc.inventory_id,spc.created_at";
 
-    public static final String DATE_START = "2013-03-07 09:00";
+    public static final String DATE_START = "2014-04-08 09:00";
 
-    public static final String DATE_END = "2013-03-27 22:00";
+    public static final String DATE_END = "2014-04-10 22:00";
 
     private static class DoubleEntryData {
         int studyCount;
@@ -66,13 +66,13 @@ public class V360DoubleEntryStats {
 
     public static void main(String[] argv) {
         try {
-            new V360DoubleEntryStats();
+            new V390DoubleEntryStats();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private V360DoubleEntryStats() throws SQLException {
+    private V390DoubleEntryStats() throws SQLException {
         // PropertyConfigurator.configure("conf/log4j.properties");
         DoubleEntryData prodData = getDbStats(DB_NAME_PRODUCTION);
         DoubleEntryData testData = getDbStats(DB_NAME_TEST);
