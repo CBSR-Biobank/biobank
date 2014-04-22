@@ -330,6 +330,10 @@ public class ImageCanvas extends Canvas {
         int cw = clientArea.width;
         int ch = clientArea.height;
 
+        if ((cw == 0) && (ch == 0)) {
+            return;
+        }
+
         if (tx > 0) tx = 0;
         if (ty > 0) ty = 0;
 
@@ -354,6 +358,7 @@ public class ImageCanvas extends Canvas {
         ScrollBar vertical = getVerticalBar();
         vertical.setIncrement(ch / 100);
         vertical.setPageIncrement(ch);
+
         if (imageBounds.height * sy > ch) {
             /* image is higher than client area */
             vertical.setMaximum((int) (imageBounds.height * sy));
