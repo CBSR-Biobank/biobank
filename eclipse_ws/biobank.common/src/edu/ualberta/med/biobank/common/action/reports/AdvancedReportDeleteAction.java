@@ -5,7 +5,6 @@ import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.EmptyResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.GlobalAdminPermission;
-import edu.ualberta.med.biobank.common.permission.reports.ReportsPermission;
 import edu.ualberta.med.biobank.model.Report;
 
 public class AdvancedReportDeleteAction implements Action<EmptyResult> {
@@ -24,10 +23,8 @@ public class AdvancedReportDeleteAction implements Action<EmptyResult> {
     public boolean isAllowed(ActionContext context) throws ActionException {
         Report report = context.load(Report.class, reportId);
 
-        if (report.getIsPublic()) {
-            return new GlobalAdminPermission().isAllowed(context);
-        }
-        return new ReportsPermission().isAllowed(context);
+        return (report.getUser().equals(context.getUser())
+        || new GlobalAdminPermission().isAllowed(context));
     }
 
     @Override

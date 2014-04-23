@@ -21,6 +21,7 @@ import edu.ualberta.med.biobank.common.action.reports.AdvancedReportGetAction.Re
 import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ReportWrapper;
+import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.forms.ReportEntryForm;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
@@ -80,7 +81,12 @@ public class ReportAdapter extends AdapterBase {
             public void widgetSelected(SelectionEvent event) {
                 ReportWrapper report = (ReportWrapper) getModelObject();
 
-                if (!report.getIsPublic() || SessionManager.getUser().isSuperAdmin()) {
+                UserWrapper user = SessionManager.getUser();
+
+                boolean canDelete = (user.equals(report.getUser()))
+                    || SessionManager.getUser().isSuperAdmin();
+
+                if (canDelete) {
                     boolean delete = BgcPlugin.openConfirm(
                         i18n.tr("Delete Report"),
                         i18n.tr(
@@ -104,7 +110,9 @@ public class ReportAdapter extends AdapterBase {
                     BgcPlugin.openAsyncError(
                         // dialog title
                         i18n.tr("Error"),
-                        i18n.tr("Only super administrators can delete shared reports"));
+                        i18n.tr("Only the owner of the shared report or a super administrator can "
+                            + "delete a shared report. The owner is: {0}",
+                            report.getUser().getFullName()));
 
                 }
             }
