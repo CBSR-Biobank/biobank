@@ -15,11 +15,17 @@ public class DispatchSendHandler extends AbstractHandler implements IHandler {
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+            @SuppressWarnings("nls")
             @Override
             public void run() {
-                ((DispatchViewForm) PlatformUI.getWorkbench()
+                DispatchViewForm viewForm = ((DispatchViewForm) PlatformUI.getWorkbench()
                     .getActiveWorkbenchWindow().getActivePage()
-                    .getActiveEditor()).dispatchSend();
+                    .getActiveEditor());
+                if (viewForm == null) {
+                    // this handler can only be invoked if the view form is open
+                    throw new IllegalStateException("view form is null");
+                }
+                viewForm.dispatchSend();
             }
         });
         return null;

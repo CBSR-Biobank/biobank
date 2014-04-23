@@ -5,6 +5,11 @@ import java.util.Date;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableContext;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -28,6 +33,7 @@ import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
+import edu.ualberta.med.biobank.dialogs.dispatch.SendDispatchDialog;
 import edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm;
 import edu.ualberta.med.biobank.forms.DispatchSendingEntryForm;
 import edu.ualberta.med.biobank.forms.DispatchViewForm;
@@ -52,12 +58,9 @@ public class DispatchAdapter extends AdapterBase {
 
     @Override
     public void init() {
-        this.isDeletable =
-            isAllowed(new DispatchDeletePermission(getModelObject().getId()));
-        this.isReadable =
-            isAllowed(new DispatchReadPermission(getModelObject().getId()));
-        this.isEditable =
-            isAllowed(new DispatchUpdatePermission(getModelObject().getId()));
+        this.isDeletable = isAllowed(new DispatchDeletePermission(getModelObject().getId()));
+        this.isReadable = isAllowed(new DispatchReadPermission(getModelObject().getId()));
+        this.isEditable = isAllowed(new DispatchUpdatePermission(getModelObject().getId()));
     }
 
     @Override
@@ -66,16 +69,16 @@ public class DispatchAdapter extends AdapterBase {
         if (getDispatchWrapper() != null) {
             return editable
                 && ((getDispatchWrapper().getSenderCenter().equals(
-                    SessionManager.getUser().getCurrentWorkingCenter()) && (getDispatchWrapper()
-                    .isNew()
+                    SessionManager.getUser().getCurrentWorkingCenter())
+                && (getDispatchWrapper().isNew()
                     || getDispatchWrapper().isInCreationState()
-                    || getDispatchWrapper().isInTransitState() || getDispatchWrapper()
-                    .isInLostState())) || (getDispatchWrapper()
-                    .getReceiverCenter().equals(
-                        SessionManager.getUser().getCurrentWorkingCenter()) && (getDispatchWrapper()
-                    .isInReceivedState()
-                    || getDispatchWrapper().isInLostState() || getDispatchWrapper()
-                    .isInClosedState())));
+                    || getDispatchWrapper().isInTransitState()
+                    || getDispatchWrapper().isInLostState()))
+                    || (getDispatchWrapper().getReceiverCenter().equals(
+                    SessionManager.getUser().getCurrentWorkingCenter())
+                && (getDispatchWrapper().isInReceivedState()
+                    || getDispatchWrapper().isInLostState()
+                    || getDispatchWrapper().isInClosedState())));
         }
         return editable;
     }
@@ -86,14 +89,15 @@ public class DispatchAdapter extends AdapterBase {
         DispatchWrapper dispatch = getDispatchWrapper();
         Assert.isNotNull(dispatch, "Dispatch is null");
         String label = StringUtil.EMPTY_STRING;
-        if (dispatch.getSenderCenter() != null
-            && dispatch.getReceiverCenter() != null)
+        if ((dispatch.getSenderCenter() != null) && (dispatch.getReceiverCenter() != null)) {
             label += dispatch.getSenderCenter().getNameShort() + " -> "
                 + dispatch.getReceiverCenter().getNameShort();
+        }
 
         ShipmentInfoWrapper shipInfo = dispatch.getShipmentInfo();
-        if ((shipInfo != null) && (shipInfo.getPackedAt() != null))
+        if ((shipInfo != null) && (shipInfo.getPackedAt() != null)) {
             label += " [" + dispatch.getFormattedPackedAt() + "]";
+        }
         return label;
     }
 
@@ -105,27 +109,26 @@ public class DispatchAdapter extends AdapterBase {
     @SuppressWarnings("nls")
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        CenterWrapper<?> siteParent = SessionManager.getUser()
-            .getCurrentWorkingCenter();
+        CenterWrapper<?> siteParent = SessionManager.getUser().getCurrentWorkingCenter();
         addViewMenu(menu, Dispatch.NAME.singular().toString());
 
-        if (isDeletable()) {
-            addDeleteMenu(menu, Dispatch.NAME.singular().toString());
-        }
-        if (siteParent.equals(getDispatchWrapper().getReceiverCenter())
+        addEditMenu(menu, Dispatch.NAME.singular().toString());
+
+        if (siteParent.equals(getDispatchWrapper().getSenderCenter())
             && isEditable
-            && getDispatchWrapper().hasErrors()) {
+            && getDispatchWrapper().isInCreationState()) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
             mi.setText(
                 // menu item label.
-                i18n.tr("Close"));
+                i18n.tr("Send Dispatch"));
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
-                    doClose();
+                    runSendDispatch();
                 }
             });
         }
+
         if (siteParent.equals(getDispatchWrapper().getSenderCenter())
             && isEditable
             && getDispatchWrapper().isInTransitState()) {
@@ -140,6 +143,22 @@ public class DispatchAdapter extends AdapterBase {
                 }
             });
         }
+
+        if (siteParent.equals(getDispatchWrapper().getReceiverCenter())
+            && isEditable
+            && getDispatchWrapper().hasErrors()) {
+            MenuItem mi = new MenuItem(menu, SWT.PUSH);
+            mi.setText(
+                // menu item label.
+                i18n.tr("Close"));
+            mi.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent event) {
+                    doClose();
+                }
+            });
+        }
+
         if (siteParent.equals(getDispatchWrapper().getReceiverCenter())
             && getDispatchWrapper().isInTransitState()) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
@@ -173,7 +192,47 @@ public class DispatchAdapter extends AdapterBase {
                 }
             });
         }
-        addEditMenu(menu, Dispatch.NAME.singular().toString());
+
+        if (isDeletable()) {
+            addDeleteMenu(menu, Dispatch.NAME.singular().toString());
+        }
+    }
+
+    @SuppressWarnings("nls")
+    protected void runSendDispatch() {
+        int result = new SendDispatchDialog(
+            Display.getDefault().getActiveShell(),
+            getDispatchWrapper()).open();
+
+        if (result == Dialog.OK) {
+            IRunnableContext context = new ProgressMonitorDialog(
+                Display.getDefault().getActiveShell());
+            try {
+                context.run(true, true, new IRunnableWithProgress() {
+                    @Override
+                    public void run(final IProgressMonitor monitor) {
+                        monitor.beginTask(
+                            // progress message.
+                            i18n.tr("Saving..."),
+                            IProgressMonitor.UNKNOWN);
+                        try {
+                            setDispatchAsSent();
+                        } catch (Exception ex) {
+                            BgcPlugin.openAsyncError(
+                                // dialog title.
+                                i18n.tr("Save error"), ex);
+                        }
+                        monitor.done();
+                    }
+                });
+            } catch (Exception e1) {
+                BgcPlugin.openAsyncError(
+                    // dialog title.
+                    i18n.tr("Save error"), e1);
+            }
+            SpecimenTransitView.getCurrent().reload();
+            openViewForm();
+        }
     }
 
     @Override
@@ -275,6 +334,7 @@ public class DispatchAdapter extends AdapterBase {
         getDispatchWrapper().setState(DispatchState.CREATION);
         getDispatchWrapper().setShipmentInfo(null);
         persistDispatch();
+        openViewForm();
     }
 
     @Override

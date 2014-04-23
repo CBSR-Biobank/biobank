@@ -86,13 +86,10 @@ public class DispatchViewForm extends BiobankViewForm {
     @Override
     protected void init() throws Exception {
         Assert.isTrue((adapter instanceof DispatchAdapter),
-            "Invalid editor input: object of type "
-                + adapter.getClass().getName());
+            "Invalid editor input: object of type " + adapter.getClass().getName());
 
         dispatchAdapter = (DispatchAdapter) adapter;
-
         setDispatchInfo(adapter.getId());
-
         setPartName(Dispatch.NAME.singular().toString());
     }
 
@@ -101,9 +98,8 @@ public class DispatchViewForm extends BiobankViewForm {
             Dispatch d = new Dispatch();
             dispatch.setWrappedObject(d);
         } else {
-            DispatchReadInfo read =
-                SessionManager.getAppService().doAction(
-                    new DispatchGetInfoAction(adapter.getId()));
+            DispatchReadInfo read = SessionManager.getAppService().doAction(
+                new DispatchGetInfoAction(adapter.getId()));
             read.dispatch.setDispatchSpecimens(read.dispatchSpecimens);
             dispatch.setWrappedObject(read.dispatch);
             SessionManager.logLookup(read.dispatch);
@@ -171,17 +167,16 @@ public class DispatchViewForm extends BiobankViewForm {
             @SuppressWarnings("nls")
             Composite parent =
                 createSectionWithClient(i18n.tr("Specimens added"));
-            specimensNonProcessedTable =
-                new DispatchSpecimenListInfoTable(parent, dispatch, false) {
-                    @Override
-                    public List<DispatchSpecimenWrapper> getInternalDispatchSpecimens() {
-                        return dispatch.getDispatchSpecimenCollection(false);
-                    }
+            specimensNonProcessedTable = new DispatchSpecimenListInfoTable(parent, dispatch, false) {
+                @Override
+                public List<DispatchSpecimenWrapper> getInternalDispatchSpecimens() {
+                    return dispatch.getDispatchSpecimenCollection(false);
+                }
 
-                };
+            };
             specimensNonProcessedTable.adaptToToolkit(toolkit, true);
-            specimensNonProcessedTable
-                .addClickListener(new IInfoTableDoubleClickItemListener<DispatchSpecimenWrapper>() {
+            specimensNonProcessedTable.addClickListener(
+                new IInfoTableDoubleClickItemListener<DispatchSpecimenWrapper>() {
                     @Override
                     public void doubleClick(
                         InfoTableEvent<DispatchSpecimenWrapper> event) {
@@ -198,15 +193,14 @@ public class DispatchViewForm extends BiobankViewForm {
                         }
                     }
                 });
-            specimensNonProcessedTable
-                .addSelectionChangedListener(new BgcEntryFormWidgetListener() {
-                    @Override
-                    public void selectionChanged(MultiSelectEvent event) {
-                        specimensNonProcessedTable.reloadCollection();
-                    }
-                });
-            specimensNonProcessedTable
-                .addEditItemListener(new IInfoTableEditItemListener<DispatchSpecimenWrapper>() {
+            specimensNonProcessedTable.addSelectionChangedListener(new BgcEntryFormWidgetListener() {
+                @Override
+                public void selectionChanged(MultiSelectEvent event) {
+                    specimensNonProcessedTable.reloadCollection();
+                }
+            });
+            specimensNonProcessedTable.addEditItemListener(
+                new IInfoTableEditItemListener<DispatchSpecimenWrapper>() {
 
                     @Override
                     public void editItem(
@@ -404,7 +398,6 @@ public class DispatchViewForm extends BiobankViewForm {
             SpecimenTransitView.getCurrent().reload();
             dispatchAdapter.openViewForm();
         }
-
     }
 
 }

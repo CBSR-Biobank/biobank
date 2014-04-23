@@ -830,11 +830,11 @@
       <handler
             class="edu.ualberta.med.biobank.handlers.DispatchSendHandler"
             commandId="edu.ualberta.med.biobank.commands.dispatchSend">
-         <enabledWhen>
+         <!--enabledWhen>
             <reference
                   definitionId="edu.ualberta.med.biobank.form.instanceof.DispatchViewForm">
             </reference>
-         </enabledWhen>
+         </enabledWhen-->
       </handler>
    </extension>
    <extension
