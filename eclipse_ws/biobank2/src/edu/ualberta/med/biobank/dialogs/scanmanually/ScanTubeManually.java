@@ -44,6 +44,11 @@ public class ScanTubeManually extends PersistedDialog implements Listener {
         Set<String> labels,
         Map<String, String> existingInventoryIdsByLabel) {
         super(parentShell);
+
+        if (labels.size() <= 0) {
+            throw new IllegalArgumentException("labels is empty");
+        }
+
         this.labelToScan = labels.iterator().next();
 
         // convert to a BidiMap
