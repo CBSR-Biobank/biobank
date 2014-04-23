@@ -6,7 +6,12 @@ import java.util.List;
 import java.util.Locale;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableContext;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -14,6 +19,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.Section;
 import org.xnap.commons.i18n.I18n;
@@ -34,6 +40,7 @@ import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.DispatchCreateScanDialog;
+import edu.ualberta.med.biobank.dialogs.dispatch.SendDispatchDialog;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDoubleClickItemListener;
@@ -48,6 +55,8 @@ import edu.ualberta.med.biobank.model.ShippingMethod;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.type.DispatchSpecimenState;
 import edu.ualberta.med.biobank.treeview.SpecimenAdapter;
+import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
+import edu.ualberta.med.biobank.views.SpecimenTransitView;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.DispatchSpecimenListInfoTable;
@@ -83,9 +92,13 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
 
     private CommentsInfoTable commentEntryTable;
 
+    private DispatchAdapter dispatchAdapter;
+
     @Override
     protected void init() throws Exception {
         super.init();
+
+        dispatchAdapter = (DispatchAdapter) adapter;
 
         if (dispatch.isNew()) {
             Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
@@ -429,6 +442,60 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
         }
         if (specimensTreeTable != null) {
             specimensTreeTable.refresh();
+        }
+    }
+
+    @Override
+    protected void doAfterSave() throws Exception {
+        super.doAfterSave();
+
+        boolean userSelection = BgcPlugin.openConfirm(
+            // confirmation dialog title
+            i18n.tr("Send the dispatch"),
+            // confirmation dialog message
+            i18n.tr("Do you wish to send the dispatch?"));
+
+        if (userSelection) {
+            BgcPlugin.openMessage(
+                // dialog title.
+                i18n.tr("Send later"),
+                i18n.tr("To send the dispatch later, you can open the dispatch"));
+
+        } else {
+            sendDispatch();
+        }
+    }
+
+    private void sendDispatch() {
+        int result = new SendDispatchDialog(Display.getDefault().getActiveShell(), dispatch).open();
+        if (result == Dialog.OK) {
+            IRunnableContext context =
+                new ProgressMonitorDialog(Display.getDefault().getActiveShell());
+            try {
+                context.run(true, true, new IRunnableWithProgress() {
+                    @Override
+                    public void run(final IProgressMonitor monitor) {
+                        monitor.beginTask(
+                            // progress message.
+                            i18n.tr("Saving..."),
+                            IProgressMonitor.UNKNOWN);
+                        try {
+                            dispatchAdapter.setModelObject(dispatch);
+                            dispatchAdapter.doSend();
+                        } catch (Exception ex) {
+                            saveErrorCatch(ex, monitor, false);
+                            return;
+                        }
+                        monitor.done();
+                    }
+                });
+            } catch (Exception e1) {
+                BgcPlugin.openAsyncError(
+                    // dialog title.
+                    i18n.tr("Save error"), e1);
+            }
+            SpecimenTransitView.getCurrent().reload();
+            dispatchAdapter.openViewForm();
         }
     }
 }
