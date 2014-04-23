@@ -868,6 +868,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
                                 }
                             }
                         }
+                        palletWidget.updateCells();
                         palletWidget.redraw();
                     }
 

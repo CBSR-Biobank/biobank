@@ -323,9 +323,6 @@ public class ImageCanvas extends Canvas {
             return;
         }
 
-        AffineTransform af = sourceImageToCanvasTransform;
-        double sx = af.getScaleX(), sy = af.getScaleY();
-        double tx = af.getTranslateX(), ty = af.getTranslateY();
         Rectangle clientArea = getClientArea();
         int cw = clientArea.width;
         int ch = clientArea.height;
@@ -333,6 +330,10 @@ public class ImageCanvas extends Canvas {
         if ((cw == 0) && (ch == 0)) {
             return;
         }
+
+        AffineTransform af = sourceImageToCanvasTransform;
+        double sx = af.getScaleX(), sy = af.getScaleY();
+        double tx = af.getTranslateX(), ty = af.getTranslateY();
 
         if (tx > 0) tx = 0;
         if (ty > 0) ty = 0;

@@ -845,6 +845,7 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
 
     @Override
     protected void refreshPalletDisplay() {
+        palletWidget.updateCells();
         palletWidget.redraw();
     }
 
