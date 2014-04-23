@@ -11,6 +11,7 @@ import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -23,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.model.Specimen;
 
 public class ScanTubesManuallyWizard extends Wizard {
@@ -44,7 +46,8 @@ public class ScanTubesManuallyWizard extends Wizard {
      *            key for the map is the position label where this inventory ID is present.
      */
     @SuppressWarnings("nls")
-    ScanTubesManuallyWizard(Set<String> labels,
+    ScanTubesManuallyWizard(
+        Set<String> labels,
         Map<String, String> existingInventoryIdsByLabel) {
         super();
 
@@ -69,6 +72,9 @@ public class ScanTubesManuallyWizard extends Wizard {
 
     @Override
     public void createPageControls(Composite parent) {
+        parent.pack(true);
+        Point size = getShell().computeSize(SWT.DEFAULT, SWT.DEFAULT);
+        getShell().setMinimumSize(size);
     }
 
     @Override
@@ -78,7 +84,7 @@ public class ScanTubesManuallyWizard extends Wizard {
 
     @Override
     public boolean needsProgressMonitor() {
-        return true;
+        return false;
     }
 
     @Override
@@ -98,7 +104,7 @@ public class ScanTubesManuallyWizard extends Wizard {
     public boolean canFinish() {
         for (IWizardPage page : this.getPages()) {
             ScanSingleTubePage tubePage = (ScanSingleTubePage) page;
-            log.trace("canFinish: label: {}, canFlipToNextPage: {}",
+            log.debug("canFinish: label: {}, canFlipToNextPage: {}",
                 tubePage.labelToScan, page.canFlipToNextPage());
 
             // the last page may be blank, skip it if it is
@@ -144,7 +150,7 @@ public class ScanTubesManuallyWizard extends Wizard {
             // TR: wizard dialog dialog page description message
             setDescription(i18n.tr("Scan the tube at position {0}", labelToScan));
             setControl(text);
-            setPageComplete(false);
+            setPageComplete(true);
         }
 
         @SuppressWarnings("nls")
@@ -152,15 +158,19 @@ public class ScanTubesManuallyWizard extends Wizard {
         public void createControl(Composite parent) {
             area = new Composite(parent, SWT.NONE);
             GridLayout layout = new GridLayout(2, false);
-            layout.horizontalSpacing = 10;
+            layout.marginWidth = 0;
+            layout.marginHeight = 0;
+            layout.verticalSpacing = 0;
+            layout.horizontalSpacing = 0;
             area.setLayout(layout);
-            area.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+            GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
+            area.setLayoutData(gridData);
 
             Label label = new Label(area, SWT.LEFT);
             label.setText(Specimen.PropertyName.INVENTORY_ID.toString() + ":");
 
             text = new Text(area, SWT.BORDER | SWT.SINGLE);
-            text.setText("");
+            text.setText(StringUtil.EMPTY_STRING);
             text.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             text.addListener(SWT.KeyUp, this);
             text.addListener(SWT.Selection, this);
@@ -177,10 +187,10 @@ public class ScanTubesManuallyWizard extends Wizard {
 
             // check if this value already exists
             String label = (String) existingInventoryIds.getKey(inventoryId);
-            log.trace("handleEvent: existing inventory id found: label: {}, inventoryId: {}",
+            log.debug("handleEvent: existing inventory id found: label: {}, inventoryId: {}",
                 label, inventoryId);
 
-            if ((label != null) && !label.equals(labelToScan)) {
+            if (!inventoryId.isEmpty() && (label != null) && !label.equals(labelToScan)) {
                 // TR: wizard page error message
                 setErrorMessage(i18n.tr("The value entered already exists at position {0}", label));
                 setMessage(null);
@@ -189,7 +199,7 @@ public class ScanTubesManuallyWizard extends Wizard {
                 existingInventoryIds.put(labelToScan, inventoryId);
                 setErrorMessage(null);
                 setMessage(null);
-                setPageComplete(!inventoryId.isEmpty());
+                setPageComplete(true);
             }
             getWizard().getContainer().updateButtons();
         }

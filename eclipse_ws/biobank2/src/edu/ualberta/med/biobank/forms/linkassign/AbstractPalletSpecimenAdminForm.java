@@ -74,7 +74,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
     private final IObservableValue scanValidValue =
         new WritableValue(Boolean.TRUE, Boolean.class);
 
-    private PalletScanManagement palletScanManagement;
+    protected PalletScanManagement palletScanManagement;
 
     protected ComboViewer profilesCombo;
 
@@ -87,7 +87,6 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
     protected void init() throws Exception {
         super.init();
         Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
-        palletScanManagement = new PalletScanManagement(this);
     }
 
     @Override

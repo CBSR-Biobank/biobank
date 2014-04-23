@@ -12,6 +12,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -118,6 +119,10 @@ public class DispatchCreateScanDialog extends AbstractScanDialog<DispatchWrapper
             showProductBarcodeField(false);
             palletWithoutPositionRadio.setSelection(true);
         }
+
+        parent.pack(true);
+        Point size = getShell().computeSize(800, 600);
+        getShell().setMinimumSize(size);
     }
 
     @SuppressWarnings("nls")

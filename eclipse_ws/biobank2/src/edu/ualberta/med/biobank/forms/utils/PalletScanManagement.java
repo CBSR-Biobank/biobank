@@ -27,7 +27,7 @@ import edu.ualberta.med.biobank.common.util.InventoryIdUtil;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
-import edu.ualberta.med.biobank.dialogs.scanmanually.ScanTubesManuallyWizardDialog;
+import edu.ualberta.med.biobank.dialogs.scanmanually.IManualScan;
 import edu.ualberta.med.biobank.forms.linkassign.IDecodePalletManagement;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.Capacity;
@@ -58,14 +58,23 @@ public class PalletScanManagement {
 
     private final IDecodePalletManagement parent;
 
-    public PalletScanManagement(IDecodePalletManagement parent, ContainerType containerType) {
+    private final IManualScan scanManually;
+
+    public PalletScanManagement(
+        IDecodePalletManagement parent,
+        ContainerType containerType,
+        IManualScan scanManually) {
         this.parent = parent;
         this.selectedContainerType = containerType;
+        this.scanManually = scanManually;
     }
 
-    public PalletScanManagement(IDecodePalletManagement parent) {
+    public PalletScanManagement(
+        IDecodePalletManagement parent,
+        IManualScan scanManually) {
         this.parent = parent;
         this.selectedContainerType = getFakePalletRowsCols(8, 12);
+        this.scanManually = scanManually;
     }
 
     @SuppressWarnings("nls")
@@ -209,7 +218,7 @@ public class PalletScanManagement {
             }
         }
 
-        Map<String, String> inventoryIds = ScanTubesManuallyWizardDialog.getInventoryIds(
+        Map<String, String> inventoryIds = scanManually.getInventoryIds(
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
             getLabelsForMissingInventoryIds(startPos), existingInventoryIdsByLabel);
 

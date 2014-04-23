@@ -37,6 +37,7 @@ import edu.ualberta.med.biobank.common.action.scanprocess.result.ScanProcessResu
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenBriefInfo;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.dialogs.scanmanually.ScanTubesManually;
 import edu.ualberta.med.biobank.forms.linkassign.AbstractPalletSpecimenAdminForm;
 import edu.ualberta.med.biobank.forms.linkassign.IDecodePalletManagement;
 import edu.ualberta.med.biobank.forms.utils.PalletScanManagement;
@@ -99,7 +100,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
         super(parentShell);
         this.currentShipment = currentShipment;
         this.currentCenter = currentSite;
-        palletScanManagement = new PalletScanManagement(this);
+        palletScanManagement = new PalletScanManagement(this, new ScanTubesManually());
     }
 
     @Override

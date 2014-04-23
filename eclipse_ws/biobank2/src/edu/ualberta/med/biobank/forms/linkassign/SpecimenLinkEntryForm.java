@@ -45,9 +45,11 @@ import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
+import edu.ualberta.med.biobank.dialogs.scanmanually.ScanTubeManuallyFactory;
 import edu.ualberta.med.biobank.forms.linkassign.LinkFormPatientManagement.CEventComboCallback;
 import edu.ualberta.med.biobank.forms.linkassign.LinkFormPatientManagement.PatientTextCallback;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
+import edu.ualberta.med.biobank.forms.utils.PalletScanManagement;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
@@ -138,6 +140,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     protected void init() throws Exception {
         log.debug("init");
         super.init();
+        palletScanManagement = new PalletScanManagement(this, new ScanTubeManuallyFactory());
         setPartName(FORM_TITLE);
         setCanLaunchScan(false);
     }
