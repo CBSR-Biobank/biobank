@@ -78,20 +78,34 @@ public class ReportAdapter extends AdapterBase {
         mi.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                boolean delete = BgcPlugin.openConfirm(
-                    i18n.tr("Delete Report"),
-                    i18n.tr(
-                        "Are you sure you want to delete the report named ''{0}''? This action cannot be undone.",
-                        ((ReportWrapper) getModelObject()).getName()));
-                if (delete) {
-                    try {
-                        AdvancedReportDeleteAction action = new AdvancedReportDeleteAction(
-                            getModelObject().getId());
-                        SessionManager.getAppService().doAction(action);
-                        parent.removeChild(ReportAdapter.this);
-                        AdvancedReportsView.getCurrent().reload();
-                    } catch (Exception e) {
+                ReportWrapper report = (ReportWrapper) getModelObject();
+
+                if (!report.getIsPublic() || SessionManager.getUser().isSuperAdmin()) {
+                    boolean delete = BgcPlugin.openConfirm(
+                        i18n.tr("Delete Report"),
+                        i18n.tr(
+                            "Are you sure you want to delete the report named ''{0}''? This action cannot be undone.",
+                            report.getName()));
+                    if (delete) {
+                        try {
+                            AdvancedReportDeleteAction action =
+                                new AdvancedReportDeleteAction(report.getId());
+                            SessionManager.getAppService().doAction(action);
+                            parent.removeChild(ReportAdapter.this);
+                            AdvancedReportsView.getCurrent().reload();
+                        } catch (Exception e) {
+                            BgcPlugin.openAsyncError(
+                                // dialog title
+                                i18n.tr("Error"),
+                                e.getLocalizedMessage());
+                        }
                     }
+                } else {
+                    BgcPlugin.openAsyncError(
+                        // dialog title
+                        i18n.tr("Error"),
+                        i18n.tr("Only super administrators can delete shared reports"));
+
                 }
             }
         });

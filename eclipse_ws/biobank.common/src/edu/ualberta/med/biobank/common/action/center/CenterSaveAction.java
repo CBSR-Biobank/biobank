@@ -52,7 +52,6 @@ public abstract class CenterSaveAction implements Action<IdResult> {
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        // TODO Auto-generated method stub
         return false;
     }
 
