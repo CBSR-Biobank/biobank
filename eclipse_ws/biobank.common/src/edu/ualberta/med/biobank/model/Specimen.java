@@ -16,6 +16,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotNull;
 
@@ -29,27 +30,28 @@ import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.Trnc;
 import edu.ualberta.med.biobank.validator.constraint.Empty;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
-import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
-import edu.ualberta.med.biobank.validator.group.PrePersist;
 
 /**
- * caTissue Term - Aliquot: Pertaining to a portion of the whole; any one of two
- * or more samples of something, of the same volume or weight.
+ * The specimen's inventory ID is unique to the study. Speicmen can have the same inventory IDs, but
+ * they have to be in different studies.
  * 
- * NCI Term - Specimen: A part of a thing, or of several things, taken to
- * demonstrate or to determine the character of the whole, e.g. a substance, or
- * portion of material obtained for use in testing, examination, or study;
- * particularly, a preparation of tissue or bodily fluid taken for examination
- * or diagnosis.
+ * caTissue Term - Aliquot: Pertaining to a portion of the whole; any one of two or more samples of
+ * something, of the same volume or weight.
+ * 
+ * NCI Term - Specimen: A part of a thing, or of several things, taken to demonstrate or to
+ * determine the character of the whole, e.g. a substance, or portion of material obtained for use
+ * in testing, examination, or study; particularly, a preparation of tissue or bodily fluid taken
+ * for examination or diagnosis.
  */
 @Entity
-@Table(name = "SPECIMEN")
-@Unique(properties = "inventoryId", groups = PrePersist.class)
+@Table(name = "SPECIMEN",
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = { "INVENTORY_ID", "STUDY_ID" }) })
 @Empty(property = "childSpecimens", groups = PreDelete.class)
 @NotUsed(by = DispatchSpecimen.class, property = "specimen", groups = PreDelete.class)
 public class Specimen extends AbstractBiobankModel
-implements HasActivityStatus, HasComments, HasCreatedAt {
+    implements HasActivityStatus, HasComments, HasCreatedAt {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
 
@@ -96,6 +98,7 @@ implements HasActivityStatus, HasComments, HasCreatedAt {
     private Specimen topSpecimen = this;
     private CollectionEvent collectionEvent;
     private Center currentCenter;
+    private Study study;
     private Set<DispatchSpecimen> dispatchSpecimens =
         new HashSet<DispatchSpecimen>(0);
     private CollectionEvent originalCollectionEvent;
@@ -114,7 +117,7 @@ implements HasActivityStatus, HasComments, HasCreatedAt {
     private Dna dna;
 
     @NotEmpty(message = "{edu.ualberta.med.biobank.model.Specimen.inventoryId.NotEmpty}")
-    @Column(name = "INVENTORY_ID", unique = true, nullable = false, length = 100)
+    @Column(name = "INVENTORY_ID", nullable = false, length = 100)
     public String getInventoryId() {
         return this.inventoryId;
     }
@@ -230,8 +233,8 @@ implements HasActivityStatus, HasComments, HasCreatedAt {
     @Override
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "SPECIMEN_COMMENT",
-    joinColumns = { @JoinColumn(name = "SPECIMEN_ID", nullable = false, updatable = false) },
-    inverseJoinColumns = { @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false, updatable = false) })
+        joinColumns = { @JoinColumn(name = "SPECIMEN_ID", nullable = false, updatable = false) },
+        inverseJoinColumns = { @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false, updatable = false) })
     public Set<Comment> getComments() {
         return this.comments;
     }
@@ -320,5 +323,16 @@ implements HasActivityStatus, HasComments, HasCreatedAt {
 
     public void setDna(Dna dna) {
         this.dna = dna;
+    }
+
+    @NotNull(message = "{edu.ualberta.med.biobank.model.Specimen.study.NotNull}")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "STUDY_ID", nullable = false)
+    public Study getStudy() {
+        return study;
+    }
+
+    public void setStudy(Study study) {
+        this.study = study;
     }
 }

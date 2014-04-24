@@ -39,5 +39,21 @@ public class V1_5__Biobank_v390 implements SpringJdbcMigration {
             + " has_multiple_layout HAS_MULTIPLE_LAYOUT TINYINT(1) NULL DEFAULT NULL COMMENT ''");
         jdbcTemplate.execute("ALTER TABLE dna COLLATE=latin1_general_cs");
         jdbcTemplate.execute("ALTER TABLE batch_operation_event_attr COLLATE=latin1_general_cs");
+
+        // specimen inventory IDs unique to study only
+        jdbcTemplate.execute("ALTER TABLE specimen ADD COLUMN STUDY_ID INT(11) NOT NULL COMMENT ''");
+        jdbcTemplate.execute("UPDATE specimen,collection_event as ce,patient,study "
+            + "SET specimen.study_id=study.id "
+            + "WHERE specimen.collection_event_id=ce.id "
+            + "AND ce.patient_id=patient.id "
+            + "AND patient.study_id=study.id ");
+
+        jdbcTemplate.execute("ALTER TABLE specimen DROP KEY INVENTORY_ID");
+        jdbcTemplate.execute("ALTER TABLE specimen ADD INDEX FKAF84F308F2A2464F (STUDY_ID)");
+        jdbcTemplate.execute("ALTER TABLE specimen ADD CONSTRAINT FKAF84F308F2A2464F "
+            + "FOREIGN KEY FKAF84F308F2A2464F (STUDY_ID) REFERENCES study (ID) "
+            + "ON UPDATE NO ACTION ON DELETE NO ACTION");
+        jdbcTemplate.execute("ALTER TABLE specimen ADD CONSTRAINT INVENTORY_ID UNIQUE KEY(INVENTORY_ID, STUDY_ID)");
+
     }
 }

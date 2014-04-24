@@ -242,8 +242,8 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                 specimen.setQuantity(specInfo.quantity);
                 specimen.setPlateErrors(StringUtil.EMPTY_STRING);
                 specimen.setSampleErrors(StringUtil.EMPTY_STRING);
-                specimen.setSpecimenType(context.load(SpecimenType.class,
-                    specInfo.specimenTypeId));
+                specimen.setSpecimenType(context.load(SpecimenType.class, specInfo.specimenTypeId));
+                specimen.setStudy(ceventToSave.getPatient().getStudy());
 
                 newOriginalSpecimens.add(specimen);
             }

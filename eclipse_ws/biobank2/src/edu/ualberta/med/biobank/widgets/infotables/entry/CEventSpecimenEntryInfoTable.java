@@ -29,27 +29,31 @@ import edu.ualberta.med.biobank.model.SpecimenType;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class CEventSpecimenEntryInfoTable extends NewSpecimenEntryInfoTable {
-    public static final I18n i18n = I18nFactory
-        .getI18n(AliquotedSpecimenEntryInfoTable.class);
+    public static final I18n i18n = I18nFactory.getI18n(AliquotedSpecimenEntryInfoTable.class);
 
-    protected IObservableValue specimensAdded = new WritableValue(
-        Boolean.FALSE, Boolean.class);
+    protected IObservableValue specimensAdded = new WritableValue(Boolean.FALSE, Boolean.class);
+
     private boolean isEditable;
+
     private boolean isDeletable;
 
+    private final CollectionEvent cevent;
+
     @SuppressWarnings("nls")
-    public CEventSpecimenEntryInfoTable(Composite parent,
-        List<SpecimenInfo> sourceSpecimens, CollectionEvent cevent,
+    public CEventSpecimenEntryInfoTable(
+        Composite parent,
+        List<SpecimenInfo> sourceSpecimens,
+        CollectionEvent cevent,
         ColumnsShown columnsShowns) {
+
         super(parent, sourceSpecimens, columnsShowns);
+        this.cevent = cevent;
         try {
             if (cevent.getId() != null) {
-                this.isEditable =
-                    SessionManager.getAppService().isAllowed(
-                        new CollectionEventUpdatePermission(cevent.getId()));
-                this.isDeletable =
-                    SessionManager.getAppService().isAllowed(
-                        new CollectionEventUpdatePermission(cevent.getId()));
+                this.isEditable = SessionManager.getAppService().isAllowed(
+                    new CollectionEventUpdatePermission(cevent.getId()));
+                this.isDeletable = SessionManager.getAppService().isAllowed(
+                    new CollectionEventUpdatePermission(cevent.getId()));
             } else {
                 // not real deletes or edits
                 this.isEditable = true;
@@ -68,10 +72,14 @@ public class CEventSpecimenEntryInfoTable extends NewSpecimenEntryInfoTable {
         specimensAdded.setValue(getList().size() > 0);
     }
 
-    public void addOrEditSpecimen(boolean add, CommentedSpecimenInfo spcInfo,
+    public void addOrEditSpecimen(
+        boolean add,
+        CommentedSpecimenInfo spcInfo,
         Set<SourceSpecimen> studySourceTypes,
-        List<SpecimenType> allSpecimenTypes, final CollectionEvent cEvent,
+        List<SpecimenType> allSpecimenTypes,
+        final CollectionEvent cEvent,
         final Date defaultTimeDrawn) {
+
         NewListener newListener = null;
         List<String> inventoryIdExcludeList = new ArrayList<String>();
         for (SpecimenInfo sp : getList()) {
@@ -96,7 +104,8 @@ public class CEventSpecimenEntryInfoTable extends NewSpecimenEntryInfoTable {
         }
         CEventSourceSpecimenDialog dlg = new CEventSourceSpecimenDialog(
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-            spcInfo == null ? null : spcInfo,
+            cevent.getPatient().getStudy(),
+            (spcInfo == null) ? null : spcInfo,
             studySourceTypes, allSpecimenTypes,
             inventoryIdExcludeList, newListener, defaultTimeDrawn);
         int res = dlg.open();
@@ -114,8 +123,8 @@ public class CEventSpecimenEntryInfoTable extends NewSpecimenEntryInfoTable {
                 public void editItem(InfoTableEvent<SpecimenInfo> event) {
                     CommentedSpecimenInfo spcInfo = (CommentedSpecimenInfo) getSelection();
                     if (spcInfo != null) {
-                        addOrEditSpecimen(false, spcInfo, studySourceTypes, allSpecimenTypes, null,
-                            null);
+                        addOrEditSpecimen(
+                            false, spcInfo, studySourceTypes, allSpecimenTypes, null, null);
                     }
                 }
             });
@@ -127,16 +136,13 @@ public class CEventSpecimenEntryInfoTable extends NewSpecimenEntryInfoTable {
                 public void deleteItem(InfoTableEvent<SpecimenInfo> event) {
                     SpecimenInfo si = getSelection();
                     if (si != null) {
-                        if (!MessageDialog
-                            .openConfirm(
-                                PlatformUI.getWorkbench()
-                                    .getActiveWorkbenchWindow().getShell(),
-                                // dialog title.
-                                i18n.tr("Delete specimen"),
-                                // dialog message.
-                                i18n.tr(
-                                    "Are you sure you want to delete specimen \"{0}\"?",
-                                    si.specimen.getInventoryId()))) {
+                        if (!MessageDialog.openConfirm(
+                            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
+                            // dialog title.
+                            i18n.tr("Delete specimen"),
+                            // dialog message.
+                            i18n.tr("Are you sure you want to delete specimen \"{0}\"?",
+                                si.specimen.getInventoryId()))) {
                             return;
                         }
                         getList().remove(si);

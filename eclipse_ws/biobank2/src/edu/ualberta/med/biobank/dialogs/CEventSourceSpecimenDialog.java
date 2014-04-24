@@ -30,7 +30,7 @@ import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.action.others.CheckNoDuplicateAction;
+import edu.ualberta.med.biobank.common.action.others.SpecimenCheckNoDuplicateAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.util.StringUtil;
@@ -44,6 +44,7 @@ import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
+import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
@@ -79,43 +80,50 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
 
     private final List<String> inventoryIdExcludeList;
 
-    private final CommentWrapper commentWrapper = new CommentWrapper(
-        SessionManager.getAppService());
+    private final CommentWrapper commentWrapper =
+        new CommentWrapper(SessionManager.getAppService());
 
     private BgcBaseText commentWidget;
 
-    protected IObservableValue uniqueInventoryId = new WritableValue(
-        Boolean.TRUE, Boolean.class);
+    protected IObservableValue uniqueInventoryId =
+        new WritableValue(Boolean.TRUE, Boolean.class);
 
     private Binding uniqueInventoryIdBinding;
 
     private String duplicateInventoryId = null;
 
+    private final Study study;
+
     @SuppressWarnings("nls")
-    public CEventSourceSpecimenDialog(Shell parent, CommentedSpecimenInfo spec,
+    public CEventSourceSpecimenDialog(
+        Shell parent,
+        Study study,
+        CommentedSpecimenInfo spec,
         Set<SourceSpecimen> studySourceSpecimen,
         List<SpecimenType> allSpecimenTypes,
-        List<String> inventoryIdExcludeList, NewListener listener,
+        List<String> inventoryIdExcludeList,
+        NewListener listener,
         Date defaultTimeDrawn) {
+
         super(parent, listener, spec == null);
         this.defaultTimeDrawn = defaultTimeDrawn;
         this.inventoryIdExcludeList = inventoryIdExcludeList;
+        this.study = study;
+
         Assert.isNotNull(studySourceSpecimen);
         internalSpecimen = new CommentedSpecimenInfo(new SpecimenInfo());
         internalSpecimen.specimen = new Specimen();
+
         if (spec == null) {
             // FIXME ugly
             internalSpecimen.specimen.setActivityStatus(ActivityStatus.ACTIVE);
             internalSpecimen.specimen.setCreatedAt(defaultTimeDrawn);
         } else {
             internalSpecimen.specimen.setId(spec.specimen.getId());
-            internalSpecimen.specimen.setSpecimenType(spec.specimen
-                .getSpecimenType());
-            internalSpecimen.specimen.setInventoryId(spec.specimen
-                .getInventoryId());
+            internalSpecimen.specimen.setSpecimenType(spec.specimen.getSpecimenType());
+            internalSpecimen.specimen.setInventoryId(spec.specimen.getInventoryId());
             internalSpecimen.specimen.setQuantity(spec.specimen.getQuantity());
-            internalSpecimen.specimen
-                .setCreatedAt(spec.specimen.getCreatedAt());
+            internalSpecimen.specimen.setCreatedAt(spec.specimen.getCreatedAt());
             internalSpecimen.specimen.setActivityStatus(spec.specimen
                 .getActivityStatus());
             // comments is special
@@ -195,8 +203,7 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
                     public void run() {
                         try {
                             Boolean duplicate = !SessionManager.getAppService().doAction(
-                                new CheckNoDuplicateAction(Specimen.class,
-                                    null, SpecimenPeer.INVENTORY_ID.getName(), inventoryId)).isTrue();
+                                new SpecimenCheckNoDuplicateAction(inventoryId, study)).isTrue();
 
                             if (duplicate || inventoryIdExcludeList.contains(inventoryId)) {
                                 duplicateInventoryId = inventoryId;
