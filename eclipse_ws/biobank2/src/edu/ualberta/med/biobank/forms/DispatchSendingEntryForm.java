@@ -9,6 +9,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -36,6 +37,7 @@ import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.util.InventoryIdUtil;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
@@ -445,28 +447,47 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
         }
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void doAfterSave() throws Exception {
         super.doAfterSave();
 
-        boolean userSelection = BgcPlugin.openConfirm(
+        boolean userSelection = MessageDialog.openQuestion(
+            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
             // confirmation dialog title
             i18n.tr("Send the dispatch"),
             // confirmation dialog message
             i18n.tr("Do you wish to send the dispatch?"));
 
         if (userSelection) {
+            sendDispatch(this, dispatch, dispatchAdapter);
+        } else {
             BgcPlugin.openMessage(
                 // dialog title.
                 i18n.tr("Send later"),
-                i18n.tr("To send the dispatch later, you can open the dispatch"));
-
-        } else {
-            sendDispatch();
+                i18n.tr("To send the dispatch later you can open the dispatch view form and "
+                    + "press the \"Send\" button in the top right of the form.\n\n"
+                    + "You can also expand the \"Creation\" node on the tree at the left, and "
+                    + "right click on your dispatch and select \"Send Dispatch\"."));
         }
     }
 
-    private void sendDispatch() {
+    @SuppressWarnings("nls")
+    static void sendDispatch(
+        final BiobankFormBase form,
+        final DispatchWrapper dispatch,
+        final DispatchAdapter dispatchAdapter) {
+
+        if (form == null) {
+            throw new IllegalArgumentException("form is null");
+        }
+        if (dispatch == null) {
+            throw new IllegalArgumentException("dispatch is null");
+        }
+        if (dispatchAdapter == null) {
+            throw new IllegalArgumentException("dispatchAdapter is null");
+        }
+
         int result = new SendDispatchDialog(Display.getDefault().getActiveShell(), dispatch).open();
         if (result == Dialog.OK) {
             IRunnableContext context =
@@ -483,7 +504,7 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
                             dispatchAdapter.setModelObject(dispatch);
                             dispatchAdapter.doSend();
                         } catch (Exception ex) {
-                            saveErrorCatch(ex, monitor, false);
+                            form.saveErrorCatch(ex, monitor, false);
                             return;
                         }
                         monitor.done();

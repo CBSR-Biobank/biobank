@@ -237,9 +237,9 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
                 ? StringUtil.EMPTY_STRING : comment.getMessage());
 
         ShipmentInfoSaveInfo ship = null;
-        if (!dispatch.isNew() && dispatch.getShipmentInfo() != null)
-            ship =
-                DispatchSaveAction.prepareShipInfo(dispatch.getShipmentInfo());
+        if (!dispatch.isNew() && dispatch.getShipmentInfo() != null) {
+            ship = DispatchSaveAction.prepareShipInfo(dispatch.getShipmentInfo());
+        }
         DispatchSaveAction save = new DispatchSaveAction(dInfo, dsInfos, ship);
         dispatch.setId(SessionManager.getAppService().doAction(save).getId());
         ((AdapterBase) adapter).setModelObject(dispatch);

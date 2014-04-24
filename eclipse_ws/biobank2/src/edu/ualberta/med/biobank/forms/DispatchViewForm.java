@@ -3,12 +3,7 @@ package edu.ualberta.med.biobank.forms;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.ToolBarManager;
-import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.dialogs.ProgressMonitorDialog;
-import org.eclipse.jface.operation.IRunnableContext;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -31,8 +26,6 @@ import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
-import edu.ualberta.med.biobank.dialogs.dispatch.SendDispatchDialog;
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDoubleClickItemListener;
@@ -46,7 +39,6 @@ import edu.ualberta.med.biobank.model.ShipmentInfo;
 import edu.ualberta.med.biobank.model.ShippingMethod;
 import edu.ualberta.med.biobank.treeview.SpecimenAdapter;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
-import edu.ualberta.med.biobank.views.SpecimenTransitView;
 import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.DispatchSpecimenListInfoTable;
 import edu.ualberta.med.biobank.widgets.trees.DispatchSpecimensTreeTable;
@@ -366,38 +358,7 @@ public class DispatchViewForm extends BiobankViewForm {
         }
     }
 
-    @SuppressWarnings("nls")
     public void dispatchSend() {
-        int result = new SendDispatchDialog(Display.getDefault().getActiveShell(), dispatch).open();
-        if (result == Dialog.OK) {
-            IRunnableContext context =
-                new ProgressMonitorDialog(Display.getDefault().getActiveShell());
-            try {
-                context.run(true, true, new IRunnableWithProgress() {
-                    @Override
-                    public void run(final IProgressMonitor monitor) {
-                        monitor.beginTask(
-                            // progress message.
-                            i18n.tr("Saving..."),
-                            IProgressMonitor.UNKNOWN);
-                        try {
-                            dispatchAdapter.setModelObject(dispatch);
-                            dispatchAdapter.doSend();
-                        } catch (Exception ex) {
-                            saveErrorCatch(ex, monitor, false);
-                            return;
-                        }
-                        monitor.done();
-                    }
-                });
-            } catch (Exception e1) {
-                BgcPlugin.openAsyncError(
-                    // dialog title.
-                    i18n.tr("Save error"), e1);
-            }
-            SpecimenTransitView.getCurrent().reload();
-            dispatchAdapter.openViewForm();
-        }
+        DispatchSendingEntryForm.sendDispatch(this, dispatch, dispatchAdapter);
     }
-
 }
