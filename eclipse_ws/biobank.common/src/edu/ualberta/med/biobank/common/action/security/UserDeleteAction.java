@@ -1,5 +1,9 @@
 package edu.ualberta.med.biobank.common.action.security;
 
+import java.util.List;
+
+import org.hibernate.criterion.Restrictions;
+
 import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
@@ -11,6 +15,7 @@ import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.model.Group;
+import edu.ualberta.med.biobank.model.Report;
 import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankCSMSecurityUtil;
 
@@ -44,6 +49,16 @@ public class UserDeleteAction implements Action<EmptyResult> {
 
         if (!user.isFullyManageable(context.getUser())) {
             throw new LocalizedException(INADEQUATE_PERMISSIONS_ERRMSG);
+        }
+
+        // delete all reports this has
+        @SuppressWarnings({ "unchecked", "nls" })
+        List<Report> reports = context.getSession().createCriteria(Report.class, "report")
+            .createAlias("report.user", "user")
+            .add(Restrictions.eq("user.id", user.getId())).list();
+
+        for (Report report : reports) {
+            context.getSession().delete(report);
         }
 
         // the group side is the managing side, so we must remove the user from
