@@ -249,9 +249,9 @@ public class TestContainerLabelingScheme extends TestAction {
 
     @Test
     public void posToLabelTwoCharAlpha() {
-        // can only label between "01" to "99"
-        int totalRows = 9;
-        int totalCols = 10;
+        // can only label between "AA" to "ZZ"
+        int totalRows = ALPHA.size();
+        int totalCols = ALPHA.size();
         String label;
 
         for (LabelingLayout labelingLayout : LabelingLayout.values()) {
@@ -280,9 +280,11 @@ public class TestContainerLabelingScheme extends TestAction {
 
     @Test
     public void posToLabelTwoCharAlphaBadPos() {
+        int totalRows = ALPHA.size();
+        int totalCols = ALPHA.size();
         try {
             ContainerLabelingScheme.rowColToTwoChar(
-                new RowColPos(10, 10), 10, 10, LabelingLayout.VERTICAL);
+                new RowColPos(totalRows + 1, totalCols), totalRows, totalCols, LabelingLayout.VERTICAL);
             Assert.fail("should not allow labeling more than 2 digits");
         } catch (IllegalArgumentException e) {
             // do nothing
@@ -290,10 +292,10 @@ public class TestContainerLabelingScheme extends TestAction {
     }
 
     @Test
-    public void labelToPosTwoCharAlpha() {
-        // can only label between "01" to "99"
-        int totalRows = 9;
-        int totalCols = 10;
+    public void labelToPosTwotCharAlpha() {
+        // can only label between "AA" to "ZZ"
+        int totalRows = ALPHA.size();
+        int totalCols = ALPHA.size();
         String label;
 
         ContainerLabelingScheme labelingScheme = exec(
@@ -339,9 +341,9 @@ public class TestContainerLabelingScheme extends TestAction {
 
     @Test
     public void labelToPosCbsrTwoChar() {
-        // can only label between "01" to "99"
-        int totalRows = 9;
-        int totalCols = 10;
+        // can only label between "AA" to "ZZ"
+        int totalRows = CBSR_ALPHA.size();
+        int totalCols = CBSR_ALPHA.size();
         String label;
 
         for (LabelingLayout labelingLayout : LabelingLayout.values()) {
@@ -374,9 +376,11 @@ public class TestContainerLabelingScheme extends TestAction {
 
     @Test
     public void posToLabelCbsrTwoCharBadPos() {
+        int totalRows = CBSR_ALPHA.size();
+        int totalCols = CBSR_ALPHA.size();
         try {
             ContainerLabelingScheme.rowColToCbsrTwoChar(
-                new RowColPos(10, 10), 10, 10, LabelingLayout.VERTICAL);
+                new RowColPos(totalRows + 1, totalCols), totalRows, totalCols, LabelingLayout.VERTICAL);
             Assert.fail("should not allow labeling more than 2 digits");
         } catch (IllegalArgumentException e) {
             // do nothing
@@ -389,15 +393,15 @@ public class TestContainerLabelingScheme extends TestAction {
             new ContainerLabelingSchemeGetInfoAction("CBSR 2 char alphabetic")).getLabelingScheme();
         Assert.assertNotNull(labelingScheme);
 
-        // can only label between "01" to "99"
-        int totalRows = 9;
-        int totalCols = 10;
+        // can only label between "AA" to "ZZ"
+        int totalRows = CBSR_ALPHA.size();
+        int totalCols = CBSR_ALPHA.size();
+
         String label;
 
         for (LabelingLayout labelingLayout : LabelingLayout.values()) {
             for (int i = 0, n = totalRows * totalCols; i < n; ++i) {
-                label = CBSR_ALPHA.get(i / CBSR_ALPHA.size())
-                    + CBSR_ALPHA.get(i % CBSR_ALPHA.size());
+                label = CBSR_ALPHA.get(i / totalCols) + CBSR_ALPHA.get(i % totalCols);
                 RowColPos pos = labelingScheme.cbsrTwoCharToRowCol(
                     label, totalRows, totalCols, "test", labelingLayout);
                 if (labelingLayout.equals(LabelingLayout.VERTICAL)) {

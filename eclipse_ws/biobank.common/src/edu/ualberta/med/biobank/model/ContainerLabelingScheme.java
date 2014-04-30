@@ -24,12 +24,18 @@ public class ContainerLabelingScheme extends AbstractBiobankModel
     public static final String CBSR_2_CHAR_LABELLING_PATTERN =
         "ABCDEFGHJKLMNPQRSTUVWXYZ";
 
+    public static final int CBSR_2_CHAR_LABELLING_MAX_INDEX =
+        CBSR_2_CHAR_LABELLING_PATTERN.length() * CBSR_2_CHAR_LABELLING_PATTERN.length();
+
     @SuppressWarnings("nls")
     public static String CBSR_SBS_LABELLING_PATTERN = "ABCDEFGHJ";
 
     @SuppressWarnings("nls")
     public static final String TWO_CHAR_LABELLING_PATTERN =
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+    public static final int TWO_CHAR_LABELLING_MAX_INDEX =
+        TWO_CHAR_LABELLING_PATTERN.length() * TWO_CHAR_LABELLING_PATTERN.length();
 
     @SuppressWarnings("nls")
     public static final String DEWAR_ROW_LABELLING_PATTERN = "ABCDEFGHIJKLMNOP";
@@ -131,7 +137,7 @@ public class ContainerLabelingScheme extends AbstractBiobankModel
             index = totalCols * rcp.getRow() + rcp.getCol();
         }
 
-        if ((index < 0) || (index >= 99)) {
+        if ((index < 0) || (index >= CBSR_2_CHAR_LABELLING_MAX_INDEX)) {
             throw new IllegalArgumentException("position is invalid: " + rcp);
         }
 
@@ -221,7 +227,7 @@ public class ContainerLabelingScheme extends AbstractBiobankModel
             index = totalCols * rcp.getRow() + rcp.getCol();
         }
 
-        if ((index < 0) || (index >= 99)) {
+        if ((index < 0) || (index >= TWO_CHAR_LABELLING_MAX_INDEX)) {
             throw new IllegalArgumentException("position is invalid: " + rcp);
         }
 
@@ -276,7 +282,8 @@ public class ContainerLabelingScheme extends AbstractBiobankModel
         int len = label.length();
         if ((len != getMinChars()) && (len != getMaxChars())) {
             throw new IllegalArgumentException(
-                MessageFormat.format("Label should be {0} characters.", getMinChars()));
+                MessageFormat.format("Label should be {0} characters: {1}.",
+                    getMinChars(), label));
         }
 
         int index1 = CBSR_2_CHAR_LABELLING_PATTERN.indexOf(label.charAt(len - 2));
