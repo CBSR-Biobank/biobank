@@ -670,4 +670,92 @@ public class TestContainerLabelingScheme extends TestAction {
         }
 
     }
+
+    @Test
+    public void testBox85by2() {
+        String posString;
+
+        ContainerLabelingScheme labelingScheme = exec(
+            new ContainerLabelingSchemeGetInfoAction("Box 85 by 2")).getLabelingScheme();
+        Assert.assertNotNull(labelingScheme);
+
+        Dimensions[] containerDimensions = new Dimensions[] {
+            new Dimensions(85, 2)
+        };
+
+        for (Dimensions dimensions : containerDimensions) {
+            for (int col = 0; col < dimensions.totalCols; ++col) {
+                for (int row = 0; row < dimensions.totalRows; ++row) {
+                    RowColPos pos = new RowColPos(row, col);
+                    posString = ContainerLabelingScheme.rowColToBox85by2(pos);
+                    if (row >= 9) {
+                        Assert.assertTrue(posString.length() == 3);
+                    } else {
+                        Assert.assertTrue(posString.length() == 2);
+                    }
+                    Assert.assertEquals(SBS_ALPHA.get(col).charAt(0), posString.charAt(0));
+                    Assert.assertEquals(row + 1, Integer.valueOf(posString.substring(1)).intValue());
+                }
+            }
+
+            for (int col = 0; col < dimensions.totalCols; ++col) {
+                for (int row = 0; row < dimensions.totalRows; ++row) {
+                    RowColPos pos = labelingScheme.box85by2ToRowCol(
+                        String.format("%s%02d", SBS_ALPHA.get(col), row + 1));
+                    Assert.assertEquals(row, pos.getRow().intValue());
+                    Assert.assertEquals(col, pos.getCol().intValue());
+                }
+            }
+        }
+    }
+
+    @Test
+    public void box85by2Bounds() {
+        ContainerLabelingScheme labelingScheme = exec(
+            new ContainerLabelingSchemeGetInfoAction("Box 85 by 2")).getLabelingScheme();
+        Assert.assertNotNull(labelingScheme);
+
+        try {
+            ContainerLabelingScheme.rowColToBox85by2(new RowColPos(86, 2));
+            Assert.fail("SBS cannot label more than 16 rows");
+        } catch (IllegalArgumentException e) {
+            // do nothing
+        }
+
+        try {
+            ContainerLabelingScheme.rowColToBox85by2(new RowColPos(85, 3));
+            Assert.fail("SBS cannot label more than 24 columns");
+        } catch (IllegalArgumentException e) {
+            // do nothing
+        }
+
+        try {
+            ContainerLabelingScheme.rowColToBox85by2(new RowColPos(-1, 2));
+            Assert.fail("SBS cannot label more than 16 rows");
+        } catch (IllegalArgumentException e) {
+            // do nothing
+        }
+
+        try {
+            ContainerLabelingScheme.rowColToBox85by2(new RowColPos(85, -1));
+            Assert.fail("SBS cannot label more than 24 columns");
+        } catch (IllegalArgumentException e) {
+            // do nothing
+        }
+
+        try {
+            labelingScheme.box85by2ToRowCol("A87");
+            Assert.fail("invalid row in label");
+        } catch (IllegalArgumentException e) {
+            // do nothing
+        }
+
+        try {
+            labelingScheme.box85by2ToRowCol("C1");
+            Assert.fail("invalid column in label");
+        } catch (IllegalArgumentException e) {
+            // do nothing
+        }
+    }
+
 }

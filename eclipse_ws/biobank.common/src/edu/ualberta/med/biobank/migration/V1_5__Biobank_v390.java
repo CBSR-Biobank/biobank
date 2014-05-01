@@ -39,5 +39,10 @@ public class V1_5__Biobank_v390 implements SpringJdbcMigration {
             + " has_multiple_layout HAS_MULTIPLE_LAYOUT TINYINT(1) NULL DEFAULT NULL COMMENT ''");
         jdbcTemplate.execute("ALTER TABLE dna COLLATE=latin1_general_cs");
         jdbcTemplate.execute("ALTER TABLE batch_operation_event_attr COLLATE=latin1_general_cs");
+
+        // add new labeling scheme for OHS
+        jdbcTemplate.execute("INSERT INTO container_labeling_scheme "
+            + "(ID, NAME, MIN_CHARS, MAX_CHARS, MAX_ROWS, MAX_COLS, MAX_CAPACITY, HAS_MULTIPLE_LAYOUT, VERSION) VALUES "
+            + "( 7, 'Box 85 by 2', 2, 3, 85, 2, 170, 0, 0)");
     }
 }

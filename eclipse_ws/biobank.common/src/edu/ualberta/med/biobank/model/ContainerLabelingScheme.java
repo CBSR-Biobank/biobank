@@ -42,6 +42,10 @@ public class ContainerLabelingScheme extends AbstractBiobankModel
 
     public static final int CBSR_SBS_MAX_COLUMN = 9;
 
+    public static final int BOX_85_BY_2_MAX_ROWS = 85;
+
+    public static final int BOX_85_BY_2_MAX_COLS = 2;
+
     private String name;
     private Integer minChars;
     private Integer maxChars;
@@ -205,6 +209,22 @@ public class ContainerLabelingScheme extends AbstractBiobankModel
         return result.toString();
     }
 
+    @SuppressWarnings("nls")
+    public static String rowColToBox85by2(RowColPos rcp) {
+        int row = rcp.getRow();
+        int col = rcp.getCol();
+        if ((row < 0) || (row > BOX_85_BY_2_MAX_ROWS)) {
+            throw new IllegalArgumentException("row is invalid: " + row);
+        }
+        if ((col < 0) || (col >= BOX_85_BY_2_MAX_COLS)) {
+            throw new IllegalArgumentException("column is invalid: " + col);
+        }
+        StringBuffer result = new StringBuffer();
+        result.append((char) ('A' + col));
+        result.append(row + 1);
+        return result.toString();
+    }
+
     /**
      * Convert a position in row*column to two letter (in the CBSR way)
      * 
@@ -267,6 +287,9 @@ public class ContainerLabelingScheme extends AbstractBiobankModel
         case 6:
             // 2 char alphabetic
             return rowColToTwoChar(rcp, rowCapacity, colCapacity, labelingLayout);
+        case 7:
+            //
+            return rowColToBox85by2(rcp);
         }
         return null;
     }
@@ -385,14 +408,28 @@ public class ContainerLabelingScheme extends AbstractBiobankModel
      * F9. (CBSR SBS skip I and O)
      */
     @SuppressWarnings("nls")
-    public RowColPos cbsrSbsToRowCol(String pos)
-        throws IllegalArgumentException {
+    public RowColPos cbsrSbsToRowCol(String pos) {
         if ((pos.length() != getMinChars()) && (pos.length() != getMaxChars())) {
-            throw new IllegalArgumentException("binPos has an invalid length: "
-                + pos);
+            throw new IllegalArgumentException("pos has an invalid length: " + pos);
         }
         int row = CBSR_SBS_LABELLING_PATTERN.indexOf(pos.charAt(0));
         int col = Integer.parseInt(pos.substring(1)) - 1;
+        return new RowColPos(row, col);
+    }
+
+    @SuppressWarnings("nls")
+    public RowColPos box85by2ToRowCol(String pos) {
+        if ((pos.length() != getMinChars()) && (pos.length() != getMaxChars())) {
+            throw new IllegalArgumentException("pos has an invalid length: " + pos);
+        }
+        int col = "AB".indexOf(pos.charAt(0));
+        int row = Integer.parseInt(pos.substring(1)) - 1;
+        if ((row < 0) || (row > BOX_85_BY_2_MAX_ROWS)) {
+            throw new IllegalArgumentException("row is invalid: " + row);
+        }
+        if ((col < 0) || (col >= BOX_85_BY_2_MAX_COLS)) {
+            throw new IllegalArgumentException("column is invalid: " + col);
+        }
         return new RowColPos(row, col);
     }
 
@@ -401,9 +438,13 @@ public class ContainerLabelingScheme extends AbstractBiobankModel
      * 1:0.
      */
     @SuppressWarnings("nls")
-    public RowColPos twoCharToRowCol(String label, int rowCap, int colCap,
-        String containerTypeName, LabelingLayout labelingLayout)
-        throws IllegalArgumentException {
+    public RowColPos twoCharToRowCol(
+        String label,
+        int rowCap,
+        int colCap,
+        String containerTypeName,
+        LabelingLayout labelingLayout) {
+
         int len = label.length();
         if ((len != getMinChars()) && (len != getMaxChars())) {
             throw new IllegalArgumentException(MessageFormat.format("Label should be {0} characters.",
@@ -470,6 +511,10 @@ public class ContainerLabelingScheme extends AbstractBiobankModel
         case 6:
             // 2 char alphabetic
             return twoCharToRowCol(position, rowCapacity, colCapacity, null, labelingLayout);
+
+        case 7:
+            // Box 85 by 2
+            return box85by2ToRowCol(position);
         }
         return null;
     }

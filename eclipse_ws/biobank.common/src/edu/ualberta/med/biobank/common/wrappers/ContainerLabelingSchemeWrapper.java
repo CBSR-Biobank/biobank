@@ -33,6 +33,8 @@ public class ContainerLabelingSchemeWrapper extends
 
     public static final int SCHEME_2_CHAR_ALPHA = 6;
 
+    public static final int SCHEME_BOX_85_BY_2 = 7;
+
     @SuppressWarnings("nls")
     public static final String CBSR_2_CHAR_LABELLING_PATTERN = "ABCDEFGHJKLMNPQRSTUVWXYZ";
 
@@ -111,6 +113,14 @@ public class ContainerLabelingSchemeWrapper extends
 
                     case SCHEME_2_CHAR_ALPHA:
                         if (!scheme.getName().equals("2 char alphabetic")) {
+                            throw new ApplicationException(
+                                "labeling scheme is not "
+                                    + scheme.getName());
+                        }
+                        break;
+
+                    case SCHEME_BOX_85_BY_2:
+                        if (!scheme.getName().equals("Box 85 by 2")) {
                             throw new ApplicationException(
                                 "labeling scheme is not "
                                     + scheme.getName());
