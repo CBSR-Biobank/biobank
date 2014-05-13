@@ -29,7 +29,9 @@ public class MoveContainerDialog extends BgcBaseDialog {
     private String newLabel = StringUtil.EMPTY_STRING;
 
     @SuppressWarnings("nls")
-    public MoveContainerDialog(Shell parent, ContainerWrapper srcContainer,
+    public MoveContainerDialog(
+        Shell parent,
+        ContainerWrapper srcContainer,
         ContainerWrapper dstContainer) {
         super(parent);
         Assert.isNotNull(srcContainer);
@@ -63,18 +65,17 @@ public class MoveContainerDialog extends BgcBaseDialog {
         contents.setLayout(new GridLayout(2, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        BgcBaseText bbt =
-            (BgcBaseText) createBoundWidgetWithLabel(
-                contents,
-                BgcBaseText.class,
-                SWT.FILL,
-                i18n.tr("Destination Address"),
-                null,
-                this,
-                "newLabel",
-                new StringLengthValidator(2,
-                    // TR: validation error message
-                    i18n.tr("Destination label must be another container (4 characters minimum).")));
+        BgcBaseText bbt = (BgcBaseText) createBoundWidgetWithLabel(
+            contents,
+            BgcBaseText.class,
+            SWT.FILL,
+            i18n.tr("Destination Address"),
+            null,
+            this,
+            "newLabel",
+            new StringLengthValidator(2,
+                // TR: validation error message
+                i18n.tr("Destination label must be another container (4 characters minimum).")));
         if (this.dstContainer != null)
             bbt.setText(this.dstContainer.getLabel());
     }

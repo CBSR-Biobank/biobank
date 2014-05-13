@@ -28,14 +28,16 @@ public class ContainerMoveAction implements Action<IdResult> {
     private ActionContext context;
 
     @SuppressWarnings("nls")
-    public ContainerMoveAction(Container containerToMove,
-        Container newParentContainer, String newLabel) {
+    public ContainerMoveAction(
+        Container containerToMove,
+        Container newParentContainer,
+        String newLabel) {
+
         if (containerToMove == null) {
             throw new IllegalArgumentException("Container to move is null");
         }
         if (newParentContainer == null) {
-            throw new IllegalArgumentException(
-                "New parent container to move to is null");
+            throw new IllegalArgumentException("New parent container to move to is null");
         }
         if (newLabel == null) {
             throw new IllegalArgumentException("Move to label is null");
@@ -43,7 +45,8 @@ public class ContainerMoveAction implements Action<IdResult> {
 
         if (log.isDebugEnabled()) {
             log.debug("containerToMoveId={} newParentId={} newLabel={}",
-                new Object[] { containerToMove.getLabel(),
+                new Object[] {
+                    containerToMove.getLabel(),
                     newParentContainer.getLabel(),
                     newLabel });
         }
@@ -67,20 +70,18 @@ public class ContainerMoveAction implements Action<IdResult> {
         this.context = context;
 
         // validation tests will tell us if the new position is not empty
-        Container containerToMove = context.load(Container.class,
-            containerToMoveId);
-        Container newParentContainer = context.load(Container.class,
-            newParentContainerId);
+        Container containerToMove = context.load(Container.class, containerToMoveId);
+        Container newParentContainer = context.load(Container.class, newParentContainerId);
 
         try {
-            RowColPos position =
-                newParentContainer.getPositionFromLabelingScheme(
-                    newLabel.substring(newParentContainer.getLabel()
-                        .length()));
+            String childPosition = newLabel.substring(newParentContainer.getLabel().length());
+            if (childPosition.isEmpty()) {
+                throw new IllegalArgumentException("cannot retrieve child position");
+            }
+            RowColPos position = newParentContainer.getPositionFromLabelingScheme(childPosition);
 
-            ContainerActionHelper.setPosition(context, containerToMove,
-                position,
-                newParentContainerId);
+            ContainerActionHelper.setPosition(
+                context, containerToMove, position, newParentContainerId);
 
             context.getSession().saveOrUpdate(containerToMove);
             context.getSession().flush();
@@ -88,15 +89,14 @@ public class ContainerMoveAction implements Action<IdResult> {
             log.debug("container " + containerToMoveId + " moved under parent "
                 + newParentContainerId);
         } catch (Exception e) {
-            throw new LocalizedException(bundle.tr("Unable to move container.")
-                .format(), e);
+            throw new LocalizedException(
+                bundle.tr("Unable to move container.").format(), e);
         }
 
         // update the path information for this container and its children
         updateContainerAndChildren(containerToMove, newParentContainer);
 
         return new IdResult(containerToMoveId);
-
     }
 
     @SuppressWarnings("nls")
@@ -105,8 +105,7 @@ public class ContainerMoveAction implements Action<IdResult> {
         if (context == null) {
             throw new IllegalStateException("action context not set");
         }
-        ContainerActionHelper.updateContainerPathAndLabel(container,
-            parentContainer);
+        ContainerActionHelper.updateContainerPathAndLabel(container, parentContainer);
         context.getSession().saveOrUpdate(container);
 
         log.debug("updateContainerAndChildren: containerId={} label={}",

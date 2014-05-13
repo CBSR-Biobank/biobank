@@ -131,7 +131,10 @@ public class ContainerGetInfoAction implements Action<ListResult<Container>> {
 
             for (SpecimenPosition pos : container.getSpecimenPositions()) {
                 Specimen specimen = pos.getSpecimen();
-                specimen.getParentSpecimen().getInventoryId();
+                Specimen parentSpecimen = specimen.getParentSpecimen();
+                if (parentSpecimen != null) {
+                    parentSpecimen.getInventoryId();
+                }
                 specimen.getCollectionEvent().getPatient().getStudy().getName();
                 ProcessingEvent pevent = specimen.getProcessingEvent();
                 if (pevent != null) {

@@ -3,6 +3,9 @@ package edu.ualberta.med.biobank.treeview.admin;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.validation.ConstraintViolationException;
+
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.Dialog;
@@ -24,9 +27,11 @@ import org.xnap.commons.i18n.I18nFactory;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.container.ContainerDeleteAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerGetChildrenAction;
-import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoAction;
+import edu.ualberta.med.biobank.common.action.container.ContainerGetContainerOrParentsByLabelAction;
+import edu.ualberta.med.biobank.common.action.container.ContainerGetContainerOrParentsByLabelAction.ContainerData;
 import edu.ualberta.med.biobank.common.action.container.ContainerMoveAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerMoveSpecimensAction;
+import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.container.ContainerDeletePermission;
 import edu.ualberta.med.biobank.common.permission.container.ContainerReadPermission;
 import edu.ualberta.med.biobank.common.permission.container.ContainerUpdatePermission;
@@ -36,6 +41,7 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.dialogs.MoveContainerDialog;
 import edu.ualberta.med.biobank.dialogs.MoveSpecimensToDialog;
 import edu.ualberta.med.biobank.dialogs.select.SelectParentContainerDialog;
+import edu.ualberta.med.biobank.forms.BiobankFormBase;
 import edu.ualberta.med.biobank.forms.ContainerEntryForm;
 import edu.ualberta.med.biobank.forms.ContainerViewForm;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
@@ -43,6 +49,7 @@ import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContainerAdapter extends AdapterBase {
     private static final I18n i18n = I18nFactory.getI18n(ContainerAdapter.class);
@@ -241,20 +248,18 @@ public class ContainerAdapter extends AdapterBase {
     @SuppressWarnings("nls")
     public void moveContainer(ContainerWrapper destParentContainer) {
         final ContainerAdapter oldParent = (ContainerAdapter) getParent();
-        final MoveContainerDialog mc =
-            new MoveContainerDialog(PlatformUI.getWorkbench()
-                .getActiveWorkbenchWindow().getShell(), getContainer(),
-                destParentContainer);
+        final MoveContainerDialog mc = new MoveContainerDialog(
+            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
+            getContainer(),
+            destParentContainer);
         if (mc.open() == Dialog.OK) {
             try {
                 if (setNewPositionFromLabel(mc.getNewLabel())) {
                     // update new parent
-                    ContainerWrapper newParentContainer =
-                        getContainer().getParentContainer();
-                    ContainerAdapter parentAdapter =
-                        (ContainerAdapter) SessionManager
-                            .searchFirstNode(ContainerWrapper.class,
-                                newParentContainer.getId());
+                    ContainerWrapper newParentContainer = getContainer().getParentContainer();
+                    ContainerAdapter parentAdapter = (ContainerAdapter)
+                        SessionManager.searchFirstNode(
+                            ContainerWrapper.class, newParentContainer.getId());
                     if (parentAdapter != null) {
                         parentAdapter.getContainer().reload();
                         parentAdapter.removeAll();
@@ -266,11 +271,10 @@ public class ContainerAdapter extends AdapterBase {
                     oldParent.performExpand();
                 }
             } catch (Exception e) {
-                BgcPlugin
-                    .openError(
-                        // dialog title.
-                        i18n.tr("Problem while moving container"),
-                        e);
+                BgcPlugin.openError(
+                    // dialog title.
+                    i18n.tr("Problem while moving container"),
+                    e);
             }
         }
     }
@@ -280,43 +284,72 @@ public class ContainerAdapter extends AdapterBase {
      * object's position, label and the label of children
      */
     @SuppressWarnings("nls")
-    public boolean setNewPositionFromLabel(final String newLabel)
-        throws Exception {
+    public boolean setNewPositionFromLabel(final String newLabel) {
         final ContainerWrapper container = getContainer();
         @SuppressWarnings("unused")
         final String oldLabel = container.getLabel();
 
-        Container qryContainer = new Container();
-        qryContainer.setLabel(newLabel);
-
-        List<Container> newParentContainers =
-            SessionManager.getAppService().doAction(new ContainerGetInfoAction(qryContainer,
-                SessionManager.getUser().getCurrentWorkingSite().getWrappedObject())).getList();
-        if (newParentContainers.size() == 0) {
-            BgcPlugin.openError(
-                // dialog title.
-                i18n.tr("Container Move Error"),
-                // dialog message. {0}=label.
-                i18n.tr("A parent container with child \"{0}\" does not exist.", newLabel));
-            return false;
-        }
-
-        Container newParent;
-        if (newParentContainers.size() > 1) {
-            SelectParentContainerDialog dlg =
-                new SelectParentContainerDialog(PlatformUI.getWorkbench()
-                    .getActiveWorkbenchWindow().getShell(), newParentContainers);
-            if (dlg.open() != Dialog.OK) {
+        ContainerData containerData;
+        try {
+            containerData = SessionManager.getAppService().doAction(
+                new ContainerGetContainerOrParentsByLabelAction(
+                    newLabel,
+                    SessionManager.getUser().getCurrentWorkingSite().getWrappedObject(),
+                    null));
+            List<Container> newParentContainers = containerData.getPossibleParentContainers();
+            if (newParentContainers.size() == 0) {
+                BgcPlugin.openError(
+                    // dialog title.
+                    i18n.tr("Container Move Error"),
+                    // dialog message. {0}=label.
+                    i18n.tr("A parent container with child \"{0}\" does not exist.", newLabel));
                 return false;
             }
-            newParent = dlg.getSelectedContainer();
-        } else {
-            newParent = newParentContainers.get(0);
-        }
 
-        SessionManager.getAppService().doAction(new ContainerMoveAction(
-            getContainer().getWrappedObject(),
-            newParent, newLabel));
+            Container newParent;
+            if (newParentContainers.size() > 1) {
+                SelectParentContainerDialog dlg = new SelectParentContainerDialog(
+                    PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
+                    newParentContainers);
+                if (dlg.open() != Dialog.OK) {
+                    return false;
+                }
+                newParent = dlg.getSelectedContainer();
+            } else {
+                newParent = newParentContainers.get(0);
+            }
+
+            SessionManager.getAppService().doAction(new ContainerMoveAction(
+                getContainer().getWrappedObject(),
+                newParent, newLabel));
+        } catch (ApplicationException ex) {
+            if (ex.getCause() instanceof ConstraintViolationException) {
+                List<String> msgs = BiobankFormBase.getConstraintViolationsMsgs(
+                    (ConstraintViolationException) ex.getCause());
+                BgcPlugin.openAsyncError(
+                    i18n.tr("Container move error"),
+                    StringUtils.join(msgs, "\n"));
+
+            } else {
+                BgcPlugin.openAsyncError(
+                    i18n.tr("Container move error"),
+                    ex.getLocalizedMessage());
+            }
+
+        } catch (ActionException ex) {
+            if (ex.getCause() instanceof ConstraintViolationException) {
+                List<String> msgs = BiobankFormBase.getConstraintViolationsMsgs(
+                    (ConstraintViolationException) ex.getCause());
+                BgcPlugin.openAsyncError(
+                    i18n.tr("Container move error"),
+                    StringUtils.join(msgs, "\n"));
+
+            } else {
+                BgcPlugin.openAsyncError(
+                    i18n.tr("Container move error"),
+                    ex.getLocalizedMessage());
+            }
+        }
         return true;
     }
 
