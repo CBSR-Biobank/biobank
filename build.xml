@@ -748,6 +748,10 @@
       <arg line="-q -o ${env.JBOSS_HOME}/../jboss-4.0.5.GA.zip -d ${package.jboss.root.dir}" />
     </exec>
 
+    <copy file="${secu-log.dir}/jboss/overwrite/run.conf"
+	  tofile="${package.jboss.target.dir}/bin/run.conf"
+	  overwrite="true" verbose="true"/>
+
     <copy file="${secu-log.dir}/jboss/overwrite/server/default/conf/jboss-service.xml"
 	  tofile="${package.jboss.target.dir}/server/default/conf/jboss-service.xml"
 	  overwrite="true" verbose="true"/>
