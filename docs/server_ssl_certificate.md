@@ -20,10 +20,11 @@ Use these instructions to create a keystore file and import an SSL certificate i
 1.  Generate a CSR:
 
     ```sh
-    keytool -certreq -keyalg RSA -file <csr_file_name> -keystore biobank.keystore
+    keytool -certreq -keyalg RSA -alias <server_domain_name> -file <csr_file_name> -keystore biobank.keystore
     ```
 
-    Replace `<csr_file_name>` with a file name to be used in the next step.
+    Replace `<server_domain_name>` with the host name of your server, and `<csr_file_name>` with a
+    file name to be used in the next step.
 
 1.  Submit the file `<csr_file_name>` to the certificate signing authority. E.g.
     [Global Sign](https://system.globalsign.com/bm/public/certificate/poporder.do?domain=7ff3ae40cf752700e377eee8c1545d2796be16ea).
