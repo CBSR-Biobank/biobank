@@ -56,7 +56,7 @@ Use these instructions to create a keystore file and import an SSL certificate i
   1. certificate:
 
     ```sh
-    keytool -import -file reply.cer -alias <server_domain_name> -keystore biobank.keystore
+    keytool -import -file primary.cer -alias <server_domain_name> -keystore biobank.keystore
     ```
 
     Replace `<server_domain_name>` with the host name of your server.
