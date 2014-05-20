@@ -12,9 +12,9 @@ below, should be taken when running the server.
 
 The most recent version can be downloaded from here:
 
-* Biobank server v3.9.0.rc7
+* Biobank server v3.9.1
 
- * [Ubuntu package](http://aicml-med.cs.ualberta.ca/CBSR/Biobank_v3.9.0.rc7/biobank-server-3.9.0.rc7.deb)
+ * [Ubuntu package](http://aicml-med.cs.ualberta.ca/CBSR/Biobank_v3.9.1/biobank-server-3.9.1.deb)
 
 ##Requirements
 
