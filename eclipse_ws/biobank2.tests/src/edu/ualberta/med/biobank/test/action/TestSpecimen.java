@@ -38,11 +38,6 @@ import edu.ualberta.med.biobank.model.util.RowColPos;
 
 public class TestSpecimen extends TestAction {
 
-    @Test
-    public void saveNew() throws Exception {
-
-    }
-
     private Container createContainer() {
         ContainerLabelingScheme labeling = (ContainerLabelingScheme)
             session.createCriteria(ContainerLabelingScheme.class)
