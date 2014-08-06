@@ -24,7 +24,8 @@ import org.slf4j.LoggerFactory;
  */
 public class V390DoubleEntryStats {
 
-    private static Logger log = LoggerFactory.getLogger(V390DoubleEntryStats.class);
+    private static Logger log = LoggerFactory
+        .getLogger(V390DoubleEntryStats.class);
 
     public static final String DB_NAME_PRODUCTION = "biobank_v320_de";
 
@@ -45,18 +46,16 @@ public class V390DoubleEntryStats {
         + " WHERE spc.created_at >= convert_tz(?,'Canada/Mountain','GMT') AND spc.created_at <= convert_tz(?,'Canada/Mountain','GMT')"
         + " AND (ocenter.name_short='CBSR' or ccenter.name_short='CBSR')";
 
-    public static final String SELECT_DETAILS_CLAUSE =
-        "SELECT ocenter.name_short origin_center,ccenter.name_short current_center,"
-            + "s.name_short study,p.pnumber,ce.visit_number,pe.worksheet,spc.inventory_id,"
-            + "pspc.inventory_id parent_spc_inv_id,stype.name,date(spc.created_at),"
-            + "row,col,label";
+    public static final String SELECT_DETAILS_CLAUSE = "SELECT ocenter.name_short origin_center,ccenter.name_short current_center,"
+        + "s.name_short study,p.pnumber,ce.visit_number,pe.worksheet,spc.inventory_id,"
+        + "pspc.inventory_id parent_spc_inv_id,stype.name,date(spc.created_at),"
+        + "row,col,label";
 
-    public static final String ORDER_BY_CLAUSE =
-        " ORDER BY s.name_short,p.pnumber,spc.inventory_id,spc.created_at";
+    public static final String ORDER_BY_CLAUSE = " ORDER BY s.name_short,p.pnumber,spc.inventory_id,spc.created_at";
 
-    public static final String DATE_START = "2014-05-12 09:00";
+    public static final String DATE_START = "2014-05-12 00:00";
 
-    public static final String DATE_END = "2014-05-13 22:00";
+    public static final String DATE_END = "2014-05-14 00:00";
 
     private static class DoubleEntryData {
         int studyCount;
@@ -87,15 +86,20 @@ public class V390DoubleEntryStats {
         System.out.println();
 
         System.out.println(",Production,Test");
-        System.out.println("studies," + prodData.studyCount + "," + testData.studyCount);
-        System.out.println("centres," + prodData.centreCount + "," + testData.centreCount);
-        System.out.println("patients," + prodData.patients.size() + "," + testData.patients.size());
+        System.out.println("studies," + prodData.studyCount + ","
+            + testData.studyCount);
+        System.out.println("centres," + prodData.centreCount + ","
+            + testData.centreCount);
+        System.out.println("patients," + prodData.patients.size() + ","
+            + testData.patients.size());
         System.out.println("collection events," + prodData.cevents.size() + ","
             + testData.cevents.size());
-        System.out.println("processing events," + prodData.peventCount + "," + testData.peventCount);
-        System.out.println("specimens created," + prodData.specimensCreated + ","
-            + testData.specimensCreated);
-        System.out.println("scan assigned specimens," + prodData.specimensScanAssigned + ","
+        System.out.println("processing events," + prodData.peventCount + ","
+            + testData.peventCount);
+        System.out.println("specimens created," + prodData.specimensCreated
+            + "," + testData.specimensCreated);
+        System.out.println("scan assigned specimens,"
+            + prodData.specimensScanAssigned + ","
             + testData.specimensScanAssigned);
         System.out.println();
 
@@ -104,7 +108,8 @@ public class V390DoubleEntryStats {
         printSpecimenDelta(prodData, testData);
     }
 
-    private void printPatientDelta(DoubleEntryData prodData, DoubleEntryData testData) {
+    private void printPatientDelta(DoubleEntryData prodData,
+        DoubleEntryData testData) {
         Set<String> notInTestDb = new LinkedHashSet<String>();
         Set<String> notInProdDb = new LinkedHashSet<String>();
 
@@ -123,7 +128,8 @@ public class V390DoubleEntryStats {
         }
 
         if (notInTestDb.size() > 0) {
-            System.out.println("Patients not in Test DB: (" + notInTestDb.size() + ")");
+            System.out.println("Patients not in Test DB: ("
+                + notInTestDb.size() + ")");
             for (String inventoryId : notInTestDb) {
                 System.out.println(inventoryId);
             }
@@ -131,8 +137,8 @@ public class V390DoubleEntryStats {
         }
 
         if (notInProdDb.size() > 0) {
-            System.out.println("Patients not in Production DB: (" + notInProdDb.size()
-                + ")");
+            System.out.println("Patients not in Production DB: ("
+                + notInProdDb.size() + ")");
             for (String inventoryId : notInProdDb) {
                 System.out.println(inventoryId);
             }
@@ -140,7 +146,8 @@ public class V390DoubleEntryStats {
         }
     }
 
-    private void printCeventDelta(DoubleEntryData prodData, DoubleEntryData testData) {
+    private void printCeventDelta(DoubleEntryData prodData,
+        DoubleEntryData testData) {
         Set<String> notInTestDb = new LinkedHashSet<String>();
         Set<String> notInProdDb = new LinkedHashSet<String>();
 
@@ -159,7 +166,8 @@ public class V390DoubleEntryStats {
         }
 
         if (notInTestDb.size() > 0) {
-            System.out.println("Collection events not in Test DB: (" + notInTestDb.size() + ")");
+            System.out.println("Collection events not in Test DB: ("
+                + notInTestDb.size() + ")");
             for (String inventoryId : notInTestDb) {
                 System.out.println(inventoryId);
             }
@@ -167,8 +175,8 @@ public class V390DoubleEntryStats {
         }
 
         if (notInProdDb.size() > 0) {
-            System.out.println("Collection events not in Production DB: (" + notInProdDb.size()
-                + ")");
+            System.out.println("Collection events not in Production DB: ("
+                + notInProdDb.size() + ")");
             for (String inventoryId : notInProdDb) {
                 System.out.println(inventoryId);
             }
@@ -177,26 +185,30 @@ public class V390DoubleEntryStats {
 
     }
 
-    private void printSpecimenDelta(DoubleEntryData prodData, DoubleEntryData testData) {
+    private void printSpecimenDelta(DoubleEntryData prodData,
+        DoubleEntryData testData) {
         Map<String, Object[]> notInTestDb = new LinkedHashMap<String, Object[]>();
         Map<String, Object[]> notInProdDb = new LinkedHashMap<String, Object[]>();
 
         // check for specimens in production db and not in test db
         for (String inventoryId : prodData.specimens.keySet()) {
             if (!testData.specimens.containsKey(inventoryId)) {
-                notInTestDb.put(inventoryId, prodData.specimens.get(inventoryId));
+                notInTestDb.put(inventoryId,
+                    prodData.specimens.get(inventoryId));
             }
         }
 
         // check for specimens in production db and not in test db
         for (String inventoryId : testData.specimens.keySet()) {
             if (!prodData.specimens.containsKey(inventoryId)) {
-                notInProdDb.put(inventoryId, testData.specimens.get(inventoryId));
+                notInProdDb.put(inventoryId,
+                    testData.specimens.get(inventoryId));
             }
         }
 
         if (notInTestDb.size() > 0) {
-            System.out.println("Specimens not in Test DB: (" + notInTestDb.size() + ")");
+            System.out.println("Specimens not in Test DB: ("
+                + notInTestDb.size() + ")");
             for (String inventoryId : notInTestDb.keySet()) {
                 System.out.println(inventoryId);
             }
@@ -204,8 +216,8 @@ public class V390DoubleEntryStats {
         }
 
         if (notInProdDb.size() > 0) {
-            System.out.println("Specimens not in Production DB: (" + notInProdDb.size()
-                + ")");
+            System.out.println("Specimens not in Production DB: ("
+                + notInProdDb.size() + ")");
             for (String inventoryId : notInProdDb.keySet()) {
                 System.out.println(inventoryId);
             }
@@ -225,28 +237,35 @@ public class V390DoubleEntryStats {
         deData.cevents = getCevents(BASE_QRY, dbCon);
         deData.peventCount = getPeventCount(BASE_QRY, dbCon);
         deData.specimensCreated = getSpecimensCreatedCount(BASE_QRY, dbCon);
-        deData.specimensScanAssigned = getSpecimensScanAssignedCount(BASE_QRY, dbCon);
+        deData.specimensScanAssigned = getSpecimensScanAssignedCount(BASE_QRY,
+            dbCon);
         deData.specimens = getSpecimens(BASE_QRY, dbCon);
 
         return deData;
     }
 
-    private int getStudiesCount(String baseQry, Connection dbCon) throws SQLException {
-        PreparedStatement ps = dbCon.prepareCall("SELECT COUNT(DISTINCT s.id) " + baseQry);
+    private int getStudiesCount(String baseQry, Connection dbCon)
+        throws SQLException {
+        PreparedStatement ps = dbCon.prepareCall("SELECT COUNT(DISTINCT s.id) "
+            + baseQry);
         ResultSet rs = doQuery(ps);
         rs.next();
         return rs.getInt(1);
     }
 
-    private int getOriginCentersCount(String baseQry, Connection dbCon) throws SQLException {
-        PreparedStatement ps = dbCon.prepareCall("SELECT COUNT(DISTINCT ocenter.id) " + baseQry);
+    private int getOriginCentersCount(String baseQry, Connection dbCon)
+        throws SQLException {
+        PreparedStatement ps = dbCon
+            .prepareCall("SELECT COUNT(DISTINCT ocenter.id) " + baseQry);
         ResultSet rs = doQuery(ps);
         rs.next();
         return rs.getInt(1);
     }
 
-    private Set<String> getPatients(String baseQry, Connection dbCon) throws SQLException {
-        PreparedStatement ps = dbCon.prepareCall("SELECT DISTINCT p.pnumber " + baseQry);
+    private Set<String> getPatients(String baseQry, Connection dbCon)
+        throws SQLException {
+        PreparedStatement ps = dbCon.prepareCall("SELECT DISTINCT p.pnumber "
+            + baseQry);
         ResultSet rs = doQuery(ps);
 
         Set<String> results = new LinkedHashSet<String>();
@@ -256,9 +275,11 @@ public class V390DoubleEntryStats {
         return results;
     }
 
-    private Set<String> getCevents(String baseQry, Connection dbCon) throws SQLException {
-        PreparedStatement ps = dbCon.prepareCall("SELECT DISTINCT ce.visit_number, p.pnumber "
-            + baseQry);
+    private Set<String> getCevents(String baseQry, Connection dbCon)
+        throws SQLException {
+        PreparedStatement ps = dbCon
+            .prepareCall("SELECT DISTINCT ce.visit_number, p.pnumber "
+                + baseQry);
         ResultSet rs = doQuery(ps);
 
         Set<String> results = new LinkedHashSet<String>();
@@ -268,23 +289,29 @@ public class V390DoubleEntryStats {
         return results;
     }
 
-    private int getPeventCount(String baseQry, Connection dbCon) throws SQLException {
-        PreparedStatement ps = dbCon.prepareCall("SELECT COUNT(DISTINCT pe.id) " + baseQry);
+    private int getPeventCount(String baseQry, Connection dbCon)
+        throws SQLException {
+        PreparedStatement ps = dbCon
+            .prepareCall("SELECT COUNT(DISTINCT pe.id) " + baseQry);
         ResultSet rs = doQuery(ps);
         rs.next();
         return rs.getInt(1);
     }
 
-    private int getSpecimensCreatedCount(String baseQry, Connection dbCon) throws SQLException {
-        PreparedStatement ps = dbCon.prepareCall("SELECT COUNT(DISTINCT spc.id) " + baseQry);
+    private int getSpecimensCreatedCount(String baseQry, Connection dbCon)
+        throws SQLException {
+        PreparedStatement ps = dbCon
+            .prepareCall("SELECT COUNT(DISTINCT spc.id) " + baseQry);
         ResultSet rs = doQuery(ps);
         rs.next();
         return rs.getInt(1);
     }
 
-    private int getSpecimensScanAssignedCount(String baseQry, Connection dbCon) throws SQLException {
-        PreparedStatement ps = dbCon.prepareCall("SELECT COUNT(DISTINCT spc.id) " + baseQry
-            + " AND spos.id is not null");
+    private int getSpecimensScanAssignedCount(String baseQry, Connection dbCon)
+        throws SQLException {
+        PreparedStatement ps = dbCon
+            .prepareCall("SELECT COUNT(DISTINCT spc.id) " + baseQry
+                + " AND spos.id is not null");
         ResultSet rs = doQuery(ps);
         rs.next();
         return rs.getInt(1);
@@ -292,15 +319,19 @@ public class V390DoubleEntryStats {
 
     private Map<String, Object[]> getSpecimens(String baseQry, Connection dbCon)
         throws SQLException {
-        PreparedStatement ps = dbCon.prepareCall(SELECT_DETAILS_CLAUSE + baseQry + ORDER_BY_CLAUSE);
+        PreparedStatement ps = dbCon.prepareCall(SELECT_DETAILS_CLAUSE
+            + baseQry + ORDER_BY_CLAUSE);
         ResultSet rs = doQuery(ps);
 
         Map<String, Object[]> results = new LinkedHashMap<String, Object[]>();
         while (rs.next()) {
-            results.put(rs.getString(7),
-                new Object[] { rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4),
-                    rs.getString(5), rs.getString(6), rs.getString(7), rs.getString(8),
-                    rs.getString(9), rs.getString(10), rs.getString(11), rs.getString(12),
+            results.put(
+                rs.getString(7),
+                new Object[] { rs.getString(1), rs.getString(2),
+                    rs.getString(3), rs.getString(4), rs.getString(5),
+                    rs.getString(6), rs.getString(7), rs.getString(8),
+                    rs.getString(9), rs.getString(10),
+                    rs.getString(11), rs.getString(12),
                     rs.getString(13), });
         }
         return results;
@@ -309,7 +340,7 @@ public class V390DoubleEntryStats {
     private ResultSet doQuery(PreparedStatement ps) throws SQLException {
         ps.setString(1, DATE_START);
         ps.setString(2, DATE_END);
-        log.debug("getStudiesCount: {}", ps);
+        log.trace("getStudiesCount: {}", ps);
         return ps.executeQuery();
     }
 
