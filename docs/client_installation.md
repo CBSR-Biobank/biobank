@@ -11,7 +11,7 @@ computer, the Biobank client will not overwrite your current Java installation.
 
 The latest version of the client can be downloaded from here:
 
-* [Biobank v3.9.0.rc5](http://aicml-med.cs.ualberta.ca/CBSR/Biobank_v3.9.0/)
+* [Biobank v3.9.1](http://aicml-med.cs.ualberta.ca/CBSR/Biobank_v3.9.1/)
 
 If you are connecting to CBSR's Biobank server you have to use the following version:
 
