@@ -28,7 +28,7 @@
 	sudo service mysql start
 	```
 
-If the MySQL server doesn't start, you can see the errors of your mysql server in /var/log/mysql/error.log.
+If the MySQL server doesn't start, you can see the errors of your mysql server in `/var/log/mysql/error.log`.
 
 ****
 
