@@ -46,4 +46,6 @@ For further information or to request a demonstration of the software you may em
 1.  [Client scanning decoding](docs/client_scanning_and_decoding.md): How to use the client to decode
     microwell plate images that contain tubes with 2D barcodes.
 
+1. [Client error logs](docs/client_error_logs.md): How to send the software team the *client error
+   logs* to help debug a software error.
 
