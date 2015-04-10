@@ -67,9 +67,6 @@ public class ContainerDisplayWidget extends ImageCanvas {
      * @param name
      * @param containerDisplay
      * @param cellStatus
-     * @param manageOwnSize When set to true, the size of the widget depends on
-     *            {@link containerDisplay}. Set this to false to have the the image displayed with
-     *            scroll bars (when needed).
      */
     @SuppressWarnings("nls")
     public ContainerDisplayWidget(
@@ -143,6 +140,12 @@ public class ContainerDisplayWidget extends ImageCanvas {
             name,
             getContainerDisplayFromType(name, null, true),
             null);
+    }
+
+    @Override
+    public void dispose() {
+        multiSelectionManager.disableMultiSelection();
+        super.dispose();
     }
 
     @SuppressWarnings("nls")

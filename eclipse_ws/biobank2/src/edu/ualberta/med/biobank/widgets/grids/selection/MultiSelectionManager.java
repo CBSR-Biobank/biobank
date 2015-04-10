@@ -10,22 +10,21 @@ import java.util.TreeMap;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
-import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
-import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.events.MouseTrackListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
 import edu.ualberta.med.biobank.widgets.grids.well.AbstractUIWell;
 
-public class MultiSelectionManager {
+public class MultiSelectionManager implements MouseListener, MouseTrackListener, KeyListener {
+
+    private static Logger log = LoggerFactory.getLogger(MultiSelectionManager.class.getName());
 
     private final ContainerDisplayWidget container;
-
-    private MouseListener selectionMouseListener;
-    private MouseTrackListener selectionMouseTrackListener;
 
     private enum SelectionMode {
         NONE, MULTI, RANGE;
@@ -35,8 +34,12 @@ public class MultiSelectionManager {
     private SelectionMode selectionMode = SelectionMode.NONE;
 
     private final Map<RowColPos, AbstractUIWell> selectedCells;
-    private AbstractUIWell lastSelectedCell;
     private final List<MultiSelectionListener> listeners;
+
+    private AbstractUIWell lastSelectedCell;
+
+    // the cell the user selected by pressing the left mouse button
+    private AbstractUIWell lastAnchorCell = null;
 
     private MultiSelectionSpecificBehaviour specificBehaviour;
 
@@ -57,19 +60,23 @@ public class MultiSelectionManager {
     }
 
     public void enableMultiSelection(MultiSelectionSpecificBehaviour t) {
-        initListeners();
         this.specificBehaviour = t;
-        container.addMouseListener(selectionMouseListener);
-        container.addMouseTrackListener(selectionMouseTrackListener);
+        container.addMouseListener(this);
+        container.addMouseTrackListener(this);
+        container.addKeyListener(this);
         enabled = true;
     }
 
     public void disableMultiSelection() {
-        container.removeMouseListener(selectionMouseListener);
-        container.removeMouseTrackListener(selectionMouseTrackListener);
+        container.removeMouseListener(this);
+        container.removeMouseTrackListener(this);
+        container.removeKeyListener(this);
         clearMultiSelection();
-        for (AbstractUIWell cell : container.getCells().values()) {
-            specificBehaviour.removeSelection(cell);
+        Map<RowColPos, ? extends AbstractUIWell> cells = container.getCells();
+        if (cells != null) {
+            for (AbstractUIWell cell : cells.values()) {
+                specificBehaviour.removeSelection(cell);
+            }
         }
         enabled = false;
     }
@@ -78,8 +85,10 @@ public class MultiSelectionManager {
         clearMultiSelection(true);
     }
 
+    @SuppressWarnings("nls")
     public void clearMultiSelection(boolean notify) {
         for (AbstractUIWell cell : selectedCells.values()) {
+            log.debug("clearMultiSelection: unselecting cell " + cell.getPositionStr());
             cell.setSelected(false);
         }
         selectedCells.clear();
@@ -92,8 +101,16 @@ public class MultiSelectionManager {
         notifyListeners(new MultiSelectionEvent(this, selectedCells.size()));
     }
 
+    @SuppressWarnings("nls")
     private void addAllCellsInRange(AbstractUIWell cell) {
-        AbstractUIWell firstCell = lastSelectedCell;
+        if (lastAnchorCell == null) {
+            lastAnchorCell = cell;
+        }
+
+        log.trace("addAllCellsInRange: cell: " + cell.getPositionStr());
+        log.trace("addAllCellsInRange: lastSelectedCell: " + lastAnchorCell.getPositionStr());
+
+        AbstractUIWell firstCell = lastAnchorCell;
         int startRow = firstCell.getRow();
         int endRow = cell.getRow();
         if (startRow > endRow) {
@@ -108,98 +125,16 @@ public class MultiSelectionManager {
                 endCol = firstCell.getCol();
             }
             for (int indexCol = startCol; indexCol <= endCol; indexCol++) {
-                AbstractUIWell cellToAdd = container.getCells().get(
-                    new RowColPos(indexRow, indexCol));
+                AbstractUIWell cellToAdd =
+                    container.getCells().get(new RowColPos(indexRow, indexCol));
                 if (cellToAdd != null
                     && specificBehaviour.isSelectable(cellToAdd)) {
                     if (!selectedCells.values().contains(cellToAdd)) {
+                        log.trace("addAllCellsInRange: selected: " + cellToAdd.getPositionStr());
                         selectCell(cellToAdd);
                     }
                 }
             }
-        }
-    }
-
-    private void initListeners() {
-        if (selectionMouseListener == null) {
-            selectionMouseListener = new MouseAdapter() {
-                @Override
-                public void mouseDown(MouseEvent e) {
-                    selectionTrackOn = true;
-                    AbstractUIWell cell = container.getObjectAtCoordinates(e.x, e.y);
-                    if ((cell != null) && specificBehaviour.isSelectable(cell)) {
-                        switch (selectionMode) {
-                        case MULTI:
-                            if (selectedCells.containsValue(cell)) {
-                                selectedCells.remove(new RowColPos(cell.getRow(), cell.getCol()));
-                                cell.setSelected(false);
-                            } else {
-                                selectCell(cell);
-                            }
-                            break;
-                        case RANGE:
-                            if (selectedCells.size() > 0) {
-                                addAllCellsInRange(cell);
-                            } else {
-                                selectCell(cell);
-                            }
-                            break;
-                        default:
-                            boolean alreadySelected = selectedCells.containsValue(cell);
-                            if (alreadySelected && (selectedCells.size() == 1)) {
-                                selectedCells.clear();
-                                cell.setSelected(false);
-                                lastSelectedCell = null;
-                            } else {
-                                clearMultiSelection(false);
-                                selectCell(cell);
-                            }
-                            break;
-                        }
-                        notifyListeners();
-                        container.updateCells();
-                    }
-                }
-
-                @Override
-                public void mouseUp(MouseEvent e) {
-                    selectionTrackOn = false;
-                }
-            };
-        }
-
-        if (selectionMouseTrackListener == null) {
-            selectionMouseTrackListener = new MouseTrackAdapter() {
-                @Override
-                public void mouseHover(MouseEvent e) {
-                    if (selectionTrackOn) {
-                        AbstractUIWell cell = container.getObjectAtCoordinates(e.x, e.y);
-                        if (cell != null && !cell.equals(lastSelectedCell)) {
-                            selectCell(cell);
-                            notifyListeners();
-                            container.redraw();
-                        }
-                    }
-                }
-            };
-
-            container.addKeyListener(new KeyListener() {
-                @Override
-                public void keyPressed(KeyEvent e) {
-                    if (e.keyCode == SWT.SHIFT) {
-                        selectionMode = SelectionMode.RANGE;
-                    } else if (e.keyCode == SWT.CTRL) {
-                        selectionMode = SelectionMode.MULTI;
-                    }
-                }
-
-                @Override
-                public void keyReleased(KeyEvent e) {
-                    if (e.keyCode == SWT.SHIFT || e.keyCode == SWT.CTRL) {
-                        selectionMode = SelectionMode.NONE;
-                    }
-                }
-            });
         }
     }
 
@@ -225,6 +160,99 @@ public class MultiSelectionManager {
 
     public boolean isEnabled() {
         return enabled;
+    }
+
+    @Override
+    public void mouseDoubleClick(MouseEvent e) {
+        // do nothing
+    }
+
+    @SuppressWarnings("nls")
+    @Override
+    public void mouseDown(MouseEvent e) {
+        selectionTrackOn = true;
+        AbstractUIWell cell = container.getObjectAtCoordinates(e.x, e.y);
+        if ((cell != null) && specificBehaviour.isSelectable(cell)) {
+            switch (selectionMode) {
+            case MULTI:
+                if (selectedCells.containsValue(cell)) {
+                    selectedCells.remove(new RowColPos(cell.getRow(), cell.getCol()));
+                    cell.setSelected(false);
+                } else {
+                    selectCell(cell);
+                }
+                break;
+            case RANGE:
+                if (selectedCells.size() > 0) {
+                    addAllCellsInRange(cell);
+                } else {
+                    selectCell(cell);
+                }
+                break;
+            default:
+                boolean alreadySelected = selectedCells.containsValue(cell);
+                if (alreadySelected && (selectedCells.size() == 1)) {
+                    selectedCells.clear();
+                    cell.setSelected(false);
+                    lastSelectedCell = null;
+                } else {
+                    log.debug("clearing muliple selection");
+                    clearMultiSelection(false);
+                    selectCell(cell);
+                }
+                lastAnchorCell = cell;
+                break;
+            }
+            notifyListeners();
+            container.updateCells();
+        }
+    }
+
+    @Override
+    public void mouseUp(MouseEvent e) {
+        selectionTrackOn = false;
+    }
+
+    @Override
+    public void mouseEnter(MouseEvent e) {
+        // do nothing
+    }
+
+    @Override
+    public void mouseExit(MouseEvent e) {
+        // do nothing
+    }
+
+    @Override
+    public void mouseHover(MouseEvent e) {
+        if (selectionTrackOn) {
+            AbstractUIWell cell = container.getObjectAtCoordinates(e.x, e.y);
+            if (cell != null && !cell.equals(lastSelectedCell)) {
+                selectCell(cell);
+                notifyListeners();
+                container.redraw();
+            }
+        }
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        if (e.keyCode == SWT.SHIFT) {
+            selectionMode = SelectionMode.RANGE;
+        } else if (e.keyCode == SWT.CTRL) {
+            selectionMode = SelectionMode.MULTI;
+        }
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+        if (e.keyCode == SWT.SHIFT || e.keyCode == SWT.CTRL) {
+            selectionMode = SelectionMode.NONE;
+        } else if (e.keyCode == SWT.ESC) {
+            clearMultiSelection(false);
+            notifyListeners();
+            container.updateCells();
+        }
     }
 
 }

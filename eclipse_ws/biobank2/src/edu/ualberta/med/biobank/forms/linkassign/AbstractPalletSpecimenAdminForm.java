@@ -24,7 +24,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +46,7 @@ import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
 import edu.ualberta.med.biobank.widgets.grids.well.SpecimenCell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
+import edu.ualberta.med.scannerconfig.PalletDimensions;
 import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -79,6 +79,8 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
     protected ComboViewer profilesCombo;
 
     protected boolean plateMismatchErrorReported = false;
+
+    protected final Set<ContainerType> palletContainerTypes = new HashSet<ContainerType>();
 
     // global state of the pallet process
     protected UICellStatus currentScanState = UICellStatus.NOT_INITIALIZED;
@@ -223,7 +225,6 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
 
     @SuppressWarnings("nls")
     protected void createScanButton(Composite parent) {
-        // TR: button text
         scanButton = toolkit.createButton(parent, DECODE_PALLET_BUTTON_LABEL, SWT.PUSH);
         GridData gd = new GridData();
         gd.widthHint = 100;
@@ -378,15 +379,6 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
         return palletScanManagement.getScansCount() > 0;
     }
 
-    protected void focusControl(final Control control) {
-        Display.getDefault().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                control.setFocus();
-            }
-        });
-    }
-
     protected void initCellsWithContainer(ContainerWrapper currentMultipleContainer) {
         if (currentMultipleContainer != null) {
             palletScanManagement.initCellsWithContainer(currentMultipleContainer);
@@ -403,6 +395,10 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
 
     protected void setFakeContainerType(int rows, int cols) {
         palletScanManagement.setFakeContainerType(rows, cols);
+    }
+
+    protected void initPalletContainerTypes() throws ApplicationException {
+        palletContainerTypes.addAll(AbstractLinkAssignEntryForm.getPalletContainerTypes());
     }
 
     /**
@@ -435,6 +431,12 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
                 inventoryIds)).getList();
 
         return SpecimenSetGetInfoAction.toMap(specimenData);
+    }
+
+    public PalletDimensions getCurrentPlateDimensions() {
+        ContainerType containerType = getContainerType();
+        return PalletScanManagement.capacityToPlateDimensions(containerType.getCapacity());
+
     }
 
     /**

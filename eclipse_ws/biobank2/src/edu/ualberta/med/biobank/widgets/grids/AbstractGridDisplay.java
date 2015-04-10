@@ -405,7 +405,7 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
     public RowColPos getPositionAtCoordinates(int x, int y) {
         int row = y / getCellHeight();
         int col = x / getCellWidth();
-        log.debug("getPositionAtCoordinates: row: {}, col: {}", row, col);
+        log.trace("getPositionAtCoordinates: row: {}, col: {}", row, col);
         if ((row >= 0) && (row < getRows()) && (col >= 0) && (col < getCols())) {
             return new RowColPos(row, col);
         }

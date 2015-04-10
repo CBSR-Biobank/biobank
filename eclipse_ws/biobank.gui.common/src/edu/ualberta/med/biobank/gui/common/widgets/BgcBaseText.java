@@ -9,6 +9,7 @@ import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.events.TypedEvent;
 import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
@@ -192,5 +193,9 @@ public class BgcBaseText extends BgcBaseWidget {
     @Override
     public void setToolTipText(String string) {
         textWidget.setToolTipText(string);
+    }
+
+    public boolean isEventSource(TypedEvent event) {
+        return event.widget == textWidget;
     }
 }

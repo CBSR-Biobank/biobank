@@ -46,13 +46,13 @@ import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 
 public abstract class BgcBaseDialog extends TitleAreaDialog {
 
+    // private static Logger log = LoggerFactory.getLogger(BgcBaseDialog.class.getName());
+
     protected BgcWidgetCreator widgetCreator;
 
     protected Boolean okButtonEnabled;
 
-    protected boolean setupFinished = false;
-
-    private boolean closed;
+    private boolean closed = false;
 
     public BgcBaseDialog(Shell parentShell) {
         super(parentShell);
@@ -135,7 +135,6 @@ public abstract class BgcBaseDialog extends TitleAreaDialog {
             new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
 
         bindChangeListener();
-        setupFinished = true;
         return parentComposite;
     }
 
@@ -181,9 +180,7 @@ public abstract class BgcBaseDialog extends TitleAreaDialog {
             setErrorMessage(null);
             setOkButtonEnabled(true);
         } else {
-            if (setupFinished) {
-                setErrorMessage(status.getMessage());
-            }
+            setErrorMessage(status.getMessage());
             setOkButtonEnabled(false);
         }
     }
@@ -196,10 +193,11 @@ public abstract class BgcBaseDialog extends TitleAreaDialog {
 
     @Override
     public void setErrorMessage(String newErrorMessage) {
-        if (!closed)
+        if (!closed) {
             // test that dialog is not closed to avoid sometimes
             // NullPointerException or disposed problems.
             super.setErrorMessage(newErrorMessage);
+        }
     }
 
     protected void setOkButtonEnabled(boolean enabled) {

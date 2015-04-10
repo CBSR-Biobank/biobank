@@ -62,6 +62,9 @@ public class CollectionEventGetSourceSpecimensAction implements Action<ListResul
                 spcType.getName();
             }
             spc.getTopSpecimen().getOriginInfo().getCenter().getName();
+
+            // study needs to be loaded when used by SpecimenLinkAndAssign
+            spc.getCollectionEvent().getPatient().getStudy().getName();
         }
 
         return new ListResult<Specimen>(specimens);

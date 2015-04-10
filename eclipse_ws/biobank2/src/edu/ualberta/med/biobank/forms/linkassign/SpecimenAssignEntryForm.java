@@ -66,6 +66,7 @@ import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.helpers.ScanAssignHelper;
 import edu.ualberta.med.biobank.model.AbstractPosition;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Capacity;
@@ -78,7 +79,6 @@ import edu.ualberta.med.biobank.validators.StringLengthValidator;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.grids.well.SpecimenCell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
-import edu.ualberta.med.scannerconfig.PalletDimensions;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 /**
@@ -114,7 +114,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     @SuppressWarnings("nls")
     private static final String PALLET_TYPES_BINDING = "palletType-binding";
 
-    protected static boolean useScanner = true;
+    protected static boolean usingFlatbedScanner = true;
 
     // for single specimen assign
     private Button cabinetCheckButton;
@@ -135,12 +135,11 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         Boolean.class);
 
     // for multiple specimens assign
-    private final ContainerWrapper currentMultipleContainer;
+    private ContainerWrapper currentMultipleContainer;
     protected boolean palletproductBarcodeTextModified;
     private NonEmptyStringValidator productBarcodeValidator;
-    protected boolean isModifyingMultipleFields;
     private NonEmptyStringValidator palletLabelValidator;
-    private BgcBaseText palletPositionText;
+    private BgcBaseText palletLabelText;
     protected boolean useNewProductBarcode;
     private ComboViewer palletTypesViewer;
     protected boolean palletPositionTextModified;
@@ -151,8 +150,6 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     private Label palletproductBarcodeLabel;
     private boolean isNewMultipleContainer;
     private boolean checkingMultipleContainerPosition;
-
-    private boolean initWithProduct = false;
 
     protected SpecimenAssignResInfo res;
 
@@ -278,7 +275,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                         // compatibility with old cabinet specimens imported
                         // 4 letters specimens are now C+4letters
                         inventoryIdText.setText("C" + inventoryIdText.getText());
-                        focusControl(inventoryIdText);
+                        BgcPlugin.focusControl(inventoryIdText);
                     }
                 }
             }
@@ -308,7 +305,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                         BgcPlugin.openError(
                             // TR: dialog title
                             i18n.tr("Move - specimen error"), ex);
-                        focusControl(inventoryIdText);
+                        BgcPlugin.focusControl(inventoryIdText);
 
                     }
                 inventoryIdModified = false;
@@ -419,11 +416,11 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             displayOldSingleFields(false);
             // TR: text box text
             positionString = i18n.trc("position string", "none");
-            focusControl(newSinglePositionText);
+            BgcPlugin.focusControl(newSinglePositionText);
         } else {
             displayOldSingleFields(true);
             oldSinglePositionCheckText.setText(oldSinglePositionCheckText.getText());
-            focusControl(oldSinglePositionCheckText);
+            BgcPlugin.focusControl(oldSinglePositionCheckText);
         }
         oldSinglePositionText.setText(positionString);
         appendLog(NLS.bind("Specimen {0}: current position={1}",
@@ -516,7 +513,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                         new Runnable() {
                             @Override
                             public void run() {
-                                initContainersFromPosition(newSinglePositionText, null);
+                                ScanAssignHelper.getContainerByLabel(newSinglePositionText.getText());
                                 checkPositionAndSpecimen(inventoryIdText, newSinglePositionText);
                             }
                         });
@@ -595,15 +592,33 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             // TR: label
             i18n.tr("Container product barcode"));
         palletproductBarcodeText = (BgcBaseText) createBoundWidget(
-            multipleOptionsFields, BgcBaseText.class, SWT.NONE,
-            palletproductBarcodeLabel, null, currentMultipleContainer,
+            multipleOptionsFields,
+            BgcBaseText.class,
+            SWT.NONE,
+            palletproductBarcodeLabel,
+            null,
+            currentMultipleContainer,
             ContainerPeer.PRODUCT_BARCODE.getName(),
-            productBarcodeValidator, PRODUCT_BARCODE_BINDING);
+            productBarcodeValidator,
+            PRODUCT_BARCODE_BINDING);
         palletproductBarcodeText.addKeyListener(textFieldKeyListener);
         gd = new GridData();
         gd.horizontalAlignment = SWT.FILL;
         palletproductBarcodeText.setLayoutData(gd);
 
+        palletproductBarcodeText.addModifyListener(new ModifyListener() {
+            @Override
+            public void modifyText(ModifyEvent e) {
+                if (!checkingMultipleContainerPosition) {
+                    palletproductBarcodeTextModified = true;
+                    palletTypesViewer.setInput(null);
+                    // log.debug("clearing selections in palletTypesViewer");
+                    currentMultipleContainer.setContainerType(null);
+                    palletLabelText.setEnabled(true);
+                    palletLabelText.setText(StringUtil.EMPTY_STRING);
+                }
+            }
+        });
         palletproductBarcodeText.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
@@ -613,69 +628,69 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                     boolean ok = checkMultipleScanBarcode();
                     setCanLaunchScan(ok);
                     if (!ok) {
-                        focusControl(palletproductBarcodeText);
+                        BgcPlugin.focusControl(palletproductBarcodeText);
                     }
                 }
                 palletproductBarcodeTextModified = false;
             }
         });
-        palletproductBarcodeText.addModifyListener(new ModifyListener() {
-            @Override
-            public void modifyText(ModifyEvent e) {
-                if (!checkingMultipleContainerPosition) {
-                    palletproductBarcodeTextModified = true;
-                    palletTypesViewer.setInput(null);
-                    // log.debug("clearing selections in palletTypesViewer");
-                    currentMultipleContainer.setContainerType(null);
-                    palletPositionText.setEnabled(true);
-                    palletPositionText.setText(StringUtil.EMPTY_STRING);
-                }
-            }
-        });
 
-        palletPositionText = (BgcBaseText) createLabelledWidget(
+        palletLabelText = (BgcBaseText) createLabelledWidget(
             multipleOptionsFields, BgcBaseText.class, SWT.NONE,
             // TR: label
             i18n.tr("Container label"), null);
-        palletPositionText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
+        palletLabelText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
         gd = new GridData();
         gd.horizontalAlignment = SWT.FILL;
-        palletPositionText.setLayoutData(gd);
-        palletPositionText.addFocusListener(new FocusAdapter() {
+        palletLabelText.setLayoutData(gd);
+        palletLabelText.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
-                if (palletPositionText.isEnabled() && palletPositionTextModified
-                    && palletLabelValidator.validate(palletPositionText.getText())
-                        .equals(Status.OK_STATUS)) {
+                final String palletLabel = palletLabelText.getText();
+
+                if (palletLabelText.isEnabled() && palletPositionTextModified
+                    && palletLabelValidator.validate(palletLabel).equals(Status.OK_STATUS)) {
                     BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
                         @Override
                         public void run() {
-                            boolean ok = (initWithProduct || checkMultipleContainerPosition());
+                            checkingMultipleContainerPosition = true;
+                            ContainerWrapper container =
+                                ScanAssignHelper.getOrCreateContainerByLabel(
+                                    palletLabel, currentMultipleContainer);
+
+                            if (container == null) {
+                                appendLog(NLS.bind(
+                                    "ERROR: could not get container with label {0}", palletLabel));
+                                return;
+                            }
+
+                            currentMultipleContainer = container;
+
+                            boolean ok = checkAndUpdateContainer(container, palletLabel);
                             setCanLaunchScan(ok);
                             initCellsWithContainer(currentMultipleContainer);
-                            currentMultipleContainer.setLabel(palletPositionText.getText());
+                            currentMultipleContainer.setLabel(palletLabel);
                             if (!ok) {
-                                focusControl(palletPositionText);
+                                BgcPlugin.focusControl(palletLabelText);
                                 showOnlyPallet(true);
                             } else if (palletTypesViewer.getCombo().getEnabled()) {
-                                focusControl(palletTypesViewer.getCombo());
+                                BgcPlugin.focusControl(palletTypesViewer.getCombo());
                             }
                             palletPositionTextModified = false;
+                            checkingMultipleContainerPosition = false;
                         }
                     });
                 }
                 palletPositionTextModified = false;
             }
         });
-        palletPositionText.addModifyListener(new ModifyListener() {
+        palletLabelText.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent e) {
-                if (!isModifyingMultipleFields) {
-                    palletPositionTextModified = true;
-                    palletTypesViewer.setInput(null);
-                    // log.debug("clearing selections in palletTypesViewer");
-                    currentMultipleContainer.setContainerType(null);
-                }
+                palletPositionTextModified = true;
+                palletTypesViewer.setInput(null);
+                // log.debug("clearing selections in palletTypesViewer");
+                currentMultipleContainer.setContainerType(null);
             }
         });
 
@@ -684,68 +699,20 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     }
 
     @SuppressWarnings("nls")
-    private boolean checkMultipleContainerPosition() {
-        checkingMultipleContainerPosition = true;
-        initContainersFromPosition(palletPositionText, null);
-
-        if ((container == null) && parentContainers.isEmpty()) {
-            // no container selected
-            return false;
-        }
-
-        if (container != null) {
-            container.setLabel(palletPositionText.getText());
-            return checkAndUpdateContainer();
-        }
-
-        ContainerWrapper parentContainer = parentContainers.get(0);
+    private boolean checkAndUpdateContainer(ContainerWrapper container, String palletLabel) {
         try {
-            container = parentContainer.getChildByLabel(
-                palletPositionText.getText().substring(parentContainer.getLabel().length()));
+            ContainerTypeWrapper typeSelection;
+            List<ContainerTypeWrapper> possibleTypes =
+                ScanAssignHelper.getContainerTypes(container, usingFlatbedScanner);
 
-            if (container == null) {
-                // no container at this position right now, create one
-                String childLabel = palletPositionText.getText().substring(
-                    parentContainer.getLabel().length());
-                parentContainer.addChild(childLabel, currentMultipleContainer);
-                container = currentMultipleContainer;
-                container.setParent(parentContainer, parentContainer.getPositionFromLabelingScheme(
-                    childLabel));
-            }
-
-            checkAndUpdateContainer();
-        } catch (Exception ex) {
-            BgcPlugin.openError(
-                // TR: dialog title
-                i18n.tr("Values validation"), ex);
-            appendLog(NLS.bind("ERROR: {0}", ex.getMessage()));
-            return false;
-        }
-        return true;
-    }
-
-    @SuppressWarnings("nls")
-    private boolean checkAndUpdateContainer() {
-        try {
-            List<ContainerTypeWrapper> possibleTypes = new ArrayList<ContainerTypeWrapper>(0);
-            ContainerTypeWrapper typeSelection = container.getContainerType();
-            ContainerWrapper parentContainer = container.getParentContainer();
-
-            if (parentContainer != null) {
-                possibleTypes.addAll(getPossibleTypes(
-                    parentContainer.getContainerType().getChildContainerTypeCollection()));
-                if (possibleTypes.size() == 1) {
-                    typeSelection = possibleTypes.get(0);
-                }
+            if (possibleTypes.size() == 1) {
+                typeSelection = possibleTypes.get(0);
             } else {
-                possibleTypes.add(container.getContainerType());
+                typeSelection = container.getContainerType();
             }
-
-            boolean enableTypesCombo = true;
 
             if (!checkExistingContainerValid(container)) return false;
 
-            enableTypesCombo = false;
             String newBarcode = currentMultipleContainer.getProductBarcode();
 
             currentMultipleContainer.initObjectWith(container);
@@ -753,13 +720,17 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                 currentMultipleContainer.reset();
             }
 
-            logContainerProductBarcodeUpdate(container, newBarcode);
+            String msg = ScanAssignHelper.containerProductBarcodeUpdateLogMessage(
+                container, newBarcode, palletLabel);
+            if (!msg.isEmpty()) {
+                appendLog(msg);
+            }
 
             if ((newBarcode != null) && !newBarcode.isEmpty()) {
                 palletproductBarcodeText.setText(newBarcode);
             }
 
-            palletTypesViewer.getCombo().setEnabled(enableTypesCombo);
+            palletTypesViewer.getCombo().setEnabled(false);
             palletTypesViewer.setInput(possibleTypes);
             if (possibleTypes.isEmpty()) {
                 BgcPlugin.openAsyncError(
@@ -784,8 +755,6 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                 i18n.tr("Values validation"), ex);
             appendLog(NLS.bind("ERROR: {0}", ex.getMessage()));
             return false;
-        } finally {
-            checkingMultipleContainerPosition = false;
         }
 
         return true;
@@ -793,117 +762,41 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
 
     @SuppressWarnings("nls")
     private boolean checkExistingContainerValid(ContainerWrapper container) {
-        if (container == null) {
-            throw new IllegalStateException("container is null");
-        }
+        switch (ScanAssignHelper.checkExistingContainerValid(container)) {
+        case VALID:
+            String productBarcode = container.getProductBarcode();
+            if ((productBarcode != null) && !productBarcode.isEmpty()
+                && (currentMultipleContainer.getProductBarcode() != null)) {
+                if (!productBarcode.equals(currentMultipleContainer.getProductBarcode())) {
+                    ScanAssignHelper.containerPositionError(
+                        activityLogger,
+                        container,
+                        productBarcode,
+                        palletLabelText.getText());
+                    return false;
+                }
+            }
+            return true;
 
-        // only perform checks for existing containers
-        if (container.isNew()) return true;
+        case IS_NEW:
+            return true;
 
-        ContainerTypeWrapper containerType = container.getContainerType();
-        if ((containerType != null) && containerType.getSpecimenTypeCollection().isEmpty()) {
+        case DOES_NOT_HOLD_SPECIMENS:
             BgcPlugin.openError(
                 // TR: dialog title
                 i18n.tr("Error"),
                 // TR: dialog message
                 i18n.tr("Container selected can't hold specimens"));
             return false;
+
+        default:
+            throw new IllegalArgumentException("container is invalid");
         }
-
-        String productBarcode = container.getProductBarcode();
-        if ((productBarcode != null) && !productBarcode.isEmpty()
-            && (currentMultipleContainer.getProductBarcode() != null)) {
-            if (!productBarcode.equals(currentMultipleContainer.getProductBarcode())) {
-                containerPositionError(productBarcode);
-                return false;
-            }
-        }
-        return true;
-    }
-
-    @SuppressWarnings("nls")
-    private void containerPositionError(String palletProductBarcode) {
-        BgcPlugin.openError(
-            // TR: dialog title
-            i18n.tr("Position error"),
-            // TR: dialog message
-            i18n.tr("A pallet with product barcode \"{0}\" is already at position {1}"
-                + "(site {2})",
-                palletProductBarcode, palletPositionText.getText(),
-                currentMultipleContainer.getSite().getNameShort()));
-        appendLog(MessageFormat.format(
-            "A pallet with product barcode \"{0}\" is already at position {1}  (site {2})",
-            palletProductBarcode, palletPositionText.getText(),
-            currentMultipleContainer.getSite().getNameShort()));
-    }
-
-    /**
-     * Logs that the container's product barcode will be updated.
-     */
-    @SuppressWarnings("nls")
-    private void logContainerProductBarcodeUpdate(ContainerWrapper container,
-        String palletProductBarcode) {
-        // only perform checks for existing containers
-        if (container.isNew()) return;
-
-        if (container.getContainerType().getSpecimenTypeCollection().isEmpty()) {
-            throw new IllegalStateException(
-                "invalid container, cannot hold specimens");
-        }
-
-        // container has no product barcode: update it with the one entered by
-        // user
-        if (container.hasSpecimens()) {
-            // Position already physically used but no barcode was
-            // set (old database compatibility)
-            appendLog(MessageFormat.format(
-                "Position {0} already used with no product barcode and with type {1}."
-                    + " Product barcode {2} will be set.",
-                palletPositionText.getText(), container.getContainerType()
-                    .getName(), palletProductBarcode));
-            return;
-        }
-
-        // Position initialised but not physically used
-        appendLog(MessageFormat.format(
-            "Position {0} initialised with type {1} and free to be used",
-            palletPositionText.getText(), container.getContainerType().getName()));
-    }
-
-    /**
-     * is use scanner, want only 8*12 or 10*10 pallets. Also check the container type can hold
-     * specimens
-     */
-    private List<ContainerTypeWrapper> getPossibleTypes(
-        List<ContainerTypeWrapper> childContainerTypeCollection) {
-        List<ContainerTypeWrapper> palletTypes = new ArrayList<ContainerTypeWrapper>();
-        for (ContainerTypeWrapper type : childContainerTypeCollection) {
-            if (!type.getSpecimenTypeCollection().isEmpty()
-                && (!useScanner || isPalletScannable(type)))
-                palletTypes.add(type);
-        }
-        return palletTypes;
-    }
-
-    private boolean isPalletScannable(ContainerTypeWrapper ctype) {
-        for (PalletDimensions gridDimensions : PalletDimensions.values()) {
-            int rows = gridDimensions.getRows();
-            int cols = gridDimensions.getCols();
-            if (ctype.isPalletRowsCols(rows, cols))
-                return true;
-        }
-        return false;
-    }
-
-    private boolean isPalletScannable(ContainerWrapper container) {
-        return isPalletScannable(container.getContainerType());
     }
 
     @SuppressWarnings("nls")
     protected boolean checkMultipleScanBarcode() {
         try {
-            initWithProduct = false;
-
             Container qryContainer = new Container();
             qryContainer.setProductBarcode(currentMultipleContainer.getProductBarcode());
             List<Container> containers = SessionManager.getAppService().doAction(
@@ -922,13 +815,15 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                 SessionManager.getAppService(), containers.get(0));
             isNewMultipleContainer = false;
 
-            if (!isContainerValid(palletFoundWithProductBarcode)) return false;
+            if (!ScanAssignHelper.isContainerValid(
+                palletFoundWithProductBarcode, palletLabelText.getText())) {
+                return false;
+            }
 
             currentMultipleContainer.initObjectWith(palletFoundWithProductBarcode);
             currentMultipleContainer.reset();
-            initWithProduct = true;
 
-            palletPositionText.setText(palletFoundWithProductBarcode.getLabel());
+            palletLabelText.setText(palletFoundWithProductBarcode.getLabel());
 
             // display the type, which can't be modified.
             palletTypesViewer.getCombo().setEnabled(false);
@@ -944,7 +839,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                 palletFoundWithProductBarcode.getContainerType().getName()));
             // can't modify the position if exists already
 
-            palletPositionText.setEnabled(false);
+            palletLabelText.setEnabled(false);
         } catch (Exception ex) {
             BgcPlugin.openError(
                 // TR: dialog title
@@ -955,38 +850,10 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         return true;
     }
 
-    @SuppressWarnings("nls")
-    private boolean isContainerValid(ContainerWrapper palletContainer) {
-        // a container with this barcode exists
-        if (!isPalletScannable(palletContainer)) {
-            BgcPlugin.openAsyncError(
-                // TR: dialog title
-                i18n.tr("Values validation"),
-                // TR: dialog message
-                i18n.tr("A container with this barcode exists but is not a 8*12 or 10*10 container."));
-            return false;
-        }
-
-        if (!palletPositionText.getText().isEmpty()
-            && !palletPositionText.getText().equals(palletContainer.getLabel())) {
-            // a label was entered but is different from the one set to the pallet
-            // retrieved
-            BgcPlugin.openAsyncError(
-                // TR: dialog title
-                i18n.tr("Values validation"),
-                // TR: dialog message
-                i18n.tr("A pallet with barcode {0} is already used in position {1}.",
-                    palletContainer.getProductBarcode(),
-                    palletContainer.getFullInfoLabel()));
-            return false;
-        }
-        return true;
-    }
-
     @Override
     protected void defaultInitialisation() {
         super.defaultInitialisation();
-        boolean use = !mode.isSingleMode() && useScanner;
+        boolean use = !mode.isSingleMode() && usingFlatbedScanner;
         useScannerButton.setSelection(use);
         setUseScanner(use);
     }
@@ -994,7 +861,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     @SuppressWarnings("nls")
     @Override
     protected void setUseScanner(boolean use) {
-        useScanner = use;
+        usingFlatbedScanner = use;
         widgetCreator.showWidget(scanButton, use);
         widgetCreator.showWidget(palletproductBarcodeLabel, use);
         widgetCreator.showWidget(palletproductBarcodeText, use);
@@ -1024,8 +891,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
      * assign multiple: list of container types
      */
     @SuppressWarnings("nls")
-    private void createPalletTypesViewer(Composite parent)
-        throws ApplicationException {
+    private void createPalletTypesViewer(Composite parent) throws ApplicationException {
         initPalletContainerTypes();
         palletTypesViewer = widgetCreator.createComboViewer(
             parent,
@@ -1047,7 +913,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
 
                     Set<ContainerType> ctypes = new HashSet<ContainerType>(1);
                     ctypes.add(ctype.getWrappedObject());
-                    if (!useScanner) {
+                    if (!usingFlatbedScanner) {
                         displayPalletPositions();
                     }
                 }
@@ -1058,7 +924,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     @Override
     @SuppressWarnings("nls")
     protected void checkPalletContainerTypes() {
-        if (!isSingleMode() && useScanner && isPalletContainerTypesInvalid()) {
+        if (!isSingleMode() && usingFlatbedScanner && isPalletContainerTypesInvalid()) {
             throw new IllegalStateException("no pallets defined at this site");
         }
     }
@@ -1074,10 +940,10 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         if (mode.isSingleMode()) return true;
 
         IStructuredSelection selection = (IStructuredSelection) palletTypesViewer.getSelection();
-        return (!useScanner || scanMultipleWithHandheldInput)
-            && (!useScanner || productBarcodeValidator.validate(
+        return (!usingFlatbedScanner || scanMultipleWithHandheldInput)
+            && (!usingFlatbedScanner || productBarcodeValidator.validate(
                 palletproductBarcodeText.getText()).equals(Status.OK_STATUS))
-            && palletLabelValidator.validate(palletPositionText.getText()).equals(Status.OK_STATUS)
+            && palletLabelValidator.validate(palletLabelText.getText()).equals(Status.OK_STATUS)
             && !selection.isEmpty();
     }
 
@@ -1171,7 +1037,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             public void run() {
                 appendLog(MessageFormat.format(
                     "ASSIGNING: {0} specimens added to pallet {1} of site {2}",
-                    res.specimens.size(), palletPositionText.getText(),
+                    res.specimens.size(), palletLabelText.getText(),
                     currentMultipleContainer.getSite().getNameShort()));
             }
         });
@@ -1223,13 +1089,12 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         foundSpecNull.setValue(true);
         singleSpecimen.reset(); // reset internal values
         setDirty(false);
-        initWithProduct = false;
         if (mode.isSingleMode()) {
-            focusControl(inventoryIdText);
-        } else if (useScanner) {
-            focusControl(palletproductBarcodeText);
+            BgcPlugin.focusControl(inventoryIdText);
+        } else if (usingFlatbedScanner) {
+            BgcPlugin.focusControl(palletproductBarcodeText);
         } else {
-            focusControl(palletPositionText);
+            BgcPlugin.focusControl(palletLabelText);
         }
     }
 
@@ -1244,7 +1109,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         if (!resetAll) {
             // keep fields values
             productBarcode = palletproductBarcodeText.getText();
-            label = palletPositionText.getText();
+            label = palletLabelText.getText();
             type = currentMultipleContainer.getContainerType();
         } else {
             if (palletTypesViewer != null) {
@@ -1256,12 +1121,12 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             palletLabel.setText(i18n.tr("Pallet"));
             palletWidget.setCells(null);
         }
-        setScanHasBeenLaunched(isSingleMode() || !useScanner);
+        setScanHasBeenLaunched(isSingleMode() || !usingFlatbedScanner);
         initPalletValues();
 
         palletproductBarcodeText.setText(productBarcode);
         productBarcodeValidator.validate(productBarcode);
-        palletPositionText.setText(label);
+        palletLabelText.setText(label);
         palletLabelValidator.validate(label);
         currentMultipleContainer.setContainerType(type);
         if (resetAll) {
@@ -1278,10 +1143,10 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         widgetCreator.setBinding(OLD_SINGLE_POSITION_BINDING, isSingleMode);
         oldSinglePositionCheckText.setText("?");
         widgetCreator.setBinding(NEW_SINGLE_POSITION_BINDING, isSingleMode);
-        widgetCreator.setBinding(PRODUCT_BARCODE_BINDING, !isSingleMode && useScanner);
+        widgetCreator.setBinding(PRODUCT_BARCODE_BINDING, !isSingleMode && usingFlatbedScanner);
         widgetCreator.setBinding(PALLET_TYPES_BINDING, !isSingleMode);
         super.setBindings(isSingleMode);
-        setScanHasBeenLaunched(isSingleMode || !useScanner);
+        setScanHasBeenLaunched(isSingleMode || !usingFlatbedScanner);
         log.debug("setBindings: isSingleMode" + isSingleMode);
         checkPalletContainerTypes();
         setCanLaunchScan(true);
@@ -1292,10 +1157,10 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         boolean single = mode.isSingleMode();
         if (single) {
             setFirstControl(inventoryIdText);
-        } else if (useScanner) {
+        } else if (usingFlatbedScanner) {
             setFirstControl(palletproductBarcodeText);
         } else {
-            setFirstControl(palletPositionText);
+            setFirstControl(palletLabelText);
         }
 
         try {
@@ -1377,7 +1242,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             hotelWidget.setStorageSize(capacity.getRowCapacity(), capacity.getColCapacity());
             hotelWidget.redraw();
 
-            palletLabel.setText(palletPositionText.getText());
+            palletLabel.setText(palletLabelText.getText());
 
             setContainerType(currentMultipleContainer.getContainerType().getWrappedObject());
             palletWidget.setCells(getCells());
@@ -1419,13 +1284,13 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     @Override
     protected Composite getFocusedComposite(boolean single) {
         if (single) return inventoryIdText;
-        if (useScanner) return palletproductBarcodeText;
-        return palletPositionText;
+        if (usingFlatbedScanner) return palletproductBarcodeText;
+        return palletLabelText;
     }
 
     @Override
     protected boolean needPlate() {
-        return useScanner;
+        return usingFlatbedScanner;
     }
 
     @Override

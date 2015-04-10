@@ -485,6 +485,10 @@ public class BgcWidgetCreator {
         return createLabel(parent, fieldLabel, SWT.LEFT, true);
     }
 
+    public Label createLabel(Composite parent, String fieldLabel, int style) {
+        return createLabel(parent, fieldLabel, style, true);
+    }
+
     @SuppressWarnings("nls")
     public Label createLabel(Composite parent, String fieldLabel, int options,
         boolean addColon) {
@@ -602,8 +606,7 @@ public class BgcWidgetCreator {
 
     public Binding addBooleanBinding(WritableValue writableValue,
         IObservableValue observableValue, final String errorMsg) {
-        return addBooleanBinding(writableValue, observableValue, errorMsg,
-            IStatus.ERROR);
+        return addBooleanBinding(writableValue, observableValue, errorMsg, IStatus.ERROR);
     }
 
     public Binding addBooleanBinding(WritableValue writableValue,
@@ -674,8 +677,7 @@ public class BgcWidgetCreator {
         IObservableValue modelObservableValue,
         UpdateValueStrategy targetToModel, UpdateValueStrategy modelToTarget) {
         Assert.isNotNull(dbc);
-        return dbc.bindValue(targetObservableValue, modelObservableValue, targetToModel,
-            modelToTarget);
+        return dbc.bindValue(targetObservableValue, modelObservableValue, targetToModel, modelToTarget);
     }
 
     public void removeBinding(Binding binding) {
@@ -780,9 +782,9 @@ public class BgcWidgetCreator {
         int widgetOptions, String fieldLabel, String value,
         boolean useBackgroundColor) {
         BgcBaseText widget =
-            (BgcBaseText) createLabelledWidget(parent,
-                BgcBaseText.class, SWT.READ_ONLY | widgetOptions, fieldLabel,
-                value);
+            (BgcBaseText) createLabelledWidget(parent, BgcBaseText.class, SWT.READ_ONLY
+                | widgetOptions,
+                fieldLabel, value);
         if (useBackgroundColor)
             widget.setBackground(READ_ONLY_TEXT_BGR);
         return widget;

@@ -11,6 +11,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
@@ -106,6 +107,7 @@ public class BgcPlugin extends AbstractUIPlugin {
         SCAN_CLOSE_EDIT("scan_close_edit.png"),
         SCAN_EDIT("scan_edit.png"),
         SCAN_LINK("scanLink.png"),
+        SCAN_LINK_AND_ASSIGN("scanLinkAndAssign.png"),
         SEARCH("search.png"),
         SENT("sent.png"),
         SESSIONS("sessions.png"),
@@ -411,6 +413,17 @@ public class BgcPlugin extends AbstractUIPlugin {
             .getService(ISourceProviderService.class);
         return (LoginPermissionSessionState) service
             .getSourceProvider(LoginPermissionSessionState.LOGIN_STATE_SOURCE_NAME);
+    }
+
+    public static void focusControl(final Control control) {
+        Display.getDefault().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+                if (!control.isDisposed()) {
+                    control.setFocus();
+                }
+            }
+        });
     }
 
 }

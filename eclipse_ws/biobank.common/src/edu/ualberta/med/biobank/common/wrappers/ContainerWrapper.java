@@ -258,7 +258,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         if (rcp != null) {
             if ((rcp.getRow() >= type.getRowCapacity()) || (rcp.getCol() >= type.getColCapacity())) {
                 throw new Exception(MessageFormat.format(
-                    "Can't use position {0} in container {1} because its"
+                    "Can not use position {0} in container {1} because its"
                         + " maximum capacity is {2} rows and {3} columns.",
                     position, getFullInfoLabel(), type.getRowCapacity(), type.getColCapacity()));
             }

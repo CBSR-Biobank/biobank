@@ -55,7 +55,7 @@ public abstract class AbstractSpecimenAdminForm extends BiobankEntryForm {
     protected boolean finished = true;
     protected boolean printed = false;
 
-    private static Logger activityLogger;
+    protected static Logger activityLogger;
     private static ActivityLogAppender appender;
     private static FileAppender fileAppender;
 

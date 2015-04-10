@@ -39,6 +39,7 @@ public class ScanTubeManually extends PersistedDialog implements Listener {
 
     private String inventoryId;
 
+    @SuppressWarnings("nls")
     public ScanTubeManually(
         Shell parentShell,
         Set<String> labels,

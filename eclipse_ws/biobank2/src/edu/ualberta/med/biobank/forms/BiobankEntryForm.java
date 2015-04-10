@@ -11,7 +11,6 @@ import org.eclipse.core.databinding.observable.ChangeEvent;
 import org.eclipse.core.databinding.observable.IChangeListener;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.action.Action;
@@ -44,6 +43,8 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.services.ISourceProviderService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
@@ -70,12 +71,12 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
  */
 public abstract class BiobankEntryForm extends BiobankFormBase implements
     IBgcEntryForm {
-    private static final I18n i18n = I18nFactory
-        .getI18n(BiobankEntryForm.class);
+    private static final I18n i18n = I18nFactory.getI18n(BiobankEntryForm.class);
+
+    private static Logger log = LoggerFactory.getLogger(BiobankEntryForm.class);
 
     @SuppressWarnings("nls")
-    private static final String CONTEXT_ENTRY_FORM =
-        "biobank.context.entryForm";
+    private static final String CONTEXT_ENTRY_FORM = "biobank.context.entryForm";
 
     protected String sessionName;
 
@@ -256,8 +257,9 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
     @Override
     public void setFocus() {
         super.setFocus();
-        Assert.isNotNull(firstControl, "first control widget is not set");
-        if (!firstControl.isDisposed()) {
+        if (firstControl == null) {
+            log.error("setFocus: first control widget is not set");
+        } else if (!firstControl.isDisposed()) {
             firstControl.setFocus();
         }
     }
@@ -331,8 +333,14 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
     protected void bindChangeListener() {
         final IObservableValue statusObservable = new WritableValue();
         statusObservable.addChangeListener(new IChangeListener() {
+            @SuppressWarnings("nls")
             @Override
             public void handleChange(ChangeEvent event) {
+                if (firstControl == null) {
+                    log.error("changeListener:handlerChange: first control widget is not set");
+                    return;
+                }
+
                 IObservableValue validationStatus = (IObservableValue) event.getSource();
                 handleStatusChanged((IStatus) validationStatus.getValue());
             }

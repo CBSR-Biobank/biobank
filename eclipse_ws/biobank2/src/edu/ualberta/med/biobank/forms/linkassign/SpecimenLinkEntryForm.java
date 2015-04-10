@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -22,6 +21,7 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
@@ -40,14 +40,10 @@ import edu.ualberta.med.biobank.common.action.scanprocess.result.ProcessResult;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction.AliquotedSpecimenInfo;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction.AliquotedSpecimenResInfo;
-import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypesGetForContainerTypesAction;
 import edu.ualberta.med.biobank.common.util.StringUtil;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.scanmanually.ScanTubeManuallyFactory;
-import edu.ualberta.med.biobank.forms.linkassign.LinkFormPatientManagement.CEventComboCallback;
-import edu.ualberta.med.biobank.forms.linkassign.LinkFormPatientManagement.PatientTextCallback;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.forms.utils.PalletScanManagement;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
@@ -55,6 +51,8 @@ import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.helpers.ScanAssignHelper;
+import edu.ualberta.med.biobank.helpers.ScanLinkHelper;
 import edu.ualberta.med.biobank.model.AbstractPosition;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
@@ -65,6 +63,8 @@ import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.validators.StringLengthValidator;
 import edu.ualberta.med.biobank.widgets.grids.well.SpecimenCell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
+import edu.ualberta.med.biobank.widgets.specimenlink.ILinkFormPatientManagementParent;
+import edu.ualberta.med.biobank.widgets.specimenlink.LinkFormPatientManagement;
 import edu.ualberta.med.biobank.widgets.specimentypeselection.AliquotedSpecimenSelectionWidget;
 import edu.ualberta.med.biobank.widgets.specimentypeselection.ISpecimenTypeSelectionChangedListener;
 import edu.ualberta.med.biobank.widgets.specimentypeselection.SpecimenTypeSelectionEvent;
@@ -79,7 +79,8 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
  * @author Delphine
  * 
  */
-public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
+public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm implements
+    ILinkFormPatientManagementParent {
 
     private static final I18n i18n = I18nFactory.getI18n(SpecimenLinkEntryForm.class);
 
@@ -106,7 +107,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     private static Mode mode = Mode.MULTIPLE;
 
     // TODO do not need a composite class anymore if only one link form is left
-    private final LinkFormPatientManagement linkFormPatientManagement;
+    private LinkFormPatientManagement linkFormPatientManagement;
 
     // single linking
     // source specimen / type relation when only one specimen
@@ -131,16 +132,13 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     // source/type hierarchy selected (use rows order)
     private List<SpecimenHierarchyInfo> preSelections;
 
-    public SpecimenLinkEntryForm() {
-        linkFormPatientManagement = new LinkFormPatientManagement(widgetCreator, this);
-    }
-
     @SuppressWarnings("nls")
     @Override
     protected void init() throws Exception {
         log.debug("init");
         super.init();
         palletScanManagement = new PalletScanManagement(this, new ScanTubeManuallyFactory());
+        linkFormPatientManagement = new LinkFormPatientManagement(widgetCreator, this, activityLogger);
         setPartName(FORM_TITLE);
         setCanLaunchScan(false);
     }
@@ -170,7 +168,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     @SuppressWarnings("nls")
     @Override
     protected String getActivityTitle() {
-        return "Specimen Link";
+        return i18n.tr("Specimen Link");
     }
 
     @Override
@@ -198,25 +196,11 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     @Override
     protected void createCommonFields(Composite commonFieldsComposite) {
         linkFormPatientManagement.createPatientNumberText(commonFieldsComposite);
-        linkFormPatientManagement.setPatientTextCallback(new PatientTextCallback() {
-            @Override
-            public void focusLost() {
-                setTypeCombos();
-            }
-
-            @Override
-            public void textModified() {
-            }
-        });
         // Processing event and Collection events lists
         linkFormPatientManagement.createEventsWidgets(commonFieldsComposite);
-        linkFormPatientManagement.setCEventComboCallback(new CEventComboCallback() {
-            @Override
-            public void selectionChanged() {
-                setCanLaunchScan(true);
-                setTypeCombos();
-            }
-        });
+        linkFormPatientManagement.addPatientNumberKeyListener(this.textFieldKeyListener);
+
+        setFirstControl(linkFormPatientManagement.getFirstControl());
     }
 
     @SuppressWarnings("nls")
@@ -357,7 +341,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
                         .getShell().getDisplay(), new Runnable() {
                         @Override
                         public void run() {
-                            initContainersFromPosition(newSinglePositionText, null);
+                            ScanAssignHelper.getContainerByLabel(newSinglePositionText.getText());
                             checkPositionAndSpecimen(inventoryIdText, newSinglePositionText);
                         }
                     });
@@ -406,7 +390,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         singleTypesWidget.setEnabled(ok);
         newSinglePositionText.setEnabled(ok);
         canSaveSingleSpecimen.setValue(ok);
-        if (!ok) focusControl(inventoryIdText);
+        if (!ok) BgcPlugin.focusControl(inventoryIdText);
 
     }
 
@@ -439,7 +423,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     private void setTypeCombos() {
         log.debug("setTypeCombos");
 
-        List<AliquotedSpecimen> studiesAliquotedTypes = null;
+        List<AliquotedSpecimen> studyAliquotedTypes = null;
         List<SpecimenType> authorizedTypesInContainers = new ArrayList<SpecimenType>();
         if (isSingleMode()) {
             log.debug("setTypeCombos: single mode");
@@ -451,23 +435,15 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
             }
         } else {
             log.debug("setTypeCombos: multiple mode");
-
-            /*
-             * If the current center is a site, and if this site defines containers of 8*12 or 10*10
-             * size, then get the specimen types these containers can contain
-             */
-            if (SessionManager.getUser().getCurrentWorkingSite() != null) {
-                List<SpecimenType> res = null;
-                try {
-                    res = getSpecimenTypeForPalletScannable();
-                } catch (ApplicationException e) {
-                    BgcPlugin.openAsyncError("Error", "Failed to retrieve specimen types.");
-                }
-                if (res.size() != 0) authorizedTypesInContainers = res;
+            try {
+                authorizedTypesInContainers.addAll(
+                    ScanLinkHelper.getSpecimenTypeForPalletScannable());
+            } catch (ApplicationException e) {
+                BgcPlugin.openAsyncError("Error", "Failed to retrieve specimen types.");
             }
         }
 
-        studiesAliquotedTypes =
+        studyAliquotedTypes =
             linkFormPatientManagement.getStudyAliquotedTypes(authorizedTypesInContainers);
         List<Specimen> availableSourceSpecimens =
             linkFormPatientManagement.getParentSpecimenForPEventAndCEvent();
@@ -487,33 +463,10 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         // for single
         singleTypesWidget.resetValues(true, false);
         singleTypesWidget.setSourceSpecimens(availableSourceSpecimens);
-        singleTypesWidget.setResultTypes(studiesAliquotedTypes);
+        singleTypesWidget.setResultTypes(studyAliquotedTypes);
         if (!isSingleMode()) {
-            specimenTypesWidget.setSelections(availableSourceSpecimens, studiesAliquotedTypes);
+            specimenTypesWidget.setSelections(availableSourceSpecimens, studyAliquotedTypes);
         }
-    }
-
-    private List<SpecimenType> getSpecimenTypeForPalletScannable() throws ApplicationException {
-        List<SpecimenType> result = new ArrayList<SpecimenType>();
-
-        SiteWrapper site = SessionManager.getUser().getCurrentWorkingSite();
-        if (site == null) {
-            // scan link being used when working center is a clinic, clinics do not have
-            // container types
-            return result;
-        }
-
-        Set<Capacity> capacities = new HashSet<Capacity>();
-        for (PalletDimensions gridDimensions : PalletDimensions.values()) {
-            Capacity capacity = new Capacity();
-            capacity.setRowCapacity(gridDimensions.getRows());
-            capacity.setColCapacity(gridDimensions.getCols());
-            capacities.add(capacity);
-        }
-        result = SessionManager.getAppService().doAction(
-            new SpecimenTypesGetForContainerTypesAction(site.getWrappedObject(), capacities
-            )).getList();
-        return result;
     }
 
     @Override
@@ -575,37 +528,13 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
             }
         }
         List<AliquotedSpecimenResInfo> resList =
-            SessionManager
-                .getAppService()
-                .doAction(
-                    new SpecimenLinkSaveAction(SessionManager.getUser().getCurrentWorkingCenter()
-                        .getId(), linkFormPatientManagement.getCurrentPatient().getStudy().getId(),
-                        asiList)).getList();
-        printSaveMultipleLogMessage(resList);
-    }
-
-    @SuppressWarnings("nls")
-    protected void printSaveMultipleLogMessage(List<AliquotedSpecimenResInfo> resList) {
-        log.debug("printSaveMultipleLogMessage");
-
-        StringBuffer sb = new StringBuffer("ALIQUOTED SPECIMENS:\n");
-        for (AliquotedSpecimenResInfo resInfo : resList) {
-            sb.append(MessageFormat
-                .format(
-                    "LINKED: ''{0}'' with type ''{1}'' to source: {2} ({3}) - Patient: {4} - Visit: {5} - Center: {6}\n",
-                    resInfo.inventoryId, resInfo.typeName, resInfo.parentTypeName,
-                    resInfo.parentInventoryId, resInfo.patientPNumber, resInfo.visitNumber,
-                    resInfo.currentCenterName));
-        }
-        // Want only one common 'log entry' so use a stringbuffer to print
-        // everything together
-        appendLog(sb.toString());
-
-        // LINKING\: {0} specimens linked to patient {1} on center {2}
-        appendLog(MessageFormat.format(
-            "LINKING: {0} specimens linked to patient {1} on center {2}", resList.size(),
-            linkFormPatientManagement.getCurrentPatient().getPnumber(), SessionManager.getUser()
-                .getCurrentWorkingCenter().getNameShort()));
+            SessionManager.getAppService().doAction(
+                new SpecimenLinkSaveAction(
+                    SessionManager.getUser().getCurrentWorkingCenter().getId(),
+                    linkFormPatientManagement.getCurrentPatient().getStudy().getId(),
+                    asiList)
+                ).getList();
+        appendLogs(ScanLinkHelper.linkedSpecimensLogMessage(resList));
     }
 
     @SuppressWarnings("nls")
@@ -883,5 +812,31 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
 
             });
         toolkit.adapt(specimenTypesWidget);
+    }
+
+    @Override
+    public Button createButton(Composite parent, String text, int style) {
+        return toolkit.createButton(parent, text, style);
+    }
+
+    @Override
+    public boolean isFinished() {
+        return finished;
+    }
+
+    @Override
+    public void focusLost() {
+        setTypeCombos();
+    }
+
+    @Override
+    public void textModified() {
+        // do nothing
+    }
+
+    @Override
+    public void collectionEventSelectionChanged() {
+        setCanLaunchScan(true);
+        setTypeCombos();
     }
 }

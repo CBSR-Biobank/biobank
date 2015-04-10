@@ -89,4 +89,6 @@ classes
 package-jboss/debian/opt/jboss/jboss-4.0.5.GA/
 package-jboss/debian/opt/jboss/templates/
 package-jboss/debian/opt/jboss/tools/
-
+cacerts
+decode.png
+*.sql.gz

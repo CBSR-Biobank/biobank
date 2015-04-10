@@ -189,13 +189,15 @@ public class PalletScanManagement {
             manuallyEnteredCells.add(cell);
         }
 
-        try {
-            parent.postProcessDecodeTubesManually(manuallyEnteredCells);
-        } catch (Exception ex) {
-            BgcPlugin.openAsyncError(
-                // dialog title
-                i18n.tr("Decode pallet error"),
-                ex);
+        if (!manuallyEnteredCells.isEmpty()) {
+            try {
+                parent.postProcessDecodeTubesManually(manuallyEnteredCells);
+            } catch (Exception ex) {
+                BgcPlugin.openAsyncError(
+                    // dialog title
+                    i18n.tr("Decode pallet error"),
+                    ex);
+            }
         }
     }
 

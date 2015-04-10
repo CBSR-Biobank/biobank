@@ -1,11 +1,9 @@
 package edu.ualberta.med.biobank.forms.linkassign;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.databinding.Binding;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
@@ -22,27 +20,20 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.action.container.ContainerGetContainerOrParentsByLabelAction;
-import edu.ualberta.med.biobank.common.action.container.ContainerGetContainerOrParentsByLabelAction.ContainerData;
 import edu.ualberta.med.biobank.common.action.containerType.SpecimenContainerTypesByCapacityAction;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.util.StringUtil;
-import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
-import edu.ualberta.med.biobank.dialogs.select.SelectParentContainerDialog;
-import edu.ualberta.med.biobank.forms.utils.PalletScanManagement;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.model.Capacity;
-import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.util.RowColPos;
@@ -120,10 +111,7 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
     // handheld scanner
     protected boolean scanMultipleWithHandheldInput = false;
 
-    private final Set<ContainerType> palletContainerTypes;
-
     public AbstractLinkAssignEntryForm() {
-        palletContainerTypes = new HashSet<ContainerType>();
     }
 
     @SuppressWarnings("nls")
@@ -629,73 +617,6 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
         }
     }
 
-    /**
-     * Search possible parents from the position text. Is used both by single and multiple assign.
-     * 
-     * @param positionText the position to use for initialisation
-     * @param type
-     */
-    @SuppressWarnings("nls")
-    protected void initContainersFromPosition(BgcBaseText positionText, ContainerTypeWrapper type) {
-        parentContainers = new ArrayList<ContainerWrapper>();
-        try {
-            Site site = SessionManager.getUser().getCurrentWorkingSite().getWrappedObject();
-
-            ContainerType rawType = null;
-            if (type != null) {
-                rawType = type.getWrappedObject();
-            }
-
-            container = null;
-            ContainerData containerData = SessionManager.getAppService().doAction(
-                new ContainerGetContainerOrParentsByLabelAction(positionText.getText(),
-                    site, rawType));
-
-            List<Container> possibleParents = containerData.getPossibleParentContainers();
-
-            if (containerData.getContainer() != null) {
-                container = new ContainerWrapper(SessionManager.getAppService(),
-                    containerData.getContainer());
-            } else if (possibleParents.isEmpty()) {
-                BgcPlugin.openAsyncError(
-                    // TR: dialog title
-                    i18n.tr("Container label error"),
-                    // TR: dialog message
-                    i18n.tr("Unable to find a container with label {0}", positionText.getText()));
-            } else if (possibleParents.size() == 1) {
-                Container parent = possibleParents.get(0);
-                parentContainers.add(new ContainerWrapper(SessionManager.getAppService(),
-                    parent));
-                appendLog(i18n.tr("Parent container: {0}", parent.getLabel()));
-            } else {
-                SelectParentContainerDialog dlg = new SelectParentContainerDialog(
-                    PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), possibleParents);
-                dlg.open();
-                if (dlg.getSelectedContainer() == null) {
-                    Set<String> labelData = new HashSet<String>();
-                    for (Container cont : possibleParents) {
-                        labelData.add(ContainerWrapper.getFullInfoLabel(cont));
-                    }
-                    BgcPlugin.openError(
-                        // TR: dialog title
-                        i18n.tr("Container problem"),
-                        // TR: dialog message
-                        i18n.tr("More than one container found matching {0}", StringUtils.join(labelData, ", ")));
-                    focusControl(positionText);
-                } else {
-                    parentContainers.add(new ContainerWrapper(SessionManager.getAppService(),
-                        dlg.getSelectedContainer()));
-                }
-            }
-            updateAvailableSpecimenTypes();
-        } catch (Exception ex) {
-            BgcPlugin.openError(
-                // TR: dialog title
-                i18n.tr("Init container from position"), ex);
-            focusControl(positionText);
-        }
-    }
-
     protected abstract void updateAvailableSpecimenTypes();
 
     /**
@@ -749,7 +670,7 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
                         appendLog(NLS.bind(
                             "ERROR: Container cannot hold specimens: {0}",
                             positionString));
-                        focusControl(positionField);
+                        BgcPlugin.focusControl(positionField);
                         return;
                     } else if ((singleSpecimen.getSpecimenType() != null)
                         && !specimenTypeCollection.contains(singleSpecimen.getSpecimenType())) {
@@ -762,7 +683,7 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
                         appendLog(NLS.bind(
                             "ERROR: Container {0} cannot hold specimens of type \"{1}\"",
                             positionString, singleSpecimen.getSpecimenType()));
-                        focusControl(positionField);
+                        BgcPlugin.focusControl(positionField);
                         return;
                     }
 
@@ -781,7 +702,7 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
                         appendLog(NLS.bind(
                             "ERROR: Position {0} already in use in container {1}",
                             positionString, parentContainers.get(0).getLabel()));
-                        focusControl(positionField);
+                        BgcPlugin.focusControl(positionField);
                         return;
                     }
                     setDirty(true);
@@ -794,13 +715,13 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
                         bce);
                     appendLog("ERROR: "
                         + bce.getMessage());
-                    focusControl(inventoryIdField);
+                    BgcPlugin.focusControl(inventoryIdField);
                 } catch (Exception e) {
                     BgcPlugin.openError(
                         // TR: dialog title
                         i18n.tr("Error while checking position"),
                         e);
-                    focusControl(positionField);
+                    BgcPlugin.focusControl(positionField);
                 }
             }
         });
@@ -849,10 +770,6 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
         palletWidget.redraw();
     }
 
-    protected void initPalletContainerTypes() throws ApplicationException {
-        palletContainerTypes.addAll(getPalletContainerTypes());
-    }
-
     @SuppressWarnings("nls")
     protected void checkPalletContainerTypes() {
         if (!isSingleMode() && palletContainerTypes.isEmpty()) {
@@ -866,7 +783,7 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
 
     /**
      * Returns the leaf container types, ones that only hold specimens, that match the plate
-     * dimensions define in {@link PalletDimensions}.
+     * dimensions defined in {@link PalletDimensions}.
      * 
      * @note A site may not have any container types defined that match any elements of
      *       PlateDimensions.
@@ -885,11 +802,5 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
         List<ContainerType> ctypesList = SessionManager.getAppService().doAction(
             new SpecimenContainerTypesByCapacityAction(site, capacities)).getList();
         return new HashSet<ContainerType>(ctypesList);
-    }
-
-    public PalletDimensions getCurrentPlateDimensions() {
-        ContainerType containerType = getContainerType();
-        return PalletScanManagement.capacityToPlateDimensions(containerType.getCapacity());
-
     }
 }

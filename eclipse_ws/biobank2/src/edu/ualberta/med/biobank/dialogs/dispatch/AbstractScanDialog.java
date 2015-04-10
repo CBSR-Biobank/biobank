@@ -79,7 +79,6 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
 
     private final IObservableValue hasValues = new WritableValue(Boolean.FALSE, Boolean.class);
 
-    /** should only be assigned by using {@link setScanOkValue} */
     private boolean scanStatus = false;
 
     /** Holds the value stored in {@link scanStatus} */

@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.test.action;
 
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -33,6 +34,7 @@ import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventGet
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventGetInfoAction;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventGetInfoAction.PEventInfo;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventSaveAction;
+import edu.ualberta.med.biobank.common.action.scanprocess.GetProcessingEventsAction;
 import edu.ualberta.med.biobank.common.action.search.PEventByWSSearchAction;
 import edu.ualberta.med.biobank.common.action.site.SiteGetInfoAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
@@ -40,6 +42,7 @@ import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction.AliquotedSpecimenInfo;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.CollectionEvent;
+import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Specimen;
@@ -440,5 +443,104 @@ public class TestProcessingEvent extends TestAction {
 
         peventIds = exec(new PEventByWSSearchAction(worksheet, site)).getList();
         Assert.assertEquals(0, peventIds.size());
+    }
+
+    @Test
+    public void getProcessingEvents() {
+        session.beginTransaction();
+
+        Study study = factory.createStudy();
+        factory.createClinic();
+        study.getContacts().add(factory.createContact());
+        Patient patient = factory.createPatient();
+        study.getPatients().add(patient);
+        CollectionEvent cevent = factory.createCollectionEvent();
+        Site site = factory.createSite();
+        site.getStudies().add(study);
+        session.getTransaction().commit();
+
+        List<ProcessingEvent> pevents =
+            exec(new GetProcessingEventsAction(patient.getPnumber(), site.getId())).getList();
+
+        session.beginTransaction();
+
+        Specimen parentSpecimen = factory.createParentSpecimen();
+        ProcessingEvent pevent = factory.createProcessingEvent();
+        parentSpecimen.setProcessingEvent(pevent);
+
+        session.getTransaction().commit();
+
+        pevents = exec(new GetProcessingEventsAction(patient.getPnumber(), site.getId())).getList();
+
+        Assert.assertEquals(1, pevents.size());
+        for (ProcessingEvent pe : pevents) {
+            Assert.assertEquals(1, pe.getSpecimens().size());
+            for (Specimen spc : pe.getSpecimens()) {
+                Assert.assertEquals(spc.getCollectionEvent().getId(), cevent.getId());
+                Assert.assertEquals(spc.getCollectionEvent().getPatient().getId(), patient.getId());
+                Assert.assertEquals(spc.getCollectionEvent().getPatient().getStudy().getId(), study.getId());
+            }
+        }
+    }
+
+    @Test
+    public void processingEventsLastSevenDays() {
+        session.beginTransaction();
+
+        Study study = factory.createStudy();
+        factory.createClinic();
+        study.getContacts().add(factory.createContact());
+        Patient patient = factory.createPatient();
+        study.getPatients().add(patient);
+        CollectionEvent cevent = factory.createCollectionEvent();
+        Site site = factory.createSite();
+        site.getStudies().add(study);
+        Specimen parentSpecimen = factory.createParentSpecimen();
+        ProcessingEvent pevent = factory.createProcessingEvent();
+        parentSpecimen.setProcessingEvent(pevent);
+
+        Calendar cal = Calendar.getInstance();
+
+        // yesterday at midnight
+        cal.add(Calendar.DATE, -1);
+        cal.set(Calendar.AM_PM, Calendar.AM);
+        cal.set(Calendar.HOUR, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        Date date = cal.getTime();
+
+        pevent.setCreatedAt(date);
+
+        session.getTransaction().commit();
+
+        List<ProcessingEvent> pevents =
+            exec(new GetProcessingEventsAction(patient.getPnumber(), site.getId(), true)).getList();
+
+        Assert.assertEquals(1, pevents.size());
+        for (ProcessingEvent pe : pevents) {
+            Assert.assertEquals(1, pe.getSpecimens().size());
+            for (Specimen spc : pe.getSpecimens()) {
+                Assert.assertEquals(spc.getCollectionEvent().getId(), cevent.getId());
+                Assert.assertEquals(spc.getCollectionEvent().getPatient().getId(), patient.getId());
+                Assert.assertEquals(spc.getCollectionEvent().getPatient().getStudy().getId(), study.getId());
+            }
+        }
+
+        // create another pevent, but for 8 days ago, should not be returned by action
+        cal.add(Calendar.DATE, -8);
+        cal.set(Calendar.AM_PM, Calendar.AM);
+        cal.set(Calendar.HOUR, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        date = cal.getTime();
+
+        session.beginTransaction();
+        pevent = factory.createProcessingEvent();
+        pevent.setCreatedAt(date);
+        session.getTransaction().commit();
+
+        pevents = exec(new GetProcessingEventsAction(patient.getPnumber(), site.getId(), true)).getList();
+
+        Assert.assertEquals(1, pevents.size());
     }
 }

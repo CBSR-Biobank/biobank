@@ -20,20 +20,21 @@ import edu.ualberta.med.biobank.model.ProcessingEvent;
 public class PatientGetProcessingEventsByPNumberAction implements
     Action<PatientGetProcessingEventsByPNumberResult> {
     private static final long serialVersionUID = 1L;
-    // @formatter:off
+
     @SuppressWarnings("nls")
-    private static final String PATIENT_EXISTS_HQL = 
+    private static final String PATIENT_EXISTS_HQL =
         "SELECT 1 FROM " + Patient.class.getName() + "WHERE pnumber = ?";
+
     @SuppressWarnings("nls")
     private static final String PROCESSING_EVENTS_GET_HQL =
         "SELECT distinct(processingEvent)" +
-        " FROM " + Patient.class.getName() + " AS patient" +
-        " JOIN patient.collectionEvents AS collectionEvents" +
-        " JOIN collectionEvents.allSpecimens AS specimens" +
-        " JOIN specimens.processingEvent AS processingEvent" +
-        " WHERE patient.pnumber = ?" +
-        " AND processingEvent.center.id = ?" +
-        " ORDER BY processingEvent.createdAt DESC";
+            " FROM " + Patient.class.getName() + " AS patient" +
+            " JOIN patient.collectionEvents AS collectionEvents" +
+            " JOIN collectionEvents.allSpecimens AS specimens" +
+            " JOIN specimens.processingEvent AS processingEvent" +
+            " WHERE patient.pnumber = ?" +
+            " AND processingEvent.center.id = ?" +
+            " ORDER BY processingEvent.createdAt DESC";
     // @formatter:on
 
     private final String pNumber;
@@ -90,8 +91,7 @@ public class PatientGetProcessingEventsByPNumberAction implements
     private List<ProcessingEvent> getProcessingEvents(ActionContext context) {
         List<ProcessingEvent> pEvents = new ArrayList<ProcessingEvent>();
 
-        Query query =
-            context.getSession().createQuery(PROCESSING_EVENTS_GET_HQL);
+        Query query = context.getSession().createQuery(PROCESSING_EVENTS_GET_HQL);
         query.setParameter(0, pNumber);
         query.setParameter(1, centerId);
 

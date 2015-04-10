@@ -105,18 +105,32 @@ public class TestConfigCreate {
         log.debug("username: {}", appArgs.username);
 
         Clinic clinic = createClinic("Clinic1", "CL1");
-        Study study = createStudy("Study1", "ST1", clinic.getContacts().iterator().next());
 
         Set<Study> studies = new HashSet<Study>();
-        studies.add(study);
 
+        for (int i = 1; i <= 2; ++i) {
+            Study study = createStudy("Study" + i, "ST" + i, clinic.getContacts().iterator().next());
+            studies.add(study);
+        }
         Site site1 = createSite("Site1", "Site1", studies);
         createSite("Site2", "Site2", studies);
 
-        createPatientWithProcessingEvent(study, site1);
-        log.info("testing configuration created");
+        int studyCount = 0;
+        for (Study study : studies) {
+            ++studyCount;
+            for (int j = 0; j <= 2; ++j) {
+                Integer patientNumber = 1000 + 100 * studyCount + j;
+                String sourceSpecimenInventoryId = "A" + patientNumber;
+                createPatientWithProcessingEvent(
+                    study,
+                    patientNumber.toString(),
+                    sourceSpecimenInventoryId,
+                    site1);
+            }
+        }
 
         createFreezer(site1);
+        log.info("testing configuration created");
     }
 
     private Clinic createClinic(String name, String nameShort) {
@@ -209,7 +223,11 @@ public class TestConfigCreate {
         return specimenType;
     }
 
-    private void createPatientWithProcessingEvent(Study study, Center center) {
+    private Patient createPatientWithProcessingEvent(
+        Study study,
+        String patientNumber,
+        String sourceSpecimenInventoryId,
+        Center center) {
         if (session == null) {
             throw new IllegalStateException("session not initialized");
         }
@@ -220,7 +238,7 @@ public class TestConfigCreate {
         session.beginTransaction();
 
         Patient patient = new Patient();
-        patient.setPnumber("1100");
+        patient.setPnumber(patientNumber);
         patient.setCreatedAt(new Date());
         patient.setStudy(study);
         session.save(patient);
@@ -238,13 +256,13 @@ public class TestConfigCreate {
         session.save(originInfo);
 
         ProcessingEvent processingEvent = new ProcessingEvent();
-        processingEvent.setWorksheet("A100");
+        processingEvent.setWorksheet(collectionEvent.getPatient().getPnumber());
         processingEvent.setCenter(center);
         processingEvent.setCreatedAt(new Date());
         session.save(processingEvent);
 
         Specimen specimen = new Specimen();
-        specimen.setInventoryId("A100");
+        specimen.setInventoryId(sourceSpecimenInventoryId);
         specimen.setSpecimenType(getSpecimenType(SOURCE_SPC_TYPE_NAME));
         specimen.setCurrentCenter(center);
         specimen.setCollectionEvent(collectionEvent);
@@ -259,6 +277,7 @@ public class TestConfigCreate {
         session.save(specimen);
 
         session.getTransaction().commit();
+        return patient;
     }
 
     private Site createSite(String name, String nameShort, Set<Study> studies) {

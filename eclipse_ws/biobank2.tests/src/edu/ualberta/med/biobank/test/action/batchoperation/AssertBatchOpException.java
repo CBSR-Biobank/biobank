@@ -52,6 +52,7 @@ public class AssertBatchOpException {
     }
 
     @Override
+    @SuppressWarnings("nls")
     public String toString() {
         return StringUtil.join(expectedMessages, "\r\n");
     }

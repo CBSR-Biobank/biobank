@@ -12,10 +12,11 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
-public class SpecimenLinkAdapter extends AdapterBase {
-    private static final I18n i18n = I18nFactory.getI18n(SpecimenAssignAdapter.class);
+public class SpecimenLinkAndAssignAdapter extends AdapterBase {
+    private static final I18n i18n = I18nFactory.getI18n(SpecimenLinkAndAssignAdapter.class);
 
-    public SpecimenLinkAdapter(AdapterBase parent, int id, String name, boolean hasChildren) {
+    public SpecimenLinkAndAssignAdapter(
+        AdapterBase parent, int id, String name, boolean hasChildren) {
         super(parent, id, name, hasChildren);
     }
 

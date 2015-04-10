@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.handlers;
 
+import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IHandler;
 import org.eclipse.jface.action.IContributionItem;
@@ -16,13 +17,11 @@ import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import org.eclipse.core.commands.AbstractHandler;
 import edu.ualberta.med.biobank.rcp.perspective.LinkAssignPerspective;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 /**
- * Open a form in patient administration like scan link, scan assign or cabinet
- * like/assign
+ * Open a form in patient administration like scan link, scan assign or cabinet like/assign
  */
 public abstract class LinkAssignCommonHandler extends AbstractHandler
     implements
@@ -35,12 +34,11 @@ public abstract class LinkAssignCommonHandler extends AbstractHandler
         throws ExecutionException {
         IWorkbench workbench = BiobankPlugin.getDefault().getWorkbench();
         try {
-            if (workbench.getActiveWorkbenchWindow().getActivePage()
-                .closeAllEditors(true)) {
-                workbench.showPerspective(LinkAssignPerspective.ID,
+            if (workbench.getActiveWorkbenchWindow().getActivePage().closeAllEditors(true)) {
+                workbench.showPerspective(
+                    LinkAssignPerspective.ID,
                     workbench.getActiveWorkbenchWindow());
-                IWorkbenchPage page = workbench.getActiveWorkbenchWindow()
-                    .getActivePage();
+                IWorkbenchPage page = workbench.getActiveWorkbenchWindow().getActivePage();
                 // open the editor
                 AdapterBase.openForm(new FormInput(adapter), editorId, true);
                 hideConsoleViewIcons(page);
