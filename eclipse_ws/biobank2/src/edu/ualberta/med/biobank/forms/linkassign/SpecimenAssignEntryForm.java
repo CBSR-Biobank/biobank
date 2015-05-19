@@ -647,6 +647,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             @Override
             public void focusLost(FocusEvent e) {
                 final String palletLabel = palletLabelText.getText();
+                final String palletBarcode = palletproductBarcodeText.getText();
 
                 if (palletLabelText.isEnabled() && palletPositionTextModified
                     && palletLabelValidator.validate(palletLabel).equals(Status.OK_STATUS)) {
@@ -655,8 +656,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                         public void run() {
                             checkingMultipleContainerPosition = true;
                             ContainerWrapper container =
-                                ScanAssignHelper.getOrCreateContainerByLabel(
-                                    palletLabel, currentMultipleContainer);
+                                ScanAssignHelper.getOrCreateContainerByLabel(palletLabel);
 
                             if (container == null) {
                                 appendLog(NLS.bind(
@@ -670,6 +670,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                             setCanLaunchScan(ok);
                             initCellsWithContainer(currentMultipleContainer);
                             currentMultipleContainer.setLabel(palletLabel);
+                            currentMultipleContainer.setProductBarcode(palletBarcode);
                             if (!ok) {
                                 BgcPlugin.focusControl(palletLabelText);
                                 showOnlyPallet(true);

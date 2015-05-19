@@ -25,8 +25,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
@@ -59,7 +57,7 @@ public class ScanLinkDialog extends PersistedDialog
 
     private static final I18n i18n = I18nFactory.getI18n(ScanLinkDialog.class);
 
-    private static Logger log = LoggerFactory.getLogger(ScanLinkDialog.class);
+    // private static Logger log = LoggerFactory.getLogger(ScanLinkDialog.class);
 
     @SuppressWarnings("nls")
     private static final String SCAN_LINK_DIALOG_SETTINGS =

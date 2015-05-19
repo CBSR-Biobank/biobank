@@ -66,16 +66,10 @@ public class ScanAssignHelper {
      * 
      * @param palletLabel the label to search for.
      * 
-     * @param currentContainer if a new container is to be created under the parent container, then
-     *            this is the one that is added.
-     * 
      * @return The container matching the label.
      */
     @SuppressWarnings("nls")
-    public static ContainerWrapper getOrCreateContainerByLabel(
-        String palletLabel, ContainerWrapper currentContainer) {
-        log.info("palletLabelTextFocusLost: currentContainer: {}", currentContainer);
-
+    public static ContainerWrapper getOrCreateContainerByLabel(String palletLabel) {
         ContainerWrapper container = getContainerByLabel(palletLabel);
 
         if (container == null) {
@@ -95,16 +89,16 @@ public class ScanAssignHelper {
             container = parentContainer.getChildByLabel(
                 palletLabel.substring(parentContainer.getLabel().length()));
 
-            log.info("getOrCreateContainerByLabel: label: {}, parent container label: {}",
+            log.debug("getOrCreateContainerByLabel: label: {}, parent container label: {}",
                 palletLabel, parentContainer.getLabel());
-            // log.info("getOrCreateContainerByLabel: barcode: {}", container.getProductBarcode());
 
             if (container == null) {
+                container = new ContainerWrapper(SessionManager.getAppService());
+
                 // no container at this position right now, create one
-                log.info("getOrCreateContainerByLabel: creating new container at label: {}", palletLabel);
+                log.debug("getOrCreateContainerByLabel: creating new container at label: {}", palletLabel);
                 String childLabel = palletLabel.substring(parentContainer.getLabel().length());
-                parentContainer.addChild(childLabel, currentContainer);
-                container = currentContainer;
+                parentContainer.addChild(childLabel, container);
                 container.setParent(parentContainer,
                     parentContainer.getPositionFromLabelingScheme(childLabel));
             }

@@ -9,9 +9,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.xnap.commons.i18n.I18n;
-import org.xnap.commons.i18n.I18nFactory;
-
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction.AliquotedSpecimenResInfo;
 import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypesGetForContainerTypesAction;
@@ -28,8 +25,6 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
  * 
  */
 public class ScanLinkHelper {
-
-    private static final I18n i18n = I18nFactory.getI18n(ScanLinkHelper.class);
 
     /**
      * If the current center is a site, and if this site defines containers of 8*12 or 10*10 size,

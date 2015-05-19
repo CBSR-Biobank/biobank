@@ -270,10 +270,7 @@ public class ScanAssignDialog extends ScanLinkDialog
         }
     }
 
-    @SuppressWarnings("nls")
     private void palletBarcodeTextModified() {
-        log.info("palletBarcodeTextModified: palletBarcodeTextModified: {}, checkingPalletLabel: {}",
-            palletBarcodeTextModified, checkingPalletLabel);
         if (!checkingPalletLabel) {
             palletBarcodeTextModified = true;
             palletTypesViewer.setInput(null);
@@ -283,10 +280,7 @@ public class ScanAssignDialog extends ScanLinkDialog
         }
     }
 
-    @SuppressWarnings("nls")
     private void palletLabelTextModified() {
-        log.info("palletLabelTextModified: palletBarcodeTextModified: {}, checkingPalletLabel: {}",
-            palletLabelTextModified, checkingPalletLabel);
         palletLabelTextModified = true;
         palletTypesViewer.setInput(null);
         palletContainer.setContainerType(null);
@@ -411,7 +405,7 @@ public class ScanAssignDialog extends ScanLinkDialog
                 public void run() {
                     checkingPalletLabel = true;
                     ContainerWrapper container =
-                        ScanAssignHelper.getOrCreateContainerByLabel(label, palletContainer);
+                        ScanAssignHelper.getOrCreateContainerByLabel(label);
 
                     if (container == null) {
                         activityLogger.trace(NLS.bind("ERROR: Could not get container with label {0}", label));
@@ -424,6 +418,10 @@ public class ScanAssignDialog extends ScanLinkDialog
 
                     palletContainer.setProductBarcode((String) palletBarcode.getValue());
                     palletContainer.setLabel(label);
+
+                    log.info("palletContainer: label: {}, pallet container: {}", label, container);
+                    log.info("palletContainer: position: {}",
+                        palletContainer.getPositionAsRowCol());
 
                     if (!ok) {
                         BgcPlugin.focusControl(palletLabelText);
@@ -548,6 +546,7 @@ public class ScanAssignDialog extends ScanLinkDialog
         userPalletLabel = palletLabelText.getText();
         selectedPalletContainerType = (ContainerTypeWrapper) ((IStructuredSelection)
             palletTypesViewer.getSelection()).getFirstElement();
+        palletContainer.setLabel(userPalletLabel);
         super.okPressed();
     }
 

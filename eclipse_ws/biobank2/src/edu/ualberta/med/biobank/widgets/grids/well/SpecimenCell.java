@@ -141,24 +141,32 @@ public class SpecimenCell extends AbstractUIWell {
         return palletScanned;
     }
 
-    public void merge(SpecimenBriefInfo specimenBriefInfo, CellInfo cell) throws Exception {
+    public SpecimenWrapper mergeExpected(SpecimenBriefInfo specimenBriefInfo, CellInfo cell)
+        throws Exception {
         setStatus(cell.getStatus());
         if (cell.getInformation() != null) {
             setInformation(cell.getInformation().toString());
         } else {
             setInformation(StringUtil.EMPTY_STRING);
         }
-        decodedWell = new DecodedWell(decodedWell.getLabel(), cell.getValue());
         setTitle(cell.getTitle().toString());
 
         SpecimenWrapper specimen;
         if (specimenBriefInfo != null) {
-            specimen = new SpecimenWrapper(SessionManager.getAppService(), specimenBriefInfo.getSpecimen());
+            specimen = new SpecimenWrapper(SessionManager.getAppService(),
+                specimenBriefInfo.getSpecimen());
         } else {
             specimen = new SpecimenWrapper(SessionManager.getAppService());
         }
         setExpectedSpecimen(specimen);
+        return specimen;
+    }
+
+    public SpecimenWrapper merge(SpecimenBriefInfo specimenBriefInfo, CellInfo cell)
+        throws Exception {
+        SpecimenWrapper specimen = mergeExpected(specimenBriefInfo, cell);
         setSpecimen(specimen);
+        return specimen;
     }
 
     public void setStatus(CellInfoStatus status) {

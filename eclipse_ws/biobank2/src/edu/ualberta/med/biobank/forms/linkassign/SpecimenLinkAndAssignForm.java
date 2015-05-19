@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.forms.linkassign;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -42,6 +43,7 @@ import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.container.ContainerSaveAction;
 import edu.ualberta.med.biobank.common.action.exception.AccessDeniedException;
 import edu.ualberta.med.biobank.common.action.scanprocess.CellInfo;
 import edu.ualberta.med.biobank.common.action.scanprocess.SpecimenAssignProcessAction;
@@ -49,6 +51,9 @@ import edu.ualberta.med.biobank.common.action.scanprocess.SpecimenLinkProcessAct
 import edu.ualberta.med.biobank.common.action.scanprocess.data.AssignProcessInfo;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.ProcessResult;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.ScanProcessResult;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenAssignSaveAction;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenAssignSaveAction.SpecimenAssignResInfo;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenAssignSaveAction.SpecimenInfo;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenBriefInfo;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction.AliquotedSpecimenInfo;
@@ -84,6 +89,7 @@ import edu.ualberta.med.biobank.widgets.grids.well.SpecimenCell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 import edu.ualberta.med.scannerconfig.PalletDimensions;
 import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 /**
  * Allows the user to select specimens from a pallet grid and link and assign specimens.
@@ -105,7 +111,7 @@ public class SpecimenLinkAndAssignForm
     @SuppressWarnings("nls")
     public static final String ID = "edu.ualberta.med.biobank.forms.SpecimenLinkEntryAndAssignForm";
 
-    // TR: form title
+    // TR: form titlekey
     @SuppressWarnings("nls")
     public static final String FORM_TITLE = i18n.tr("Specimen link and assign");
 
@@ -157,6 +163,9 @@ public class SpecimenLinkAndAssignForm
     private final IObservableValue allSpecimensSameStudy = new WritableValue(Boolean.FALSE, Boolean.class);
 
     private ScanAssignSettings scanAssignSettings;
+
+    private final Map<String, AliquotedSpecimenResInfo> linkedSpecimensMap =
+        new HashMap<String, AliquotedSpecimenResInfo>(0);
 
     @Override
     protected void init() throws Exception {
@@ -374,6 +383,15 @@ public class SpecimenLinkAndAssignForm
         recreateScanPalletWidget(rows, cols);
         page.layout(true, true);
         book.reflow(true);
+    }
+
+    @Override
+    protected void launchScanAndProcessResult() {
+        // need to disable here because it is re-enabled after the flatbed scan is processed
+        //
+        // see afterScanAndProcess() and enableMultiSelection()
+        enableMultiSelection(false);
+        super.launchScanAndProcessResult();
     }
 
     /**
@@ -634,11 +652,18 @@ public class SpecimenLinkAndAssignForm
         if (dialog.open() == Dialog.OK) {
             scanMode = ScanMode.ASSIGN;
 
-            scanAssignSettings = new ScanAssignSettings(
-                dialog.getPalletBarcode(),
-                dialog.getPalletLabel(),
-                dialog.getPalletContainerType(),
-                dialog.getPalletContainer());
+            if (scanAssignSettings.palletLabel.isEmpty()) {
+                // only update the settings the first time the dialog is opened
+                scanAssignSettings = new ScanAssignSettings(
+                    dialog.getPalletBarcode(),
+                    dialog.getPalletLabel(),
+                    dialog.getPalletContainerType(),
+                    dialog.getPalletContainer(),
+                    dialog.isNewContainer());
+            }
+
+            log.info("palletContainer parent: {}",
+                scanAssignSettings.palletContainer.getParentContainer());
 
             palletWidgetLinkSpecimens(
                 palletWidget.getMultiSelectionManager().getSelectedCells(),
@@ -746,12 +771,8 @@ public class SpecimenLinkAndAssignForm
                 log.debug("processScanResult: palletCell is null: pos ({}, {})",
                     pos.getRow(), pos.getCol());
             }
-            palletCell.merge(specimenDataMap.get(palletCell.getValue()), servercell);
-            // additional cell specific client conversion if needed
-            processCellResult(pos, palletCell);
+            palletCell.mergeExpected(specimenDataMap.get(palletCell.getValue()), servercell);
         }
-
-        afterScanAndProcess(null);
     }
 
     public void assignDecodeAndProcessError(String errorMsg) {
@@ -793,6 +814,7 @@ public class SpecimenLinkAndAssignForm
             if (allCellsHaveNoType()) {
                 scanMode = ScanMode.NONE;
             }
+            linkedSpecimensMap.clear();
         }
     }
 
@@ -806,6 +828,7 @@ public class SpecimenLinkAndAssignForm
                 + "Doing so will clear any previously assigned specimens also."));
         if (userSelection) {
             clearCells(palletWidget.getCells().values());
+            linkedSpecimensMap.clear();
         }
     }
 
@@ -903,11 +926,9 @@ public class SpecimenLinkAndAssignForm
         currentGridDimensions = new RowColPos(RowColPos.ROWS_DEFAULT, RowColPos.COLS_DEFAULT);
     }
 
-    @SuppressWarnings("nls")
     @Override
     protected void refreshPalletDisplay() {
-        log.debug("refreshPalletDisplay:");
-        // TODO Auto-generated method stub
+        // do nothing
     }
 
     /**
@@ -1006,41 +1027,141 @@ public class SpecimenLinkAndAssignForm
         SessionManager.log("save", null, "SpecimenLinkAndAssign");
     }
 
-    @SuppressWarnings({ "unchecked", "nls" })
+    @SuppressWarnings("nls")
     private void saveLinkedSpecimens() throws Exception {
         if (scanMode != ScanMode.LINK) {
             throw new IllegalStateException("invalid mode: " + scanMode);
         }
+        linkSpecimens();
+    }
 
+    @SuppressWarnings("unchecked")
+    private void linkSpecimens() throws Exception {
         Map<RowColPos, SpecimenCell> cells = (Map<RowColPos, SpecimenCell>) palletWidget.getCells();
-        List<AliquotedSpecimenInfo> asiList = new ArrayList<AliquotedSpecimenInfo>();
+        Map<String, SpecimenCell> cellsByInventoryId = new HashMap<String, SpecimenCell>(cells.size());
+        List<AliquotedSpecimenInfo> spcInfoList = new ArrayList<AliquotedSpecimenInfo>();
+
         for (SpecimenCell cell : cells.values()) {
             if (SpecimenCell.hasValue(cell) && cell.getStatus() == UICellStatus.TYPE) {
                 SpecimenWrapper sourceSpecimen = cell.getSourceSpecimen();
                 SpecimenWrapper aliquotedSpecimen = cell.getSpecimen();
-                AliquotedSpecimenInfo asi = new AliquotedSpecimenInfo();
-                asi.activityStatus = ActivityStatus.ACTIVE;
-                asi.typeId = aliquotedSpecimen.getSpecimenType().getId();
-                asi.inventoryId = cell.getValue();
-                asi.parentSpecimenId = sourceSpecimen.getId();
-                asiList.add(asi);
+                AliquotedSpecimenInfo spcInfo = new AliquotedSpecimenInfo();
+                spcInfo.activityStatus = ActivityStatus.ACTIVE;
+                spcInfo.typeId = aliquotedSpecimen.getSpecimenType().getId();
+                spcInfo.inventoryId = cell.getValue();
+                spcInfo.parentSpecimenId = sourceSpecimen.getId();
+                spcInfoList.add(spcInfo);
             }
+            cellsByInventoryId.put(cell.getValue(), cell);
         }
+
         List<AliquotedSpecimenResInfo> linkedSpecimens =
             SessionManager.getAppService().doAction(
                 new SpecimenLinkSaveAction(
-                    SessionManager.getUser().getCurrentWorkingCenter().getId(), null, asiList)
+                    SessionManager.getUser().getCurrentWorkingCenter().getId(), null, spcInfoList)
                 ).getList();
+        setLinkedSpecimens(linkedSpecimens);
+
         appendLogs(ScanLinkHelper.linkedSpecimensLogMessage(linkedSpecimens));
     }
 
+    private void setLinkedSpecimens(List<AliquotedSpecimenResInfo> linkedSpecimens) {
+        for (AliquotedSpecimenResInfo spcInfo : linkedSpecimens) {
+            linkedSpecimensMap.put(spcInfo.inventoryId, spcInfo);
+        }
+    }
+
     @SuppressWarnings("nls")
-    private void saveAssignedSpecimens() {
+    private void saveAssignedSpecimens() throws Exception {
         if (scanMode != ScanMode.ASSIGN) {
             throw new IllegalStateException("invalid mode: " + scanMode);
         }
 
+        linkSpecimens();
+        assignSpecimens();
+    }
+
+    @SuppressWarnings({ "unchecked", "nls" })
+    private void assignSpecimens() throws ApplicationException {
         // TODO See SpecimenAssignEntryForm.saveMultipleSpecimens()
+        Map<RowColPos, SpecimenCell> cells = (Map<RowColPos, SpecimenCell>) palletWidget.getCells();
+        List<SpecimenInfo> specInfos = new ArrayList<SpecimenAssignSaveAction.SpecimenInfo>();
+        for (Entry<RowColPos, SpecimenCell> entry : cells.entrySet()) {
+            RowColPos rcp = entry.getKey();
+            SpecimenCell cell = entry.getValue();
+            if ((cell != null) && (cell.getStatus() == UICellStatus.TYPE)) {
+                AliquotedSpecimenResInfo spcInfo = linkedSpecimensMap.get(cell.getValue());
+
+                if (spcInfo == null) {
+                    throw new IllegalStateException(
+                        "inventory ID missing from linked specimen information: " + cell.getValue());
+                }
+
+                SpecimenInfo specInfo = new SpecimenInfo();
+                specInfo.specimenId = spcInfo.id;
+                specInfo.position = rcp;
+                specInfos.add(specInfo);
+            }
+        }
+
+        ContainerWrapper palletContainer = scanAssignSettings.palletContainer;
+        ContainerWrapper parentContainer = palletContainer.getParentContainer();
+
+        if (parentContainer == null) {
+            throw new IllegalStateException("pallet's parent container is null");
+        }
+
+        // need to update container's product barcode
+        ContainerSaveAction csAction = new ContainerSaveAction();
+        csAction.setBarcode(scanAssignSettings.palletBarcode);
+        csAction.setTypeId(palletContainer.getContainerType().getId());
+        csAction.setActivityStatus(palletContainer.getActivityStatus());
+        csAction.setSiteId(SessionManager.getUser().getCurrentWorkingSite().getId());
+
+        if (palletContainer.getId() != null) {
+            csAction.setId(palletContainer.getId());
+        }
+
+        if (palletContainer.getParentContainer() == null) {
+            csAction.setLabel(palletContainer.getLabel());
+        } else {
+            csAction.setParentId(parentContainer.getId());
+            csAction.setPosition(palletContainer.getPositionAsRowCol());
+        }
+
+        logContainerSaveAction(csAction);
+        Integer containerId = SessionManager.getAppService().doAction(csAction).getId();
+
+        SpecimenAssignResInfo res = SessionManager.getAppService().doAction(
+            new SpecimenAssignSaveAction(containerId, specInfos));
+
+        if (scanAssignSettings.isNewPalletContainer) {
+            if (res.parentContainerId != null) {
+                appendLog(MessageFormat.format(
+                    "ADDED: Pallet {0} of type {1} to position {2} of site {3}",
+                    res.parentBarcode, res.parentTypeName,
+                    res.parentLabel, res.siteName));
+            } else {
+                throw new RuntimeException(
+                    // TR: exception message
+                    i18n.tr("problem with parent container creation"));
+            }
+        }
+    }
+
+    @SuppressWarnings("nls")
+    private void logContainerSaveAction(ContainerSaveAction action) {
+        StringBuffer buf = new StringBuffer();
+        buf.append("containerId: ").append(action.containerId);
+        buf.append(", activityStatus: ").append(action.activityStatus);
+        buf.append(", barcode: ").append(action.barcode);
+        buf.append(", label: ").append(action.label);
+        buf.append(", siteId: ").append(action.siteId);
+        buf.append(", typeId: ").append(action.typeId);
+        buf.append(", position: ").append(action.position);
+        buf.append(", path: ").append(action.path);
+        buf.append(", parentId: ").append(action.parentId);
+        log.info("ContainerSaveActionL {}", buf.toString());
     }
 
     private enum ScanMode {
@@ -1059,20 +1180,24 @@ public class SpecimenLinkAndAssignForm
 
         public final ContainerWrapper palletContainer;
 
+        public final boolean isNewPalletContainer;
+
         public ScanAssignSettings(
             String palletBarcode,
             String palletLabel,
             ContainerTypeWrapper palletType,
-            ContainerWrapper palletContainer) {
+            ContainerWrapper palletContainer,
+            boolean isNewPalletContainer) {
             this.palletBarcode = palletBarcode;
             this.palletLabel = palletLabel;
             this.palletType = palletType;
             this.palletContainer = palletContainer;
+            this.isNewPalletContainer = isNewPalletContainer;
         }
 
         public static ScanAssignSettings getInitialValues() {
             return new ScanAssignSettings(
-                StringUtil.EMPTY_STRING, StringUtil.EMPTY_STRING, null, null);
+                StringUtil.EMPTY_STRING, StringUtil.EMPTY_STRING, null, null, false);
         }
 
     }
