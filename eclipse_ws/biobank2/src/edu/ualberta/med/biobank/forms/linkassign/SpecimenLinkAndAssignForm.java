@@ -34,6 +34,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -288,8 +289,43 @@ public class SpecimenLinkAndAssignForm
             );
 
         createScanButton(leftComposite);
+        createHelpText(leftComposite);
+
         setCanLaunchScan(true);
         setFirstControl(palletDimensionsComboViewer.getCombo());
+    }
+
+    @SuppressWarnings("nls")
+    private void createHelpText(Composite parent) {
+        Composite composite = toolkit.createComposite(parent);
+        GridLayout gl = new GridLayout(1, false);
+        gl.marginTop = 20;
+        composite.setLayout(gl);
+        GridData gd = new GridData(SWT.HORIZONTAL, SWT.TOP, true, false, 1, 1);
+        composite.setLayoutData(gd);
+        toolkit.paintBordersFor(composite);
+
+        Label label = toolkit.createLabel(composite,
+            // TR: label in entry form
+            i18n.tr("Once a pallet has been decoded, use left click to select a cell."),
+            SWT.WRAP | SWT.LEFT);
+        gd = new GridData(SWT.HORIZONTAL, SWT.TOP, true, false, 1, 1);
+        label.setLayoutData(gd);
+
+        label = toolkit.createLabel(composite,
+            // TR: label in entry form
+            i18n.tr("Use the Shift key and left click to extend the range of selected cells."),
+            SWT.WRAP | SWT.LEFT);
+        gd = new GridData(SWT.HORIZONTAL, SWT.TOP, true, false, 1, 1);
+        label.setLayoutData(gd);
+
+        label = toolkit.createLabel(composite,
+            // TR: label in entry form
+            i18n.tr("Use the Ctrl key and left click to add a cell to the selected cells."),
+            SWT.WRAP);
+        gd = new GridData(SWT.HORIZONTAL, SWT.TOP, true, false, 1, 1);
+        label.setLayoutData(gd);
+
     }
 
     private void createRightSection(Composite parent) throws Exception {
@@ -598,6 +634,8 @@ public class SpecimenLinkAndAssignForm
                 SessionManager.getAppService(), sourceSecimen));
             cell.setSpecimenType(new SpecimenTypeWrapper(
                 SessionManager.getAppService(), aliquotSpecimenType));
+            cell.setTitle(
+                cell.getSourceSpecimen().getCollectionEvent().getPatient().getPnumber());
             if (cell.getStatus() != UICellStatus.ERROR) {
                 cell.setStatus(UICellStatus.TYPE);
             }
@@ -661,9 +699,6 @@ public class SpecimenLinkAndAssignForm
                     dialog.getPalletContainer(),
                     dialog.isNewContainer());
             }
-
-            log.info("palletContainer parent: {}",
-                scanAssignSettings.palletContainer.getParentContainer());
 
             palletWidgetLinkSpecimens(
                 palletWidget.getMultiSelectionManager().getSelectedCells(),
@@ -786,6 +821,7 @@ public class SpecimenLinkAndAssignForm
             SpecimenCell cell = (SpecimenCell) i;
             cell.setSourceSpecimen(null);
             cell.setSpecimenType(null);
+            cell.setTitle(StringUtil.EMPTY_STRING);
             cell.setStatus(UICellStatus.NO_TYPE);
         }
         palletWidget.updateCells();
@@ -904,7 +940,14 @@ public class SpecimenLinkAndAssignForm
                 log.debug("afterScanAndProcess: asyncExec");
                 // Show result in grid
                 palletWidget.setCells(getCells());
-                enableMultiSelection(true);
+
+                // rowToProcess is null when an image is decoded.
+                //
+                // it is non-null when the user double clicks on a cell and enters the barcode
+                // manually.
+                if (rowToProcess == null) {
+                    enableMultiSelection(true);
+                }
             }
         });
     }
@@ -1129,7 +1172,6 @@ public class SpecimenLinkAndAssignForm
             csAction.setPosition(palletContainer.getPositionAsRowCol());
         }
 
-        logContainerSaveAction(csAction);
         Integer containerId = SessionManager.getAppService().doAction(csAction).getId();
 
         SpecimenAssignResInfo res = SessionManager.getAppService().doAction(
@@ -1147,21 +1189,6 @@ public class SpecimenLinkAndAssignForm
                     i18n.tr("problem with parent container creation"));
             }
         }
-    }
-
-    @SuppressWarnings("nls")
-    private void logContainerSaveAction(ContainerSaveAction action) {
-        StringBuffer buf = new StringBuffer();
-        buf.append("containerId: ").append(action.containerId);
-        buf.append(", activityStatus: ").append(action.activityStatus);
-        buf.append(", barcode: ").append(action.barcode);
-        buf.append(", label: ").append(action.label);
-        buf.append(", siteId: ").append(action.siteId);
-        buf.append(", typeId: ").append(action.typeId);
-        buf.append(", position: ").append(action.position);
-        buf.append(", path: ").append(action.path);
-        buf.append(", parentId: ").append(action.parentId);
-        log.info("ContainerSaveActionL {}", buf.toString());
     }
 
     private enum ScanMode {

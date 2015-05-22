@@ -227,8 +227,7 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
     @SuppressWarnings("nls")
     private void createSingleMultipleSection(Composite leftComposite)
         throws Exception {
-        Composite singleMultipleComposite = toolkit
-            .createComposite(leftComposite);
+        Composite singleMultipleComposite = toolkit.createComposite(leftComposite);
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
         layout.marginWidth = 0;
@@ -239,8 +238,7 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
         singleMultipleComposite.setLayoutData(gd);
         toolkit.paintBordersFor(singleMultipleComposite);
 
-        Composite buttonsComposite = toolkit
-            .createComposite(singleMultipleComposite);
+        Composite buttonsComposite = toolkit.createComposite(singleMultipleComposite);
         layout = new GridLayout(3, false);
         layout.horizontalSpacing = 0;
         layout.marginWidth = 0;
@@ -476,10 +474,8 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
         gd.grabExcessHorizontalSpace = true;
         singleVisualisation.setLayoutData(gd);
 
-        thirdSingleParentLabel =
-            toolkit.createLabel(singleVisualisation, StringUtil.EMPTY_STRING);
-        secondSingleParentLabel =
-            toolkit.createLabel(singleVisualisation, StringUtil.EMPTY_STRING);
+        thirdSingleParentLabel = toolkit.createLabel(singleVisualisation, StringUtil.EMPTY_STRING);
+        secondSingleParentLabel = toolkit.createLabel(singleVisualisation, StringUtil.EMPTY_STRING);
 
         ContainerType thirdSingleParentType = null;
         ContainerType secondSingleParentType = null;

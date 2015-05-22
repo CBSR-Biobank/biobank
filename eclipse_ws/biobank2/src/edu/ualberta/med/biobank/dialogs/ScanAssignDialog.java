@@ -300,10 +300,7 @@ public class ScanAssignDialog extends ScanLinkDialog
         }
     }
 
-    @SuppressWarnings("nls")
     private void palletBarcodeTextFocusLost() {
-        log.info("palletBarcodeTextFocusLost: palletBarcodeTextModified: {}, checkingPalletLabel: {}",
-            palletBarcodeTextModified, checkingPalletLabel);
         if (palletBarcodeTextModified) {
             String value = (String) palletBarcode.getValue();
             palletContainer.setProductBarcode(value);
@@ -393,10 +390,6 @@ public class ScanAssignDialog extends ScanLinkDialog
 
     @SuppressWarnings("nls")
     private void palletLabelTextFocusLost() {
-        log.info("palletLabelTextFocusLost: palletLabelTextModified: {}, checkingPalletLabel: {}",
-            palletLabelTextModified, checkingPalletLabel);
-        log.info("palletLabelTextFocusLost: palletContainer: {}", palletContainer);
-
         final String label = (String) palletLabel.getValue();
 
         if (palletLabelText.isEnabled() && palletLabelTextModified && !label.isEmpty()) {
@@ -418,10 +411,6 @@ public class ScanAssignDialog extends ScanLinkDialog
 
                     palletContainer.setProductBarcode((String) palletBarcode.getValue());
                     palletContainer.setLabel(label);
-
-                    log.info("palletContainer: label: {}, pallet container: {}", label, container);
-                    log.info("palletContainer: position: {}",
-                        palletContainer.getPositionAsRowCol());
 
                     if (!ok) {
                         BgcPlugin.focusControl(palletLabelText);
