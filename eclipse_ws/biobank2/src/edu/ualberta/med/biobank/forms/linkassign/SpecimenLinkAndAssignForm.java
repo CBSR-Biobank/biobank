@@ -165,6 +165,8 @@ public class SpecimenLinkAndAssignForm
 
     private ScanAssignSettings scanAssignSettings;
 
+    private boolean multiSelectionEnabled = false;
+
     private final Map<String, AliquotedSpecimenResInfo> linkedSpecimensMap =
         new HashMap<String, AliquotedSpecimenResInfo>(0);
 
@@ -419,15 +421,6 @@ public class SpecimenLinkAndAssignForm
         recreateScanPalletWidget(rows, cols);
         page.layout(true, true);
         book.reflow(true);
-    }
-
-    @Override
-    protected void launchScanAndProcessResult() {
-        // need to disable here because it is re-enabled after the flatbed scan is processed
-        //
-        // see afterScanAndProcess() and enableMultiSelection()
-        enableMultiSelection(false);
-        super.launchScanAndProcessResult();
     }
 
     /**
@@ -763,11 +756,17 @@ public class SpecimenLinkAndAssignForm
             throw new IllegalStateException("current working center is null");
         }
 
-        Map<RowColPos, SpecimenCell> cells = (Map<RowColPos, SpecimenCell>) palletWidget.getCells();
+        Collection<AbstractUIWell> selectedCells =
+            palletWidget.getMultiSelectionManager().getSelectedCells();
+        Map<RowColPos, SpecimenCell> cellsMap = (Map<RowColPos, SpecimenCell>) palletWidget.getCells();
         Map<RowColPos, CellInfo> serverCells = new HashMap<RowColPos, CellInfo>(0);
-        if (cells != null) {
-            for (Entry<RowColPos, SpecimenCell> entry : cells.entrySet()) {
-                serverCells.put(entry.getKey(), entry.getValue().transformIntoServerCell());
+        for (AbstractUIWell i : selectedCells) {
+            SpecimenCell cell = (SpecimenCell) i;
+            log.info("pos: {}, status: {}", cell.getPositionStr(), cell.getStatus());
+            if (cell.getStatus() != UICellStatus.EMPTY) {
+                RowColPos pos = new RowColPos(cell.getRow(), cell.getCol());
+                cellsMap.put(pos, cell);
+                serverCells.put(pos, cell.transformIntoServerCell());
             }
         }
 
@@ -786,12 +785,12 @@ public class SpecimenLinkAndAssignForm
 
         Map<String, SpecimenBriefInfo> specimenDataMap =
             AbstractPalletSpecimenAdminForm.getSpecimenData(
-                currentWorkingCenter, new HashSet<SpecimenCell>(cells.values()));
+                currentWorkingCenter, new HashSet<SpecimenCell>(cellsMap.values()));
 
         // for each cell, convert into a client side cell
         for (Entry<RowColPos, CellInfo> entry : res.getCells().entrySet()) {
             RowColPos pos = entry.getKey();
-            SpecimenCell palletCell = cells.get(entry.getKey());
+            SpecimenCell palletCell = cellsMap.get(entry.getKey());
             CellInfo servercell = entry.getValue();
             if (palletCell == null) {
                 // can happen if missing no tube in this cell
@@ -802,12 +801,19 @@ public class SpecimenLinkAndAssignForm
                         servercell.getRow(),
                         servercell.getCol(),
                         servercell.getValue()));
-                cells.put(pos, palletCell);
+                cellsMap.put(pos, palletCell);
                 log.debug("processScanResult: palletCell is null: pos ({}, {})",
                     pos.getRow(), pos.getCol());
             }
             palletCell.mergeExpected(specimenDataMap.get(palletCell.getValue()), servercell);
         }
+        Display.getDefault().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+                palletWidget.updateCells();
+                palletWidget.redraw();
+            }
+        });
     }
 
     public void assignDecodeAndProcessError(String errorMsg) {
@@ -819,10 +825,21 @@ public class SpecimenLinkAndAssignForm
     private void clearCells(Collection<? extends AbstractUIWell> cells) {
         for (AbstractUIWell i : cells) {
             SpecimenCell cell = (SpecimenCell) i;
+
+            // log.info("pos: {}, status: {}", cell.getPositionStr(), cell.getStatus());
+
             cell.setSourceSpecimen(null);
             cell.setSpecimenType(null);
             cell.setTitle(StringUtil.EMPTY_STRING);
-            cell.setStatus(UICellStatus.NO_TYPE);
+
+            UICellStatus cellStatus = cell.getStatus();
+
+            if (cellStatus == UICellStatus.TYPE) {
+                cell.setStatus(UICellStatus.NO_TYPE);
+            } else if (cellStatus != UICellStatus.NO_TYPE) {
+                cell.setStatus(UICellStatus.EMPTY);
+            }
+            cell.setExpectedSpecimen(null);
         }
         palletWidget.updateCells();
         palletWidget.redraw();
@@ -940,12 +957,8 @@ public class SpecimenLinkAndAssignForm
                 log.debug("afterScanAndProcess: asyncExec");
                 // Show result in grid
                 palletWidget.setCells(getCells());
-
-                // rowToProcess is null when an image is decoded.
-                //
-                // it is non-null when the user double clicks on a cell and enters the barcode
-                // manually.
-                if (rowToProcess == null) {
+                if (!multiSelectionEnabled) {
+                    multiSelectionEnabled = true;
                     enableMultiSelection(true);
                 }
             }
@@ -959,7 +972,9 @@ public class SpecimenLinkAndAssignForm
      */
     @Override
     protected void enableFields(boolean enable) {
+        linkedSpecimensMap.clear();
         setChildrenActionSectionEnabled(false);
+        multiSelectionEnabled = false;
         enableMultiSelection(false);
         palletWidget.setCells(getCells());
         palletScanManagement.onReset();

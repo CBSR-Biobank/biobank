@@ -1265,7 +1265,7 @@
                   commandId="edu.ualberta.med.biobank.commands.processing.specimenLinkAndAssign"
                   icon="icons/scanLinkAndAssign.png"
                   style="push"
-                  tooltip="Specimen Link and Assign (demo)">
+                  tooltip="Specimen Link and Assign">
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.deleteSelection"
