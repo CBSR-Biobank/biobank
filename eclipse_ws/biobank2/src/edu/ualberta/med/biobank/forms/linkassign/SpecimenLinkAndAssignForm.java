@@ -133,9 +133,9 @@ public class SpecimenLinkAndAssignForm
     private static final String CLEAR_PALLET_CONTAINER_BUTTON_LABEL =
         i18n.tr("Clear pallet container");
 
-    private static final int LEFT_SECTION_WIDTH = 260;
+    private static final int LEFT_SECTION_WIDTH = 220;
 
-    private static final int RIGHT_SECTION_WIDTH = 300;
+    private static final int RIGHT_SECTION_WIDTH = 320;
 
     private static BgcLogger logger = BgcLogger.getLogger(SpecimenLinkAndAssignForm.class.getName());
 
