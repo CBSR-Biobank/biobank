@@ -23,7 +23,11 @@ import edu.ualberta.med.biobank.model.util.RowColPos;
 
 public class SpecimenAssignProcessAction extends ServerProcessAction {
     private static final long serialVersionUID = 1L;
+
     private static final Bundle bundle = new CommonBundle();
+
+    // private static Logger log =
+    // LoggerFactory.getLogger(SpecimenAssignProcessAction.class.getName());
 
     private final AssignProcessInfo data;
 
@@ -60,14 +64,25 @@ public class SpecimenAssignProcessAction extends ServerProcessAction {
         CellInfoStatus currentScanState = CellInfoStatus.EMPTY;
         Map<RowColPos, Boolean> movedAndMissingSpecimensFromPallet =
             new HashMap<RowColPos, Boolean>();
-        for (int row = 0; row < assignData.getPalletRowCapacity(actionContext); row++) {
-            for (int col = 0; col < assignData.getPalletColCapacity(actionContext); col++) {
+        int maxRow = assignData.getPalletRowCapacity(actionContext);
+        int maxCol = assignData.getPalletColCapacity(actionContext);
+
+        for (int row = 0; row < maxRow; row++) {
+            for (int col = 0; col < maxCol; col++) {
                 RowColPos rcp = new RowColPos(row, col);
                 CellInfo cell = cells.get(rcp);
-                if (cell == null || cell.getStatus() == null
-                    || cell.getStatus() == CellInfoStatus.EMPTY
-                    || cell.getStatus() == CellInfoStatus.ERROR
-                    || cell.getStatus() == CellInfoStatus.MISSING) {
+                CellInfoStatus cellStatus = null;
+
+                if (cell != null) {
+                    cellStatus = cell.getStatus();
+                }
+
+                if ((cell == null)
+                    || (cellStatus == null)
+                    || (cellStatus == CellInfoStatus.EMPTY)
+                    || (cellStatus == CellInfoStatus.ERROR)
+                    || (cellStatus == CellInfoStatus.MISSING)) {
+
                     Specimen expectedSpecimen = assignData.getExpectedSpecimen(session, row, col);
                     if (expectedSpecimen != null) {
                         if (cell == null) {

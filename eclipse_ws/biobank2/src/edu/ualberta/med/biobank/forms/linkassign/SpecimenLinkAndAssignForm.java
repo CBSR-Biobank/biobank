@@ -47,6 +47,7 @@ import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.container.ContainerSaveAction;
 import edu.ualberta.med.biobank.common.action.exception.AccessDeniedException;
 import edu.ualberta.med.biobank.common.action.scanprocess.CellInfo;
+import edu.ualberta.med.biobank.common.action.scanprocess.CellInfoStatus;
 import edu.ualberta.med.biobank.common.action.scanprocess.SpecimenAssignProcessAction;
 import edu.ualberta.med.biobank.common.action.scanprocess.SpecimenLinkProcessAction;
 import edu.ualberta.med.biobank.common.action.scanprocess.data.AssignProcessInfo;
@@ -59,6 +60,7 @@ import edu.ualberta.med.biobank.common.action.specimen.SpecimenBriefInfo;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction.AliquotedSpecimenInfo;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction.AliquotedSpecimenResInfo;
+import edu.ualberta.med.biobank.common.permission.specimen.SpecimenLinkAndAssignPermission;
 import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
@@ -126,12 +128,16 @@ public class SpecimenLinkAndAssignForm
 
     @SuppressWarnings("nls")
     // TR: button label
-    private static final String CLEAR_CELLS_BUTTON_LABEL = i18n.tr("Clear cells");
+    private static final String CLEAR_LINK_AND_ASSIGN_BUTTON_LABEL = i18n.tr("Clear link / assign");
 
     @SuppressWarnings("nls")
     // TR: button label
     private static final String CLEAR_PALLET_CONTAINER_BUTTON_LABEL =
         i18n.tr("Clear pallet container");
+
+    @SuppressWarnings("nls")
+    // TR: button label
+    private static final String CLEAR_ALL_LABEL = i18n.tr("Clear all");
 
     private static final int LEFT_SECTION_WIDTH = 220;
 
@@ -159,9 +165,16 @@ public class SpecimenLinkAndAssignForm
 
     protected Button clearPalletContainerButton;
 
-    private final IObservableValue allSpecimensLinkedOrAssigned = new WritableValue(Boolean.FALSE, Boolean.class);
+    protected Button clearAllButton;
 
-    private final IObservableValue allSpecimensSameStudy = new WritableValue(Boolean.FALSE, Boolean.class);
+    private final IObservableValue allSpecimensLinkedOrAssigned =
+        new WritableValue(Boolean.FALSE, Boolean.class);
+
+    private final IObservableValue allSpecimensSameStudy =
+        new WritableValue(Boolean.FALSE, Boolean.class);
+
+    private final IObservableValue specimenPositionsValid =
+        new WritableValue(Boolean.FALSE, Boolean.class);
 
     private ScanAssignSettings scanAssignSettings;
 
@@ -169,6 +182,8 @@ public class SpecimenLinkAndAssignForm
 
     private final Map<String, AliquotedSpecimenResInfo> linkedSpecimensMap =
         new HashMap<String, AliquotedSpecimenResInfo>(0);
+
+    private boolean havePermission = false;
 
     @Override
     protected void init() throws Exception {
@@ -178,6 +193,11 @@ public class SpecimenLinkAndAssignForm
         setPartName(FORM_TITLE);
         setCanLaunchScan(false);
         createDataBinding();
+
+        // make sure the user is allowed to access this feature
+        havePermission = SessionManager.getAppService().isAllowed(
+            new SpecimenLinkAndAssignPermission(
+                SessionManager.getUser().getCurrentWorkingCenter().getId()));
     }
 
     private void createDataBinding() {
@@ -212,6 +232,22 @@ public class SpecimenLinkAndAssignForm
         });
         widgetCreator.bindValue(new WritableValue(Boolean.FALSE, Boolean.class),
             allSpecimensSameStudy, uvs, uvs);
+
+        uvs = new UpdateValueStrategy();
+        uvs.setAfterGetValidator(new IValidator() {
+            @SuppressWarnings("nls")
+            @Override
+            public IStatus validate(Object value) {
+                if (value instanceof Boolean && !(Boolean) value) {
+                    return ValidationStatus.error(
+                        // validation error message.
+                        i18n.tr("Specimen(s) assigned to invalid positions"));
+                }
+                return Status.OK_STATUS;
+            }
+        });
+        widgetCreator.bindValue(new WritableValue(Boolean.FALSE, Boolean.class),
+            specimenPositionsValid, uvs, uvs);
     }
 
     @Override
@@ -234,9 +270,32 @@ public class SpecimenLinkAndAssignForm
         mainComposite.setLayoutData(gd);
         toolkit.adapt(mainComposite);
 
+        if (!havePermission) {
+            noPermission(mainComposite);
+            return;
+        }
+
         createLeftSection(mainComposite);
         createPalletComposite(mainComposite);
         createRightSection(mainComposite);
+    }
+
+    @SuppressWarnings("nls")
+    private void noPermission(Composite parent) {
+        Composite composite = toolkit.createComposite(parent);
+        GridLayout gl = new GridLayout(1, false);
+        gl.marginTop = 20;
+        composite.setLayout(gl);
+        GridData gd = new GridData(SWT.HORIZONTAL, SWT.TOP, true, false, 1, 1);
+        composite.setLayoutData(gd);
+        toolkit.paintBordersFor(composite);
+
+        Label label = toolkit.createLabel(composite,
+            // TR: label in entry form
+            i18n.tr("Access Denied. You do not have permission to use this feature."),
+            SWT.WRAP | SWT.LEFT);
+        gd = new GridData(SWT.HORIZONTAL, SWT.TOP, true, false, 1, 1);
+        label.setLayoutData(gd);
     }
 
     @SuppressWarnings("nls")
@@ -366,7 +425,7 @@ public class SpecimenLinkAndAssignForm
         });
         scanAssignButton.setEnabled(false);
 
-        clearCellsButton = toolkit.createButton(rightComposite, CLEAR_CELLS_BUTTON_LABEL, SWT.PUSH);
+        clearCellsButton = toolkit.createButton(rightComposite, CLEAR_LINK_AND_ASSIGN_BUTTON_LABEL, SWT.PUSH);
         gd = new GridData();
         gd.widthHint = buttonWidth;
         clearCellsButton.setLayoutData(gd);
@@ -387,10 +446,21 @@ public class SpecimenLinkAndAssignForm
             @Override
             public void widgetSelected(SelectionEvent e) {
                 clearPalletContainer();
-                scanAssignSettings = ScanAssignSettings.getInitialValues();
             }
         });
         clearPalletContainerButton.setEnabled(false);
+
+        clearAllButton = toolkit.createButton(rightComposite, CLEAR_ALL_LABEL, SWT.PUSH);
+        gd = new GridData();
+        gd.widthHint = buttonWidth;
+        clearAllButton.setLayoutData(gd);
+        clearAllButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                clearAllOnSelected();
+            }
+        });
+        clearAllButton.setEnabled(false);
 
         createCancelConfirmWidget(rightComposite);
         setChildrenActionSectionEnabled(false);
@@ -435,6 +505,7 @@ public class SpecimenLinkAndAssignForm
         scanAssignButton.setEnabled(enable);
         clearCellsButton.setEnabled(enable);
         clearPalletContainerButton.setEnabled(enable);
+        clearAllButton.setEnabled(enable);
     }
 
     protected void recreateScanPalletWidget(int rows, int cols) {
@@ -762,11 +833,16 @@ public class SpecimenLinkAndAssignForm
         Map<RowColPos, CellInfo> serverCells = new HashMap<RowColPos, CellInfo>(0);
         for (AbstractUIWell i : selectedCells) {
             SpecimenCell cell = (SpecimenCell) i;
-            log.info("pos: {}, status: {}", cell.getPositionStr(), cell.getStatus());
             if (cell.getStatus() != UICellStatus.EMPTY) {
                 RowColPos pos = new RowColPos(cell.getRow(), cell.getCol());
                 cellsMap.put(pos, cell);
-                serverCells.put(pos, cell.transformIntoServerCell());
+                CellInfo serverCell = cell.transformIntoServerCell();
+
+                // set server cells status to null so that SpecimenAssignProcessAction performs
+                // proper checks
+                serverCell.setStatus(null);
+
+                serverCells.put(pos, serverCell);
             }
         }
 
@@ -780,40 +856,67 @@ public class SpecimenLinkAndAssignForm
                 serverCells,
                 Locale.getDefault()));
 
-        // print result logs
-        appendLogs(res.getLogs());
+        // print result logs - but first filter out specimens that are to be linked and assigned
+        List<String> filteredLogs = new ArrayList<String>();
+        for (String log : res.getLogs()) {
+            if (!log.contains("not found in the database")) {
+                filteredLogs.add(log);
+            }
+        }
+        appendLogs(filteredLogs);
 
         Map<String, SpecimenBriefInfo> specimenDataMap =
             AbstractPalletSpecimenAdminForm.getSpecimenData(
                 currentWorkingCenter, new HashSet<SpecimenCell>(cellsMap.values()));
 
+        boolean haveSpecimenPositionError = false;
+
         // for each cell, convert into a client side cell
         for (Entry<RowColPos, CellInfo> entry : res.getCells().entrySet()) {
             RowColPos pos = entry.getKey();
             SpecimenCell palletCell = cellsMap.get(entry.getKey());
-            CellInfo servercell = entry.getValue();
+            CellInfo serverCell = entry.getValue();
             if (palletCell == null) {
                 // can happen if missing no tube in this cell
                 palletCell = new SpecimenCell(
                     pos.getRow(),
                     pos.getCol(),
                     new DecodedWell(
-                        servercell.getRow(),
-                        servercell.getCol(),
-                        servercell.getValue()));
+                        serverCell.getRow(),
+                        serverCell.getCol(),
+                        serverCell.getValue()));
                 cellsMap.put(pos, palletCell);
                 log.debug("processScanResult: palletCell is null: pos ({}, {})",
                     pos.getRow(), pos.getCol());
             }
-            palletCell.mergeExpected(specimenDataMap.get(palletCell.getValue()), servercell);
+
+            // specimens that have not been linked yet will return a status of ERROR, it is OK
+            // to add these.
+            //
+            // However, serverCell.getExpectedSpecimenId() returns non null if the spot is already
+            // filled by a different specimen
+            if ((serverCell.getStatus() != CellInfoStatus.ERROR)
+                || (serverCell.getExpectedSpecimenId() != null)) {
+                palletCell.mergeExpected(specimenDataMap.get(palletCell.getValue()), serverCell);
+            }
+
+            if (serverCell.getExpectedSpecimenId() != null) {
+                haveSpecimenPositionError = true;
+            }
         }
+        updateCells(!haveSpecimenPositionError);
+    }
+
+    private void updateCells(final boolean validSpecimenPositions) {
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
                 palletWidget.updateCells();
                 palletWidget.redraw();
+                specimenPositionsValid.setValue(validSpecimenPositions);
             }
         });
+
     }
 
     public void assignDecodeAndProcessError(String errorMsg) {
@@ -822,7 +925,7 @@ public class SpecimenLinkAndAssignForm
         }
     }
 
-    private void clearCells(Collection<? extends AbstractUIWell> cells) {
+    private void clearLinkAndAssignOnCells(Collection<? extends AbstractUIWell> cells) {
         for (AbstractUIWell i : cells) {
             SpecimenCell cell = (SpecimenCell) i;
 
@@ -849,7 +952,7 @@ public class SpecimenLinkAndAssignForm
     }
 
     /**
-     * Called when the user presses the "Clear cells" button.
+     * Called when the user presses the "Clear link / assign" button.
      * 
      * The selected cells have any link and / or assign information cleared.
      */
@@ -859,16 +962,20 @@ public class SpecimenLinkAndAssignForm
             // confirmation dialog title
             i18n.tr("Clear cells"),
             // confirmation dialog message
-            i18n.tr("Are you sure you want to clear the selected cells?"));
+            i18n.tr("Are you sure you want to clear the link / assing information on the selected cells?"));
 
         if (userSelection) {
-            clearCells(palletWidget.getMultiSelectionManager().getSelectedCells());
-
-            if (allCellsHaveNoType()) {
-                scanMode = ScanMode.NONE;
-            }
-            linkedSpecimensMap.clear();
+            clearSelectionConfirmed();
         }
+    }
+
+    private void clearSelectionConfirmed() {
+        clearLinkAndAssignOnCells(palletWidget.getMultiSelectionManager().getSelectedCells());
+
+        if (allCellsHaveNoType()) {
+            scanMode = ScanMode.NONE;
+        }
+        linkedSpecimensMap.clear();
     }
 
     @SuppressWarnings("nls")
@@ -879,9 +986,37 @@ public class SpecimenLinkAndAssignForm
             // confirmation dialog message
             i18n.tr("Are you sure you want to clear the pallet container?\n"
                 + "Doing so will clear any previously assigned specimens also."));
+
         if (userSelection) {
-            clearCells(palletWidget.getCells().values());
+            clearLinkAndAssignOnCells(palletWidget.getCells().values());
             linkedSpecimensMap.clear();
+            scanAssignSettings = ScanAssignSettings.getInitialValues();
+        }
+    }
+
+    /**
+     * Called when the user presses the "Clear all" button.
+     * 
+     * The selected cells have any link and / or assign information cleared.
+     */
+    @SuppressWarnings("nls")
+    private void clearAllOnSelected() {
+        boolean userSelection = BgcPlugin.openConfirm(
+            // confirmation dialog title
+            i18n.tr("Clear cells"),
+            // confirmation dialog message
+            i18n.tr("Are you sure you want to clear everything on the selected cells (including decoded inventory IDs)?"));
+
+        if (userSelection) {
+            clearSelectionConfirmed();
+            for (AbstractUIWell cell : palletWidget.getMultiSelectionManager().getSelectedCells()) {
+                SpecimenCell specimenCell = (SpecimenCell) cell;
+                specimenCell.setStatus(UICellStatus.EMPTY);
+                specimenCell.setValue(StringUtil.EMPTY_STRING);
+            }
+
+            palletWidget.updateCells();
+            palletWidget.redraw();
         }
     }
 
@@ -972,6 +1107,7 @@ public class SpecimenLinkAndAssignForm
      */
     @Override
     protected void enableFields(boolean enable) {
+        scanMode = ScanMode.NONE;
         linkedSpecimensMap.clear();
         setChildrenActionSectionEnabled(false);
         multiSelectionEnabled = false;
@@ -982,6 +1118,7 @@ public class SpecimenLinkAndAssignForm
         // setScanHasBeenLaunched(false);
         cancelConfirmWidget.reset();
         currentGridDimensions = new RowColPos(RowColPos.ROWS_DEFAULT, RowColPos.COLS_DEFAULT);
+        specimenPositionsValid.setValue(false);
     }
 
     @Override

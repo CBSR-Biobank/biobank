@@ -9,6 +9,8 @@ import java.util.Set;
 import org.hibernate.FetchMode;
 import org.hibernate.Query;
 import org.hibernate.criterion.Restrictions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
@@ -21,7 +23,7 @@ import edu.ualberta.med.biobank.model.Study;
 public class ClinicGetStudyInfoAction implements Action<ListResult<StudyCountInfo>> {
     private static final long serialVersionUID = 1L;
 
-    // private static Logger log = LoggerFactory.getLogger(ClinicGetStudyInfoAction.class);
+    private static Logger log = LoggerFactory.getLogger(ClinicGetStudyInfoAction.class);
 
     @SuppressWarnings("nls")
     private static final String STUDY_INFO_HQL =
@@ -84,10 +86,12 @@ public class ClinicGetStudyInfoAction implements Action<ListResult<StudyCountInf
             if (row[1] == null) continue;
 
             Study study = (Study) row[1];
-            if (!studiesForClinic.contains(study)) {
-                throw new IllegalStateException("study not associated with clinic");
+            if (studiesForClinic.contains(study)) {
+                countInfoById.put(study, new StudyCountInfo(study, (Long) row[2], (Long) row[3]));
+            } else {
+                log.error("study not linked to clinic via contacts: study: {}, clincId: {}",
+                    study.getNameShort(), clinicId);
             }
-            countInfoById.put(study, new StudyCountInfo(study, (Long) row[2], (Long) row[3]));
         }
 
         // set counts for studies with no patients and collection events

@@ -112,10 +112,12 @@ public class ScanTubeManually extends PersistedDialog implements Listener {
             // TR: wizard page error message
             setErrorMessage(i18n.tr("The value entered already exists at position {0}", label));
             setMessage(null);
+            setOkButtonEnabled(false);
         } else {
             existingInventoryIds.put(labelToScan, inventoryId);
             setErrorMessage(null);
             setMessage(i18n.tr("Scan the tube at position {0}", labelToScan));
+            setOkButtonEnabled(true);
         }
     }
 
