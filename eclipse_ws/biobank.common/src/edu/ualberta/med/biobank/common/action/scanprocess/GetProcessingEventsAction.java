@@ -80,7 +80,7 @@ public class GetProcessingEventsAction implements Action<ListResult<ProcessingEv
     @SuppressWarnings("nls")
     @Override
     public ListResult<ProcessingEvent> run(ActionContext context) throws ActionException {
-        log.info("run: pNumber={}, currentWorkingCenterId={}", pNumber, currentWorkingCenterId);
+        log.debug("run: pNumber={}, currentWorkingCenterId={}", pNumber, currentWorkingCenterId);
 
         List<ProcessingEvent> processingEvents;
 

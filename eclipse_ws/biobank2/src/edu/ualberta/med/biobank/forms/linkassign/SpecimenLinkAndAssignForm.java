@@ -96,12 +96,12 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 /**
  * Allows the user to select specimens from a pallet grid and link and assign specimens.
- * 
+ *
  * Specimens on the same pallet row can be assigned to different source specimens, aliquot specimen
  * types, collection events and patients.
- * 
+ *
  * @author nelson
- * 
+ *
  */
 public class SpecimenLinkAndAssignForm
     extends AbstractPalletSpecimenAdminForm
@@ -137,7 +137,7 @@ public class SpecimenLinkAndAssignForm
 
     @SuppressWarnings("nls")
     // TR: button label
-    private static final String CLEAR_ALL_LABEL = i18n.tr("Clear all");
+    private static final String CLEAR_ALL_ON_SELECTEDLABEL = i18n.tr("Clear all on selected");
 
     private static final int LEFT_SECTION_WIDTH = 220;
 
@@ -165,7 +165,7 @@ public class SpecimenLinkAndAssignForm
 
     protected Button clearPalletContainerButton;
 
-    protected Button clearAllButton;
+    protected Button clearAllOnSelectedButton;
 
     private final IObservableValue allSpecimensLinkedOrAssigned =
         new WritableValue(Boolean.FALSE, Boolean.class);
@@ -450,17 +450,17 @@ public class SpecimenLinkAndAssignForm
         });
         clearPalletContainerButton.setEnabled(false);
 
-        clearAllButton = toolkit.createButton(rightComposite, CLEAR_ALL_LABEL, SWT.PUSH);
+        clearAllOnSelectedButton = toolkit.createButton(rightComposite, CLEAR_ALL_ON_SELECTEDLABEL, SWT.PUSH);
         gd = new GridData();
         gd.widthHint = buttonWidth;
-        clearAllButton.setLayoutData(gd);
-        clearAllButton.addSelectionListener(new SelectionAdapter() {
+        clearAllOnSelectedButton.setLayoutData(gd);
+        clearAllOnSelectedButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 clearAllOnSelected();
             }
         });
-        clearAllButton.setEnabled(false);
+        clearAllOnSelectedButton.setEnabled(false);
 
         createCancelConfirmWidget(rightComposite);
         setChildrenActionSectionEnabled(false);
@@ -495,9 +495,9 @@ public class SpecimenLinkAndAssignForm
 
     /**
      * Called when the user has selected some cells from the pallet visualization widget.
-     * 
+     *
      * This can only be called after the user has decoded an image.
-     * 
+     *
      * @param enable
      */
     private void setChildrenActionSectionEnabled(boolean enable) {
@@ -505,7 +505,7 @@ public class SpecimenLinkAndAssignForm
         scanAssignButton.setEnabled(enable);
         clearCellsButton.setEnabled(enable);
         clearPalletContainerButton.setEnabled(enable);
-        clearAllButton.setEnabled(enable);
+        clearAllOnSelectedButton.setEnabled(enable);
     }
 
     protected void recreateScanPalletWidget(int rows, int cols) {
@@ -538,7 +538,7 @@ public class SpecimenLinkAndAssignForm
     /**
      * Called to enable or disable the cell selection functionality in the pallet visualization
      * widget.
-     * 
+     *
      * @param enable
      */
     private void enableMultiSelection(boolean enable) {
@@ -570,7 +570,7 @@ public class SpecimenLinkAndAssignForm
     /**
      * Used to check if the selected cells are valid for scan linking or assigning. I.e. not already
      * linked or assigned.
-     * 
+     *
      * @return true if all the selected cells have type {@link UICellStatus.NO_TYPE}.
      */
     @SuppressWarnings("nls")
@@ -590,7 +590,7 @@ public class SpecimenLinkAndAssignForm
 
     /**
      * Used to check if all the cells in the pallet have been linked or assigned.
-     * 
+     *
      * @return true if all the selected cells have type other than {@link UICellStatus.NO_TYPE}.
      */
     private boolean allCellsHaveNoType() {
@@ -605,7 +605,7 @@ public class SpecimenLinkAndAssignForm
 
     /**
      * Used to check if all the cells in the pallet have been linked or assigned.
-     * 
+     *
      * @return true if all the selected cells have type other than {@link UICellStatus.NO_TYPE}.
      */
     private boolean allCellsHaveType() {
@@ -620,7 +620,7 @@ public class SpecimenLinkAndAssignForm
 
     /**
      * Checks that all the linked specimens belong to the same study.
-     * 
+     *
      * @return true if all specimens are to be linked to the same study. False otherwise.
      */
     private boolean allSpecimensInSameStudy() {
@@ -640,7 +640,7 @@ public class SpecimenLinkAndAssignForm
     /**
      * Called when the user has selected some cells and wants to link them to patients, collection
      * event, source specimen, and specimen type.
-     * 
+     *
      * Note that the server will not be updated until the user presses the "Confirm" button.
      */
     @SuppressWarnings("nls")
@@ -711,9 +711,9 @@ public class SpecimenLinkAndAssignForm
     /**
      * Called when the user has selected some cells and wants to link them to patients, collection
      * event, source specimen, specimen type, and a position in a container.
-     * 
+     *
      * This is the same as {@link scanLinkSelection} but also allows to assign a container position.
-     * 
+     *
      * Note that the server will not be updated until the user presses the "Confirm" button.
      */
     @SuppressWarnings("nls")
@@ -816,8 +816,8 @@ public class SpecimenLinkAndAssignForm
     }
 
     /**
-     * go through cells retrieved from scan, set status and update the types combos components
-     * 
+     * Goes through cells retrieved from scan, set status based on response from server.
+     *
      * @throws Exception
      */
     @SuppressWarnings({ "nls", "unchecked" })
@@ -827,12 +827,9 @@ public class SpecimenLinkAndAssignForm
             throw new IllegalStateException("current working center is null");
         }
 
-        Collection<AbstractUIWell> selectedCells =
-            palletWidget.getMultiSelectionManager().getSelectedCells();
         Map<RowColPos, SpecimenCell> cellsMap = (Map<RowColPos, SpecimenCell>) palletWidget.getCells();
         Map<RowColPos, CellInfo> serverCells = new HashMap<RowColPos, CellInfo>(0);
-        for (AbstractUIWell i : selectedCells) {
-            SpecimenCell cell = (SpecimenCell) i;
+        for (SpecimenCell cell : cellsMap.values()) {
             if (cell.getStatus() != UICellStatus.EMPTY) {
                 RowColPos pos = new RowColPos(cell.getRow(), cell.getCol());
                 cellsMap.put(pos, cell);
@@ -953,7 +950,7 @@ public class SpecimenLinkAndAssignForm
 
     /**
      * Called when the user presses the "Clear link / assign" button.
-     * 
+     *
      * The selected cells have any link and / or assign information cleared.
      */
     @SuppressWarnings("nls")
@@ -996,7 +993,7 @@ public class SpecimenLinkAndAssignForm
 
     /**
      * Called when the user presses the "Clear all" button.
-     * 
+     *
      * The selected cells have any link and / or assign information cleared.
      */
     @SuppressWarnings("nls")
@@ -1057,9 +1054,9 @@ public class SpecimenLinkAndAssignForm
 
     /**
      * Used to enter the decoded barcode's message.
-     * 
+     *
      * This can be done by using a hand held scanner.
-     * 
+     *
      * Sometimes, decoding of barcodes using the flatbed scanner some barcodes are missed. This
      * additional method of adding deocded barcode messages provides more flexibility.
      */
@@ -1102,7 +1099,7 @@ public class SpecimenLinkAndAssignForm
 
     /**
      * Called when the form is reset, either by pressing the cancel or confirm buttons
-     * 
+     *
      * @param enalbe - in this implementation we don't care about this value.
      */
     @Override
@@ -1128,7 +1125,7 @@ public class SpecimenLinkAndAssignForm
 
     /**
      * Fields are always valid for this form.
-     * 
+     *
      */
     @Override
     protected boolean fieldsValid() {
@@ -1284,18 +1281,26 @@ public class SpecimenLinkAndAssignForm
         for (Entry<RowColPos, SpecimenCell> entry : cells.entrySet()) {
             RowColPos rcp = entry.getKey();
             SpecimenCell cell = entry.getValue();
-            if ((cell != null) && (cell.getStatus() == UICellStatus.TYPE)) {
-                AliquotedSpecimenResInfo spcInfo = linkedSpecimensMap.get(cell.getValue());
+            if (cell != null) {
+                log.info("cell: pos: {}, status: {}", cell.getRowColPos(), cell.getStatus());
 
-                if (spcInfo == null) {
-                    throw new IllegalStateException(
-                        "inventory ID missing from linked specimen information: " + cell.getValue());
+                // only add cells with status of UICellStatus.TYPE
+                //
+                // if cell has status of UICellStatus.FILLED it has been previously assigned
+                if (cell.getStatus() == UICellStatus.TYPE) {
+                    AliquotedSpecimenResInfo spcInfo = linkedSpecimensMap.get(cell.getValue());
+
+                    if (spcInfo == null) {
+                        throw new IllegalStateException(
+                            "inventory ID missing from linked specimen information: "
+                                + cell.getValue());
+                    }
+
+                    SpecimenInfo specInfo = new SpecimenInfo();
+                    specInfo.specimenId = spcInfo.id;
+                    specInfo.position = rcp;
+                    specInfos.add(specInfo);
                 }
-
-                SpecimenInfo specInfo = new SpecimenInfo();
-                specInfo.specimenId = spcInfo.id;
-                specInfo.position = rcp;
-                specInfos.add(specInfo);
             }
         }
 
