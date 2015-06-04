@@ -96,12 +96,12 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 /**
  * Allows the user to select specimens from a pallet grid and link and assign specimens.
- *
+ * 
  * Specimens on the same pallet row can be assigned to different source specimens, aliquot specimen
  * types, collection events and patients.
- *
+ * 
  * @author nelson
- *
+ * 
  */
 public class SpecimenLinkAndAssignForm
     extends AbstractPalletSpecimenAdminForm
@@ -495,9 +495,9 @@ public class SpecimenLinkAndAssignForm
 
     /**
      * Called when the user has selected some cells from the pallet visualization widget.
-     *
+     * 
      * This can only be called after the user has decoded an image.
-     *
+     * 
      * @param enable
      */
     private void setChildrenActionSectionEnabled(boolean enable) {
@@ -538,7 +538,7 @@ public class SpecimenLinkAndAssignForm
     /**
      * Called to enable or disable the cell selection functionality in the pallet visualization
      * widget.
-     *
+     * 
      * @param enable
      */
     private void enableMultiSelection(boolean enable) {
@@ -570,7 +570,7 @@ public class SpecimenLinkAndAssignForm
     /**
      * Used to check if the selected cells are valid for scan linking or assigning. I.e. not already
      * linked or assigned.
-     *
+     * 
      * @return true if all the selected cells have type {@link UICellStatus.NO_TYPE}.
      */
     @SuppressWarnings("nls")
@@ -590,7 +590,7 @@ public class SpecimenLinkAndAssignForm
 
     /**
      * Used to check if all the cells in the pallet have been linked or assigned.
-     *
+     * 
      * @return true if all the selected cells have type other than {@link UICellStatus.NO_TYPE}.
      */
     private boolean allCellsHaveNoType() {
@@ -605,7 +605,7 @@ public class SpecimenLinkAndAssignForm
 
     /**
      * Used to check if all the cells in the pallet have been linked or assigned.
-     *
+     * 
      * @return true if all the selected cells have type other than {@link UICellStatus.NO_TYPE}.
      */
     private boolean allCellsHaveType() {
@@ -620,7 +620,7 @@ public class SpecimenLinkAndAssignForm
 
     /**
      * Checks that all the linked specimens belong to the same study.
-     *
+     * 
      * @return true if all specimens are to be linked to the same study. False otherwise.
      */
     private boolean allSpecimensInSameStudy() {
@@ -640,7 +640,7 @@ public class SpecimenLinkAndAssignForm
     /**
      * Called when the user has selected some cells and wants to link them to patients, collection
      * event, source specimen, and specimen type.
-     *
+     * 
      * Note that the server will not be updated until the user presses the "Confirm" button.
      */
     @SuppressWarnings("nls")
@@ -711,9 +711,9 @@ public class SpecimenLinkAndAssignForm
     /**
      * Called when the user has selected some cells and wants to link them to patients, collection
      * event, source specimen, specimen type, and a position in a container.
-     *
+     * 
      * This is the same as {@link scanLinkSelection} but also allows to assign a container position.
-     *
+     * 
      * Note that the server will not be updated until the user presses the "Confirm" button.
      */
     @SuppressWarnings("nls")
@@ -817,7 +817,7 @@ public class SpecimenLinkAndAssignForm
 
     /**
      * Goes through cells retrieved from scan, set status based on response from server.
-     *
+     * 
      * @throws Exception
      */
     @SuppressWarnings({ "nls", "unchecked" })
@@ -950,7 +950,7 @@ public class SpecimenLinkAndAssignForm
 
     /**
      * Called when the user presses the "Clear link / assign" button.
-     *
+     * 
      * The selected cells have any link and / or assign information cleared.
      */
     @SuppressWarnings("nls")
@@ -993,7 +993,7 @@ public class SpecimenLinkAndAssignForm
 
     /**
      * Called when the user presses the "Clear all" button.
-     *
+     * 
      * The selected cells have any link and / or assign information cleared.
      */
     @SuppressWarnings("nls")
@@ -1054,9 +1054,9 @@ public class SpecimenLinkAndAssignForm
 
     /**
      * Used to enter the decoded barcode's message.
-     *
+     * 
      * This can be done by using a hand held scanner.
-     *
+     * 
      * Sometimes, decoding of barcodes using the flatbed scanner some barcodes are missed. This
      * additional method of adding deocded barcode messages provides more flexibility.
      */
@@ -1099,7 +1099,7 @@ public class SpecimenLinkAndAssignForm
 
     /**
      * Called when the form is reset, either by pressing the cancel or confirm buttons
-     *
+     * 
      * @param enalbe - in this implementation we don't care about this value.
      */
     @Override
@@ -1115,7 +1115,7 @@ public class SpecimenLinkAndAssignForm
         // setScanHasBeenLaunched(false);
         cancelConfirmWidget.reset();
         currentGridDimensions = new RowColPos(RowColPos.ROWS_DEFAULT, RowColPos.COLS_DEFAULT);
-        specimenPositionsValid.setValue(false);
+        specimenPositionsValid.setValue(true);
     }
 
     @Override
@@ -1125,7 +1125,7 @@ public class SpecimenLinkAndAssignForm
 
     /**
      * Fields are always valid for this form.
-     *
+     * 
      */
     @Override
     protected boolean fieldsValid() {
