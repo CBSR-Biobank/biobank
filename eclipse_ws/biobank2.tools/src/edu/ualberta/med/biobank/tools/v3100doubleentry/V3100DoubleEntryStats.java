@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.tools.v390doubleentry;
+package edu.ualberta.med.biobank.tools.v3100doubleentry;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -10,25 +10,26 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.PropertyConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The databases "biobank_v320_de" and "biobank_v390_de" must first be populated on the host machine
- * prior to running this code. A database dump of the production database goes into
+ * The databases "biobank_v321_de" and "biobank_v3100_de" must first be populated on the host
+ * machine prior to running this code. A database dump of the production database goes into
  * "biobank_v320_de", and a database dump of the test environment database goes into
  * "biobank_v390_de".
  * 
  * @author Nelson Loyola
  * 
  */
-public class V390DoubleEntryStats {
+public class V3100DoubleEntryStats {
 
-    private static Logger log = LoggerFactory.getLogger(V390DoubleEntryStats.class);
+    private static Logger log = LoggerFactory.getLogger(V3100DoubleEntryStats.class);
 
-    public static final String DB_NAME_PRODUCTION = "biobank_v320_de";
+    public static final String DB_NAME_PRODUCTION = "biobank_v321_de";
 
-    public static final String DB_NAME_TEST = "biobank_v390_de";
+    public static final String DB_NAME_TEST = "biobank_v3100_de";
 
     public static final String BASE_QRY = " FROM specimen spc"
         + " LEFT JOIN specimen pspc on pspc.id=spc.parent_specimen_id"
@@ -52,9 +53,9 @@ public class V390DoubleEntryStats {
 
     public static final String ORDER_BY_CLAUSE = " ORDER BY s.name_short,p.pnumber,spc.inventory_id,spc.created_at";
 
-    public static final String DATE_START = "2014-05-12 00:00";
+    public static final String DATE_START = "2015-06-04 00:00";
 
-    public static final String DATE_END = "2014-05-14 00:00";
+    public static final String DATE_END = "2015-06-05 20:00";
 
     private static class DoubleEntryData {
         int studyCount;
@@ -69,19 +70,19 @@ public class V390DoubleEntryStats {
 
     public static void main(String[] argv) {
         try {
-            new V390DoubleEntryStats();
+            new V3100DoubleEntryStats();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private V390DoubleEntryStats() throws SQLException {
-        // PropertyConfigurator.configure("conf/log4j.properties");
+    private V3100DoubleEntryStats() throws SQLException {
+        PropertyConfigurator.configure("conf/log4j.properties");
         DoubleEntryData prodData = getDbStats(DB_NAME_PRODUCTION);
         DoubleEntryData testData = getDbStats(DB_NAME_TEST);
 
-        System.out.println("Double entry start:, " + DATE_START);
-        System.out.println("Double entry end:, " + DATE_END);
+        System.out.println("Double entry start:, " + DATE_START + " Mountain time");
+        System.out.println("Double entry end:, " + DATE_END + " Mountain time");
         System.out.println();
 
         System.out.println(",Production,Test");
@@ -339,7 +340,7 @@ public class V390DoubleEntryStats {
     private ResultSet doQuery(PreparedStatement ps) throws SQLException {
         ps.setString(1, DATE_START);
         ps.setString(2, DATE_END);
-        log.trace("getStudiesCount: {}", ps);
+        log.trace("doQuery: {}", ps);
         return ps.executeQuery();
     }
 
