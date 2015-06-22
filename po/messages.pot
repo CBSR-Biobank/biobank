@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-06-17 12:14-0600\n"
+"POT-Creation-Date: 2015-06-22 14:41-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2607,50 +2607,50 @@ msgid "Enter Name"
 msgstr ""
 
 #. TR: button label
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/ScanAssignDialog.java:59
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/ScanAssignDialog.java:57
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenLinkAndAssignForm.java:127
 msgid "Scan assign"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/ScanAssignDialog.java:144
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/ScanAssignDialog.java:142
 msgid "Pallet label is invalid"
 msgstr ""
 
 #. TR: validation error message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/ScanAssignDialog.java:175
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/ScanAssignDialog.java:173
 msgid "Enter the pallet's barcode"
 msgstr ""
 
 #. TR: label
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/ScanAssignDialog.java:181
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/ScanAssignDialog.java:179
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/dispatch/DispatchCreateScanDialog.java:108
 msgid "Pallet product barcode"
 msgstr ""
 
 #. TR: validation error message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/ScanAssignDialog.java:195
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/ScanAssignDialog.java:193
 msgid "Enter the pallet's label"
 msgstr ""
 
 #. TR: label
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/ScanAssignDialog.java:201
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/ScanAssignDialog.java:199
 msgid "Pallet label"
 msgstr ""
 
 #. TR: dialog field label
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/ScanAssignDialog.java:215
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/ScanAssignDialog.java:213
 msgid "Pallet container type"
 msgstr ""
 
 #. TR: validation error message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/ScanAssignDialog.java:219
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/ScanAssignDialog.java:217
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:903
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenLinkAndAssignForm.java:328
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenLinkEntryForm.java:226
 msgid "A pallet type should be selected"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/ScanAssignDialog.java:345
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/ScanAssignDialog.java:343
 #, java-format
 msgid ""
 "The dimensions for the container are invalid for the pallet that was "
@@ -2658,13 +2658,13 @@ msgid ""
 msgstr ""
 
 #. TR: dialog title
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/ScanAssignDialog.java:353
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/ScanAssignDialog.java:351
 msgid "Invalid container"
 msgstr ""
 
 #. TR: dialog title
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/ScanAssignDialog.java:384
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/ScanAssignDialog.java:504
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/ScanAssignDialog.java:382
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/ScanAssignDialog.java:502
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/dispatch/DispatchCreateScanDialog.java:181
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:756
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:847
@@ -2675,13 +2675,13 @@ msgid "Values validation"
 msgstr ""
 
 #. TR: dialog title
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/ScanAssignDialog.java:488
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/ScanAssignDialog.java:486
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:739
 msgid "Containers Error"
 msgstr ""
 
 #. TR: dialog message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/ScanAssignDialog.java:490
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/ScanAssignDialog.java:488
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:741
 msgid ""
 "No container type that can hold specimens has been found (if scanner is "
@@ -2689,14 +2689,14 @@ msgid ""
 msgstr ""
 
 #. TR: dialog title
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/ScanAssignDialog.java:522
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/ScanAssignDialog.java:520
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractLinkAssignEntryForm.java:662
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractLinkAssignEntryForm.java:675
 msgid "Container error"
 msgstr ""
 
 #. TR: dialog message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/ScanAssignDialog.java:524
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/ScanAssignDialog.java:522
 msgid "The selected container can not hold specimens"
 msgstr ""
 
@@ -7299,7 +7299,7 @@ msgid "Enter a dispatch/shipment waybill and hit enter"
 msgstr ""
 
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/BiobankLabelProvider.java:73
-msgid "Error in count"
+msgid "The value returned for patient count is invalid"
 msgstr ""
 
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/BiobankLabelProvider.java:88
@@ -8767,7 +8767,7 @@ msgid "jasper template has not been set"
 msgstr ""
 
 #: eclipse_ws/labelPrinter/src/edu/ualberta/med/biobank/labelprinter/template/Template.java:188
-msgid "Error: Failed to persit key-updated configuration"
+msgid "Could not save changes to the database"
 msgstr ""
 
 #: eclipse_ws/labelPrinter/src/edu/ualberta/med/biobank/labelprinter/template/TemplateStore.java:55
