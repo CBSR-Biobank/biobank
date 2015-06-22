@@ -24,8 +24,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
@@ -49,7 +47,7 @@ public class ScanAssignDialog extends ScanLinkDialog
 
     private static final I18n i18n = I18nFactory.getI18n(ScanAssignDialog.class);
 
-    private static Logger log = LoggerFactory.getLogger(ScanAssignDialog.class);
+    // private static Logger log = LoggerFactory.getLogger(ScanAssignDialog.class);
 
     @SuppressWarnings("nls")
     private static final String SCAN_ASSIGN_DIALOG_SETTINGS =

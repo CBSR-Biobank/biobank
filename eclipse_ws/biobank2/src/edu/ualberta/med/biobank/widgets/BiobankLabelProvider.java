@@ -70,7 +70,7 @@ public class BiobankLabelProvider extends LabelProvider implements
                     return String.valueOf(study.getPatientCount(true));
                 } catch (Exception e) {
                     BgcPlugin.openAsyncError(
-                        i18n.tr("Error in count"), e);
+                        i18n.tr("The value returned for patient count is invalid"), e);
                 }
             }
         } else if (element instanceof SpecimenWrapper) {
