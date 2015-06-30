@@ -174,7 +174,7 @@ public class SpecimenLinkAndAssignForm
         new WritableValue(Boolean.FALSE, Boolean.class);
 
     private final IObservableValue specimenPositionsValid =
-        new WritableValue(Boolean.FALSE, Boolean.class);
+        new WritableValue(Boolean.TRUE, Boolean.class);
 
     private ScanAssignSettings scanAssignSettings;
 
@@ -246,7 +246,7 @@ public class SpecimenLinkAndAssignForm
                 return Status.OK_STATUS;
             }
         });
-        widgetCreator.bindValue(new WritableValue(Boolean.FALSE, Boolean.class),
+        widgetCreator.bindValue(new WritableValue(Boolean.TRUE, Boolean.class),
             specimenPositionsValid, uvs, uvs);
     }
 

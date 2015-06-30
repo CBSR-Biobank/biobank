@@ -88,7 +88,6 @@ public class LinkFormPatientManagement {
     protected CollectionEventWrapper currentCEventSelected;
     protected String currentWorksheetNumber;
     protected boolean worksheetNumberModified;
-    private CEventComboCallback cEventComboCallback;
     private Label pEventComboLabel;
     private ComboViewer viewerProcessingEvents;
     protected ProcessingEventWrapper currentPEventSelected;
@@ -247,8 +246,9 @@ public class LinkFormPatientManagement {
                 @Override
                 public void doSelection(Object selectedObject) {
                     currentCEventSelected = (CollectionEventWrapper) selectedObject;
-                    if ((cEventComboCallback != null) && !settingCollectionEvent)
-                        cEventComboCallback.selectionChanged();
+                    if (!settingCollectionEvent) {
+                        widgetParent.collectionEventSelectionChanged();
+                    }
                 }
             }, new BiobankLabelProvider());
         GridData gridData = new GridData();
@@ -350,14 +350,6 @@ public class LinkFormPatientManagement {
 
     public void enabledPatientText(boolean enabled) {
         patientNumberText.setEnabled(enabled);
-    }
-
-    protected static interface CEventComboCallback {
-        public void selectionChanged();
-    }
-
-    public void setCEventComboCallback(CEventComboCallback callback) {
-        this.cEventComboCallback = callback;
     }
 
     @SuppressWarnings("nls")
