@@ -15,6 +15,8 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.mysql.jdbc.jdbc2.optional.MysqlConnectionPoolDataSource;
 
@@ -22,6 +24,9 @@ import edu.ualberta.med.biobank.common.util.StringUtil;
 
 @SuppressWarnings("nls")
 public class SessionProvider {
+
+    private static final Logger log = LoggerFactory.getLogger(SessionProvider.class);
+
     public enum Mode {
         DEBUG,
         RUN;
@@ -96,6 +101,7 @@ public class SessionProvider {
                 }
             }
 
+            log.info("dbName: {}, dbUser: {}", dbName, dbUser);
             String url = MessageFormat.format("jdbc:mysql://{0}:3306/{1}", dbHost, dbName);
 
             // Construct DataSource
