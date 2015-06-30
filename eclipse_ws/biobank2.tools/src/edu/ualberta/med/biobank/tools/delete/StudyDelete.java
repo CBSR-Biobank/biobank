@@ -65,6 +65,8 @@ public class StudyDelete {
         Patient patient = (Patient) session.createCriteria(Patient.class)
             .add(Restrictions.eq("pnumber", pnumber)).uniqueResult();
 
+        log.info("deleting patient: " + pnumber);
+
         if (patient != null) {
             session.beginTransaction();
             deleteCollectionEvents(session, patient);
@@ -72,7 +74,9 @@ public class StudyDelete {
         } else {
             System.out.println("Error: patient " + pnumber + " not found in database.");
         }
-
+        session.beginTransaction();
+        session.delete(patient);
+        session.getTransaction().commit();
     }
 
     private static void deletePatients(Session session, Study study) {
@@ -151,6 +155,7 @@ public class StudyDelete {
     }
 
     private static void deleteCollectionEvents(Session session, Patient patient) {
+        log.info("deleteCollectionEvents: patient: {}", patient.getPnumber());
         for (CollectionEvent cevent : patient.getCollectionEvents()) {
             deleteParentSpecimens(session, cevent);
         }
