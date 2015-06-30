@@ -51,7 +51,6 @@ import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
-import edu.ualberta.med.biobank.helpers.ScanAssignHelper;
 import edu.ualberta.med.biobank.helpers.ScanLinkHelper;
 import edu.ualberta.med.biobank.model.AbstractPosition;
 import edu.ualberta.med.biobank.model.ActivityStatus;
@@ -341,7 +340,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm implement
                         .getShell().getDisplay(), new Runnable() {
                         @Override
                         public void run() {
-                            ScanAssignHelper.getContainerByLabel(newSinglePositionText.getText());
+                            initContainersFromPosition(newSinglePositionText, null);
                             checkPositionAndSpecimen(inventoryIdText, newSinglePositionText);
                         }
                     });

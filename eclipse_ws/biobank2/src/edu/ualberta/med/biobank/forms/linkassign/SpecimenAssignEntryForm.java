@@ -513,7 +513,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                         new Runnable() {
                             @Override
                             public void run() {
-                                ScanAssignHelper.getContainerByLabel(newSinglePositionText.getText());
+                                initContainersFromPosition(newSinglePositionText, null);
                                 checkPositionAndSpecimen(inventoryIdText, newSinglePositionText);
                             }
                         });
