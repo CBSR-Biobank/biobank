@@ -311,8 +311,7 @@ public class PalletScanManagement {
     public void initCellsWithContainer(ContainerWrapper container) {
         if (!useScanner) {
             wells.clear();
-            for (Entry<RowColPos, SpecimenWrapper> entry : container
-                .getSpecimens().entrySet()) {
+            for (Entry<RowColPos, SpecimenWrapper> entry : container.getSpecimens().entrySet()) {
                 RowColPos pos = entry.getKey();
                 SpecimenCell cell = new SpecimenCell(
                     pos.getRow(),
@@ -320,6 +319,7 @@ public class PalletScanManagement {
                     new DecodedWell(pos.getRow(), pos.getCol(), entry.getValue().getInventoryId()));
                 cell.setSpecimen(entry.getValue());
                 cell.setStatus(UICellStatus.FILLED);
+                cell.setExpectedSpecimen(entry.getValue());
                 wells.put(pos, cell);
             }
             try {

@@ -15,9 +15,11 @@ import org.eclipse.swt.widgets.Composite;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.ImageCanvas;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.type.LabelingLayout;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionManager;
 import edu.ualberta.med.biobank.widgets.grids.well.AbstractUIWell;
@@ -334,6 +336,14 @@ public class ContainerDisplayWidget extends ImageCanvas {
 
     public void updateCells() {
         setSourceImage(containerDisplay.updateGridImage(this));
+    }
+
+    public void setLabelingScheme(ContainerLabelingSchemeWrapper childLabelingScheme) {
+        containerDisplay.setLabelingScheme(childLabelingScheme);
+    }
+
+    public void setLabelingLayout(LabelingLayout labelingLayout) {
+        containerDisplay.setLabelingLayout(labelingLayout);
     }
 
 }

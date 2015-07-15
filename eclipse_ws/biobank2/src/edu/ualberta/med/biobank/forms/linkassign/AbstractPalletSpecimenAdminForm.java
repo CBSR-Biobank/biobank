@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.forms.linkassign;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -114,10 +115,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
         // conversion for server side call
         Map<RowColPos, CellInfo> serverCells = null;
         if (cells != null) {
-            serverCells = new HashMap<RowColPos, CellInfo>();
-            for (Entry<RowColPos, SpecimenCell> entry : cells.entrySet()) {
-                serverCells.put(entry.getKey(), entry.getValue().transformIntoServerCell());
-            }
+            serverCells = AbstractPalletSpecimenAdminForm.getServerSpecimenData(cells.values());
         }
         // server side call
         ScanProcessResult res = (ScanProcessResult) SessionManager.getAppService().doAction(
@@ -187,8 +185,12 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
             throw new IllegalStateException("current working center is null");
         }
 
-        Map<RowColPos, CellInfo> serverCells =
-            AbstractPalletSpecimenAdminForm.getServerSpecimenData(cells);
+        Map<RowColPos, SpecimenCell> mergedCells = getCells();
+        for (SpecimenCell cell : cells) {
+            mergedCells.put(cell.getRowColPos(), cell);
+        }
+
+        Map<RowColPos, CellInfo> serverCells = getServerSpecimenData(mergedCells.values());
 
         ScanProcessResult res = (ScanProcessResult) SessionManager.getAppService().doAction(
             getPalletProcessAction(
@@ -446,7 +448,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
      * @return
      */
     @SuppressWarnings("nls")
-    public static Map<RowColPos, CellInfo> getServerSpecimenData(Set<SpecimenCell> cells) {
+    public static Map<RowColPos, CellInfo> getServerSpecimenData(Collection<SpecimenCell> cells) {
         if (cells == null) {
             throw new IllegalArgumentException("cells is null");
         }

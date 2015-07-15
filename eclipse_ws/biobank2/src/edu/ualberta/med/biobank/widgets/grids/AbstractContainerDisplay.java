@@ -10,8 +10,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import edu.ualberta.med.biobank.common.util.StringUtil;
+import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.type.LabelingLayout;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.grids.well.AbstractUIWell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
@@ -47,6 +50,8 @@ public abstract class AbstractContainerDisplay {
     protected List<UICellStatus> legendStatus;
 
     protected final String containerLabel;
+
+    private ContainerLabelingSchemeWrapper childLabelingScheme = null;
 
     public AbstractContainerDisplay(String containerLabel) {
         this.containerLabel = containerLabel;
@@ -87,6 +92,10 @@ public abstract class AbstractContainerDisplay {
 
     protected abstract Rectangle getGridSize();
 
+    protected RowColPos storageSize = new RowColPos(0, 0);
+
+    private LabelingLayout labelingLayout = LabelingLayout.VERTICAL;
+
     /**
      * Get the text to write inside the cell. This default implementation use the cell position and
      * the containerType.
@@ -104,12 +113,19 @@ public abstract class AbstractContainerDisplay {
         if (containerType != null) {
             return parentLabel + containerType.getPositionString(rowcol);
         }
+        if (childLabelingScheme != null) {
+            return ContainerLabelingScheme.getPositionString(
+                rowcol,
+                childLabelingScheme.getId(),
+                storageSize.getRow(),
+                storageSize.getCol(),
+                labelingLayout);
+        }
         return StringUtil.EMPTY_STRING;
     }
 
-    @SuppressWarnings("unused")
     public void setStorageSize(int rows, int columns) {
-        //
+        storageSize = new RowColPos(rows, columns);
     }
 
     public Point getSizeToApply() {
@@ -128,6 +144,14 @@ public abstract class AbstractContainerDisplay {
         this.maxWidth = maxWidth;
         this.maxHeight = maxHeight;
         log.debug("setDisplaySize: maxWidth: {}, maxHeight: {}", maxWidth, maxHeight);
+    }
+
+    public void setLabelingScheme(ContainerLabelingSchemeWrapper childLabelingScheme) {
+        this.childLabelingScheme = childLabelingScheme;
+    }
+
+    public void setLabelingLayout(LabelingLayout labelingLayout) {
+        this.labelingLayout = labelingLayout;
     }
 
 }

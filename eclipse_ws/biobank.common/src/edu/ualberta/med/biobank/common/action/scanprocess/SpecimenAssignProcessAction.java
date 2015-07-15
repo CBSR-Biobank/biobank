@@ -189,8 +189,6 @@ public class SpecimenAssignProcessAction extends ServerProcessAction {
             scanCell.setInformation(bundle.tr("Missing specimen \"{0}\".").format(
                 missingSpecimen.getInventoryId()));
             scanCell.setTitle("?");
-            // MISSING in {0}\: specimen {1} from visit {2} (patient {3})
-            // missing
             appendNewLog(MessageFormat.format(
                 "MISSING in {0}: specimen ''{1}'' from visit {2} (patient {3}) missing", position,
                 missingSpecimen.getInventoryId(), missingSpecimen.getCollectionEvent()

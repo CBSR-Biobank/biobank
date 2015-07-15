@@ -679,6 +679,9 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                             }
                             palletPositionTextModified = false;
                             checkingMultipleContainerPosition = false;
+
+                            palletWidget.updateCells();
+                            palletWidget.redraw();
                         }
                     });
                 }
@@ -1177,7 +1180,8 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
      */
     @Override
     public boolean canDecodeTubesManually(SpecimenCell cell) {
-        return fieldsValid();
+        return fieldsValid() && (super.canDecodeTubesManually(cell)
+            || cell.getStatus() == UICellStatus.MISSING);
     }
 
     /**
@@ -1232,6 +1236,10 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             if (freezerContainer != null) {
                 freezerLabel.setText(freezerContainer.getFullInfoLabel());
                 freezerWidget.setSelection(hotelContainer.getPositionAsRowCol());
+                freezerWidget.setLabelingScheme(
+                    freezerContainer.getContainerType().getChildLabelingScheme());
+                freezerWidget.setLabelingLayout(
+                    freezerContainer.getContainerType().getLabelingLayout());
                 capacity = freezerContainer.getContainerType().getWrappedObject().getCapacity();
                 freezerWidget.setStorageSize(capacity.getRowCapacity(), capacity.getColCapacity());
                 freezerWidget.redraw();
@@ -1239,6 +1247,10 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
 
             hotelLabel.setText(hotelContainer.getFullInfoLabel());
             hotelWidget.setSelection(currentMultipleContainer.getPositionAsRowCol());
+            hotelWidget.setLabelingScheme(
+                hotelContainer.getContainerType().getChildLabelingScheme());
+            hotelWidget.setLabelingLayout(
+                freezerContainer.getContainerType().getLabelingLayout());
             capacity = hotelContainer.getContainerType().getWrappedObject().getCapacity();
             hotelWidget.setStorageSize(capacity.getRowCapacity(), capacity.getColCapacity());
             hotelWidget.redraw();
