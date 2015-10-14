@@ -340,7 +340,7 @@
     </replace>
 
     <exec executable="openssl" dir="scripts/ssl">
-      <arg line="req -newkey rsa:1024 -x509 -outform DER -out cert.der -days 3650 -config cert.cnf" />
+      <arg line="req -newkey rsa:2048 -x509 -outform DER -out cert.der -days 3650 -config cert.cnf" />
     </exec>
     <exec executable="openssl" dir="scripts/ssl">
       <arg line="pkcs8 -topk8 -nocrypt -in key.pem -inform PEM -out key.der -outform DER" />

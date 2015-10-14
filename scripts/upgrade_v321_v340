@@ -82,7 +82,7 @@ if [ ! -f "$DBDUMP" ]; then
     exit
 fi
 
-echo "recreating database..."
+echo "recreating database '$DBNAME'..."
 mysqladmin -f -h$DBHOST -u$DBUSER -p$DBPWD drop $DBNAME
 mysqladmin -h$DBHOST -u$DBUSER -p$DBPWD create $DBNAME
 echo "importing old database..."
@@ -96,3 +96,4 @@ echo "upgrading database from v3.2.1 to v3.3.0 ..."
 mysql -h$DBHOST -u$DBUSER -p$DBPWD $DBNAME < data/sql/upgrade_v321_v330.sql
 echo "upgrading database from v3.3.0 to v3.4.0 ..."
 mysql -h$DBHOST -u$DBUSER -p$DBPWD $DBNAME < data/sql/upgrade_v330_v340.sql
+echo "databse '$DBNAME' upgraded ..."
