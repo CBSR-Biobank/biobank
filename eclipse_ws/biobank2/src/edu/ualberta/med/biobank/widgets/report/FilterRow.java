@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.widgets.report;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -260,9 +259,9 @@ class FilterRow extends Composite {
                 // only include options that are in the suggestions
                 Collection<String> toRemove = new ArrayList<String>();
                 for (Map.Entry<String, String> entry : options.entrySet()) {
-                    String key = entry.getKey();
-                    if (!suggestions.contains(key)) {
-                        toRemove.add(key);
+                    String value = entry.getValue();
+                    if (!suggestions.contains(value)) {
+                        toRemove.add(value);
                     }
                 }
 
@@ -403,9 +402,8 @@ class FilterRow extends Composite {
                         @Override
                         public void run() {
                             if (autoSuggest()) {
-                                filtersWidget
-                                    .notifyListeners(new FilterChangeEvent(
-                                        filter, true, false));
+                                filtersWidget.notifyListeners(
+                                    new FilterChangeEvent(filter, true, false));
                             }
                             autoButton.setEnabled(true);
                         }
@@ -415,8 +413,7 @@ class FilterRow extends Composite {
     }
 
     private Report getAutoSuggestReport() {
-        Entity entity = filtersWidget.getReport().getEntity()
-            .getWrappedObject();
+        Entity entity = filtersWidget.getReport().getEntity().getWrappedObject();
 
         Set<ReportFilter> reportFilters = new HashSet<ReportFilter>();
         for (ReportFilter filter : filtersWidget.getReportFilters()) {
@@ -440,17 +437,25 @@ class FilterRow extends Composite {
             reportFilters.add(filter);
         }
 
-        ReportColumn rc = new ReportColumn();
-        rc.setPosition(0);
-        EntityColumn ec = new EntityColumn();
-        ec.setEntityProperty(filter.getEntityProperty());
-        rc.setEntityColumn(ec);
+        Set<ReportColumn> reportColumns = new HashSet<ReportColumn>();
+
+        for (EntityColumn ec : filter.getEntityProperty().getEntityColumns()) {
+            EntityColumn newEc = new EntityColumn();
+            newEc.setEntityProperty(filter.getEntityProperty());
+            newEc.setId(ec.getId());
+
+            ReportColumn rc = new ReportColumn();
+            rc.setPosition(0);
+            rc.setEntityColumn(newEc);
+            reportColumns.add(rc);
+        }
 
         Report report = new Report();
         report.setEntity(entity);
         report.setReportFilters(reportFilters);
         report.setIsCount(true);
-        report.setReportColumns(new HashSet<ReportColumn>(Arrays.asList(rc)));
+        report.setReportColumns(reportColumns);
+        report.setUser(SessionManager.getUser().getWrappedObject());
 
         return report;
     }

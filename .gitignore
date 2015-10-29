@@ -92,3 +92,4 @@ package-jboss/debian/opt/jboss/tools/
 cacerts
 decode.png
 *.sql.gz
+/eclipse_ws/Servers/
