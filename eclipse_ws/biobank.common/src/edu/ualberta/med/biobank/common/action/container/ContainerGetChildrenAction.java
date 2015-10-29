@@ -17,11 +17,10 @@ import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SpecimenType;
 
 public class ContainerGetChildrenAction implements
-Action<ListResult<Container>> {
+    Action<ListResult<Container>> {
     private static final long serialVersionUID = 1L;
 
-    private static Logger log = LoggerFactory
-        .getLogger(ContainerGetInfoAction.class.getName());
+    private static Logger log = LoggerFactory.getLogger(ContainerGetChildrenAction.class.getName());
 
     private final Integer parentContainerId;
 
@@ -33,14 +32,14 @@ Action<ListResult<Container>> {
     public boolean isAllowed(ActionContext context) throws ActionException {
         Container c = context.load(Container.class, parentContainerId);
         return new ContainerReadPermission(c.getSite().getId())
-        .isAllowed(context);
+            .isAllowed(context);
     }
 
     @SuppressWarnings("nls")
     @Override
     public ListResult<Container> run(ActionContext context)
         throws ActionException {
-        log.info("run: parentContainerId={}", parentContainerId);
+        log.debug("run: parentContainerId={}", parentContainerId);
 
         Container parentContainer = context.load(Container.class, parentContainerId);
         ArrayList<Container> childContainers = new ArrayList<Container>(
@@ -70,7 +69,7 @@ Action<ListResult<Container>> {
                 if (!ctSet.contains(ct)) {
                     ctSet.add(ct);
 
-                    log.info("run: parentContainerId={} childCtype={}",
+                    log.debug("run: parentContainerId={} childCtype={}",
                         parentContainerId, ct.getNameShort());
 
                     ct.getCapacity().getRowCapacity();
