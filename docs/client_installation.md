@@ -19,7 +19,7 @@ Biobank client will not overwrite your current Java installation.
     package, you can skip this step.
 
 1.  Create a folder where you want to store the Biobank client
-    software. This directory is referred to as the **client folder**
+    software. This folder is referred to as the **client folder**
     in the steps below.
 
     *For example, this can be
