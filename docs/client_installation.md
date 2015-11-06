@@ -59,9 +59,9 @@ The Biobank client application is now installed and ready to run.
 `C:\Users\_userid_\Desktop\BioBank_v3.10.0\BioBank` folder and
 double click on `BioBank.exe` to run the application.*
 
-**If you are using MS Windows, and wish to install the client in the
+**_If you are using MS Windows, and wish to install the client in the
 `C:\Program Files` folder, you will need administrator rights to
-perform these steps.**
+perform these steps._**
 
 ## Mac OSX or Linux
 
