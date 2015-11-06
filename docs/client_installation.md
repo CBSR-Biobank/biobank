@@ -32,13 +32,13 @@ Biobank client will not overwrite your current Java installation.
 
     [Biobank v3.10.0 MS Windows Client](http://aicml-med.cs.ualberta.ca/CBSR/Biobank_v3.10.0/BioBank-3.10.0-win32.win32.x86.zip)
 
-1.  Using Windows Explorer, move the file downloaded in the previous
-    step to your *client folder*.
+1.  Using *Windows Explorer*, navigate to the folder where the file was
+    downloaded to, right click on the file, and select **Extract
+    All**. A new window pops up.
 
-1.  In the Windows Explorer window, right click on the file, and
-    select **Extract All**. Do not make any changes to text box
-    labelled `Files will be extracted to this folder`. Press the
-    `Extract` button,
+1.  In the window that popped up, press the **Browse** button and
+    navigate to your **client folder**, and then press the **Extract**
+    button.
 
     After the files have been extracted, your *client folder*
     should contain a folder named `BioBank`.
