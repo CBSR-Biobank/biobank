@@ -41,9 +41,10 @@ Biobank client will not overwrite your current Java installation.
     `Extract` button,
 
     After the files have been extracted, your *client folder*
-    should have a `BioBank` sub directory.
+    should contain a folder named `BioBank`.
 
-    *I.e. you will now have the `C:\Users\_userid_\Desktop\BioBank_v3.10.0\BioBank`.*
+    *I.e. you will now have the
+    `C:\Users\_userid_\Desktop\BioBank_v3.10.0\BioBank` folder.*
 
 1.  If you are using MS Windows in a Virtual Host enviroment, like
     [VM Fusion](http://www.vmware.com/ca/en/products/fusion), you will
@@ -55,11 +56,11 @@ Biobank client will not overwrite your current Java installation.
 The Biobank client application is now installed and ready to run.
 
 *You can open Windows Explorer and go to the
-`C:\Users\_userid_\Desktop\BioBank_v3.10.0\BioBank` directory and
+`C:\Users\_userid_\Desktop\BioBank_v3.10.0\BioBank` folder and
 double click on `BioBank.exe` to run the application.*
 
 **If you are using MS Windows, and wish to install the client in the
-`C:\Program Files` directory, you will need administrator rights to
+`C:\Program Files` folder, you will need administrator rights to
 perform these steps.**
 
 ## Mac OSX or Linux
