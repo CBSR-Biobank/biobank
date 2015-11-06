@@ -12,9 +12,7 @@ below, should be taken when running the server.
 
 The most recent version can be downloaded from here:
 
-* Biobank server v3.9.1
-
- * [Ubuntu package](http://aicml-med.cs.ualberta.ca/CBSR/Biobank_v3.9.1/biobank-server-3.9.1.deb)
+* [Biobank server v3.10.0 Ubuntu package](http://aicml-med.cs.ualberta.ca/CBSR/Biobank_v3.10.0/biobank-server-3.10.0.deb)
 
 ##Requirements
 
@@ -132,6 +130,9 @@ Prior to deploying a server, the following software packages have to be installe
 1.  Run the `/opt/jboss/chkconfig` script to test your configuration. The script runs a series of
     tests and outputs the results. Ensure all the tests pass. Once all the tests pass you can start
     the server.
+
+1.  Install and configure the Apache Web Server to front JBoss using
+    [these instructions](apache_fronting_jboss.md).
 
 Start the biobank server with the command:
 
