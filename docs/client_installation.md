@@ -18,14 +18,14 @@ Biobank client will not overwrite your current Java installation.
     You only need to do this once. If you've alredy installed this
     package, you can skip this step.
 
-1.  Create a directory where you want to store the Biobank client
-    software. This directory is referred to as the **client
-    directory** in the steps below.
+1.  Create a folder where you want to store the Biobank client
+    software. This directory is referred to as the **client folder**
+    in the steps below.
 
     *For example, this can be
     `C:\Users\_userid_\Desktop\BioBank_v3.10.0`, where `_userid_` is
     your Windows user id.* If your user ID is `user1`, then your
-    *client directory* folder is at
+    *client folder* folder is at
     `C:\Users\user1\Desktop\BioBank_v3.10.0`.
 
 1.  Download the client from here:
@@ -33,14 +33,14 @@ Biobank client will not overwrite your current Java installation.
     [Biobank v3.10.0 MS Windows Client](http://aicml-med.cs.ualberta.ca/CBSR/Biobank_v3.10.0/BioBank-3.10.0-win32.win32.x86.zip)
 
 1.  Using Windows Explorer, move the file downloaded in the previous
-    step to your *client directory*.
+    step to your *client folder*.
 
 1.  In the Windows Explorer window, right click on the file, and
     select **Extract All**. Do not make any changes to text box
     labelled `Files will be extracted to this folder`. Press the
     `Extract` button,
 
-    After the files have been extracted, your *client directory*
+    After the files have been extracted, your *client folder*
     should have a `BioBank` sub directory.
 
     *I.e. you will now have the `C:\Users\_userid_\Desktop\BioBank_v3.10.0\BioBank`.*
