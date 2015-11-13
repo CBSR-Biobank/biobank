@@ -1227,6 +1227,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     /**
      * Multiple assign
      */
+    @SuppressWarnings("null")
     protected void displayPalletPositions() {
         if (currentMultipleContainer.hasParentContainer()) {
             Capacity capacity;
