@@ -32,9 +32,8 @@ import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 
 /**
- * Creates and maintains a custom trust store (via javax.net.ssl.trustStore)
- * that is alive only as long as the JVM is and can trust otherwise rejected
- * certificates.
+ * Creates and maintains a custom trust store (via javax.net.ssl.trustStore) that is alive only as
+ * long as the JVM is and can trust otherwise rejected certificates.
  * 
  * @author Jonathan Ferland
  */
@@ -45,7 +44,10 @@ public final class TrustStore {
     private static final String DEFAULT_KEYSTORE_PATH =
         new File(System.getProperty("java.home"), "lib/security/cacerts")
             .getAbsolutePath();
-    private static final String CUSTOM_TRUST_STORE_PATH = "cacerts";
+
+    private static final String CUSTOM_TRUST_STORE_PATH =
+        System.getProperty("user.home") + System.getProperty("file.separator") + "biobank_cacerts";
+
     private static final String DEFAULT_KEYSTORE_PW = "changeit";
     private static final String TRUST_STORE_PROPERTY_NAME =
         "javax.net.ssl.trustStore";
@@ -157,7 +159,7 @@ public final class TrustStore {
         } else {
             inputFile = CUSTOM_TRUST_STORE_PATH;
         }
-        
+
         InputStream in = new FileInputStream(inputFile);
         ks.load(in, DEFAULT_KEYSTORE_PW.toCharArray());
         in.close();
@@ -202,7 +204,7 @@ public final class TrustStore {
     private static class CustomTrustManager
         implements X509TrustManager {
         private final X509TrustManager delegate;
-        private X509Certificate[] chain;
+        private X509Certificate[] chain = new X509Certificate[] {};
 
         private CustomTrustManager(X509TrustManager delegate) {
             this.delegate = delegate;

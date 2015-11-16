@@ -27,4 +27,3 @@ Bundle-Vendor: AICML
 Bundle-Localization: plugin
 Export-Package: edu.ualberta.med.biobank
 Import-Package: org.eclipse.equinox.internal.p2.ui
-
