@@ -10,6 +10,8 @@ import org.hibernate.criterion.Restrictions;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchChangeStateAction;
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchDeleteAction;
@@ -28,11 +30,14 @@ import edu.ualberta.med.biobank.model.DispatchSpecimen;
 import edu.ualberta.med.biobank.model.ShippingMethod;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenPosition;
+import edu.ualberta.med.biobank.model.type.DispatchSpecimenState;
 import edu.ualberta.med.biobank.model.type.DispatchState;
 import edu.ualberta.med.biobank.test.action.helper.DispatchHelper;
 import edu.ualberta.med.biobank.test.action.helper.ShipmentInfoHelper;
 
 public class TestDispatch extends TestAction {
+
+    private static final Logger LOG = LoggerFactory.getLogger(TestDispatch.class);
 
     private Integer patientId;
     private Center site;
@@ -117,7 +122,7 @@ public class TestDispatch extends TestAction {
     }
 
     /*
-     * Ensure current centre on specimens has been updated after a dispatch goes into IN_TRANSIT
+     * Ensure current centre on specimens has not been updated after a dispatch goes into IN_TRANSIT
      * state.
      */
     @Test
@@ -135,11 +140,19 @@ public class TestDispatch extends TestAction {
             Assert.assertEquals(clinic, dispatchSpecimen.getSpecimen().getCurrentCenter());
         }
 
-        exec(new DispatchChangeStateAction(dispatch.getId(), DispatchState.IN_TRANSIT,
-            new ShipmentInfoSaveInfo(null, getMethodNameR(), new Date(), new Date(),
-                getMethodNameR(), shippingMethod.getId())));
+        exec(new DispatchChangeStateAction(
+            dispatch.getId(),
+            DispatchState.IN_TRANSIT,
+            new ShipmentInfoSaveInfo(
+                null,
+                getMethodNameR(),
+                new Date(),
+                new Date(),
+                getMethodNameR(),
+                shippingMethod.getId())));
 
         session.clear();
+
         @SuppressWarnings("unchecked")
         List<DispatchSpecimen> list = session.createCriteria(DispatchSpecimen.class)
             .add(Restrictions.eq("dispatch.id", dispatch.getId()))
@@ -151,7 +164,86 @@ public class TestDispatch extends TestAction {
     }
 
     /**
-     * The positions on the specimens mus be cleared when the dispatch state is set to IN_TRANSIT.
+     * Ensure current centre on specimens has been updated after a dispatch goes into RECEIVED state
+     * for extra specimens.
+     */
+    @Test
+    public void specimenCurrentCenterOnReceive() throws Exception {
+        session.beginTransaction();
+        Dispatch dispatch = factory.createDispatch(clinic, site);
+        DispatchSpecimen[] dispatchSpecimens = new DispatchSpecimen[] {
+            factory.createDispatchSpecimen(),
+            factory.createDispatchSpecimen()
+        };
+
+        // extra specimens
+        Specimen[] extraSpecimens = new Specimen[] {
+            factory.createParentSpecimen(),
+            factory.createParentSpecimen()
+        };
+
+        ShippingMethod shippingMethod = factory.createShippingMethod();
+        session.getTransaction().commit();
+
+        for (DispatchSpecimen dispatchSpecimen : dispatchSpecimens) {
+            Assert.assertEquals(clinic, dispatchSpecimen.getSpecimen().getCurrentCenter());
+        }
+
+        ShipmentInfoSaveInfo shipmentInfo = new ShipmentInfoSaveInfo(
+            null,
+            getMethodNameR(),
+            new Date(),
+            new Date(),
+            getMethodNameR(),
+            shippingMethod.getId());
+
+        exec(new DispatchChangeStateAction(
+            dispatch.getId(),
+            DispatchState.IN_TRANSIT,
+            shipmentInfo));
+
+        session.clear();
+
+        DispatchSaveInfo dispatchInfo = new DispatchSaveInfo(
+            dispatch.getId(),
+            site,
+            clinic,
+            DispatchState.RECEIVED,
+            null);
+
+        Set<DispatchSpecimenInfo> dsInfos =
+            new HashSet<DispatchSpecimenInfo>(dispatchSpecimens.length);
+
+        for (DispatchSpecimen dispatchSpecimen : dispatchSpecimens) {
+            dsInfos.add(new DispatchSpecimenInfo(
+                dispatchSpecimen.getId(),
+                dispatchSpecimen.getSpecimen().getId(),
+                DispatchSpecimenState.RECEIVED));
+        }
+
+        for (Specimen specimen : extraSpecimens) {
+            dsInfos.add(new DispatchSpecimenInfo(
+                null,
+                specimen.getId(),
+                DispatchSpecimenState.EXTRA));
+        }
+
+        // save dispatch as received
+        exec(new DispatchSaveAction(dispatchInfo, dsInfos, shipmentInfo)).getId();
+
+        @SuppressWarnings("unchecked")
+        List<DispatchSpecimen> list = session.createCriteria(DispatchSpecimen.class)
+            .add(Restrictions.eq("dispatch.id", dispatch.getId()))
+            .setFetchMode("specimen", FetchMode.JOIN).list();
+
+        for (DispatchSpecimen dispatchSpecimen : list) {
+            LOG.info("specimen center: {}", dispatchSpecimen.getSpecimen().getCurrentCenter().getNameShort());
+            Assert.assertEquals(site, dispatchSpecimen.getSpecimen().getCurrentCenter());
+        }
+    }
+
+    /**
+     * The positions on the specimens must be cleared when the dispatch state is set to IN_TRANSIT.
      * 
      */
     @Test

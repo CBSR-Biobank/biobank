@@ -109,6 +109,7 @@ public class DispatchSaveAction implements Action<IdResult> {
         return new IdResult(disp.getId());
     }
 
+    @SuppressWarnings("nls")
     private Set<DispatchSpecimen> reassemble(ActionContext context, Dispatch dispatch,
         Set<DispatchSpecimenInfo> dsInfos) {
         Set<DispatchSpecimen> dispSpecimens = new HashSet<DispatchSpecimen>();
@@ -116,6 +117,16 @@ public class DispatchSaveAction implements Action<IdResult> {
             DispatchSpecimen dspec = context.get(DispatchSpecimen.class, dsInfo.dispatchSpecimenId,
                 new DispatchSpecimen());
             Specimen spec = context.load(Specimen.class, dsInfo.specimenId);
+            if (spec == null) {
+                throw new IllegalStateException(
+                    "specimen for dispatch does not exist: " + dsInfo.specimenId);
+            }
+            if ((dInfo.state == DispatchState.RECEIVED)
+                || (dInfo.state == DispatchState.CLOSED)
+                || (dInfo.state == DispatchState.LOST)) {
+                spec.setCurrentCenter(context.get(Center.class, dInfo.receiverId));
+                context.getSession().saveOrUpdate(spec);
+            }
             dspec.setSpecimen(spec);
             dspec.setState(dsInfo.state);
             dspec.setDispatch(dispatch);
