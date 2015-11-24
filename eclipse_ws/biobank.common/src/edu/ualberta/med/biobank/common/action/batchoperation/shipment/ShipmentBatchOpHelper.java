@@ -98,11 +98,13 @@ public class ShipmentBatchOpHelper implements IBatchOpPojoHelper {
 
         Date timeNow = new Date();
 
-        Comment comment = new Comment();
-        comment.setMessage(csvInfo.getComment());
-        comment.setUser(user);
-        comment.setCreatedAt(timeNow);
-        originInfo.getComments().add(comment);
+        if (!csvInfo.getComment().isEmpty()) {
+            Comment comment = new Comment();
+            comment.setMessage(csvInfo.getComment());
+            comment.setUser(user);
+            comment.setCreatedAt(timeNow);
+            originInfo.getComments().add(comment);
+        }
 
         ShipmentInfo shipmentInfo = new ShipmentInfo();
         shipmentInfo.setPackedAt(csvInfo.getDateReceived());

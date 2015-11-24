@@ -18,7 +18,7 @@ class ShipmentCsvHelper {
 
     Set<ShipmentBatchOpInputRow> createShipments(Center sendingCenter,
         Center receivingCenter, Set<ShippingMethod> shippingMethods,
-        int maxShipments) {
+        int maxShipments, boolean hasComments) {
         Set<ShipmentBatchOpInputRow> csvInfos = new HashSet<ShipmentBatchOpInputRow>();
         for (int i = 0; i < maxShipments; ++i) {
             for (ShippingMethod shippingMethod : shippingMethods) {
@@ -28,11 +28,17 @@ class ShipmentCsvHelper {
                 csvInfo.setReceivingCenter(receivingCenter.getNameShort());
                 csvInfo.setShippingMethod(shippingMethod.getName());
                 csvInfo.setWaybill(nameGenerator.next(String.class));
-                csvInfo.setComment(nameGenerator.next(String.class));
+                csvInfo.setComment(hasComments ? nameGenerator.next(String.class) : "");
                 csvInfos.add(csvInfo);
             }
         }
         return csvInfos;
+    }
+
+    Set<ShipmentBatchOpInputRow> createShipments(Center sendingCenter,
+        Center receivingCenter, Set<ShippingMethod> shippingMethods,
+        int maxShipments) {
+        return createShipments(sendingCenter, receivingCenter, shippingMethods, maxShipments, false);
     }
 
     ShippingMethod getNewShippingMethod() {

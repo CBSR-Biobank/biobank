@@ -9,7 +9,6 @@ import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +32,6 @@ import edu.ualberta.med.biobank.test.action.batchoperation.specimen.TestSpecimen
  * @author Nelson Loyola
  * 
  */
-@Ignore
 public class TestShipmentCsvInfo extends TestAction {
 
     private static Logger log = LoggerFactory
@@ -64,14 +62,41 @@ public class TestShipmentCsvInfo extends TestAction {
         Criteria c = session.createCriteria(ShippingMethod.class, "sm");
 
         @SuppressWarnings("unchecked")
-        Set<ShippingMethod> shippingMethods =
-        new HashSet<ShippingMethod>(c.list());
+        Set<ShippingMethod> shippingMethods = new HashSet<ShippingMethod>(c.list());
 
         Assert.assertTrue(shippingMethods.size() > 0);
 
         Set<ShipmentBatchOpInputRow> csvInfos =
             shipmentCsvHelper.createShipments(factory.getDefaultClinic(),
                 factory.getDefaultSite(), shippingMethods, 10);
+        ShipmentCsvWriter.write(CSV_NAME, csvInfos);
+
+        try {
+            ShipmentBatchOpAction importAction =
+                new ShipmentBatchOpAction(CSV_NAME);
+            exec(importAction);
+        } catch (BatchOpErrorsException e) {
+            CsvUtil.showErrorsInLog(log, e);
+            Assert.fail("errors in CVS data: " + e.getMessage());
+        }
+
+        checkCsvInfoAgainstDb(csvInfos);
+    }
+
+    @Test
+    public void noComments() throws IOException {
+        tx.commit();
+
+        Criteria c = session.createCriteria(ShippingMethod.class, "sm1");
+
+        @SuppressWarnings("unchecked")
+        Set<ShippingMethod> shippingMethods = new HashSet<ShippingMethod>(c.list());
+
+        Assert.assertTrue(shippingMethods.size() > 0);
+
+        Set<ShipmentBatchOpInputRow> csvInfos =
+            shipmentCsvHelper.createShipments(factory.getDefaultClinic(),
+                factory.getDefaultSite(), shippingMethods, 10, false);
         ShipmentCsvWriter.write(CSV_NAME, csvInfos);
 
         try {
@@ -110,8 +135,8 @@ public class TestShipmentCsvInfo extends TestAction {
             Assert.fail("errors should have been reported in CVS data");
         } catch (BatchOpErrorsException e) {
             new AssertBatchOpException()
-            .withMessage(ShipmentBatchOpAction.CSV_SENDING_CENTER_ERROR
-                .format(badClinic.getNameShort()));
+                .withMessage(ShipmentBatchOpAction.CSV_SENDING_CENTER_ERROR
+                    .format(badClinic.getNameShort()));
         }
     }
 
@@ -139,8 +164,8 @@ public class TestShipmentCsvInfo extends TestAction {
             Assert.fail("errors should have been reported in CVS data");
         } catch (BatchOpErrorsException e) {
             new AssertBatchOpException()
-            .withMessage(ShipmentBatchOpAction.CSV_RECEIVING_CENTER_ERROR
-                .format(badSite.getNameShort()));
+                .withMessage(ShipmentBatchOpAction.CSV_RECEIVING_CENTER_ERROR
+                    .format(badSite.getNameShort()));
         }
     }
 
@@ -167,8 +192,8 @@ public class TestShipmentCsvInfo extends TestAction {
             Assert.fail("errors should have been reported in CVS data");
         } catch (BatchOpErrorsException e) {
             new AssertBatchOpException()
-            .withMessage(ShipmentBatchOpAction.CSV_SHIPPING_METHOD_ERROR
-                .format(badShippingMethod.getName())).assertIn(e);
+                .withMessage(ShipmentBatchOpAction.CSV_SHIPPING_METHOD_ERROR
+                    .format(badShippingMethod.getName())).assertIn(e);
         }
     }
 
@@ -181,18 +206,19 @@ public class TestShipmentCsvInfo extends TestAction {
             OriginInfo originInfo = (OriginInfo) c.uniqueResult();
 
             Assert.assertNotNull(originInfo.getShipmentInfo());
-            Assert.assertEquals(0,
-                DateCompare.compare(csvInfo.getDateReceived(), originInfo
-                    .getShipmentInfo().getReceivedAt()));
-            Assert.assertEquals(csvInfo.getSendingCenter(), originInfo
-                .getCenter().getNameShort());
-            Assert.assertEquals(csvInfo.getReceivingCenter(), originInfo
-                .getReceiverCenter().getNameShort());
-            Assert.assertEquals(csvInfo.getShippingMethod(), originInfo
-                .getShipmentInfo().getShippingMethod().getName());
-            Assert.assertTrue(originInfo.getComments().size() > 0);
-            Assert.assertEquals(csvInfo.getComment(), originInfo
-                .getComments().iterator().next().getMessage());
+            Assert.assertEquals(0, DateCompare.compareWithoutSeconds(
+                csvInfo.getDateReceived(), originInfo.getShipmentInfo().getReceivedAt()));
+            Assert.assertEquals(csvInfo.getSendingCenter(),
+                originInfo.getCenter().getNameShort());
+            Assert.assertEquals(csvInfo.getReceivingCenter(),
+                originInfo.getReceiverCenter().getNameShort());
+            Assert.assertEquals(csvInfo.getShippingMethod(),
+                originInfo.getShipmentInfo().getShippingMethod().getName());
+            if (!originInfo.getComments().isEmpty()) {
+                Assert.assertEquals(
+                    csvInfo.getComment(),
+                    originInfo.getComments().iterator().next().getMessage());
+            }
 
         }
     }

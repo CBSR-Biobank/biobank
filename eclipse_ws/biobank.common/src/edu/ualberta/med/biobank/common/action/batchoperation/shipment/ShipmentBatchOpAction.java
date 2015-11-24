@@ -167,8 +167,9 @@ public class ShipmentBatchOpAction implements Action<BooleanResult> {
         for (ShipmentBatchOpHelper info : shipmentImportInfos) {
             OriginInfo originInfo = info.getNewOriginInfo();
 
-            context.getSession().save(
-                originInfo.getComments().iterator().next());
+            if (!originInfo.getComments().isEmpty()) {
+                context.getSession().save(originInfo.getComments().iterator().next());
+            }
             context.getSession().save(originInfo.getShipmentInfo());
             context.getSession().save(originInfo);
         }
