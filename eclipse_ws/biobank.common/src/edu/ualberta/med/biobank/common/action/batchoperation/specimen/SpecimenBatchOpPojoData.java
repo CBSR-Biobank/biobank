@@ -223,10 +223,10 @@ public class SpecimenBatchOpPojoData implements IBatchOpPojoHelper {
 
         log.trace("created collection event: pt={} v#={} invId={}",
             new Object[] {
-            pojo.getPatientNumber(),
-            pojo.getVisitNumber(),
-            pojo.getInventoryId()
-        });
+                pojo.getPatientNumber(),
+                pojo.getVisitNumber(),
+                pojo.getInventoryId()
+            });
 
         return cevent;
     }
@@ -260,7 +260,7 @@ public class SpecimenBatchOpPojoData implements IBatchOpPojoHelper {
             && (parentSpecimen == null)) {
             throw new IllegalStateException(
                 "parent specimen for specimen with " + pojo.getInventoryId()
-                + " has not be created yet");
+                    + " has not be created yet");
         }
 
         specimen = new Specimen();
@@ -279,10 +279,6 @@ public class SpecimenBatchOpPojoData implements IBatchOpPojoHelper {
         specimen.setCreatedAt(pojo.getCreatedAt());
         specimen.setActivityStatus(ActivityStatus.ACTIVE);
 
-        if (pevent != null) {
-            specimen.setProcessingEvent(pevent);
-        }
-
         if ((pojo.getComment() != null) && !pojo.getComment().isEmpty()) {
             if (user == null) {
                 throw new IllegalStateException("user is null, cannot add comment");
@@ -298,18 +294,11 @@ public class SpecimenBatchOpPojoData implements IBatchOpPojoHelper {
         if (isSourceSpecimen()) {
             specimen.setOriginalCollectionEvent(cevent);
             cevent.getOriginalSpecimens().add(specimen);
-        } else {
-            ProcessingEvent pevent = null;
-
-            if (parentSpecimen != null) {
-                pevent = parentSpecimen.getProcessingEvent();
-            } else if ((parentPojoData != null) && (parentPojoData.pevent != null)) {
-                pevent = parentPojoData.pevent;
-            }
 
             if (pevent != null) {
-                pevent.getSpecimens().add(specimen);
+                specimen.setProcessingEvent(pevent);
             }
+        } else {
             SpecimenActionHelper.setParent(specimen, parentSpecimen);
 
             if (pojo.getVolume() != null) {
@@ -327,11 +316,11 @@ public class SpecimenBatchOpPojoData implements IBatchOpPojoHelper {
 
         log.trace("creating specimen: pt={} v#={} invId={} isParent={}",
             new Object[] {
-            pojo.getPatientNumber(),
-            pojo.getVisitNumber(),
-            pojo.getInventoryId(),
-            specimen.getOriginalCollectionEvent() != null
-        });
+                pojo.getPatientNumber(),
+                pojo.getVisitNumber(),
+                pojo.getInventoryId(),
+                specimen.getOriginalCollectionEvent() != null
+            });
 
         return specimen;
     }
