@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.batchoperation;
+package edu.ualberta.med.biobank.common.batchoperation;
 
 import java.io.IOException;
 import java.util.Set;
@@ -11,9 +11,9 @@ import edu.ualberta.med.biobank.common.action.exception.BatchOpException;
 
 /**
  * Client side exception that can be thrown by a IBatchOpPojoReader.
- * 
+ *
  * @author Nelson Loyola
- * 
+ *
  */
 public class ClientBatchOpErrorsException extends RuntimeException {
     private static final long serialVersionUID = 1L;
@@ -35,7 +35,7 @@ public class ClientBatchOpErrorsException extends RuntimeException {
 
     /**
      * Used as an error for the overall file
-     * 
+     *
      * @param error The message to display to the user.
      */
     public ClientBatchOpErrorsException(String error) {

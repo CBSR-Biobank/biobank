@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.batchoperation;
+package edu.ualberta.med.biobank.common.batchoperation;
 
 import java.io.Serializable;
 import java.util.Set;
@@ -11,9 +11,9 @@ import edu.ualberta.med.biobank.common.action.exception.BatchOpException;
 /**
  * Client side utility class to aid in recording errors found when parsing a CSV
  * file.
- * 
+ *
  * @author Nelson Loyola
- * 
+ *
  */
 public class ClientBatchOpInputErrorList implements
     IBatchOpInputErrorList<String>,
@@ -32,7 +32,7 @@ public class ClientBatchOpInputErrorList implements
     /**
      * Used to record an individual error in the CSV file. Note that a single
      * line in the CSV file can have multiple errors.
-     * 
+     *
      * @param lineNumber
      * @param message
      * @throws BatchOpErrorsException If the number of errors exceeds

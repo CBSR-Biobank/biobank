@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.batchoperation.ceventattr;
+package edu.ualberta.med.biobank.common.batchoperation.patient;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,34 +8,35 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.supercsv.cellprocessor.ParseInt;
+import org.supercsv.cellprocessor.Optional;
+import org.supercsv.cellprocessor.ParseDate;
 import org.supercsv.cellprocessor.constraint.StrNotNullOrEmpty;
 import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.exception.SuperCSVException;
 import org.supercsv.exception.SuperCSVReflectionException;
 import org.supercsv.io.ICsvBeanReader;
 
-import edu.ualberta.med.biobank.batchoperation.ClientBatchOpErrorsException;
-import edu.ualberta.med.biobank.batchoperation.ClientBatchOpInputErrorList;
-import edu.ualberta.med.biobank.batchoperation.IBatchOpPojoReader;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.IdResult;
-import edu.ualberta.med.biobank.common.action.batchoperation.ceventattr.CeventAttrBatchOpAction;
-import edu.ualberta.med.biobank.common.action.batchoperation.ceventattr.CeventAttrBatchOpInputPojo;
+import edu.ualberta.med.biobank.common.action.batchoperation.patient.PatientBatchOpAction;
+import edu.ualberta.med.biobank.common.action.batchoperation.patient.PatientBatchOpInputPojo;
+import edu.ualberta.med.biobank.common.batchoperation.ClientBatchOpErrorsException;
+import edu.ualberta.med.biobank.common.batchoperation.ClientBatchOpInputErrorList;
+import edu.ualberta.med.biobank.common.batchoperation.IBatchOpPojoReader;
 import edu.ualberta.med.biobank.model.Center;
 
-public class CeventAttrBatchOpPojoReader implements
-    IBatchOpPojoReader<CeventAttrBatchOpInputPojo> {
+public class PatientBatchOpPojoReader implements
+    IBatchOpPojoReader<PatientBatchOpInputPojo> {
 
     @SuppressWarnings("nls")
-    private static final String CSV_FIRST_HEADER = "Patient Number";
+    private static final String CSV_FIRST_HEADER = "Study";
 
     @SuppressWarnings("nls")
     private static final String[] NAME_MAPPINGS = new String[] {
+        "studyName",
         "patientNumber",
-        "visitNumber",
-        "attrName",
-        "attrValue"
+        "enrollmentDate",
+        "comment"
     };
 
     private final Center workingCenter;
@@ -45,10 +46,10 @@ public class CeventAttrBatchOpPojoReader implements
     private final ClientBatchOpInputErrorList errorList =
         new ClientBatchOpInputErrorList();
 
-    private final Set<CeventAttrBatchOpInputPojo> pojos =
-        new LinkedHashSet<CeventAttrBatchOpInputPojo>(0);
+    private final Set<PatientBatchOpInputPojo> pojos =
+        new LinkedHashSet<PatientBatchOpInputPojo>(0);
 
-    public CeventAttrBatchOpPojoReader(Center workingCenter, String filename) {
+    public PatientBatchOpPojoReader(Center workingCenter, String filename) {
         this.workingCenter = workingCenter;
         this.filename = filename;
     }
@@ -59,9 +60,9 @@ public class CeventAttrBatchOpPojoReader implements
         Map<String, CellProcessor> aMap = new LinkedHashMap<String, CellProcessor>();
 
         aMap.put(NAME_MAPPINGS[0], new StrNotNullOrEmpty());
-        aMap.put(NAME_MAPPINGS[1], new ParseInt());
-        aMap.put(NAME_MAPPINGS[2], new StrNotNullOrEmpty());
-        aMap.put(NAME_MAPPINGS[3], new StrNotNullOrEmpty());
+        aMap.put(NAME_MAPPINGS[1], new StrNotNullOrEmpty());
+        aMap.put(NAME_MAPPINGS[2], new Optional(new ParseDate("yyyy-MM-dd HH:mm")));
+        aMap.put(NAME_MAPPINGS[3], new Optional());
 
         if (aMap.size() != NAME_MAPPINGS.length) {
             throw new IllegalStateException(
@@ -77,15 +78,15 @@ public class CeventAttrBatchOpPojoReader implements
     }
 
     @Override
-    public Set<CeventAttrBatchOpInputPojo> readPojos(ICsvBeanReader reader)
+    public Set<PatientBatchOpInputPojo> readPojos(ICsvBeanReader reader)
         throws ClientBatchOpErrorsException, IOException {
 
-        CeventAttrBatchOpInputPojo csvPojo;
+        PatientBatchOpInputPojo csvPojo;
 
         CellProcessor[] cellProcessors = getCellProcessors();
 
         try {
-            while ((csvPojo = reader.read(CeventAttrBatchOpInputPojo.class,
+            while ((csvPojo = reader.read(PatientBatchOpInputPojo.class,
                 NAME_MAPPINGS, cellProcessors)) != null) {
 
                 csvPojo.setLineNumber(reader.getLineNumber());
@@ -109,7 +110,7 @@ public class CeventAttrBatchOpPojoReader implements
 
     @Override
     public Action<IdResult> getAction() throws NoSuchAlgorithmException, IOException {
-        return new CeventAttrBatchOpAction(workingCenter, pojos,
+        return new PatientBatchOpAction(workingCenter, pojos,
             new File(filename));
     }
 

@@ -10,10 +10,10 @@
 # Ensure the path stored in the JAVA variable points to a version 6 JRE.
 #
 
-JAVA=/usr/lib/jvm/jdk1.6.0_45/bin/java
-JAR=db_delete_tool.jar
-DFLT_DBHOST=localhost
-DFLT_DBNAME=biobank
+JAVA=/usr/lib/jvm/java-6-oracle/bin/java
+JAR=BiobankCli.jar
+DFLT_DBHOST=192.168.2.43
+DFLT_DBNAME=biobank_v3100
 
 if [[ ! -f "$JAVA" ]]; then
    echo "Error: Java JRE not found at $JAVA"
@@ -41,4 +41,3 @@ read -p "Enter delete command: " COMMAND
 eval ARGS=($COMMAND)
 
 $JAVA -Ddatabase.host=$DBHOST -Ddatabase.name=$DBNAME -Ddatabase.user=$DBUSER -Ddatabase.password=$DBPWD -jar $JAR "${ARGS[0]}" "${ARGS[1]}"
-

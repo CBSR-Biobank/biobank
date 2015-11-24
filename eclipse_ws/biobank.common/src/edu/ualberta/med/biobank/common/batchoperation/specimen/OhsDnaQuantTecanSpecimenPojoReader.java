@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.batchoperation.specimen;
+package edu.ualberta.med.biobank.common.batchoperation.specimen;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,23 +19,23 @@ import org.supercsv.io.ICsvBeanReader;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
-import edu.ualberta.med.biobank.batchoperation.ClientBatchOpErrorsException;
-import edu.ualberta.med.biobank.batchoperation.ClientBatchOpInputErrorList;
-import edu.ualberta.med.biobank.batchoperation.IBatchOpPojoReader;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.batchoperation.IBatchOpInputPojo;
 import edu.ualberta.med.biobank.common.action.batchoperation.specimen.OhsTecanSpecimenBatchOpAction;
 import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpInputPojo;
+import edu.ualberta.med.biobank.common.batchoperation.ClientBatchOpErrorsException;
+import edu.ualberta.med.biobank.common.batchoperation.ClientBatchOpInputErrorList;
+import edu.ualberta.med.biobank.common.batchoperation.IBatchOpPojoReader;
 import edu.ualberta.med.biobank.common.util.InventoryIdUtil;
 import edu.ualberta.med.biobank.model.Center;
 
 /**
  * Reads an OHS DNA Quantitation TECAN CSV file containing specimen information and returns the file
  * as a list of SpecimenBatchOpInputPojo.
- * 
+ *
  * @author Brian Allen
- * 
+ *
  */
 public class OhsDnaQuantTecanSpecimenPojoReader implements
     IBatchOpPojoReader<SpecimenBatchOpInputPojo> {

@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.tools.delete;
+package edu.ualberta.med.biobank.tools.cli.command;
 
 import java.util.List;
 
@@ -18,9 +18,9 @@ import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
 
-public class StudyDelete {
+public class StudyDeleteUtils {
 
-    private static final Logger log = LoggerFactory.getLogger(StudyDelete.class);
+    private static final Logger LOG = LoggerFactory.getLogger(StudyDeleteUtils.class);
 
     public static void deleteStudy(Session session, String studyShortName) {
         Study study = (Study) session.createCriteria(Study.class)
@@ -31,7 +31,7 @@ public class StudyDelete {
                 .createAlias("domain.studies", "study")
                 .add(Restrictions.eq("study.nameShort", studyShortName)).list();
 
-            log.debug("deletePatients: deleting study: {}", study.getName());
+            LOG.debug("deletePatients: deleting study: {}", study.getName());
 
             session.beginTransaction();
             deleteDispatches(session, studyShortName);
@@ -40,7 +40,7 @@ public class StudyDelete {
             deletePatients(session, study);
 
             session.beginTransaction();
-            log.debug("deleteStudy: deleting study: {}", study.getName());
+            LOG.debug("deleteStudy: deleting study: {}", study.getName());
             for (Site site : study.getSites()) {
                 site.getStudies().remove(study);
             }
@@ -65,7 +65,7 @@ public class StudyDelete {
         Patient patient = (Patient) session.createCriteria(Patient.class)
             .add(Restrictions.eq("pnumber", pnumber)).uniqueResult();
 
-        log.info("deleting patient: " + pnumber);
+        LOG.info("deleting patient: " + pnumber);
 
         if (patient != null) {
             session.beginTransaction();
@@ -86,7 +86,7 @@ public class StudyDelete {
         }
 
         for (Patient patient : study.getPatients()) {
-            log.debug("deletePatients: deleting patient: {}", patient.getPnumber());
+            LOG.debug("deletePatients: deleting patient: {}", patient.getPnumber());
             session.delete(patient);
         }
 
@@ -124,7 +124,7 @@ public class StudyDelete {
                 .list());
 
         for (Integer dispatchId : dispatchIds) {
-            log.debug("deleteDispatches: dipatch: {}", dispatchId);
+            LOG.debug("deleteDispatches: dipatch: {}", dispatchId);
             Dispatch dispatch = (Dispatch) session.load(Dispatch.class, dispatchId);
             session.delete(dispatch);
         }
@@ -132,9 +132,9 @@ public class StudyDelete {
     }
 
     private static void deleteChildSpecimens(Session session, Specimen parentSpecimen) {
-        log.debug("deleteChildSpecimens: deleting child specimens for parent specimen: {}", parentSpecimen.getInventoryId());
+        LOG.debug("deleteChildSpecimens: deleting child specimens for parent specimen: {}", parentSpecimen.getInventoryId());
         for (Specimen specimen : parentSpecimen.getChildSpecimens()) {
-            log.debug("deleteSpecimens: specimen: {}", specimen.getInventoryId());
+            LOG.debug("deleteSpecimens: specimen: {}", specimen.getInventoryId());
             session.delete(specimen);
         }
         parentSpecimen.getChildSpecimens().clear();
@@ -147,7 +147,7 @@ public class StudyDelete {
         session.flush();
 
         for (Specimen specimen : cevent.getOriginalSpecimens()) {
-            log.debug("deleteParentSpecimens: specimen: {}", specimen.getInventoryId());
+            LOG.debug("deleteParentSpecimens: specimen: {}", specimen.getInventoryId());
             session.delete(specimen);
         }
         cevent.getOriginalSpecimens().clear();
@@ -155,18 +155,18 @@ public class StudyDelete {
     }
 
     private static void deleteCollectionEvents(Session session, Patient patient) {
-        log.info("deleteCollectionEvents: patient: {}", patient.getPnumber());
+        LOG.info("deleteCollectionEvents: patient: {}", patient.getPnumber());
         for (CollectionEvent cevent : patient.getCollectionEvents()) {
             deleteParentSpecimens(session, cevent);
         }
         session.flush();
 
         for (CollectionEvent cevent : patient.getCollectionEvents()) {
-            log.debug("deleteCollectionEvents: deleting collection event: {}",
+            LOG.debug("deleteCollectionEvents: deleting collection event: {}",
                 cevent.getVisitNumber());
 
             for (EventAttr eventAttr : cevent.getEventAttrs()) {
-                log.debug("deleteCollectionEvents: deleting event attr: {} - {}",
+                LOG.debug("deleteCollectionEvents: deleting event attr: {} - {}",
                     eventAttr.getId(),
                     eventAttr.getStudyEventAttr().getGlobalEventAttr().getLabel());
                 session.delete(eventAttr);

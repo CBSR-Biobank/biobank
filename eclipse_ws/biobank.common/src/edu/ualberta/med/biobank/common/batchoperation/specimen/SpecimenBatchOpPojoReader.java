@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.batchoperation.specimen;
+package edu.ualberta.med.biobank.common.batchoperation.specimen;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,21 +20,21 @@ import org.supercsv.exception.SuperCSVException;
 import org.supercsv.exception.SuperCSVReflectionException;
 import org.supercsv.io.ICsvBeanReader;
 
-import edu.ualberta.med.biobank.batchoperation.ClientBatchOpErrorsException;
-import edu.ualberta.med.biobank.batchoperation.ClientBatchOpInputErrorList;
-import edu.ualberta.med.biobank.batchoperation.IBatchOpPojoReader;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpAction;
 import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpInputPojo;
+import edu.ualberta.med.biobank.common.batchoperation.ClientBatchOpErrorsException;
+import edu.ualberta.med.biobank.common.batchoperation.ClientBatchOpInputErrorList;
+import edu.ualberta.med.biobank.common.batchoperation.IBatchOpPojoReader;
 import edu.ualberta.med.biobank.model.Center;
 
 /**
  * Reads a CSV file containing specimen information and returns the file as a list of
  * SpecimenBatchOpInputPojo.
- * 
+ *
  * @author Nelson Loyola
- * 
+ *
  */
 @SuppressWarnings("nls")
 public class SpecimenBatchOpPojoReader implements

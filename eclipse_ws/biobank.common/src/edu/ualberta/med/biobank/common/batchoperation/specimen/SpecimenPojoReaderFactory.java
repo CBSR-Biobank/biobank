@@ -1,18 +1,18 @@
-package edu.ualberta.med.biobank.batchoperation.specimen;
+package edu.ualberta.med.biobank.common.batchoperation.specimen;
 
-import edu.ualberta.med.biobank.batchoperation.ClientBatchOpErrorsException;
-import edu.ualberta.med.biobank.batchoperation.IBatchOpPojoReader;
 import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpInputPojo;
+import edu.ualberta.med.biobank.common.batchoperation.ClientBatchOpErrorsException;
+import edu.ualberta.med.biobank.common.batchoperation.IBatchOpPojoReader;
 import edu.ualberta.med.biobank.model.Center;
 
 /**
  * Creates a IBatchOpPojoReader instance based on the headers in the CSV file.
- * 
+ *
  * @param csvHeaders the column names contained in the first row of the CSV file as an array of
  *            String.
- * 
+ *
  * @author Nelson Loyola
- * 
+ *
  */
 public class SpecimenPojoReaderFactory {
 

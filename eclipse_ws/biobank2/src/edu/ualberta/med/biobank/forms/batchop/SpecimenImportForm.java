@@ -4,9 +4,9 @@ import org.eclipse.ui.PartInitException;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
-import edu.ualberta.med.biobank.batchoperation.IBatchOpPojoReader;
-import edu.ualberta.med.biobank.batchoperation.specimen.SpecimenPojoReaderFactory;
 import edu.ualberta.med.biobank.common.action.batchoperation.IBatchOpInputPojo;
+import edu.ualberta.med.biobank.common.batchoperation.IBatchOpPojoReader;
+import edu.ualberta.med.biobank.common.batchoperation.specimen.SpecimenPojoReaderFactory;
 import edu.ualberta.med.biobank.model.Center;
 
 public class SpecimenImportForm extends ImportForm {

@@ -12,11 +12,11 @@ import org.supercsv.io.CsvBeanReader;
 import org.supercsv.io.ICsvBeanReader;
 import org.supercsv.prefs.CsvPreference;
 
-import edu.ualberta.med.biobank.batchoperation.IBatchOpPojoReader;
-import edu.ualberta.med.biobank.batchoperation.specimen.OhsTecanSpecimenPojoReader;
-import edu.ualberta.med.biobank.batchoperation.specimen.SpecimenPojoReaderFactory;
 import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpInputPojo;
 import edu.ualberta.med.biobank.common.action.exception.BatchOpErrorsException;
+import edu.ualberta.med.biobank.common.batchoperation.IBatchOpPojoReader;
+import edu.ualberta.med.biobank.common.batchoperation.specimen.OhsTecanSpecimenPojoReader;
+import edu.ualberta.med.biobank.common.batchoperation.specimen.SpecimenPojoReaderFactory;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.test.action.TestAction;

@@ -45,11 +45,11 @@ public class GenericAppArgs {
         options.addOption(OPT_VERBOSE, "verbose", false, "Use to enable debug information.");
         options.addOption(OPT_PWD, "password", true, "The user's password.");
 
-        options.addOption(OptionBuilder.withLongOpt("port")
+        options.addOption(OptionBuilder.withArgName(OPT_PORT)
+            .withLongOpt("port")
             .withType(Number.class)
             .hasArg()
             .withDescription("The port number used by the Biobank server.")
-            .withArgName(OPT_PORT)
             .create());
     }
 
@@ -69,8 +69,8 @@ public class GenericAppArgs {
                 this.hostname = line.getOptionValue(OPT_HOST);
             }
 
-            if (line.hasOption(OPT_PORT)) {
-                this.port = ((Number) line.getParsedOptionValue(OPT_PORT)).intValue();
+            if (line.hasOption("port")) {
+                this.port = ((Number) line.getParsedOptionValue("port")).intValue();
             }
 
             if (line.hasOption(OPT_USER)) {
@@ -96,6 +96,11 @@ public class GenericAppArgs {
     public void printHelp(String name) {
         HelpFormatter fmt = new HelpFormatter();
         fmt.printHelp(name, options);
+    }
+
+    public void printUsage(String name, String header) {
+        HelpFormatter fmt = new HelpFormatter();
+        fmt.printHelp(80, name, header, options, null);
     }
 
     @Override

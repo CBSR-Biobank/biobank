@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.tools.delete;
+package edu.ualberta.med.biobank.tools.cli.command;
 
 import java.util.List;
 
@@ -13,12 +13,44 @@ import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.DispatchSpecimen;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.tools.cli.CliProvider;
 
-public class StudyCounts {
+public class StudyCountsCommand extends Command {
 
-    private static final Logger log = LoggerFactory.getLogger(StudyCounts.class);
+    private static final Logger LOG = LoggerFactory.getLogger(StudyCountsCommand.class);
 
-    public static Number getParentSpecimenCount(Session session, String studyShortName) {
+    protected static final String NAME = "study_counts";
+
+    protected static final String USAGE = NAME + " SITE_NAME_SHORT";
+
+    protected static final String HELP = "displays counts associated with a study.";
+
+    private Session session;
+
+    public StudyCountsCommand(CliProvider cliProvider) {
+        super(cliProvider, NAME, HELP, USAGE);
+    }
+
+    @Override
+    public boolean runCommand(String[] args) {
+        if (args.length != 2) {
+            System.out.println("Error: " + USAGE);
+            return false;
+        }
+
+        final String studyShortName = args[1];
+        session = cliProvider.getSessionProvider().openSession();
+
+        getPatientCount(studyShortName);
+        getCeventCount(studyShortName);
+        getParentSpecimenCount(studyShortName);
+        getChildSpecimenCount(studyShortName);
+        getDispatchCount(studyShortName);
+        getDispatchSpecimenCount(studyShortName);
+        return true;
+    }
+
+    public Number getParentSpecimenCount(String studyShortName) {
         Number count = (Number) session.createCriteria(Specimen.class, "specimen")
             .createAlias("specimen.collectionEvent", "cevent")
             .createAlias("cevent.patient", "patient")
@@ -26,11 +58,11 @@ public class StudyCounts {
             .add(Restrictions.eq("study.nameShort", studyShortName))
             .setProjection(Projections.rowCount())
             .uniqueResult();
-        log.debug("getParentSpecimenCount: study: {}, count: {}", studyShortName, count);
+        LOG.info("getParentSpecimenCount: study: {}, count: {}", studyShortName, count);
         return count;
     }
 
-    public static Number getChildSpecimenCount(Session session, String studyShortName) {
+    public Number getChildSpecimenCount(String studyShortName) {
         Number count = (Number) session.createCriteria(Specimen.class, "specimen")
             .createAlias("specimen.parentSpecimen", "pspecimen")
             .createAlias("pspecimen.collectionEvent", "cevent")
@@ -39,11 +71,11 @@ public class StudyCounts {
             .add(Restrictions.eq("study.nameShort", studyShortName))
             .setProjection(Projections.rowCount())
             .uniqueResult();
-        log.debug("getChildSpecimenCount: study: {}, count: {}", studyShortName, count);
+        LOG.info("getChildSpecimenCount: study: {}, count: {}", studyShortName, count);
         return count;
     }
 
-    public static Number getDispatchCount(Session session, String studyShortName) {
+    public Number getDispatchCount(String studyShortName) {
         @SuppressWarnings("unchecked")
         List<Dispatch> dispatches = session.createCriteria(Dispatch.class, "dispatch")
             .createAlias("dispatch.dispatchSpecimens", "dspecimens")
@@ -55,11 +87,11 @@ public class StudyCounts {
             .add(Restrictions.eq("study.nameShort", studyShortName))
             .setProjection(Projections.distinct(Projections.property("dispatch.id")))
             .list();
-        log.debug("getDispatchCount: study: {}, count: {}", studyShortName, dispatches.size());
+        LOG.info("getDispatchCount: study: {}, count: {}", studyShortName, dispatches.size());
         return dispatches.size();
     }
 
-    public static Number getDispatchSpecimenCount(Session session, String studyShortName) {
+    public Number getDispatchSpecimenCount(String studyShortName) {
         Number count = (Number) session.createCriteria(DispatchSpecimen.class, "dspecimen")
             .createAlias("dspecimen.specimen", "specimen")
             .createAlias("specimen.parentSpecimen", "pspecimen")
@@ -69,28 +101,28 @@ public class StudyCounts {
             .add(Restrictions.eq("study.nameShort", studyShortName))
             .setProjection(Projections.rowCount())
             .uniqueResult();
-        log.debug("getDispatchSpecimenCount: study: {}, count: {}", studyShortName, count);
+        LOG.info("getDispatchSpecimenCount: study: {}, count: {}", studyShortName, count);
         return count;
     }
 
-    public static Number getCeventCount(Session session, String studyShortName) {
+    public Number getCeventCount(String studyShortName) {
         Number count = (Number) session.createCriteria(CollectionEvent.class, "cevent")
             .createAlias("cevent.patient", "patient")
             .createAlias("patient.study", "study")
             .add(Restrictions.eq("study.nameShort", studyShortName))
             .setProjection(Projections.rowCount())
             .uniqueResult();
-        log.debug("getCeventCount: study: {}, count: {}", studyShortName, count);
+        LOG.info("getCeventCount: study: {}, count: {}", studyShortName, count);
         return count;
     }
 
-    public static Number getPatientCount(Session session, String studyShortName) {
+    public Number getPatientCount(String studyShortName) {
         Number count = (Number) session.createCriteria(Patient.class, "patient")
             .createAlias("patient.study", "study")
             .add(Restrictions.eq("study.nameShort", studyShortName))
             .setProjection(Projections.rowCount())
             .uniqueResult();
-        log.debug("getPatientCount: study: {}, count: {}", studyShortName, count);
+        LOG.info("getPatientCount: study: {}, count: {}", studyShortName, count);
         return count;
     }
 

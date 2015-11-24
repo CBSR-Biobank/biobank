@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.batchoperation;
+package edu.ualberta.med.biobank.common.batchoperation;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
