@@ -122,7 +122,7 @@ public class SpecimenUpdateActivityStatus extends Command {
             e.printStackTrace();
         }
 
-        return true;
+        return false;
     }
 
     private Set<SpecimenInfoPojo> readCsvFile(String filename) throws Exception {

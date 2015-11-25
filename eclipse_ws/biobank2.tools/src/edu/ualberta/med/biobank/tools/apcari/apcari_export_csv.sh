@@ -16,13 +16,8 @@ do
     esac
 done
 
-if [ -z "$SUDO_PWD" ]; then
-    read -s -p "sudo password : " SUDO_WD
-    echo ""
-fi
-
 if [ -z "$DBPWD" ]; then
-    read -s -p "MySQL Password for root : " DBPWD
+    read -s -p "Enter MySQL Password for root : " DBPWD
     echo ""
 fi
 
@@ -74,8 +69,9 @@ WHERE study.name_short='APCaRI'
 GROUP BY pt.id)"
 
     #echo $QRY
+    sudo rm -f /tmp/$OUTFILE
     mysql -uroot -p$DBPWD $DB_NAME -e "${QRY}"
-    $(echo $SUDO_PWD | sudo -S mv /tmp/$OUTFILE $OUTPUT_DIR)
+    sudo mv /tmp/$OUTFILE $OUTPUT_DIR
 }
 
 get_shipments_csv () {
@@ -112,8 +108,9 @@ WHERE s.name_short='APCaRI'
 GROUP BY sh.id,cmt.id
 ORDER BY sh.received_at)"
 
+    sudo rm -f /tmp/$OUTFILE
     mysql -uroot -p$DBPWD $DB_NAME -e "${QRY}"
-    $(echo $SUDO_PWD | sudo -S mv /tmp/$OUTFILE $OUTPUT_DIR)
+    sudo mv /tmp/$OUTFILE $OUTPUT_DIR
 }
 
 get_containers_csv () {
@@ -131,8 +128,9 @@ WHERE s.name_short='APCaRI'
 AND c.label IS NOT null
 GROUP BY c.label)"
 
+    sudo rm -f /tmp/$OUTFILE
     mysql -uroot -p$DBPWD $DB_NAME -e "${QRY}"
-    $(echo $SUDO_PWD | sudo -S mv /tmp/$OUTFILE $OUTPUT_DIR)
+    sudo mv /tmp/$OUTFILE $OUTPUT_DIR
 }
 
 # splits results into multiple CSV files with each having 1000 rows max.
@@ -206,8 +204,9 @@ LIMIT $((1000 * $OFFSET)),1000)"
 
         #echo $QRY
 
+        sudo rm -f /tmp/$OUTFILE
         mysql -uroot -p$DBPWD $DB_NAME -e "${QRY}"
-        $(echo $SUDO_PWD | sudo -S mv /tmp/$OUTFILE $OUTPUT_DIR)
+        sudo mv /tmp/$OUTFILE $OUTPUT_DIR
     done
 }
 
@@ -249,9 +248,36 @@ LIMIT $((1000 * $OFFSET)),1000)"
 
         #echo $QRY
 
+        sudo rm -f /tmp/$OUTFILE
         mysql -uroot -p$DBPWD $DB_NAME -e "${QRY}"
-        $(echo $SUDO_PWD | sudo -S mv /tmp/$OUTFILE $OUTPUT_DIR)
+        sudo mv /tmp/$OUTFILE $OUTPUT_DIR
     done
+}
+
+get_processing_events_csv () {
+    local OUTFILE="processing_events.csv"
+    local QRY="SELECT 'worksheet','createdAt','activityStatus','siteNameShort'
+UNION ALL
+(SELECT pe.worksheet,
+date_format(convert_tz(pe.created_at,'GMT','Canada/Mountain'), '%Y-%m-%d %H:%i'),
+pe.activity_status_id,ctr.name_short
+INTO OUTFILE '/tmp/$OUTFILE'
+FIELDS TERMINATED BY ','
+ENCLOSED BY '\"'
+LINES TERMINATED BY '\n'
+FROM processing_event pe
+JOIN specimen spc ON spc.processing_event_id=pe.id
+JOIN collection_event ce ON ce.id=spc.collection_event_id
+JOIN patient p ON p.id=ce.patient_id
+JOIN study s ON s.id=p.study_id
+JOIN center ctr ON ctr.id=pe.center_id
+WHERE s.name_short='APCaRI'
+GROUP by pe.id)"
+
+    #echo $QRY
+    sudo rm -f /tmp/$OUTFILE
+    mysql -uroot -p$DBPWD $DB_NAME -e "${QRY}"
+    sudo mv /tmp/$OUTFILE $OUTPUT_DIR
 }
 
 get_patients_csv
@@ -260,3 +286,4 @@ get_containers_csv
 get_parent_specimens
 get_child_specimens
 get_closed_specimens
+get_processing_events_csv

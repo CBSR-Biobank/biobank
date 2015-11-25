@@ -54,3 +54,5 @@ done
 for CSV in $CSV_DIR/closed_specimens_*.csv; do
     do_command specimen_update_activity_status_csv CBSR $CSV
 done
+
+do_command processing_event_udpate_csv $CSV_DIR/processing_events.csv

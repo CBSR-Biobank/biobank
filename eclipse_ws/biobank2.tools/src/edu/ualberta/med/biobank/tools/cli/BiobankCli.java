@@ -14,6 +14,7 @@ import edu.ualberta.med.biobank.tools.SessionProvider.Mode;
 import edu.ualberta.med.biobank.tools.cli.command.CommandRegistry;
 import edu.ualberta.med.biobank.tools.cli.command.CreateContainerCommand;
 import edu.ualberta.med.biobank.tools.cli.command.PatientDeleteCommand;
+import edu.ualberta.med.biobank.tools.cli.command.ProcessingEventUpdate;
 import edu.ualberta.med.biobank.tools.cli.command.SpecimenUpdateActivityStatus;
 import edu.ualberta.med.biobank.tools.cli.command.StudyCountsCommand;
 import edu.ualberta.med.biobank.tools.cli.command.StudyDeleteCommand;
@@ -24,9 +25,9 @@ import edu.ualberta.med.biobank.tools.utils.HostUrl;
 
 /**
  * Used to delete a study and all it's patients, collection events, and specimens.
- *
+ * 
  * @author loyola
- *
+ * 
  */
 public class BiobankCli extends Application implements CliProvider {
 
@@ -150,6 +151,7 @@ public class BiobankCli extends Application implements CliProvider {
         cr.addCommand(new StudyDeleteCommand(this));
         cr.addCommand(new PatientDeleteCommand(this));
         cr.addCommand(new SpecimenUpdateActivityStatus(this));
+        cr.addCommand(new ProcessingEventUpdate(this));
     }
 
 }
