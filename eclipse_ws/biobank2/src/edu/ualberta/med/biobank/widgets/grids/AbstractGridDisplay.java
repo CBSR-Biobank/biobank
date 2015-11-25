@@ -403,11 +403,13 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
     @SuppressWarnings("nls")
     @Override
     public RowColPos getPositionAtCoordinates(int x, int y) {
-        int row = y / getCellHeight();
-        int col = x / getCellWidth();
-        log.trace("getPositionAtCoordinates: row: {}, col: {}", row, col);
-        if ((row >= 0) && (row < getRows()) && (col >= 0) && (col < getCols())) {
-            return new RowColPos(row, col);
+        if ((x >= 0) && (y >= 0)) {
+            int row = y / getCellHeight();
+            int col = x / getCellWidth();
+            log.trace("getPositionAtCoordinates: row: {}, col: {}", row, col);
+            if ((row >= 0) && (row < getRows()) && (col >= 0) && (col < getCols())) {
+                return new RowColPos(row, col);
+            }
         }
         return null;
     }

@@ -14,6 +14,8 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.remoting.RemoteConnectFailureException;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
@@ -43,6 +45,9 @@ import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class PalletScanManagement {
+
+    private static Logger LOG = LoggerFactory.getLogger(PalletScanManagement.class.getName());
+
     private static final I18n i18n = I18nFactory.getI18n(PalletScanManagement.class);
 
     protected Map<RowColPos, SpecimenCell> wells = new HashMap<RowColPos, SpecimenCell>();
@@ -165,13 +170,22 @@ public class PalletScanManagement {
 
     @SuppressWarnings("nls")
     public void scanTubesManually(MouseEvent event, ScanManualOption scanManualOption) {
+        LOG.trace("scanTubesManually: event [ x: {}, y {} ]", event.x, event.y);
+
         RowColPos startPos = ((PalletWidget) event.widget).getPositionAtCoordinates(
             event.x, event.y);
 
         // if mouse click does not produce a position then there is nothing to do
         if (startPos == null) return;
 
-        if (!canScanTubeAlone(wells.get(startPos))) return;
+        SpecimenCell specimenCell = wells.get(startPos);
+
+        if ((specimenCell != null) && !specimenCell.getValue().isEmpty()) {
+            // this cell already has an inventory id
+            return;
+        }
+
+        if (!canScanTubeAlone(specimenCell)) return;
 
         Set<SpecimenCell> manuallyEnteredCells = new HashSet<SpecimenCell>();
 

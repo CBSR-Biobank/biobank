@@ -456,6 +456,8 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
         Map<String, SpecimenBriefInfo> specimenDataMap =
             AbstractPalletSpecimenAdminForm.getSpecimenData(currentWorkingCenter, cells);
 
+        Map<RowColPos, SpecimenCell> cellMap = getCells();
+
         for (SpecimenCell cell : cells) {
             CellInfo cellServerInfo = res.getCells().get(cell.getRowColPos());
             cell.merge(specimenDataMap.get(cell.getValue()), cellServerInfo);
@@ -465,7 +467,9 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
                 errorFound = true;
             }
             specificScanPosProcess(cell);
+            cellMap.put(cell.getRowColPos(), cell);
         }
+        palletWidget.setCells(cellMap);
         palletWidget.redraw();
         setDecodeOkValue(scanStatus && !errorFound);
         setHasValues();

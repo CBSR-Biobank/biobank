@@ -328,10 +328,21 @@ public class ContainerDisplayWidget extends ImageCanvas {
         return multiSelectionManager;
     }
 
-    @SuppressWarnings("nls")
+    /**
+     * Returns the cell that correspond to position x and y. If the coordinates do not fall inside
+     * the grid, then null is returned.
+     * 
+     * @param x The x coordinate for where the mouse was clicked.
+     * 
+     * @param y The y coordinate for were the mouse was clicked.
+     * 
+     * @return The position at the given coordinates. Null is returned if the mouse was clicked
+     *         outside the grid.
+     * 
+     */
     public RowColPos getPositionAtCoordinates(int x, int y) {
-        log.trace("getPositionAtCoordinates");
-        return containerDisplay.getPositionAtCoordinates(x, y);
+        Point pointOnImage = getPointOnImage(x, y);
+        return containerDisplay.getPositionAtCoordinates(pointOnImage.x, pointOnImage.y);
     }
 
     public void updateCells() {
