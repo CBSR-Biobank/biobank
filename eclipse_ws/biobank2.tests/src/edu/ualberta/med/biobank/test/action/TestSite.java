@@ -43,6 +43,7 @@ import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Site;
@@ -337,6 +338,11 @@ public class TestSite extends TestAction {
 
     @Test
     public void containerTypes() {
+        ContainerLabelingScheme containerLabelingScheme =
+            getContainerLabelingSchemes().get("2 char numeric");
+
+        Assert.assertNotNull(containerLabelingScheme);
+
         SiteSaveAction siteSaveAction =
             SiteHelper.getSaveAction(getMethodNameR(), getMethodNameR(), ActivityStatus.ACTIVE);
         Integer siteId = exec(siteSaveAction).getId();
@@ -344,7 +350,7 @@ public class TestSite extends TestAction {
         String ctName = getMethodName() + "FREEZER01";
 
         ContainerTypeSaveAction ctSaveAction = ContainerTypeHelper.getSaveAction(
-            ctName, ctName, siteId, true, 6, 10, getLabelingSchemeWithLargerCapacity(1).getId(),
+            ctName, ctName, siteId, true, 6, 10, containerLabelingScheme.getId(),
             getR().nextDouble());
         Integer ctId = exec(ctSaveAction).getId();
 
@@ -358,7 +364,7 @@ public class TestSite extends TestAction {
         // add another container
         ctName += "_2";
         ctSaveAction = ContainerTypeHelper.getSaveAction(ctName, ctName, siteId, true, 3, 8,
-            getLabelingSchemeWithLargerCapacity(1).getId(), getR().nextDouble());
+            containerLabelingScheme.getId(), getR().nextDouble());
         ctId = exec(ctSaveAction).getId();
 
         siteInfo = exec(new SiteGetInfoAction(siteId));
@@ -388,8 +394,13 @@ public class TestSite extends TestAction {
         Provisioning provisioning = new Provisioning(session, factory);
         session.getTransaction().commit();
 
+        ContainerLabelingScheme containerLabelingScheme =
+            getContainerLabelingSchemes().get("2 char numeric");
+
+        Assert.assertNotNull(containerLabelingScheme);
+
         provisioning.addContainerType(getExecutor(), getMethodName(),
-            getLabelingSchemeWithLargerCapacity(1).getId(), getR().nextDouble());
+            containerLabelingScheme.getId(), getR().nextDouble());
         return provisioning;
     }
 

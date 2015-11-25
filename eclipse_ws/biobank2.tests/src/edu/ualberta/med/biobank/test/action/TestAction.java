@@ -122,15 +122,6 @@ public class TestAction extends TestDb {
         return result;
     }
 
-    protected ContainerLabelingScheme getLabelingSchemeWithLargerCapacity(int capacity) {
-        for (ContainerLabelingScheme scheme : getContainerLabelingSchemes().values()) {
-            if (scheme.getMaxCapacity() > capacity) {
-                return scheme;
-            }
-        }
-        return null;
-    }
-
     protected List<ShippingMethod> getShippingMethods() {
         @SuppressWarnings("unchecked")
         List<ShippingMethod> shippingMethods = session.createCriteria(ShippingMethod.class).list();
