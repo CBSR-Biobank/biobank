@@ -239,7 +239,11 @@ public class SpecimenBatchOpPojoData implements IBatchOpPojoHelper {
         pevent = new ProcessingEvent();
         pevent.setWorksheet(pojo.getWorksheet());
         pevent.setCreatedAt(pojo.getCreatedAt());
-        pevent.setCenter(originInfo.getCenter());
+
+        Center peventCenter = (pojo.getWaybill() == null)
+            ? originInfo.getCenter() : originInfo.getReceiverCenter();
+        pevent.setCenter(peventCenter);
+
         pevent.setActivityStatus(ActivityStatus.ACTIVE);
         specimen.setProcessingEvent(pevent);
         pevent.getSpecimens().add(specimen);
