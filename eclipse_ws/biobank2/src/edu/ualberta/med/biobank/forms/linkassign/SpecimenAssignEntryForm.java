@@ -671,6 +671,8 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                             initCellsWithContainer(currentMultipleContainer);
                             currentMultipleContainer.setLabel(palletLabel);
                             currentMultipleContainer.setProductBarcode(palletBarcode);
+                            currentMultipleContainer.setSite(
+                                SessionManager.getUser().getCurrentWorkingSite());
                             if (!ok) {
                                 BgcPlugin.focusControl(palletLabelText);
                                 showOnlyPallet(true);
