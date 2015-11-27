@@ -32,4 +32,4 @@ the web site at:
 
 * [http://biosample.ca/](http://biosample.ca/)
 
-Please see the Wiki for this project form more documentation.
+Please see the Wiki for this project for more documentation.
