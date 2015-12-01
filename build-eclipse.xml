@@ -233,6 +233,72 @@ use command "ant -projecthelp" to display the targets.
     </javac>
   </target>
 
+  <path id="biobank.cli.classpath">
+    <fileset refid="biobank.common.client.build.classpath" />
+    <fileset refid="biobank.common.server.build.classpath" />
+    <fileset dir="${eclipse.proj.dir.tools}/lib" includes="**/*.jar" />
+    <fileset dir="${eclipse.proj.dir.common}/lib/server" includes="supercsv.jar" />
+  </path>
+
+  <target name="biobank-cli" depends="eclipse-biobank-tools">
+    <delete dir="${output.biobank.cli.dir}" />
+    <mkdir dir="${output.biobank.cli.dir}" />
+    <copy todir="${output.biobank.cli.dir}/lib">
+      <fileset refid="biobank.common.client.build.classpath" />
+    </copy>
+    <copy todir="${output.biobank.cli.dir}/lib">
+      <fileset refid="biobank.common.server.build.classpath" />
+    </copy>
+    <copy todir="${output.biobank.cli.dir}/lib">
+      <fileset dir="${eclipse.proj.dir.common}/lib/server"
+               includes="supercsv.jar" />
+    </copy>
+    <copy todir="${output.biobank.cli.dir}/lib">
+      <fileset dir="${eclipse.proj.dir.tools}/lib" includes="**/*.jar" />
+    </copy>
+    <copy todir="${output.biobank.cli.dir}">
+      <fileset dir="${eclipse.proj.dir.tools}/bin" includes="log4j.properties" />
+    </copy>
+    <copy todir="${output.biobank.cli.dir}">
+      <fileset dir="${eclipse.proj.dir.common}/bin"
+               includes="application-config-client*.xml" />
+    </copy>
+    <pathconvert pathsep=" "
+                 property="biobank-cli-classpath"
+                 refid="biobank.cli.classpath">
+      <map from="${basedir}/${eclipse.proj.dir.common}/lib/client/" to="./lib/" />
+      <map from="${basedir}/${eclipse.proj.dir.common}/lib/server/" to="./lib/" />
+      <map from="${basedir}/${eclipse.proj.dir.common}/bin/" to="./lib/" />
+    </pathconvert>
+    <jar destfile="${output.biobank.cli.dir}/BiobankCli.jar">
+      <manifest>
+        <attribute name="Implementation-Version" value="${java.client.version.num}" />
+        <attribute name="Main-Class"
+                   value="edu.ualberta.med.biobank.tools.cli.BiobankCli"/>
+        <attribute name="Class-Path" value=". ${biobank-cli-classpath}" />
+      </manifest>
+      <fileset dir="${eclipse.proj.dir.common}/bin"
+               includes="edu/ualberta/med/biobank/server/applicationservice/**/*.class,
+                         edu/ualberta/med/biobank/server/query/**/*.class,
+                         edu/ualberta/med/biobank/util/**/*.class,
+                         edu/ualberta/med/biobank/validator/**/*.class,
+                         edu/ualberta/med/biobank/i18n/**/*.class,
+                         edu/ualberta/med/biobank/Common*.class" />
+      <fileset dir="${eclipse.proj.dir.common}/bin"
+               includes="edu/ualberta/med/biobank/model/**/*.class" />
+      <fileset dir="${eclipse.proj.dir.common}/bin"
+               includes="edu/ualberta/med/biobank/common/**/*.class" />
+      <fileset dir="${eclipse.proj.dir.common}/bin"
+               includes="edu/ualberta/med/biobank/client/**/*.class" />
+      <fileset dir="${eclipse.proj.dir.tools}/bin" includes="**/*.class"  />
+    </jar>
+  </target>
+
+  <target name="biobank-cli-dist" depends="biobank-cli"
+          description="builds a distributable JAR for the Biobank CLI.">
+    <zip destfile="BiobankCli-${java.client.version.num}.zip" basedir="${output.biobank.cli.dir}" />
+  </target>
+
   <target name="eclipse-biobank-tests" depends="eclipse-biobank">
     <javac
 	compiler="org.eclipse.jdt.core.JDTCompilerAdapter"

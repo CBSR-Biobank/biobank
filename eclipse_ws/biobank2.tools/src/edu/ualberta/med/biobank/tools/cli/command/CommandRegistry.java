@@ -37,7 +37,7 @@ public class CommandRegistry {
     public void showCommandsAndHelp() {
         System.out.println("Possible commands:");
         for (Command command : commands.values()) {
-            System.out.println(command.getName() + "\t- " + command.getHelp());
+            System.out.format("  %-35s - %s\n", command.getName(), command.getHelp());
         }
     }
 

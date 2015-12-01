@@ -13,6 +13,7 @@ import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.DispatchSpecimen;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.tools.SessionProvider;
 import edu.ualberta.med.biobank.tools.cli.CliProvider;
 
 public class StudyCountsCommand extends Command {
@@ -38,8 +39,14 @@ public class StudyCountsCommand extends Command {
             return false;
         }
 
+        SessionProvider sessionProvider = cliProvider.getSessionProvider();
+        if (sessionProvider == null) {
+            System.out.println("could not create a hibernate session");
+            return false;
+        }
+
         final String studyShortName = args[1];
-        session = cliProvider.getSessionProvider().openSession();
+        session = sessionProvider.openSession();
 
         getPatientCount(studyShortName);
         getCeventCount(studyShortName);

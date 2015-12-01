@@ -13,6 +13,7 @@ import edu.ualberta.med.biobank.tools.SessionProvider;
 import edu.ualberta.med.biobank.tools.SessionProvider.Mode;
 import edu.ualberta.med.biobank.tools.cli.command.CommandRegistry;
 import edu.ualberta.med.biobank.tools.cli.command.CreateContainerCommand;
+import edu.ualberta.med.biobank.tools.cli.command.HelpCommand;
 import edu.ualberta.med.biobank.tools.cli.command.PatientDeleteCommand;
 import edu.ualberta.med.biobank.tools.cli.command.ProcessingEventUpdate;
 import edu.ualberta.med.biobank.tools.cli.command.SpecimenUpdateActivityStatus;
@@ -116,7 +117,16 @@ public class BiobankCli extends Application implements CliProvider {
         String commandName = quotedArgs[0];
 
         if (commandName.equals("help")) {
-            CommandRegistry.getInstance().showCommandsAndHelp();
+            CommandRegistry.getInstance().invokeCommand(commandName, quotedArgs);
+            System.exit(0);
+        }
+
+        // when run from within eclipse "clientVersion" will be null, but
+        // when run from the JAR file, it will return a valid version number
+        String clientVersion = BiobankCli.class.getPackage().getImplementationVersion();
+
+        if (commandName.equals("version")) {
+            System.out.println("BiobankCli version: " + clientVersion);
             System.exit(0);
         }
 
@@ -126,8 +136,13 @@ public class BiobankCli extends Application implements CliProvider {
             try {
                 checkCertificates(hostUrl);
 
-                appService = ServiceConnection.getAppService(hostUrl, args.username,
-                    args.password);
+                appService = ServiceConnection.getAppService(
+                    hostUrl, args.username, args.password);
+
+                // validate that we are connected with a valid version of the server
+                if (clientVersion != null) {
+                    appService.checkVersion(clientVersion);
+                }
             } catch (Exception e) {
                 System.out.println("Could not connect to application service: " + e.getMessage());
                 System.exit(1);
@@ -143,6 +158,7 @@ public class BiobankCli extends Application implements CliProvider {
 
     private void addCommands() {
         CommandRegistry cr = CommandRegistry.getInstance();
+        cr.addCommand(new HelpCommand(this));
         cr.addCommand(new SpecimenImportCommand(this));
         cr.addCommand(new PatientImportCommand(this));
         cr.addCommand(new ShipmentImportCommand(this));
