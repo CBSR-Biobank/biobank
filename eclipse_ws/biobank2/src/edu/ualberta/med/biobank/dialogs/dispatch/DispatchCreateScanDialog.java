@@ -121,7 +121,7 @@ public class DispatchCreateScanDialog extends AbstractScanDialog<DispatchWrapper
         }
 
         parent.pack(true);
-        Point size = getShell().computeSize(800, 600);
+        Point size = getShell().computeSize(600, 400);
         getShell().setMinimumSize(size);
     }
 
