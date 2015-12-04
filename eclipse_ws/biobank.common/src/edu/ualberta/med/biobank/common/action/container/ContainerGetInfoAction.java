@@ -107,7 +107,25 @@ public class ContainerGetInfoAction implements Action<ListResult<Container>> {
         // load associations
         for (Container container : containers) {
             ContainerType ctype = container.getContainerType();
+
+            if (!ctype.getTopLevel()) {
+                Container parentContainer = container.getParentContainer();
+                if (parentContainer != null) {
+                    ContainerType parentCtype = parentContainer.getContainerType();
+                    parentCtype.getChildLabelingScheme().getMaxRows();
+                    parentCtype.getChildContainerTypes().size();
+                    for (ContainerType childCtype : parentCtype.getChildContainerTypes()) {
+                        childCtype.getSpecimenTypes().size();
+                    }
+                }
+            }
+
             ctype.getChildContainerTypes().size();
+            for (ContainerType childCtype : ctype.getChildContainerTypes()) {
+                childCtype.getChildLabelingScheme().getMaxRows();
+                childCtype.getSpecimenTypes().size();
+            }
+
             ctype.getSpecimenTypes().size();
             ctype.getChildLabelingScheme().getMaxCapacity();
             container.getPosition();
@@ -127,6 +145,7 @@ public class ContainerGetInfoAction implements Action<ListResult<Container>> {
 
             for (ContainerPosition pos : container.getChildPositions()) {
                 pos.getContainer().getLabel();
+                pos.getContainer().getSpecimenPositions().size();
             }
 
             for (SpecimenPosition pos : container.getSpecimenPositions()) {
@@ -150,6 +169,9 @@ public class ContainerGetInfoAction implements Action<ListResult<Container>> {
             for (Comment comment : container.getComments()) {
                 comment.getUser().getLogin();
             }
+
+            container.getContainerType().getSpecimenTypes().size();
+
         }
 
         return new ListResult<Container>(containers);

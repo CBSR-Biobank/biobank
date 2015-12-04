@@ -57,7 +57,6 @@ public class PalletScanManagement {
     };
 
     private int scansCount = 0;
-    private boolean useScanner = true;
 
     private ContainerType selectedContainerType;
 
@@ -309,10 +308,6 @@ public class PalletScanManagement {
         initCells();
     }
 
-    public void setUseScanner(boolean useScanner) {
-        this.useScanner = useScanner;
-    }
-
     private void initCells() {
         wells = new HashMap<RowColPos, SpecimenCell>();
     }
@@ -323,48 +318,46 @@ public class PalletScanManagement {
 
     @SuppressWarnings("nls")
     public void initCellsWithContainer(ContainerWrapper container) {
-        if (!useScanner) {
-            wells.clear();
-            for (Entry<RowColPos, SpecimenWrapper> entry : container.getSpecimens().entrySet()) {
-                RowColPos pos = entry.getKey();
-                SpecimenCell cell = new SpecimenCell(
-                    pos.getRow(),
-                    pos.getCol(),
-                    new DecodedWell(pos.getRow(), pos.getCol(), entry.getValue().getInventoryId()));
-                cell.setSpecimen(entry.getValue());
-                cell.setStatus(UICellStatus.FILLED);
-                cell.setExpectedSpecimen(entry.getValue());
-                wells.put(pos, cell);
+        wells.clear();
+        for (Entry<RowColPos, SpecimenWrapper> entry : container.getSpecimens().entrySet()) {
+            RowColPos pos = entry.getKey();
+            SpecimenCell cell = new SpecimenCell(
+                pos.getRow(),
+                pos.getCol(),
+                new DecodedWell(pos.getRow(), pos.getCol(), entry.getValue().getInventoryId()));
+            cell.setSpecimen(entry.getValue());
+            cell.setStatus(UICellStatus.FILLED);
+            cell.setExpectedSpecimen(entry.getValue());
+            wells.put(pos, cell);
+        }
+        try {
+            ArrayList<String> ids = new ArrayList<String>();
+            if ((container.getProductBarcode() != null)
+                && (container.getProductBarcode().length() != 0)) {
+                ids = SessionManager.getAppService().doAction(
+                    new SpecimenByMicroplateSearchAction(container.getProductBarcode())).getList();
             }
-            try {
-                ArrayList<String> ids = new ArrayList<String>();
-                if ((container.getProductBarcode() != null)
-                    && (container.getProductBarcode().length() != 0)) {
-                    ids = SessionManager.getAppService().doAction(
-                        new SpecimenByMicroplateSearchAction(container.getProductBarcode())).getList();
+            ContainerTypeWrapper containerType = container.getContainerType();
+            if (((containerType != null) && containerType.getIsMicroplate())
+                || !ids.isEmpty()) {
+                // microplate with specimens
+                for (String id : ids) {
+                    SpecimenWrapper sw = SpecimenWrapper.getSpecimen(
+                        SessionManager.getAppService(), id);
+                    RowColPos pos = container.getPositionFromLabelingScheme(
+                        InventoryIdUtil.positionPart(id));
+                    SpecimenCell cell = new SpecimenCell(
+                        pos.getRow(),
+                        pos.getCol(),
+                        new DecodedWell(pos.getRow(), pos.getCol(), sw.getInventoryId()));
+                    cell.setSpecimen(sw);
+                    cell.setStatus(UICellStatus.NEW);
+                    wells.put(pos, cell);
                 }
-                ContainerTypeWrapper containerType = container.getContainerType();
-                if (((containerType != null) && containerType.getIsMicroplate())
-                    || !ids.isEmpty()) {
-                    // microplate with specimens
-                    for (String id : ids) {
-                        SpecimenWrapper sw = SpecimenWrapper.getSpecimen(
-                            SessionManager.getAppService(), id);
-                        RowColPos pos = container.getPositionFromLabelingScheme(
-                            InventoryIdUtil.positionPart(id));
-                        SpecimenCell cell = new SpecimenCell(
-                            pos.getRow(),
-                            pos.getCol(),
-                            new DecodedWell(pos.getRow(), pos.getCol(), sw.getInventoryId()));
-                        cell.setSpecimen(sw);
-                        cell.setStatus(UICellStatus.NEW);
-                        wells.put(pos, cell);
-                    }
-                }
-            } catch (Exception e) {
-                BgcPlugin.openAsyncError(
-                    i18n.tr("Problem with microplate specimens"), e);
             }
+        } catch (Exception e) {
+            BgcPlugin.openAsyncError(
+                i18n.tr("Problem with microplate specimens"), e);
         }
     }
 

@@ -16,6 +16,7 @@ import org.xnap.commons.i18n.I18nFactory;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.container.ContainerGetContainerOrParentsByLabelAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerGetContainerOrParentsByLabelAction.ContainerData;
+import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoAction;
 import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -30,7 +31,7 @@ public class ScanAssignHelper {
 
     private static final I18n i18n = I18nFactory.getI18n(ScanAssignHelper.class);
 
-    private static Logger log = LoggerFactory.getLogger(ScanAssignHelper.class);
+    private static Logger LOG = LoggerFactory.getLogger(ScanAssignHelper.class);
 
     @SuppressWarnings("nls")
     public static boolean isContainerValid(ContainerWrapper palletContainer, String positionText) {
@@ -89,14 +90,14 @@ public class ScanAssignHelper {
             container = parentContainer.getChildByLabel(
                 palletLabel.substring(parentContainer.getLabel().length()));
 
-            log.debug("getOrCreateContainerByLabel: label: {}, parent container label: {}",
+            LOG.debug("getOrCreateContainerByLabel: label: {}, parent container label: {}",
                 palletLabel, parentContainer.getLabel());
 
             if (container == null) {
                 container = new ContainerWrapper(SessionManager.getAppService());
 
                 // no container at this position right now, create one
-                log.debug("getOrCreateContainerByLabel: creating new container at label: {}", palletLabel);
+                LOG.debug("getOrCreateContainerByLabel: creating new container at label: {}", palletLabel);
                 String childLabel = palletLabel.substring(parentContainer.getLabel().length());
                 parentContainer.addChild(childLabel, container);
                 container.setParent(parentContainer,
@@ -165,6 +166,43 @@ public class ScanAssignHelper {
             BgcPlugin.openError(
                 // TR: dialog title
                 i18n.tr("Init container from position"), ex);
+        }
+        return null;
+    }
+
+    /**
+     * Returns a container with the give product barcode, or NULL if no container with the give
+     * product barcode exists.
+     * 
+     * @param productBarcode the product barcode for the container. Can be scanned from a 1D
+     *            barcode.
+     * 
+     * @return returns the container with the give product barcode, or NULL if none exists.
+     */
+    @SuppressWarnings("nls")
+    public static ContainerWrapper getContainerByProductBarcode(String productBarcode) {
+        try {
+            Container c = new Container();
+            c.setProductBarcode(productBarcode);
+
+            Site site = SessionManager.getUser().getCurrentWorkingSite().getWrappedObject();
+
+            ArrayList<Container> result =
+                SessionManager.getAppService().doAction(
+                    new ContainerGetInfoAction(c, site)).getList();
+
+            if (!result.isEmpty()) {
+                if (result.size() > 1) {
+                    throw new IllegalStateException(
+                        "more than one container with product barcode found: " + productBarcode);
+                }
+                return new ContainerWrapper(SessionManager.getAppService(), result.get(0));
+            }
+
+        } catch (Exception ex) {
+            BgcPlugin.openError(
+                // TR: dialog title
+                i18n.tr("Could not retrieve container with product barcode: "), ex);
         }
         return null;
     }
@@ -287,7 +325,9 @@ public class ScanAssignHelper {
 
         // container has no product barcode: update it with the one entered by
         // user
-        if (container.hasSpecimens()) {
+        String productBarcode = container.getProductBarcode();
+        if (container.hasSpecimens()
+            && ((productBarcode == null) || productBarcode.isEmpty())) {
             // Position already physically used but no barcode was
             // set (old database compatibility)
             return MessageFormat.format(

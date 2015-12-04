@@ -362,14 +362,8 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
         enableFields(true);
     }
 
-    protected void setUseScanner(boolean useScanner) {
-        palletScanManagement.setUseScanner(useScanner);
-        if (useScanner) {
-            // currentScanState = null;
-            currentScanState = UICellStatus.EMPTY;
-        } else {
-            currentScanState = UICellStatus.EMPTY;
-        }
+    protected void setUseScanner(@SuppressWarnings("unused") boolean useScanner) {
+        currentScanState = UICellStatus.EMPTY;
     }
 
     @SuppressWarnings("unused")

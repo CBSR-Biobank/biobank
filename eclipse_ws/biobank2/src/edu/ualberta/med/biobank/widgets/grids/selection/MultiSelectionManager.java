@@ -72,10 +72,13 @@ public class MultiSelectionManager implements MouseListener, MouseTrackListener,
         container.removeMouseTrackListener(this);
         container.removeKeyListener(this);
         clearMultiSelection();
-        Map<RowColPos, ? extends AbstractUIWell> cells = container.getCells();
-        if (cells != null) {
-            for (AbstractUIWell cell : cells.values()) {
-                specificBehaviour.removeSelection(cell);
+
+        if (specificBehaviour != null) {
+            Map<RowColPos, ? extends AbstractUIWell> cells = container.getCells();
+            if (cells != null) {
+                for (AbstractUIWell cell : cells.values()) {
+                    specificBehaviour.removeSelection(cell);
+                }
             }
         }
         enabled = false;

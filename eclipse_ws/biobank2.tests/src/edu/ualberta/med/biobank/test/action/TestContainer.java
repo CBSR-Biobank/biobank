@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.test.action;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -368,5 +369,29 @@ public class TestContainer extends TestAction {
             childContainer.getLabel() + "A1", childContainer.getSite()));
 
         Assert.assertEquals(2, containerData.getPossibleParentContainers().size());
+    }
+
+    /**
+     * 
+     */
+    @Test
+    public void getContainerByProductBarcode() {
+        String productBarcode = "ABC123";
+
+        session.beginTransaction();
+        Container topContainer = factory.createTopContainer();
+        topContainer.setLabel("C02");
+        Container childContainer = factory.createContainer();
+        childContainer.setLabel("C02A1");
+        childContainer.setProductBarcode(productBarcode);
+        session.getTransaction().commit();
+
+        Container c = new Container();
+        c.setProductBarcode(productBarcode);
+
+        ArrayList<Container> result =
+            exec(new ContainerGetInfoAction(c, factory.getDefaultSite())).getList();
+        Assert.assertEquals(1, result.size());
+        Assert.assertEquals(productBarcode, result.get(0).getProductBarcode());
     }
 }
