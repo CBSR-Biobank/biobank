@@ -239,16 +239,18 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
         });
         scanButton.setEnabled(false);
 
-        addBooleanBinding(new WritableValue(Boolean.FALSE, Boolean.class),
+        addBooleanBinding(
+            new WritableValue(Boolean.FALSE, Boolean.class),
             canLaunchScanValue,
             // TR: validation error message
-            i18n.tr("Errors were detected. Cannot decode pallet yet."));
+            i18n.tr("Pallet cannot be scanned. Enter inventory IDs manually by double clicking cells on the grid."));
         addBooleanBinding(
             new WritableValue(Boolean.FALSE, Boolean.class),
             scanHasBeenLaunchedValue,
             // TR: validation error message
-            i18n.tr("Decode a pallet or enter inventory IDs manually by double clicking cells on the grid"));
-        addBooleanBinding(new WritableValue(Boolean.TRUE, Boolean.class),
+            i18n.tr("Decode a pallet or enter inventory IDs manually by double clicking cells on the grid."));
+        addBooleanBinding(
+            new WritableValue(Boolean.TRUE, Boolean.class),
             scanValidValue,
             // TR: validation error message
             i18n.tr("Errors found with inventory IDs"));

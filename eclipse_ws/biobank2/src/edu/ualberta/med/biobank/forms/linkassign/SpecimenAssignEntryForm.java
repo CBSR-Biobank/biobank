@@ -28,6 +28,7 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -641,11 +642,18 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                 if (palletProductBarcodeTextModified
                     && productBarcodeValidator.validate(
                         currentMultipleContainer.getProductBarcode()).equals(Status.OK_STATUS)) {
-                    boolean ok = checkMultipleScanBarcode();
-                    setCanLaunchScan(ok);
-                    if (!ok) {
+                    checkMultipleScanBarcode();
+
+                    boolean canScan = false;
+                    ContainerTypeWrapper ctype = currentMultipleContainer.getContainerType();
+                    if (ctype != null) {
+                        canScan = ScanAssignHelper.isPalletScannable(ctype);
+
+                    }
+                    if (!canScan) {
                         BgcPlugin.focusControl(palletproductBarcodeText);
                     }
+                    setCanLaunchScan(canScan);
                 }
                 palletProductBarcodeTextModified = false;
             }
@@ -680,7 +688,14 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                                         || containerProductBarcode.isEmpty());
 
                                 boolean ok = checkAndUpdateContainer(container, palletLabel);
-                                setCanLaunchScan(ok);
+
+                                boolean canScan = false;
+                                ContainerTypeWrapper ctype = container.getContainerType();
+                                if (ctype != null) {
+                                    canScan = ScanAssignHelper.isPalletScannable(ctype);
+                                }
+                                setCanLaunchScan(canScan);
+
                                 initCellsWithContainer(currentMultipleContainer);
                                 currentMultipleContainer.setLabel(container.getLabel());
 
@@ -735,7 +750,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
 
             ContainerTypeWrapper typeSelection;
             List<ContainerTypeWrapper> possibleTypes =
-                ScanAssignHelper.getContainerTypes(container, usingFlatbedScanner);
+                ScanAssignHelper.getContainerTypes(container, false);
 
             if (possibleTypes.size() == 1) {
                 typeSelection = possibleTypes.get(0);
@@ -768,6 +783,22 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             }
 
             palletTypesViewer.getCombo().setEnabled(false);
+            palletTypesViewer.getCombo().addSelectionListener(new SelectionListener() {
+
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    ContainerTypeWrapper ctype = (ContainerTypeWrapper) ((IStructuredSelection)
+                        palletTypesViewer.getSelection()).getFirstElement();
+                    boolean canScan = ScanAssignHelper.isPalletScannable(ctype);
+                    setCanLaunchScan(canScan);
+                }
+
+                @Override
+                public void widgetDefaultSelected(SelectionEvent e) {
+                    widgetSelected(e);
+                }
+
+            });
             palletTypesViewer.setInput(possibleTypes);
             if (possibleTypes.isEmpty()) {
                 BgcPlugin.openAsyncError(
@@ -835,26 +866,24 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     }
 
     @SuppressWarnings("nls")
-    protected boolean checkMultipleScanBarcode() {
+    protected void checkMultipleScanBarcode() {
         try {
             ContainerWrapper palletFoundWithProductBarcode =
                 ScanAssignHelper.getContainerByProductBarcode(currentMultipleContainer.getProductBarcode());
             if (palletFoundWithProductBarcode == null) {
                 if (palletLabelText.getText().isEmpty()) {
                     isNewMultipleContainer = true;
-                    ContainerWrapper emptyContainer = new ContainerWrapper(SessionManager.getAppService());
-                    palletScanManagement.initCellsWithContainer(emptyContainer);
-                    palletWidget.setCells(null);
-                    showOnlyPallet(true);
+                    updateWidgetsForInavlidContainer();
                 }
-                return true;
+                return;
             }
             isNewMultipleContainer = false;
 
-            if (!ScanAssignHelper.isContainerValid(
-                palletFoundWithProductBarcode, palletLabelText.getText())) {
-                return false;
-            }
+            // if (!ScanAssignHelper.isContainerValid(
+            // palletFoundWithProductBarcode, palletLabelText.getText())) {
+            // updateWidgetsForInavlidContainer();
+            // return false;
+            // }
 
             currentMultipleContainer.initObjectWith(palletFoundWithProductBarcode);
             currentMultipleContainer.reset();
@@ -883,9 +912,15 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                 // TR: dialog title
                 i18n.tr("Values validation"), ex);
             appendLog(NLS.bind("ERROR: {0}", ex.getMessage()));
-            return false;
+            return;
         }
-        return true;
+    }
+
+    private void updateWidgetsForInavlidContainer() {
+        ContainerWrapper emptyContainer = new ContainerWrapper(SessionManager.getAppService());
+        palletScanManagement.initCellsWithContainer(emptyContainer);
+        palletWidget.setCells(null);
+        showOnlyPallet(true);
     }
 
     @Override
@@ -1368,7 +1403,11 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         // Do nothing
     }
 
+    @SuppressWarnings("nls")
     protected void updateGridDimensions(ContainerTypeWrapper ctype) {
+        if (ctype == null) {
+            throw new NullPointerException("ctype is null");
+        }
         RowColPos plateDimensions = new RowColPos(ctype.getCapacity().getRowCapacity(),
             ctype.getCapacity().getColCapacity());
 
