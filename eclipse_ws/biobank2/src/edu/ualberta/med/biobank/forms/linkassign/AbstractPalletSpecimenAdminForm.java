@@ -66,9 +66,6 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
     // TR: button label
     private static final String DECODE_PALLET_BUTTON_LABEL = i18n.tr("Decode pallet");
 
-    private final IObservableValue canLaunchScanValue =
-        new WritableValue(Boolean.TRUE, Boolean.class);
-
     private final IObservableValue scanHasBeenLaunchedValue =
         new WritableValue(Boolean.FALSE, Boolean.class);
 
@@ -237,13 +234,8 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
                 launchScanAndProcessResult();
             }
         });
-        scanButton.setEnabled(false);
+        scanButton.setVisible(false);
 
-        addBooleanBinding(
-            new WritableValue(Boolean.FALSE, Boolean.class),
-            canLaunchScanValue,
-            // TR: validation error message
-            i18n.tr("Pallet cannot be scanned. Enter inventory IDs manually by double clicking cells on the grid."));
         addBooleanBinding(
             new WritableValue(Boolean.FALSE, Boolean.class),
             scanHasBeenLaunchedValue,
@@ -265,9 +257,6 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
 
     @Override
     public void modifyText(ModifyEvent e) {
-        if (scanButton != null) {
-            scanButton.setEnabled((Boolean) canLaunchScanValue.getValue() && fieldsValid());
-        }
     }
 
     protected void createCancelConfirmWidget(Composite parent) {
@@ -286,7 +275,6 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
             cancelConfirmWidget.setConfirmEnabled(false);
             setConfirmEnabled(false);
         }
-        scanButton.setEnabled((Boolean) canLaunchScanValue.getValue());
     }
 
     protected abstract boolean fieldsValid();
@@ -333,8 +321,10 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
         return true;
     }
 
-    protected void setCanLaunchScan(boolean canLauch) {
-        canLaunchScanValue.setValue(canLauch);
+    protected void setCanLaunchScan(boolean canLaunch) {
+        if (scanButton != null) {
+            scanButton.setVisible(canLaunch);
+        }
     }
 
     protected void scanTubesManually(MouseEvent e) {

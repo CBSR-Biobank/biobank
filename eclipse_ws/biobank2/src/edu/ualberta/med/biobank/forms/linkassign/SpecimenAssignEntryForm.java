@@ -980,12 +980,14 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                     ContainerTypeWrapper ctype = (ContainerTypeWrapper) selectedObject;
                     updateGridDimensions(ctype);
                     currentMultipleContainer.setContainerType(ctype);
+                    initCellsWithContainer(currentMultipleContainer);
                     setContainerType(ctype.getWrappedObject());
                     palletTypesViewer.getCombo().setFocus();
 
                     Set<ContainerType> ctypes = new HashSet<ContainerType>(1);
                     ctypes.add(ctype.getWrappedObject());
                     displayPalletPositions();
+                    setScanHasBeenLaunched(false);
                 }
             },
             new BiobankLabelProvider());

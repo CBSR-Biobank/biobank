@@ -282,11 +282,13 @@ public class ScanAssignHelper {
     }
 
     public static boolean isPalletScannable(ContainerTypeWrapper ctype) {
-        for (PalletDimensions gridDimensions : PalletDimensions.values()) {
-            int rows = gridDimensions.getRows();
-            int cols = gridDimensions.getCols();
-            if (ctype.isPalletRowsCols(rows, cols))
-                return true;
+        if (ctype != null) {
+            for (PalletDimensions gridDimensions : PalletDimensions.values()) {
+                int rows = gridDimensions.getRows();
+                int cols = gridDimensions.getCols();
+                if (ctype.isPalletRowsCols(rows, cols))
+                    return true;
+            }
         }
         return false;
     }
