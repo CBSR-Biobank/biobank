@@ -6,8 +6,6 @@
         </chain>
         <ibiblio name="biobank-maven-repo" m2compatible="true"
 		 root="https://github.com/cbsrbiobank/biobank-maven-repo/raw/master/" />
-        <ibiblio name="gettext" m2compatible="true"
-		 root="http://gettext-commons.googlecode.com/svn/maven-repository/" />
         <ibiblio name="maven.pietschy.com" m2compatible="true"
 		 root="http://maven.pietschy.com/repository" />
         <ibiblio name="jboss-thirdparty-releases" m2compatible="true"
@@ -17,8 +15,6 @@
         <module organisation="cacore" resolver="biobank-maven-repo"/>
 	<module organisation="jsse" resolver="biobank-maven-repo" />
 	<module organisation="supercsv" resolver="biobank-maven-repo" />
-	<module organisation="gettext" name="gettext-ant-tasks" resolver="biobank-maven-repo" />
-        <module organisation="org.xnap.commons" resolver="gettext"/>
         <module organisation="com.pietschy.gwt" resolver="maven.pietschy.com"/>
         <module organisation="net.sf" name="jargs" resolver="jboss-thirdparty-releases"/>
     </modules>

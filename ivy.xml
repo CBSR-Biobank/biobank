@@ -47,7 +47,7 @@
     <dependency org="org.hibernate" name="hibernate-c3p0" rev="3.6.9.Final" conf="hibernatetool->default" />
     <dependency org="cacore" name="commons-logging" rev="1.1" conf="hibernatetool->default" />
     <dependency org="cacore" name="dom4j" rev="1.4" conf="hibernatetool->default" />
-    <dependency org="org.xnap.commons" name="gettext-commons" rev="0.9.6" conf="hibernatetool->default" />
+    <dependency org="com.googlecode.gettext-commons" name="gettext-commons" rev="0.9.8" conf="hibernatetool->default" />
     <dependency org="org.hibernate.javax.persistence" name="hibernate-jpa-2.0-api" rev="1.0.1.Final" conf="hibernatetool->default" />
     <dependency org="org.hibernate" name="hibernate-tools" rev="3.4.0.CR2" conf="hibernatetool->default" />
     <dependency org="javax.validation" name="validation-api" rev="1.0.0.GA" conf="hibernatetool->default" />
@@ -93,7 +93,7 @@
     <dependency org="org.hibernate" name="hibernate-c3p0" rev="3.6.9.Final" conf="biobank.webapp->default" />
     <dependency org="org.hibernate" name="hibernate-ehcache" rev="3.6.9.Final" conf="biobank.webapp->default" />
     <dependency org="org.hibernate" name="hibernate-validator" rev="4.2.0.Final" conf="biobank.webapp->default" />
-    <dependency org="org.xnap.commons" name="gettext-commons" rev="0.9.6" conf="biobank.webapp->default" />
+    <dependency org="com.googlecode.gettext-commons" name="gettext-commons" rev="0.9.8" conf="biobank.webapp->default" />
     <dependency org="cacore" name="jaxrpc" rev="1.1" conf="biobank.webapp->default" />
     <dependency org="mysql" name="mysql-connector-java" rev="5.1.15" conf="biobank.webapp->default" />
     <dependency org="cacore" name="ognl" rev="2.6.7" conf="biobank.webapp->default" />
@@ -124,7 +124,7 @@
     <dependency org="javax.validation" name="validation-api" rev="1.0.0.GA" conf="biobank.common.client->default,sources" />
     <dependency org="javassist" name="javassist" rev="3.12.0.GA" conf="biobank.common.client->default,sources" />
     <dependency org="commons-lang" name="commons-lang" rev="2.4" conf="biobank.common.client->default,sources" />
-    <dependency org="org.xnap.commons" name="gettext-commons" rev="0.9.6" conf="biobank.common.client->default,sources" />
+    <dependency org="com.googlecode.gettext-commons" name="gettext-commons" rev="0.9.8" conf="biobank.common.client->default,sources" />
     <dependency org="mysql" name="mysql-connector-java" rev="5.1.15" conf="biobank.common.client->default,sources" />
     <dependency org="org.slf4j" name="slf4j-api" rev="1.6.1" conf="biobank.common.client->default,sources" />
     <dependency org="org.slf4j" name="slf4j-log4j12" rev="1.6.4" conf="biobank.common.client->default,sources" />
