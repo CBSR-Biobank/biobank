@@ -86,7 +86,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
     private static final Tr CSV_WAYBILL_ERROR =
         bundle.tr("waybill \"{0}\" does not exist");
 
-    private static final Tr CSV_SPECIMEN_TYPE_ERROR =
+    public static final Tr CSV_SPECIMEN_TYPE_ERROR =
         bundle.tr("specimen type with name \"{0}\" does not exist");
 
     private static final Tr CSV_CONTAINER_LABEL_ERROR =
@@ -490,7 +490,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
             Set<SpecimenType> siteSourceSpecimenTypes =
                 BatchOpActionUtil.getSiteSourceSpecimenTypes(patient.getStudy());
 
-            if (!siteSourceSpecimenTypes.contains(spcType)) {
+            if ((spcType != null) && !siteSourceSpecimenTypes.contains(spcType)) {
                 errorSet.addError(inputPojo.getLineNumber(),
                     CSV_STUDY_SOURCE_SPC_TYPE_ERROR.format(
                         spcType.getName(), patient.getStudy().getNameShort()));
