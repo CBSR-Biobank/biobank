@@ -36,7 +36,7 @@ read -p "Enter user name for MySQL server: " DBUSER
 read -s -p "Enter user's password: " DBPWD
 echo ""
 
-read -p "Enter delete command: " COMMAND
+read -p "Enter command: " COMMAND
 
 eval ARGS=($COMMAND)
 
