@@ -261,7 +261,9 @@ use command "ant -projecthelp" to display the targets.
     </copy>
     <copy todir="${output.biobank.cli.dir}">
       <fileset dir="${eclipse.proj.dir.common}/bin"
-               includes="application-config-client*.xml" />
+               includes="application-config-client*.xml,
+                         ehcache.xml,
+                         hibernate.cfg.xml" />
     </copy>
     <pathconvert pathsep=" "
                  property="biobank-cli-classpath"

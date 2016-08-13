@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.tools.cli;
 
-import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +26,10 @@ import edu.ualberta.med.biobank.tools.utils.HostUrl;
 /**
  * Used to delete a study and all it's patients, collection events, and specimens.
  * 
+ * E.g. to delete a patient, use following command:
+ * 
+ * java -Ddb.properties=db.properties -jar BiobankCli.jar -d patient_delete ABC4321
+ * 
  * @author loyola
  * 
  */
@@ -44,29 +47,22 @@ public class BiobankCli extends Application implements CliProvider {
 
     public static class AppArgs extends GenericAppArgs {
 
-        public String database = "";
+        public boolean useDatabase = false;
 
         public AppArgs() {
             super();
-            options.addOption("d", "database", true,
-                "Use a database connection rather than connect to the Biobank server.");
+            options.addOption("d", "database", false,
+                "Use a database connection rather than connect to the Biobank server via HTTPS.");
         }
 
         @Override
         public void parse(String[] argv) {
             super.parse(argv);
 
-            try {
-                if (!error) {
-                    if (line.hasOption("d")) {
-                        this.database = (String) line.getParsedOptionValue("d");
-                    } else if (line.hasOption("database")) {
-                        this.database = (String) line.getParsedOptionValue("database");
-                    }
+            if (!error) {
+                if (line.hasOption("d") || line.hasOption("database")) {
+                    this.useDatabase = true;
                 }
-            } catch (ParseException e) {
-                error = true;
-                errorMsg = e.getMessage();
             }
         }
     }
@@ -95,7 +91,7 @@ public class BiobankCli extends Application implements CliProvider {
 
     @Override
     public SessionProvider getSessionProvider() {
-        if (appService == null) {
+        if (sessionProvider == null) {
             throw new IllegalStateException("application not started with database support");
         }
         return sessionProvider;
@@ -130,7 +126,7 @@ public class BiobankCli extends Application implements CliProvider {
             System.exit(0);
         }
 
-        if (this.options.database.isEmpty()) {
+        if (!this.options.useDatabase) {
             String hostUrl = HostUrl.getHostUrl(args.hostname, args.port);
 
             try {
