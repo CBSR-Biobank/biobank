@@ -13,6 +13,7 @@
     </resolvers>
     <modules>
         <module organisation="cacore" resolver="biobank-maven-repo"/>
+        <module organisation="gettext" resolver="biobank-maven-repo"/>
 	<module organisation="jsse" resolver="biobank-maven-repo" />
 	<module organisation="supercsv" resolver="biobank-maven-repo" />
         <module organisation="com.pietschy.gwt" resolver="maven.pietschy.com"/>
