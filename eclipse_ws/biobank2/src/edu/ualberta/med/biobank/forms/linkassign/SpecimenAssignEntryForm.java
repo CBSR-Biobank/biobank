@@ -1331,6 +1331,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
 
             ContainerTypeWrapper containerType = currentMultipleContainer.getContainerType();
             if (containerType != null) {
+                palletLabel.setText(currentMultipleContainer.getFullInfoLabel());
                 setContainerType(containerType.getWrappedObject());
             }
             palletWidget.setCells(getCells());
@@ -1416,6 +1417,8 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         currentGridDimensions = plateDimensions;
         recreateScanPalletWidget(ctype.getCapacity().getRowCapacity(),
             ctype.getCapacity().getColCapacity());
+        palletWidget.setLabelingScheme(ctype.getChildLabelingScheme());
+        palletWidget.setLabelingLayout(ctype.getLabelingLayout());
         page.layout(true, true);
         book.reflow(true);
     }

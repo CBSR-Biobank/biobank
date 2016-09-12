@@ -59,11 +59,7 @@ public class PalletDisplay extends AbstractGridDisplay {
 
     @Override
     protected String getTopTextForBox(
-        Map<RowColPos, ? extends AbstractUIWell> cells, int indexRow,
-        int indexCol) {
-        if (containerType == null) {
-            return SbsLabeling.fromRowCol(indexRow, indexCol);
-        }
+        Map<RowColPos, ? extends AbstractUIWell> cells, int indexRow, int indexCol) {
         return getDefaultTextForBox(cells, indexRow, indexCol);
     }
 

@@ -151,8 +151,6 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
         int width;
         int height;
 
-        log.trace("getClientArea: name: {}", containerLabel);
-
         if ((maxWidth >= 0) && (maxHeight >= 0)) {
             width = maxWidth;
             height = maxHeight;
@@ -367,7 +365,7 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
         if (columns <= 1) {
             // single dimension size
             setCellWidth(120);
-            setCellHeight(20);
+            setCellHeight(30);
             setLegendOnSide(true);
         }
     }
