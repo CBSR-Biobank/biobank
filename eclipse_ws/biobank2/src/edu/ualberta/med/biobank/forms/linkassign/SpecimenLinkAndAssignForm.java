@@ -878,10 +878,7 @@ public class SpecimenLinkAndAssignForm
                 palletCell = new SpecimenCell(
                     pos.getRow(),
                     pos.getCol(),
-                    new DecodedWell(
-                        serverCell.getRow(),
-                        serverCell.getCol(),
-                        serverCell.getValue()));
+                    new DecodedWell(serverCell.getTitle(), serverCell.getValue()));
                 cellsMap.put(pos, palletCell);
                 log.debug("processScanResult: palletCell is null: pos ({}, {})",
                     pos.getRow(), pos.getCol());

@@ -138,10 +138,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
                 palletCell = new SpecimenCell(
                     pos.getRow(),
                     pos.getCol(),
-                    new DecodedWell(
-                        servercell.getRow(),
-                        servercell.getCol(),
-                        servercell.getValue()));
+                    new DecodedWell(servercell.getTitle(), servercell.getValue()));
                 cells.put(pos, palletCell);
                 log.debug("processScanResult: palletCell is null: pos ({}, {})",
                     pos.getRow(), pos.getCol());

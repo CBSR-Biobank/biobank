@@ -14,8 +14,6 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.remoting.RemoteConnectFailureException;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
@@ -46,7 +44,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class PalletScanManagement {
 
-    private static Logger LOG = LoggerFactory.getLogger(PalletScanManagement.class.getName());
+    // private static Logger LOG = LoggerFactory.getLogger(PalletScanManagement.class.getName());
 
     private static final I18n i18n = I18nFactory.getI18n(PalletScanManagement.class);
 
@@ -169,7 +167,7 @@ public class PalletScanManagement {
 
     @SuppressWarnings("nls")
     public void scanTubesManually(MouseEvent event, ScanManualOption scanManualOption) {
-        LOG.trace("scanTubesManually: event [ x: {}, y {} ]", event.x, event.y);
+        // LOG.trace("scanTubesManually: event [ x: {}, y {} ]", event.x, event.y);
 
         RowColPos startPos = ((PalletWidget) event.widget).getPositionAtCoordinates(
             event.x, event.y);
@@ -196,7 +194,8 @@ public class PalletScanManagement {
 
             if ((inventoryId == null) || inventoryId.isEmpty()) continue;
 
-            SpecimenCell cell = new SpecimenCell(row, col, new DecodedWell(row, col, inventoryId));
+            String label = selectedContainerType.getPositionString(pos);
+            SpecimenCell cell = new SpecimenCell(row, col, new DecodedWell(label, inventoryId));
             wells.put(pos, cell);
 
             manuallyEnteredCells.add(cell);
@@ -324,7 +323,7 @@ public class PalletScanManagement {
             SpecimenCell cell = new SpecimenCell(
                 pos.getRow(),
                 pos.getCol(),
-                new DecodedWell(pos.getRow(), pos.getCol(), entry.getValue().getInventoryId()));
+                new DecodedWell(container.getLabel(), entry.getValue().getInventoryId()));
             cell.setSpecimen(entry.getValue());
             cell.setStatus(UICellStatus.FILLED);
             cell.setExpectedSpecimen(entry.getValue());
@@ -349,7 +348,7 @@ public class PalletScanManagement {
                     SpecimenCell cell = new SpecimenCell(
                         pos.getRow(),
                         pos.getCol(),
-                        new DecodedWell(pos.getRow(), pos.getCol(), sw.getInventoryId()));
+                        new DecodedWell(container.getLabel(), sw.getInventoryId()));
                     cell.setSpecimen(sw);
                     cell.setStatus(UICellStatus.NEW);
                     wells.put(pos, cell);

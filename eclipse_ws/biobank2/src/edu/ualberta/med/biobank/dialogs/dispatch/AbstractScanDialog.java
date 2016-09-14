@@ -398,8 +398,8 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
                 CellInfo servercell = entry.getValue();
                 if (palletWell == null) {
                     // can happen if missing
-                    palletWell = new SpecimenCell(pos.getRow(), pos.getCol(), new DecodedWell(
-                        servercell.getRow(), servercell.getCol(), servercell.getValue()));
+                    palletWell = new SpecimenCell(pos.getRow(), pos.getCol(),
+                        new DecodedWell(servercell.getTitle(), servercell.getValue()));
                     cells.put(pos, palletWell);
                 }
                 palletWell.merge(specimenDataMap.get(palletWell.getValue()), servercell);
