@@ -53,6 +53,16 @@ public abstract class AbstractContainerDisplay {
 
     private ContainerLabelingSchemeWrapper childLabelingScheme = null;
 
+    protected abstract Image updateGridImage(ContainerDisplayWidget containerDisplayWidget);
+
+    protected abstract Point computeSize(int wHint, int hHint, boolean changed);
+
+    protected abstract Rectangle getGridSize();
+
+    protected RowColPos storageSize = new RowColPos(0, 0);
+
+    private LabelingLayout labelingLayout = LabelingLayout.VERTICAL;
+
     public AbstractContainerDisplay(String containerLabel) {
         this.containerLabel = containerLabel;
     }
@@ -85,16 +95,6 @@ public abstract class AbstractContainerDisplay {
     public void setContainerType(ContainerType type) {
         this.containerType = type;
     }
-
-    protected abstract Image updateGridImage(ContainerDisplayWidget containerDisplayWidget);
-
-    protected abstract Point computeSize(int wHint, int hHint, boolean changed);
-
-    protected abstract Rectangle getGridSize();
-
-    protected RowColPos storageSize = new RowColPos(0, 0);
-
-    private LabelingLayout labelingLayout = LabelingLayout.VERTICAL;
 
     /**
      * Get the text to write inside the cell. This default implementation use the cell position and

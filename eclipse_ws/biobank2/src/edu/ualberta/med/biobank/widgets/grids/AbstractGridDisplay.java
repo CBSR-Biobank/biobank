@@ -43,10 +43,6 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
 
     protected int gridHeight;
 
-    private int rows;
-
-    private int columns;
-
     /**
      * Height used when legend in under the grid
      */
@@ -96,8 +92,8 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
         }
 
         GC newGC = new GC(image);
-        for (int row = 0; row < rows; ++row) {
-            for (int col = 0; col < columns; ++col) {
+        for (int row = 0, rows = storageSize.getRow(); row < rows; ++row) {
+            for (int col = 0, cols = storageSize.getCol(); col < cols; ++col) {
                 Rectangle r = getCellRectangleTranslated(cellRect, row, col);
 
                 Color defaultColor = getDefaultBackgroundColor(display, cells, r, row, col);
@@ -148,6 +144,8 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
     @SuppressWarnings("nls")
     @Override
     protected Rectangle getGridSize() {
+        int rows = storageSize.getRow();
+        int columns = storageSize.getCol();
         int width;
         int height;
 
@@ -360,8 +358,7 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
      */
     @Override
     public void setStorageSize(int rows, int columns) {
-        this.rows = rows;
-        this.columns = columns;
+        super.setStorageSize(rows, columns);
         if (columns <= 1) {
             // single dimension size
             setCellWidth(120);
@@ -391,11 +388,11 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
     }
 
     public int getRows() {
-        return rows;
+        return storageSize.getRow();
     }
 
     public int getCols() {
-        return columns;
+        return storageSize.getCol();
     }
 
     @SuppressWarnings("nls")
