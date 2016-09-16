@@ -51,7 +51,10 @@ public abstract class AbstractContainerDisplay {
 
     protected final String containerLabel;
 
-    private ContainerLabelingSchemeWrapper childLabelingScheme = null;
+    /**
+     * Default labelling scheme to SBS.
+     */
+    private int childLabelingSchemeId = 1;
 
     protected abstract Image updateGridImage(ContainerDisplayWidget containerDisplayWidget);
 
@@ -113,10 +116,11 @@ public abstract class AbstractContainerDisplay {
         if (containerType != null) {
             return parentLabel + containerType.getPositionString(rowcol);
         }
-        if (childLabelingScheme != null) {
+
+        if (childLabelingSchemeId > 0) {
             return ContainerLabelingScheme.getPositionString(
                 rowcol,
-                childLabelingScheme.getId(),
+                childLabelingSchemeId,
                 storageSize.getRow(),
                 storageSize.getCol(),
                 labelingLayout);
@@ -147,7 +151,15 @@ public abstract class AbstractContainerDisplay {
     }
 
     public void setLabelingScheme(ContainerLabelingSchemeWrapper childLabelingScheme) {
-        this.childLabelingScheme = childLabelingScheme;
+        if (childLabelingScheme != null) {
+            this.childLabelingSchemeId = childLabelingScheme.getId();
+        } else {
+            this.childLabelingSchemeId = 1;
+        }
+    }
+
+    public void setLabelingSchemeId(int id) {
+        this.childLabelingSchemeId = id;
     }
 
     public void setLabelingLayout(LabelingLayout labelingLayout) {

@@ -1411,9 +1411,9 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
 
         currentGridDimensions = plateDimensions;
         recreateScanPalletWidget(ctype.getCapacity().getRowCapacity(),
-            ctype.getCapacity().getColCapacity());
-        palletWidget.setLabelingScheme(ctype.getChildLabelingScheme());
-        palletWidget.setLabelingLayout(ctype.getLabelingLayout());
+            ctype.getCapacity().getColCapacity(),
+            ctype.getChildLabelingScheme(),
+            ctype.getLabelingLayout());
         page.layout(true, true);
         book.reflow(true);
     }

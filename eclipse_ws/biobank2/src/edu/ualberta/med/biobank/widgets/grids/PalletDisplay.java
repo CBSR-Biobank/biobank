@@ -9,6 +9,8 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 
 import edu.ualberta.med.biobank.common.util.StringUtil;
+import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
+import edu.ualberta.med.biobank.model.type.LabelingLayout;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.util.SbsLabeling;
 import edu.ualberta.med.biobank.widgets.grids.well.AbstractUIWell;
@@ -21,19 +23,20 @@ public class PalletDisplay extends AbstractGridDisplay {
 
     public static final int SAMPLE_WIDTH = 50;
 
-    /**
-     * Pallets are always 8*12 by default = fixed size
-     */
     public static final int PALLET_WIDTH = SAMPLE_WIDTH * SbsLabeling.COL_DEFAULT;
+
     public static final int PALLET_HEIGHT = SAMPLE_WIDTH * SbsLabeling.ROW_DEFAULT;
 
     public static final int PALLET_HEIGHT_AND_LEGEND = PALLET_HEIGHT + LEGEND_HEIGHT + 4;
 
-    public PalletDisplay(int rows, int cols) {
+    public PalletDisplay(int rows, int cols,
+        ContainerLabelingSchemeWrapper containerLabelingScheme, LabelingLayout labelingLayout) {
         super(PalletDisplay.class.getSimpleName());
         setCellWidth(SAMPLE_WIDTH);
         setCellHeight(SAMPLE_WIDTH);
         setDefaultStorageSize(rows, cols);
+        setLabelingScheme(containerLabelingScheme);
+        setLabelingLayout(labelingLayout);
     }
 
     public void setDefaultStorageSize() {
@@ -89,7 +92,6 @@ public class PalletDisplay extends AbstractGridDisplay {
         }
 
         if (!cells.isEmpty()) {
-
             SpecimenCell cell = (SpecimenCell) cells.get(new RowColPos(indexRow, indexCol));
             if ((cell != null) && (cell.getStatus() != null)) {
                 return cell.getStatus().getColor();

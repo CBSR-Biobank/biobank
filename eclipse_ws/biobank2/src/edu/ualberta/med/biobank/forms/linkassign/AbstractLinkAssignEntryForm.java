@@ -33,6 +33,7 @@ import edu.ualberta.med.biobank.common.action.container.ContainerGetContainerOrP
 import edu.ualberta.med.biobank.common.action.containerType.SpecimenContainerTypesByCapacityAction;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.util.StringUtil;
+import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
@@ -44,6 +45,7 @@ import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.type.LabelingLayout;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
 import edu.ualberta.med.biobank.widgets.grids.PalletDisplay;
@@ -445,6 +447,39 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
 
         showOnlyPallet(true);
         return palletWidget;
+    }
+
+    protected PalletWidget createScanPalletWidget(Composite palletComposite, int rows, int cols,
+        ContainerLabelingSchemeWrapper containerLabelingScheme, LabelingLayout labelingLayout) {
+        PalletWidget palletWidget = new PalletWidget(
+            palletComposite,
+            UICellStatus.DEFAULT_PALLET_SCAN_ASSIGN_STATUS_LIST,
+            rows,
+            cols,
+            containerLabelingScheme,
+            labelingLayout);
+
+        // to prevent scrollbars, do not add a GridLayout or GridData to this widget
+
+        toolkit.adapt(palletWidget);
+        palletWidget.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseDoubleClick(MouseEvent e) {
+                manageDoubleClick(e);
+            }
+        });
+
+        showOnlyPallet(true);
+        return palletWidget;
+    }
+
+    protected void recreateScanPalletWidget(int rows, int cols,
+        ContainerLabelingSchemeWrapper containerLabelingScheme,
+        LabelingLayout labelingLayout) {
+        Composite palletComposite = palletWidget.getParent();
+        palletWidget.dispose();
+        palletWidget = createScanPalletWidget(
+            palletComposite, rows, cols, containerLabelingScheme, labelingLayout);
     }
 
     protected void recreateScanPalletWidget(int rows, int cols) {

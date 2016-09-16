@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
+import edu.ualberta.med.biobank.model.type.LabelingLayout;
 import edu.ualberta.med.biobank.widgets.grids.well.AbstractUIWell;
 import edu.ualberta.med.biobank.widgets.grids.well.SpecimenCell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
@@ -34,16 +36,47 @@ public class PalletWidget extends ContainerDisplayWidget {
     /**
      * Use this constructor to provide your own tooltip callback and customize what is displayed
      * when the user hovers over a cell in the pallet visualization.
-     *
+     * 
      * Uses the default tooltip message to display when the user hovers over a cell in the pallet
      * visualization.
-     *
+     * 
      * @param parent The parent widget
-     *
+     * 
      * @param cellStatus the cell status to give to each cell on startup. See {@link UICellStatus}.
-     *
+     * 
      * @param rows the number of rows in the pallet
-     *
+     * 
+     * @param cols the number of columns in the pallet
+     * 
+     * @param labelingScheme the labeling scheme to use to label the cells.
+     * 
+     * @param labelingLayout the orientation for how to label the cells.
+     */
+    public PalletWidget(Composite parent, List<UICellStatus> cellStatus, int rows, int cols,
+        ContainerLabelingSchemeWrapper labelingScheme, LabelingLayout labelingLayout) {
+        super(
+            parent,
+            TOOLTIP_CALLBACK,
+            PalletWidget.class.getSimpleName(),
+            new PalletDisplay(rows, cols, labelingScheme, labelingLayout),
+            cellStatus);
+    }
+
+    /**
+     * Use this constructor to provide your own tooltip callback and customize what is displayed
+     * when the user hovers over a cell in the pallet visualization.
+     * 
+     * Uses the default labeling scheme and layout to label the cells.
+     * 
+     * Uses the default tooltip message to display when the user hovers over a cell in the pallet
+     * visualization.
+     * 
+     * @param parent The parent widget
+     * 
+     * @param cellStatus the cell status to give to each cell on startup. See {@link UICellStatus}.
+     * 
+     * @param rows the number of rows in the pallet
+     * 
      * @param cols the number of columns in the pallet
      */
     public PalletWidget(Composite parent, List<UICellStatus> cellStatus, int rows, int cols) {
@@ -51,22 +84,22 @@ public class PalletWidget extends ContainerDisplayWidget {
             parent,
             TOOLTIP_CALLBACK,
             PalletWidget.class.getSimpleName(),
-            new PalletDisplay(rows, cols),
+            new PalletDisplay(rows, cols, null, null),
             cellStatus);
     }
 
     /**
      * Use this constructor to provide your own tooltip callback and customize what is displayed
      * when the user hovers over a cell in the pallet visualization.
-     *
+     * 
      * @param parent The parent widget
-     *
+     * 
      * @param cellStatus the cell status to give to each cell on startup. See {@link UICellStatus}.
-     *
+     * 
      * @param rows the number of rows in the pallet
-     *
+     * 
      * @param cols the number of columns in the pallet
-     *
+     * 
      * @param tooltipCallback the method that is called to get the contents of what to display in
      *            the tooltip when the user hovers over a cell.
      */
@@ -80,7 +113,7 @@ public class PalletWidget extends ContainerDisplayWidget {
             parent,
             tooltipCallback,
             PalletWidget.class.getSimpleName(),
-            new PalletDisplay(rows, cols),
+            new PalletDisplay(rows, cols, null, null),
             cellStatus);
     }
 
