@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -13,10 +15,10 @@ import org.osgi.service.prefs.Preferences;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.gui.common.dialogs.PersistedDialog;
-import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.rcp.Application;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
@@ -38,6 +40,9 @@ public class WorkingCenterSelectDialog extends PersistedDialog {
     private static final String LAST_WORKING_CENTER_ID = "lastWorkingCenterId";
 
     @SuppressWarnings("nls")
+    private static final String LAST_WORKING_CENTER_NAME = "lastWorkingCenterName";
+
+    @SuppressWarnings("nls")
     // TR: no center selection combo box option
     private static final String COMBO_LABEL = i18n.tr("Select center");
 
@@ -46,6 +51,8 @@ public class WorkingCenterSelectDialog extends PersistedDialog {
     private final List<CenterWrapper<?>> availableCenters;
 
     public Preferences pluginPrefs = null;
+
+    private ComboViewer comboViewer;
 
     public WorkingCenterSelectDialog(Shell parentShell, UserWrapper user,
         List<CenterWrapper<?>> availableCenters) {
@@ -70,6 +77,7 @@ public class WorkingCenterSelectDialog extends PersistedDialog {
         return TITLE;
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void createDialogAreaInternal(Composite parent) throws Exception {
         Composite contents = new Composite(parent, SWT.NONE);
@@ -81,24 +89,20 @@ public class WorkingCenterSelectDialog extends PersistedDialog {
             objectList.add(NO_CENTER_STRING);
         }
 
-        CenterWrapper<?> lastWorkingCentre = getLastUsedWorkingCenter(availableCenters);
+        Object initialSelection = getLastUsedWorkingCenter(availableCenters);
+        if ((initialSelection == null) && user.isSuperAdmin()) {
+            initialSelection = NO_CENTER_STRING;
+        }
 
-        Object initialSelection = (lastWorkingCentre != null)
-            ? lastWorkingCentre : NO_CENTER_STRING;
-
-        widgetCreator.createComboViewer(contents, COMBO_LABEL,
-            objectList, initialSelection, null, new ComboSelectionUpdate() {
-                @Override
-                public void doSelection(Object selectedObject) {
-                    if (selectedObject instanceof CenterWrapper<?>) {
-                        currentCenter = (CenterWrapper<?>) selectedObject;
-                        pluginPrefs.putInt(LAST_WORKING_CENTER_ID, currentCenter.getId());
-                    } else {
-                        currentCenter = null;
-                        pluginPrefs.putInt(LAST_WORKING_CENTER_ID, -1);
-                    }
-                }
-            }, new BiobankLabelProvider() {
+        comboViewer = widgetCreator.createComboViewer(
+            contents,
+            COMBO_LABEL,
+            objectList,
+            initialSelection,
+            // working centre selection
+            i18n.tr("A working center must be selected"),
+            null,
+            new BiobankLabelProvider() {
                 @Override
                 public String getText(Object element) {
                     if (element instanceof CenterWrapper) {
@@ -111,10 +115,13 @@ public class WorkingCenterSelectDialog extends PersistedDialog {
 
     private CenterWrapper<?> getLastUsedWorkingCenter(List<CenterWrapper<?>> availableCenters) {
         int lastWorkingCentreId = pluginPrefs.getInt(LAST_WORKING_CENTER_ID, -1);
+        String lastWorkingCentreName =
+            pluginPrefs.get(LAST_WORKING_CENTER_NAME, StringUtil.EMPTY_STRING);
 
         if (lastWorkingCentreId >= 0) {
             for (CenterWrapper<?> centre : availableCenters) {
-                if (centre.getId() == lastWorkingCentreId) {
+                if ((centre.getId() == lastWorkingCentreId)
+                    && centre.getName().equals(lastWorkingCentreName)) {
                     return centre;
                 }
             }
@@ -124,6 +131,22 @@ public class WorkingCenterSelectDialog extends PersistedDialog {
 
     @Override
     protected void okPressed() {
+        Object selectedObject = ((IStructuredSelection) comboViewer.getSelection()).getFirstElement();
+        int centerId;
+        String centerName;
+
+        if (selectedObject instanceof CenterWrapper<?>) {
+            currentCenter = (CenterWrapper<?>) selectedObject;
+            centerId = currentCenter.getId();
+            centerName = currentCenter.getName();
+        } else {
+            currentCenter = null;
+            centerId = -1;
+            centerName = StringUtil.EMPTY_STRING;
+        }
+
+        pluginPrefs.putInt(LAST_WORKING_CENTER_ID, centerId);
+        pluginPrefs.put(LAST_WORKING_CENTER_NAME, centerName);
         user.setCurrentWorkingCenter(currentCenter);
         super.okPressed();
     }
