@@ -368,9 +368,18 @@ public class LoginDialog extends PersistedDialog {
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell().getDisplay(),
             sessionHelper);
 
-        if (sessionHelper.getUser() != null) {
-            finalizeConnection(sessionHelper);
+        if (sessionHelper.getUser() == null) {
+            BgcPlugin.openError(
+                // TR: error dialog title
+                i18n.tr("Login error"),
+                // TR: error dialog message
+                i18n.tr("Could not log in. Please try again."));
+            userNameWidget.setText(StringUtil.EMPTY_STRING);
+            passwordWidget.setText(StringUtil.EMPTY_STRING);
+            userNameWidget.setFocus();
+            return;
         }
+        finalizeConnection(sessionHelper);
         super.okPressed();
     }
 
