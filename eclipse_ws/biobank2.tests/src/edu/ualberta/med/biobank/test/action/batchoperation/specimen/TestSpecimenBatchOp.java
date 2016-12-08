@@ -503,7 +503,7 @@ public class TestSpecimenBatchOp extends TestAction {
     }
 
     @Test
-    public void invalidSpecimenType() throws Exception {
+    public void invalidSourceSpecimenType() throws Exception {
         Set<Patient> patients = new HashSet<Patient>();
         Patient patient = factory.createPatient();
         patients.add(patient);
@@ -520,6 +520,45 @@ public class TestSpecimenBatchOp extends TestAction {
         for (SpecimenBatchOpInputPojo csvInfo : csvInfos) {
             String stype = csvInfo.getSpecimenType();
             if (stype != null) {
+                csvInfo.setSpecimenType(stype + "_x");
+            }
+        }
+        SpecimenBatchOpCsvWriter.write(CSV_NAME, csvInfos);
+
+        try {
+            SpecimenBatchOpAction importAction = new SpecimenBatchOpAction(
+                factory.getDefaultSite(), csvInfos, new File(CSV_NAME));
+            exec(importAction);
+            Assert.fail("should not be allowed to invalid specimen types");
+        } catch (BatchOpErrorsException e) {
+            new AssertBatchOpException()
+                .withMessage(SpecimenBatchOpAction.CSV_SPECIMEN_TYPE_ERROR.format());
+        }
+    }
+
+    @Test
+    public void invalidAliquotedSpecimenType() throws Exception {
+        Set<Patient> patients = new HashSet<Patient>();
+        Patient patient = factory.createPatient();
+        patients.add(patient);
+        factory.createSourceSpecimen();
+
+        // create a new specimen type for the aliquoted specimens
+        factory.createSpecimenType();
+        Set<AliquotedSpecimen> aliquotedSpecimens = new HashSet<AliquotedSpecimen>();
+        aliquotedSpecimens.add(factory.createAliquotedSpecimen());
+        aliquotedSpecimens.add(factory.createAliquotedSpecimen());
+        aliquotedSpecimens.add(factory.createAliquotedSpecimen());
+
+        session.getTransaction().commit();
+
+        Set<SpecimenBatchOpInputPojo> csvInfos = specimenCsvHelper.createAllSpecimens(
+            factory.getDefaultStudy(), originInfos, patients);
+
+        // change the specimen type to something invalid
+        for (SpecimenBatchOpInputPojo csvInfo : csvInfos) {
+            String stype = csvInfo.getSpecimenType();
+            if ((stype != null) && !csvInfo.getSourceSpecimen()) {
                 csvInfo.setSpecimenType(stype + "_x");
             }
         }
