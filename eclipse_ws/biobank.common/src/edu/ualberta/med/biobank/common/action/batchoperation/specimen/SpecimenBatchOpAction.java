@@ -512,7 +512,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
                 Set<SpecimenType> siteAliquotedSpecimenTypes =
                     BatchOpActionUtil.getSiteAliquotedSpecimenTypes(patient.getStudy());
 
-                if (!siteAliquotedSpecimenTypes.contains(spcType)) {
+                if ((spcType != null) && !siteAliquotedSpecimenTypes.contains(spcType)) {
                     errorSet.addError(inputPojo.getLineNumber(),
                         CSV_STUDY_ALIQUOTED_SPC_TYPE_ERROR.format(
                             spcType.getName(), patient.getStudy().getNameShort()));
