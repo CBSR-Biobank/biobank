@@ -25,58 +25,60 @@ import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 
 /**
- * Helper class to aid in persisting specimens via Specimen BatchOp.
+ * Builds the following model entities from information collected from a CSV file containing
+ * specimens.
+ * 
+ * <ul>
+ * <li>{@link edu.ualberta.med.biobank.model.Specimen Specimen}</li>
+ * <li>{@link edu.ualberta.med.biobank.model.CollectionEvent CollectionEvent}</li>
+ * <li>{@link edu.ualberta.med.biobank.model.ProcessingEvent ProcessingEvent}</li>
+ * </ul>
  * 
  * @author Nelson Loyola
  * 
  */
 @SuppressWarnings("nls")
-public class SpecimenBatchOpPojoData implements IBatchOpPojoHelper {
+public class SpecimenBatchOpBuilder implements IBatchOpPojoHelper {
 
     private static Logger log = LoggerFactory
-        .getLogger(SpecimenBatchOpPojoData.class.getName());
+        .getLogger(SpecimenBatchOpBuilder.class.getName());
 
     private static final Bundle bundle = new CommonBundle();
 
-    public static final Tr CSV_NO_PATIENT_ERROR =
-        bundle.tr("specimen has no patient");
+    public static final Tr CSV_NO_PATIENT_ERROR = bundle.tr("specimen has no patient");
 
     private final BatchOpInputErrorSet errorSet = new BatchOpInputErrorSet();
 
     private final SpecimenBatchOpInputPojo pojo;
     private final SpecimenBatchOpInputPojo parentPojo;
-    private SpecimenBatchOpPojoData parentPojoData;
+    private SpecimenBatchOpBuilder parentPojoData;
     private Patient patient;
     private CollectionEvent cevent;
     private ProcessingEvent pevent;
     private Specimen parentSpecimen;
     private OriginInfo originInfo;
+    private Center originCenter;
+    private Center currentCenter;
     private SpecimenType specimenType;
     private Container container;
     private RowColPos specimenPos;
     private Specimen specimen;
     private User user;
 
-    SpecimenBatchOpPojoData(SpecimenBatchOpInputPojo pojo,
-        SpecimenBatchOpInputPojo parentPojo) {
+    SpecimenBatchOpBuilder(SpecimenBatchOpInputPojo pojo, SpecimenBatchOpInputPojo parentPojo) {
         this.pojo = pojo;
         this.parentPojo = parentPojo;
-    }
-
-    @Override
-    public int getCsvLineNumber() {
-        return pojo.getLineNumber();
     }
 
     public SpecimenBatchOpInputPojo getPojo() {
         return pojo;
     }
 
-    SpecimenBatchOpPojoData getParentInfo() {
+    SpecimenBatchOpBuilder getParentInfo() {
         return parentPojoData;
     }
 
-    void setParentPojoData(SpecimenBatchOpPojoData parentInfo) {
+    void setParentPojoData(SpecimenBatchOpBuilder parentInfo) {
         if (parentInfo == null) {
             throw new IllegalStateException("parentInfo is null");
         }
@@ -125,12 +127,28 @@ public class SpecimenBatchOpPojoData implements IBatchOpPojoHelper {
         return pojo.getParentInventoryId();
     }
 
+    public Center getOriginCenter() {
+        return originCenter;
+    }
+
+    public void setOriginCenter(Center originCenter) {
+        this.originCenter = originCenter;
+    }
+
     OriginInfo getOriginInfo() {
         return originInfo;
     }
 
     void setOriginInfo(OriginInfo originInfo) {
         this.originInfo = originInfo;
+    }
+
+    public Center getCurrentCenter() {
+        return currentCenter;
+    }
+
+    public void setCurrentCenter(Center currentCenter) {
+        this.currentCenter = currentCenter;
     }
 
     SpecimenType getSpecimenType() {
@@ -180,36 +198,61 @@ public class SpecimenBatchOpPojoData implements IBatchOpPojoHelper {
         // - columns 12, 13, and 14 are filled in
         // - columns 11, 12, 13, and 14 are filled in, but is not recommended
         // since it is redundant
-
-        return (pojo.getPalletLabel() != null)
-            && (pojo.getPalletPosition() != null);
+        return (pojo.getPalletLabel() != null) && (pojo.getPalletPosition() != null);
     }
 
+    /**
+     * Called to validate if the specimen was built correctly.
+     * 
+     * @return
+     */
     boolean validate() {
-        boolean result = true;
-
         // ensure that aliquoted specimens with parent specimens already
         // in the database have a patient
-        if ((parentSpecimen != null) && (patient == null)
-            && (parentPojo == null)) {
-            errorSet.addError(pojo.getLineNumber(),
-                CSV_NO_PATIENT_ERROR.format());
+        if ((parentSpecimen != null) && (patient == null) && (parentPojo == null)) {
+            errorSet.addError(pojo.getLineNumber(), CSV_NO_PATIENT_ERROR.format());
+            return false;
         }
-
-        return result;
+        return true;
     }
 
+/**
+     * Returns a set of errors ({@link edu.ualberta.med.biobank.common.action.batchoperation.BatchOpInputErrorSet BatchOpInputErrorSet) 
+     * if the validation failed and the specimen cannot be built.
+     * 
+     * @return
+     */
     public BatchOpInputErrorSet getErrorList() {
         return errorSet;
     }
 
-    public OriginInfo getNewOriginInfo(Center center) {
+    @Override
+    public int getCsvLineNumber() {
+        return pojo.getLineNumber();
+    }
+
+    /**
+     * Assigns member "originInfo" for this specimen.
+     * 
+     * <p>
+     * The origin info will be used in {@link #getNewSpecimen}.
+     * 
+     * @param center where this speicmen originated from.
+     * 
+     * @return A new origin info with center assigned to <code>center</code>.
+     */
+    public OriginInfo createNewOriginInfo(Center center) {
         originInfo = new OriginInfo();
         originInfo.setCenter(center);
         return originInfo;
     }
 
-    CollectionEvent getNewCollectionEvent() {
+    /**
+     * Creates a new collection event for the specimen stored into this builder.
+     * 
+     * @return a new collection event.
+     */
+    CollectionEvent createNewCollectionEvent() {
         cevent = new CollectionEvent();
         cevent.setPatient(patient);
         cevent.setVisitNumber(pojo.getVisitNumber());
@@ -231,7 +274,12 @@ public class SpecimenBatchOpPojoData implements IBatchOpPojoHelper {
         return cevent;
     }
 
-    ProcessingEvent getNewProcessingEvent() {
+    /**
+     * Creates a new processing event for the specimen stored into this builder.
+     * 
+     * @return a new processing event.
+     */
+    ProcessingEvent createNewProcessingEvent() {
         if (parentSpecimen != null) {
             throw new IllegalStateException(
                 "this specimen has a parent specimen and cannot have a processing event");
@@ -254,17 +302,27 @@ public class SpecimenBatchOpPojoData implements IBatchOpPojoHelper {
         return pevent;
     }
 
-    Specimen getNewSpecimen() {
+    /**
+     * Creates a new specimen from the information stored into this builder.
+     * 
+     * <p>
+     * Adds this specimen to the collection event associated with this builder.
+     * 
+     * @return the new specimen.
+     */
+    Specimen createNewSpecimen() {
         if (cevent == null) {
-            throw new IllegalStateException(
-                "specimen does not have a collection event");
+            throw new IllegalStateException("specimen does not have a collection event");
         }
 
-        if ((pojo.getParentInventoryId() != null)
-            && (parentSpecimen == null)) {
+        if ((pojo.getParentInventoryId() != null) && (parentSpecimen == null)) {
             throw new IllegalStateException(
                 "parent specimen for specimen with " + pojo.getInventoryId()
                     + " has not be created yet");
+        }
+
+        if (currentCenter == null) {
+            currentCenter = originInfo.getCenter();
         }
 
         specimen = new Specimen();
@@ -272,12 +330,7 @@ public class SpecimenBatchOpPojoData implements IBatchOpPojoHelper {
         specimen.setSpecimenType(specimenType);
         specimen.setPlateErrors(pojo.getPlateErrors());
         specimen.setSampleErrors(pojo.getSamplEerrors());
-
-        if (originInfo.getReceiverCenter() == null) {
-            specimen.setCurrentCenter(originInfo.getCenter());
-        } else {
-            specimen.setCurrentCenter(originInfo.getReceiverCenter());
-        }
+        specimen.setCurrentCenter(currentCenter);
         specimen.setCollectionEvent(cevent);
         specimen.setOriginInfo(originInfo);
         specimen.setCreatedAt(pojo.getCreatedAt());
@@ -314,8 +367,7 @@ public class SpecimenBatchOpPojoData implements IBatchOpPojoHelper {
         cevent.getAllSpecimens().add(specimen);
 
         if (container != null) {
-            SpecimenActionHelper.createOrChangePosition(specimen, container,
-                specimenPos);
+            SpecimenActionHelper.createOrChangePosition(specimen, container, specimenPos);
         }
 
         log.trace("creating specimen: pt={} v#={} invId={} isParent={}",

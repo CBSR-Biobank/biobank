@@ -32,9 +32,9 @@ import edu.ualberta.med.biobank.model.Center;
 /**
  * Reads a CSV file containing specimen information and returns the file as a list of
  * SpecimenBatchOpInputPojo.
- *
+ * 
  * @author Nelson Loyola
- *
+ * 
  */
 @SuppressWarnings("nls")
 public class SpecimenBatchOpPojoReader implements
@@ -53,6 +53,8 @@ public class SpecimenBatchOpPojoReader implements
         "waybill",
         "sourceSpecimen",
         "worksheet",
+        "originCenter",
+        "currentCenter",
         "palletProductBarcode",
         "rootContainerType",
         "palletLabel",
@@ -90,6 +92,8 @@ public class SpecimenBatchOpPojoReader implements
         aMap.put("waybill", new Optional());
         aMap.put("sourceSpecimen", new ParseBool());
         aMap.put("worksheet", new Optional());
+        aMap.put("originCenter", new Optional());
+        aMap.put("currentCenter", new Optional());
         aMap.put("palletProductBarcode", new Optional());
         aMap.put("rootContainerType", new Optional());
         aMap.put("palletLabel", new Optional());
@@ -114,18 +118,14 @@ public class SpecimenBatchOpPojoReader implements
         throws ClientBatchOpErrorsException {
 
         SpecimenBatchOpInputPojo csvPojo;
-
         CellProcessor[] cellProcessors = getCellProcessors();
 
         try {
             while ((csvPojo =
-                reader.read(SpecimenBatchOpInputPojo.class,
-                    NAME_MAPPINGS, cellProcessors)) != null) {
-
+                reader.read(SpecimenBatchOpInputPojo.class, NAME_MAPPINGS, cellProcessors)) != null) {
                 csvPojo.setLineNumber(reader.getLineNumber());
                 pojos.add(csvPojo);
             }
-
             return pojos;
         } catch (SuperCSVReflectionException e) {
             throw new ClientBatchOpErrorsException(e);

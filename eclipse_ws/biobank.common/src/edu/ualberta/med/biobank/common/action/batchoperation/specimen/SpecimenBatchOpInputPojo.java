@@ -6,8 +6,8 @@ import java.util.Date;
 import edu.ualberta.med.biobank.common.action.batchoperation.IBatchOpInputPojo;
 
 /**
- * POJO used by the Specimen Batch Operation feature to import specimen
- * information. The information can come from the following sources:
+ * POJO used by the Specimen Batch Operation feature to import specimen information. The information
+ * can come from the following sources:
  * 
  * <ol>
  * <li>A legacy import of specimen data</li>
@@ -31,6 +31,8 @@ public class SpecimenBatchOpInputPojo implements IBatchOpInputPojo {
     private String waybill;
     private Boolean sourceSpecimen = false;
     private String worksheet;
+    private String originCenter;
+    private String currentCenter;
     private String palletProductBarcode;
     private String rootContainerType;
     private String palletLabel;
@@ -132,6 +134,22 @@ public class SpecimenBatchOpInputPojo implements IBatchOpInputPojo {
 
     public void setWorksheet(String worksheet) {
         this.worksheet = worksheet;
+    }
+
+    public String getOriginCenter() {
+        return originCenter;
+    }
+
+    public void setOriginCenter(String originCenter) {
+        this.originCenter = originCenter;
+    }
+
+    public String getCurrentCenter() {
+        return currentCenter;
+    }
+
+    public void setCurrentCenter(String currentCenter) {
+        this.currentCenter = currentCenter;
     }
 
     public String getPalletProductBarcode() {

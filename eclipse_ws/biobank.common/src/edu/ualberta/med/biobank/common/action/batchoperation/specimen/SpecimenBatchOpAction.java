@@ -112,6 +112,12 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
     public static final Tr CSV_STUDY_ALIQUOTED_SPC_TYPE_ERROR =
         bundle.tr("specimen type \"{0}\" is invalid for child specimens in study \"{1}\"");
 
+    public static final Tr CSV_ORIGIN_CENTER_SHORT_NAME_ERROR =
+        bundle.tr("invalid origin center short name: {0}");
+
+    public static final Tr CSV_CURRENT_CENTER_SHORT_NAME_ERROR =
+        bundle.tr("invalid current center short name: {0}");
+
     private static final Tr CSV_CONTAINER_SPC_TYPE_ERROR =
         bundle.tr("specimen type \"{0}\" "
             + "cannot be stored in this container");
@@ -265,18 +271,14 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
             throw new BatchOpErrorsException(errorSet.getErrors());
         }
 
-        // for improved performance, model objects of the same type are loaded
-        // sequentially
+        // for improved performance, model objects of the same type are loaded sequentially
         // getModelObjects(context, pojos);
 
-        Map<String, SpecimenBatchOpInputPojo> pojoMap =
-            new HashMap<String, SpecimenBatchOpInputPojo>(0);
+        Map<String, SpecimenBatchOpInputPojo> pojoMap = new HashMap<String, SpecimenBatchOpInputPojo>(0);
 
-        Map<String, SpecimenBatchOpPojoData> pojoDataMap =
-            new HashMap<String, SpecimenBatchOpPojoData>(0);
+        Map<String, SpecimenBatchOpBuilder> pojoDataMap = new HashMap<String, SpecimenBatchOpBuilder>(0);
 
-        Set<SpecimenBatchOpPojoData> aliquotSpcPojoData =
-            new HashSet<SpecimenBatchOpPojoData>();
+        Set<SpecimenBatchOpBuilder> aliquotSpcPojoData = new HashSet<SpecimenBatchOpBuilder>();
 
         log.debug("SpecimenBatchOpAction: getting DB info");
         for (SpecimenBatchOpInputPojo pojo : pojos) {
@@ -288,7 +290,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
         }
 
         for (SpecimenBatchOpInputPojo pojo : pojos) {
-            SpecimenBatchOpPojoData pojoData = getDbInfo(context, pojo,
+            SpecimenBatchOpBuilder pojoData = getDbInfo(context, pojo,
                 pojoMap.get(pojo.getParentInventoryId()));
 
             if (pojoData != null) {
@@ -300,8 +302,8 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
         }
 
         // assign the parent specimen for child specimens
-        for (SpecimenBatchOpPojoData pojoData : aliquotSpcPojoData) {
-            SpecimenBatchOpPojoData parentPojoData =
+        for (SpecimenBatchOpBuilder pojoData : aliquotSpcPojoData) {
+            SpecimenBatchOpBuilder parentPojoData =
                 pojoDataMap.get(pojoData.getParentInventoryId());
 
             if (parentPojoData != null) {
@@ -309,7 +311,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
             }
         }
 
-        for (SpecimenBatchOpPojoData pojoData : pojoDataMap.values()) {
+        for (SpecimenBatchOpBuilder pojoData : pojoDataMap.values()) {
             boolean valid = pojoData.validate();
             if (!valid) {
                 errorSet.addAll(pojoData.getErrorList());
@@ -337,7 +339,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
 
         // add all source specimens first
         log.debug("SpecimenBatchOpAction: adding source specimens");
-        for (SpecimenBatchOpPojoData info : pojoDataMap.values()) {
+        for (SpecimenBatchOpBuilder info : pojoDataMap.values()) {
             if (!info.getPojo().getSourceSpecimen()) continue;
 
             Specimen spc = addSpecimen(context, batchOp, info);
@@ -358,7 +360,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
 
         // now add aliquoted specimens
         log.debug("SpecimenBatchOpAction: adding aliquot specimens");
-        for (SpecimenBatchOpPojoData info : aliquotSpcPojoData) {
+        for (SpecimenBatchOpBuilder info : aliquotSpcPojoData) {
             if ((info.getParentInventoryId() != null)
                 && (info.getParentSpecimen() == null)) {
                 Specimen parentSpc =
@@ -439,7 +441,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
     }
 
     // get referenced items that exist in the database
-    private SpecimenBatchOpPojoData getDbInfo(ActionContext context,
+    private SpecimenBatchOpBuilder getDbInfo(ActionContext context,
         SpecimenBatchOpInputPojo inputPojo,
         SpecimenBatchOpInputPojo parentInputPojo) {
         Specimen spc = BatchOpActionUtil.getSpecimen(context.getSession(), inputPojo.getInventoryId());
@@ -449,7 +451,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
             return null;
         }
 
-        SpecimenBatchOpPojoData pojoData = new SpecimenBatchOpPojoData(inputPojo, parentInputPojo);
+        SpecimenBatchOpBuilder pojoData = new SpecimenBatchOpBuilder(inputPojo, parentInputPojo);
         pojoData.setUser(context.getUser());
 
         Specimen parentSpecimen = null;
@@ -560,6 +562,30 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
             }
         }
 
+        if (inputPojo.getOriginCenter() != null) {
+            Center center = BatchOpActionUtil.getCenter(context.getSession(), inputPojo.getOriginCenter());
+            if (center != null) {
+                pojoData.setOriginCenter(center);
+                log.trace("found origin center: center={}", inputPojo.getOriginCenter());
+            } else {
+                errorSet.addError(inputPojo.getLineNumber(),
+                    CSV_ORIGIN_CENTER_SHORT_NAME_ERROR.format(inputPojo.getOriginCenter()));
+                return null;
+            }
+        }
+
+        if (inputPojo.getCurrentCenter() != null) {
+            Center center = BatchOpActionUtil.getCenter(context.getSession(), inputPojo.getCurrentCenter());
+            if (center != null) {
+                pojoData.setCurrentCenter(center);
+                log.trace("found current center: center={}", inputPojo.getCurrentCenter());
+            } else {
+                errorSet.addError(inputPojo.getLineNumber(),
+                    CSV_CURRENT_CENTER_SHORT_NAME_ERROR.format(inputPojo.getCurrentCenter()));
+                return null;
+            }
+        }
+
         // TODO: replace with pallet product barcode?
 
         // only get container information if defined for this row
@@ -599,7 +625,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
     }
 
     private Specimen addSpecimen(ActionContext context,
-        BatchOperation batchOp, SpecimenBatchOpPojoData pojoData) {
+        BatchOperation batchOp, SpecimenBatchOpBuilder pojoData) {
         if (context == null) {
             throw new NullPointerException("context is null");
         }
@@ -608,9 +634,13 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
             // workingCenterOnServerSide is assigned when isAllowed() is called
             throw new IllegalStateException("workingCenterOnServerSide is null");
         }
+
+        Center originCenter = (pojoData.getOriginCenter() != null)
+            ? pojoData.getOriginCenter() : workingCenterOnServerSide;
+
         OriginInfo originInfo = pojoData.getOriginInfo();
         if (originInfo == null) {
-            originInfo = pojoData.getNewOriginInfo(workingCenterOnServerSide);
+            originInfo = pojoData.createNewOriginInfo(originCenter);
         }
 
         CollectionEvent cevent = pojoData.getCevent();
@@ -637,7 +667,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
 
             // if still not found create one
             if (cevent == null) {
-                cevent = pojoData.getNewCollectionEvent();
+                cevent = pojoData.createNewCollectionEvent();
                 context.getSession().saveOrUpdate(cevent);
             }
 
@@ -645,7 +675,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
             pojoData.setPatient(cevent.getPatient());
         }
 
-        Specimen spc = pojoData.getNewSpecimen();
+        Specimen spc = pojoData.createNewSpecimen();
 
         // check if this specimen has a comment and if so save it to DB
         if (!spc.getComments().isEmpty()) {
@@ -705,7 +735,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
     }
 
     private ProcessingEvent createProcessignEventIfRequired(ActionContext context,
-        SpecimenBatchOpPojoData pojoData) {
+        SpecimenBatchOpBuilder pojoData) {
         ProcessingEvent pevent = null;
 
         // add the processing event for this source specimen
@@ -717,7 +747,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
                     pojoData.setPevent(pevent);
                     log.debug("createProcessignEventIfRequired: processing event created previously");
                 } else {
-                    pevent = pojoData.getNewProcessingEvent();
+                    pevent = pojoData.createNewProcessingEvent();
                     context.getSession().saveOrUpdate(pevent);
                     log.debug("createProcessignEventIfRequired: created new processing event");
 

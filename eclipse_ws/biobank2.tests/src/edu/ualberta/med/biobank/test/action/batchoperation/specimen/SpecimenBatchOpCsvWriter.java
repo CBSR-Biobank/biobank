@@ -16,15 +16,15 @@ import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 
 /**
  * Used for writing SpecimenBatchOpInputPojo to CSV files.
- * 
+ *
  * @author Nelson Loyola
- * 
+ *
  */
 class SpecimenBatchOpCsvWriter {
 
     /**
      * Generates a Patient CSV file with random patient numbers.
-     * 
+     *
      * @param filename The name of the CSV file to be saved.
      * @param studyName The short name to be used for the study.
      * @param numRows The number of rows in the CSV file.
@@ -43,6 +43,8 @@ class SpecimenBatchOpCsvWriter {
             "waybill",
             "sourceSpecimen",
             "worksheet",
+            "originCenter",
+            "currentCenter",
             "palletProductBarcode",
             "rootContainerType",
             "palletLabel",
@@ -67,6 +69,8 @@ class SpecimenBatchOpCsvWriter {
             new ConvertNullTo(""),
             new ConvertNullTo(""),
             new ConvertNullTo(""),
+            new ConvertNullTo(""),
+            new ConvertNullTo(""),
             new ConvertNullTo("")
         };
 
@@ -74,23 +78,23 @@ class SpecimenBatchOpCsvWriter {
             writer.writeHeader(header);
 
             for (SpecimenBatchOpInputPojo info : specimenInfos) {
-                final HashMap<String, ? super Object> data =
-                    new HashMap<String, Object>();
+                final HashMap<String, ? super Object> data = new HashMap<String, Object>();
                 data.put(header[0], info.getInventoryId());
                 data.put(header[1], info.getParentInventoryId());
                 data.put(header[2], info.getSpecimenType());
-                data.put(header[3],
-                    DateFormatter.formatAsDateTime(info.getCreatedAt()));
+                data.put(header[3], DateFormatter.formatAsDateTime(info.getCreatedAt()));
                 data.put(header[4], info.getPatientNumber());
                 data.put(header[5], info.getVisitNumber());
                 data.put(header[6], info.getWaybill());
                 data.put(header[7], info.getSourceSpecimen());
                 data.put(header[8], info.getWorksheet());
-                data.put(header[9], info.getPalletProductBarcode());
-                data.put(header[10], info.getRootContainerType());
-                data.put(header[11], info.getPalletLabel());
-                data.put(header[12], info.getPalletPosition());
-                data.put(header[13], info.getComment());
+                data.put(header[9], info.getOriginCenter());
+                data.put(header[10], info.getCurrentCenter());
+                data.put(header[11], info.getPalletProductBarcode());
+                data.put(header[12], info.getRootContainerType());
+                data.put(header[13], info.getPalletLabel());
+                data.put(header[14], info.getPalletPosition());
+                data.put(header[15], info.getComment());
                 writer.write(data, header, processing);
             }
         } finally {

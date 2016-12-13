@@ -130,11 +130,9 @@ class SpecimenBatchOpPojoHelper {
     private Set<SpecimenBatchOpInputPojo> aliquotedSpecimensCreate(
         Map<String, String> parentSpecimenInfoMap,
         Set<AliquotedSpecimen> aliquotedSpecimens) {
-        Set<SpecimenBatchOpInputPojo> specimenInfos =
-            new HashSet<SpecimenBatchOpInputPojo>();
+        Set<SpecimenBatchOpInputPojo> specimenInfos = new HashSet<SpecimenBatchOpInputPojo>();
 
-        for (Entry<String, String> parentSpecimenInfo : parentSpecimenInfoMap
-            .entrySet()) {
+        for (Entry<String, String> parentSpecimenInfo : parentSpecimenInfoMap.entrySet()) {
             for (AliquotedSpecimen as : aliquotedSpecimens) {
                 SpecimenBatchOpInputPojo specimenInfo = aliquotedSpecimenCreate(
                     parentSpecimenInfo.getKey(), as.getSpecimenType().getName());

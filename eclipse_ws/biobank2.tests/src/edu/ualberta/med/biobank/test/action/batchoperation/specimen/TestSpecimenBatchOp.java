@@ -25,11 +25,14 @@ import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBa
 import edu.ualberta.med.biobank.common.action.exception.BatchOpErrorsException;
 import edu.ualberta.med.biobank.common.util.DateCompare;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
+import edu.ualberta.med.biobank.model.Center;
+import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
+import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
@@ -53,20 +56,26 @@ public class TestSpecimenBatchOp extends TestAction {
 
     private final Set<OriginInfo> originInfos = new HashSet<OriginInfo>();
 
+    private NameGenerator nameGenerator;
+
+    private Site defaultSite;
+
+    private Clinic defaultClinic;
+
     @Override
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        specimenCsvHelper = new SpecimenBatchOpPojoHelper(
-            new NameGenerator("test_" + getMethodNameR()));
+        nameGenerator = new NameGenerator("test_" + getMethodNameR());
+        specimenCsvHelper = new SpecimenBatchOpPojoHelper(nameGenerator);
 
         // delete the CSV file if it exists
         File file = new File(CSV_NAME);
         file.delete();
 
         session.beginTransaction();
-        factory.createSite();
-        factory.createClinic();
+        defaultSite = factory.createSite();
+        defaultClinic = factory.createClinic();
         factory.createStudy();
 
         // add 2 shipments
@@ -894,6 +903,16 @@ public class TestSpecimenBatchOp extends TestAction {
                     specimen.getOriginInfo().getShipmentInfo().getWaybill());
             }
 
+            if (csvInfo.getOriginCenter() != null) {
+                Assert.assertEquals(csvInfo.getOriginCenter(),
+                    specimen.getOriginInfo().getCenter().getNameShort());
+            }
+
+            if (csvInfo.getCurrentCenter() != null) {
+                Assert.assertEquals(csvInfo.getCurrentCenter(),
+                    specimen.getCurrentCenter().getNameShort());
+            }
+
             if (csvInfo.getSourceSpecimen()) {
                 Assert.assertNotNull(specimen.getOriginalCollectionEvent());
 
@@ -1081,4 +1100,146 @@ public class TestSpecimenBatchOp extends TestAction {
                 SpecimenBatchOpAction.CSV_STUDY_ALIQUOTED_SPC_TYPE_ERROR.format());
         }
     }
+
+    @Test
+    public void originCenterIsInvalid() throws Exception {
+        Set<Patient> patients = new HashSet<Patient>();
+        Set<Specimen> parentSpecimens = new HashSet<Specimen>();
+
+        patients.add(factory.createPatient());
+        factory.createSourceSpecimen();
+        factory.createAliquotedSpecimen();
+        parentSpecimens.add(factory.createParentSpecimen());
+        factory.createSpecimenType();
+        factory.createAliquotedSpecimen();
+        session.getTransaction().commit();
+
+        Set<SpecimenBatchOpInputPojo> inputPojos = specimenCsvHelper.createAllSpecimens(
+            factory.getDefaultStudy(), originInfos, patients);
+
+        // change the origin center to something invalid
+        for (SpecimenBatchOpInputPojo inputPojo : inputPojos) {
+            inputPojo.setOriginCenter(nameGenerator.next(Center.class));
+        }
+
+        SpecimenBatchOpCsvWriter.write(CSV_NAME, inputPojos);
+
+        try {
+            SpecimenBatchOpAction importAction = new SpecimenBatchOpAction(
+                factory.getDefaultSite(), inputPojos, new File(CSV_NAME));
+            exec(importAction);
+            Assert.fail("should fail");
+        } catch (BatchOpErrorsException e) {
+            CsvUtil.showErrorsInLog(log, e);
+            new AssertBatchOpException().withMessage(
+                SpecimenBatchOpAction.CSV_ORIGIN_CENTER_SHORT_NAME_ERROR.format());
+        }
+    }
+
+    @Test
+    public void originCenterIsValid() throws Exception {
+        Set<Patient> patients = new HashSet<Patient>();
+        Set<Specimen> parentSpecimens = new HashSet<Specimen>();
+
+        patients.add(factory.createPatient());
+        factory.createSourceSpecimen();
+        factory.createAliquotedSpecimen();
+        parentSpecimens.add(factory.createParentSpecimen());
+        factory.createSpecimenType();
+        factory.createAliquotedSpecimen();
+        session.getTransaction().commit();
+
+        Set<SpecimenBatchOpInputPojo> inputPojos = specimenCsvHelper.createAllSpecimens(
+            factory.getDefaultStudy(), originInfos, patients);
+
+        // assign the origin center
+        for (SpecimenBatchOpInputPojo inputPojo : inputPojos) {
+            inputPojo.setOriginCenter(defaultClinic.getNameShort());
+        }
+
+        SpecimenBatchOpCsvWriter.write(CSV_NAME, inputPojos);
+
+        SpecimenBatchOpAction importAction = new SpecimenBatchOpAction(
+            factory.getDefaultSite(), inputPojos, new File(CSV_NAME));
+
+        try {
+            Integer bachOpId = exec(importAction).getId();
+            checkCsvInfoAgainstDb(inputPojos);
+            BatchOpGetResult<Specimen> batchOpResult = exec(new SpecimenBatchOpGetAction(bachOpId));
+            Assert.assertEquals(inputPojos.size(), batchOpResult.getModelObjects().size());
+        } catch (BatchOpErrorsException e) {
+            CsvUtil.showErrorsInLog(log, e);
+        }
+
+    }
+
+    @Test
+    public void currentCenterIsInvalid() throws Exception {
+        Set<Patient> patients = new HashSet<Patient>();
+        Set<Specimen> parentSpecimens = new HashSet<Specimen>();
+
+        patients.add(factory.createPatient());
+        factory.createSourceSpecimen();
+        factory.createAliquotedSpecimen();
+        parentSpecimens.add(factory.createParentSpecimen());
+        factory.createSpecimenType();
+        factory.createAliquotedSpecimen();
+        session.getTransaction().commit();
+
+        Set<SpecimenBatchOpInputPojo> inputPojos = specimenCsvHelper.createAllSpecimens(
+            factory.getDefaultStudy(), originInfos, patients);
+
+        // change the current center to something invalid
+        for (SpecimenBatchOpInputPojo inputPojo : inputPojos) {
+            inputPojo.setCurrentCenter(nameGenerator.next(Center.class));
+        }
+
+        SpecimenBatchOpCsvWriter.write(CSV_NAME, inputPojos);
+
+        try {
+            SpecimenBatchOpAction importAction = new SpecimenBatchOpAction(
+                factory.getDefaultSite(), inputPojos, new File(CSV_NAME));
+            exec(importAction);
+            Assert.fail("should fail");
+        } catch (BatchOpErrorsException e) {
+            CsvUtil.showErrorsInLog(log, e);
+            new AssertBatchOpException().withMessage(
+                SpecimenBatchOpAction.CSV_CURRENT_CENTER_SHORT_NAME_ERROR.format());
+        }
+    }
+
+    @Test
+    public void currentCtenterIsValid() throws Exception {
+        Set<Patient> patients = new HashSet<Patient>();
+        Set<Specimen> parentSpecimens = new HashSet<Specimen>();
+
+        patients.add(factory.createPatient());
+        factory.createSourceSpecimen();
+        factory.createAliquotedSpecimen();
+        parentSpecimens.add(factory.createParentSpecimen());
+        factory.createSpecimenType();
+        factory.createAliquotedSpecimen();
+        session.getTransaction().commit();
+
+        Set<SpecimenBatchOpInputPojo> inputPojos = specimenCsvHelper.createAllSpecimens(
+            factory.getDefaultStudy(), originInfos, patients);
+
+        // assig the origin center
+        for (SpecimenBatchOpInputPojo inputPojo : inputPojos) {
+            inputPojo.setCurrentCenter(defaultSite.getNameShort());
+        }
+
+        SpecimenBatchOpCsvWriter.write(CSV_NAME, inputPojos);
+
+        SpecimenBatchOpAction importAction = new SpecimenBatchOpAction(
+            factory.getDefaultSite(), inputPojos, new File(CSV_NAME));
+        Integer bachOpId = exec(importAction).getId();
+
+        checkCsvInfoAgainstDb(inputPojos);
+
+        BatchOpGetResult<Specimen> batchOpResult = exec(new SpecimenBatchOpGetAction(bachOpId));
+
+        Assert.assertEquals(inputPojos.size(), batchOpResult.getModelObjects().size());
+    }
+
 }
