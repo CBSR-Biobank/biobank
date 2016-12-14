@@ -30,9 +30,13 @@ public class SpecimenImportCommand extends Command {
 
     protected static final String NAME = "specimen_import_csv";
 
-    protected static final String USAGE = NAME + " SITE_NAME_SHORT CSV_FILE";
-
     protected static final String HELP = "Used to import specimens from a CSV file.";
+
+    protected static final String USAGE =
+        NAME
+            + " SITE_NAME_SHORT CSV_FILE\n\n"
+            + "SITE_NAME_SHORT is the short name of the working center you wish to use to import the file from.\n\n"
+            + BatchOpUsage.USAGE;
 
     private Map<String, Site> sites;
 

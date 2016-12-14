@@ -41,11 +41,11 @@ public class CommandRegistry {
         }
     }
 
-    public void showCommandHelp(String commandName) {
+    public void showCommandUsage(String commandName) {
         checkCommands();
         if (commands.containsKey(commandName)) {
             Command command = commands.get(commandName);
-            System.out.println(command.getUsage() + "\n\n" + command.getHelp());
+            System.out.println(command.getUsage());
         } else {
             System.out.println("Error: no command registered: " + commandName);
             System.exit(1);

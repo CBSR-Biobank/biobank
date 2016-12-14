@@ -13,22 +13,16 @@ import edu.ualberta.med.biobank.tools.SessionProvider.Mode;
 import edu.ualberta.med.biobank.tools.cli.command.CommandRegistry;
 import edu.ualberta.med.biobank.tools.cli.command.CreateContainerCommand;
 import edu.ualberta.med.biobank.tools.cli.command.HelpCommand;
-import edu.ualberta.med.biobank.tools.cli.command.PatientDeleteCommand;
 import edu.ualberta.med.biobank.tools.cli.command.ProcessingEventUpdate;
 import edu.ualberta.med.biobank.tools.cli.command.SpecimenUpdateActivityStatus;
-import edu.ualberta.med.biobank.tools.cli.command.StudyCountsCommand;
-import edu.ualberta.med.biobank.tools.cli.command.StudyDeleteCommand;
 import edu.ualberta.med.biobank.tools.cli.command.batchoperation.PatientImportCommand;
-import edu.ualberta.med.biobank.tools.cli.command.batchoperation.ShipmentImportCommand;
 import edu.ualberta.med.biobank.tools.cli.command.batchoperation.SpecimenImportCommand;
 import edu.ualberta.med.biobank.tools.utils.HostUrl;
 
 /**
- * Used to delete a study and all it's patients, collection events, and specimens.
+ * Provides a Command Line Interface (CLI) to a Biobank server.
  * 
- * E.g. to delete a patient, use following command:
- * 
- * java -Ddb.properties=db.properties -jar BiobankCli.jar -d patient_delete ABC4321
+ * The CLI provides a number commands that can be used to add information to a Biobank installation.
  * 
  * @author loyola
  * 
@@ -157,13 +151,17 @@ public class BiobankCli extends Application implements CliProvider {
         cr.addCommand(new HelpCommand(this));
         cr.addCommand(new SpecimenImportCommand(this));
         cr.addCommand(new PatientImportCommand(this));
-        cr.addCommand(new ShipmentImportCommand(this));
-        cr.addCommand(new StudyCountsCommand(this));
         cr.addCommand(new CreateContainerCommand(this));
-        cr.addCommand(new StudyDeleteCommand(this));
-        cr.addCommand(new PatientDeleteCommand(this));
         cr.addCommand(new SpecimenUpdateActivityStatus(this));
         cr.addCommand(new ProcessingEventUpdate(this));
+
+        // DO NOT ADD these commands since they need to be converted to actions
+        // cr.addCommand(new StudyCountsCommand(this));
+        // cr.addCommand(new PatientDeleteCommand(this));
+        // cr.addCommand(new StudyDeleteCommand(this));
+
+        // Shipment CSV import not fully implemented on server side yet
+        // cr.addCommand(new ShipmentImportCommand(this));
     }
 
 }

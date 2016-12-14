@@ -39,10 +39,18 @@ public class ProcessingEventUpdate extends Command {
 
     private static final String NAME = "processing_event_udpate_csv";
 
-    private static final String USAGE = NAME + " CSV_FILE";
-
     private static final String HELP = "Updates processing events based on worksheet number."
         + " Worksheet number cannot be updated.";
+
+    private static final String USAGE = NAME
+        + " CSV_FILE\n\n"
+        + "Used to update the time created, Activity Status, and / or site on one or more processing events.\n\n"
+        + "The CSV file must have the following columns:\n"
+        + "  1. worksheet number\n"
+        + "  2. time created in YYYY-MM-DD HH:MM format\n"
+        + "  3. Activity status ID\n"
+        + "  4. Site short name\n"
+        + ActivityStatusUsage.USAGE;
 
     private BiobankApplicationService appService;
 
@@ -129,7 +137,7 @@ public class ProcessingEventUpdate extends Command {
     // cell processors have to be recreated every time the file is read
     public CellProcessor[] getCellProcessors() {
         final CellProcessor[] processors = new CellProcessor[] {
-            new Unique(), // inventory ID
+            new Unique(), // worksheet number
             new ParseDate("yyyy-MM-dd HH:mm"),
             new LMinMax(ActivityStatus.ACTIVE.getId(), ActivityStatus.FLAGGED.getId()), // activity
                                                                                         // status

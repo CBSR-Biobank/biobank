@@ -27,7 +27,6 @@ import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
-import edu.ualberta.med.biobank.tools.cli.AppServiceUtils;
 import edu.ualberta.med.biobank.tools.cli.CliProvider;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -37,13 +36,16 @@ public class SpecimenUpdateActivityStatus extends Command {
 
     private static final String NAME = "specimen_update_activity_status_csv";
 
-    private static final String USAGE = NAME + " SITE_NAME_SHORT CSV_FILE";
-
     private static final String HELP = "Used to update the activity status on specimens.";
 
-    private BiobankApplicationService appService;
+    private static final String USAGE = NAME + " CSV_FILE\n\n"
+        + "Used to update the Activity Status on one or more specimens.\n\n"
+        + "The CSV file must have the following columns:\n"
+        + "  1. Specimen inventory ID\n"
+        + "  2. Activity status ID\n"
+        + ActivityStatusUsage.USAGE;
 
-    private Map<String, Site> sites;
+    private BiobankApplicationService appService;
 
     private Site site;
 
@@ -62,18 +64,10 @@ public class SpecimenUpdateActivityStatus extends Command {
             return false;
         }
 
-        final String siteNameShort = args[1];
         final String csvFile = args[2];
 
         try {
             appService = cliProvider.getAppService();
-            sites = AppServiceUtils.getSitesByNameShort(appService);
-            site = sites.get(siteNameShort);
-
-            if (site == null) {
-                System.out.println("site is invalid: " + siteNameShort);
-                return false;
-            }
 
             LOG.info("Reading CSV file: {}", csvFile);
 

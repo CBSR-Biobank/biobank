@@ -8,8 +8,10 @@ public abstract class Command implements CommandRunner {
 
     protected final String name;
 
+    // single line help string
     protected final String help;
 
+    // details on how to use command
     protected final String usage;
 
     public Command(CliProvider cliProvider, String name, String help, String usage) {

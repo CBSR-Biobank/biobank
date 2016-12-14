@@ -93,3 +93,4 @@ cacerts
 decode.png
 *.sql.gz
 /eclipse_ws/Servers/
+BiobankCli*.zip

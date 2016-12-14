@@ -29,7 +29,7 @@ public class HelpCommand extends Command {
         }
 
         final String command = args[1];
-        CommandRegistry.getInstance().showCommandHelp(command);
+        CommandRegistry.getInstance().showCommandUsage(command);
         return true;
     }
 
