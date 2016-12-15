@@ -34,6 +34,7 @@ my $help = 0;
 use constant {
     WIN32           => "win32",
     LINUX64         => "linux64",
+    CLI             => "cli",
     WIN32_JRE_ZIP   => "jre.win32.x86.zip",
     LINUX64_JRE_ZIP => "jre.linux.x86_64.zip"
 };
@@ -78,17 +79,37 @@ sub addLinux64Jre {
     addJre $zipFile, $jreZipFile, "$jrePath/@{[ LINUX64_JRE_ZIP ]}"
 }
 
+sub addJreToLinuxCli {
+    my ($biobankCliZipFile, $javaJreZip) = (@_);
+    (my $biobankLinuxCliZipFile = $biobankCliZipFile) =~ s/.zip$/_linux_with_jre.zip/;
+
+    if (-e "$javaJreZip") {
+        copy($biobankCliZipFile, $biobankLinuxCliZipFile);
+        system("rm -rf ./biobank-cli");
+        say "uncompressing $javaJreZip";
+        system("$UNZIP -d biobank-cli $javaJreZip > /dev/null");
+        say "compressing $biobankLinuxCliZipFile";
+        system("$ZIP -r -g $biobankLinuxCliZipFile biobank-cli/jre/ > /dev/null");
+        system("rm -rf ./biobank-cli");
+    } else {
+        die "ERROR: Could not find JRE zip file: $javaJreZip\n";
+    }
+}
+
 sub findBiobankFilesInDir {
     my $dir = shift(@_);
     my %result = ();
 
     opendir(my $dh, ".") || die "can't open current directory for reading: $!";
     while (readdir $dh) {
-        if ($_ =~ /win32.x86.zip$/) {
+        if ($_ =~ /^Biobank.*win32.x86.zip$/) {
             $result{WIN32} = $_;
         }
-        if ($_ =~ /linux.gtk.x86_64.zip$/) {
+        if ($_ =~ /^Biobank.*linux.gtk.x86_64.zip$/) {
             $result{LINUX64} = $_;
+        }
+        if ($_ =~ /^BiobankCli.*zip$/ && $_ !~ /with_jre/) {
+            $result{CLI} = $_;
         }
     }
     close $dh;
@@ -103,4 +124,8 @@ if (exists($files{WIN32})) {
 
 if (exists($files{WIN32})) {
     addLinux64Jre $files{LINUX64}
+}
+
+if (exists($files{CLI})) {
+    addJreToLinuxCli $files{CLI}, "$jrePath/@{[ LINUX64_JRE_ZIP ]}"
 }

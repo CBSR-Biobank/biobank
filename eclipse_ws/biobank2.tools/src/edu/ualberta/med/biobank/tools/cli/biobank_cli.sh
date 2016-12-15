@@ -16,11 +16,11 @@ OPTIONS
   -p | --port     PORT     The port being used by the Biobank server. Defautls to 443.
   -u | --user     USER     The username to use when logging into the Biobank server.
   -w | --password PWD      The user's password.
-  -j | --jrepath  PATH     The path to the Java Runtime Environment (JRE). Defaults to /usr/lib/jvm/java-6-oracle.
+  -j | --jrepath  PATH     The path to the Java Runtime Environment (JRE). Defaults to \"jre\".
   -h | --help              Displays this help text.
 "
 
-JAVA="/usr/lib/jvm/java-6-oracle/bin/java"
+JAVA="jre/bin/java"
 JAR="BiobankCli.jar"
 
 if [[ ! -f "$JAVA" ]]; then
@@ -55,7 +55,7 @@ while true; do
         -u | --user )     SRV_USER="$2"; shift; shift;;
         -w | --password ) SRV_PWD="$2"; shift; shift;;
         -j | --jrepath )  JAVA="$2/bin/java"; shift; shift;;
-        -h | --help )     HELP=true; shift; shift;;
+        -h | --help )     HELP=true; shift;;
         -- ) shift; break ;;
         * ) break ;;
     esac
@@ -83,6 +83,11 @@ fi
 if [ -z "$SRV_PWD" ]; then
     read -s -p "Enter user's password: " SRV_PWD
     echo ""
+fi
+
+if [ ! -f "$JAVA" ]; then
+    echo "ERROR: Java executable not found at $JAVA"
+    exit 1
 fi
 
 COMMAND="$*"
