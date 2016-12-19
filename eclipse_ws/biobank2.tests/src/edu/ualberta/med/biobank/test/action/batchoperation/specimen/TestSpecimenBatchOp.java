@@ -128,11 +128,11 @@ public class TestSpecimenBatchOp extends TestAction {
         checkCsvInfoAgainstDb(csvInfos);
     }
 
-    // test with 1000 patients
+    // test with large number of patients
     @Ignore
     @Test
     public void manyPatients() throws Exception {
-        final int numPatients = 1000;
+        final int numPatients = 500;
 
         Set<Patient> patients = new HashSet<Patient>();
 

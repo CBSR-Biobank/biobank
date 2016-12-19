@@ -149,7 +149,8 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
         }
 
         if (batchOpSpecimens.size() > SIZE_LIMIT) {
-            throw new IllegalArgumentException("pojo list size exceeds maximum");
+            throw new IllegalArgumentException(
+                "Number of rows in file greater than maximum: " + batchOpSpecimens.size());
         }
 
         this.workingCenterId = workingCenter.getId();
@@ -367,8 +368,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
                     parentSpecimens.get(info.getParentInventoryId());
                 if (parentSpc == null) {
                     errorSet.addError(info.getPojo().getLineNumber(),
-                        CSV_PARENT_SPC_INV_ID_ERROR.format(info.getPojo()
-                            .getParentInventoryId()));
+                        CSV_PARENT_SPC_INV_ID_ERROR.format(info.getPojo().getParentInventoryId()));
                 } else {
                     info.setParentSpecimen(parentSpc);
                 }

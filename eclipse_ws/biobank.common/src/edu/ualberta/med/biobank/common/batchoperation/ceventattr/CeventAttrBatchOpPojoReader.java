@@ -14,6 +14,7 @@ import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.exception.SuperCSVException;
 import org.supercsv.exception.SuperCSVReflectionException;
 import org.supercsv.io.ICsvBeanReader;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.IdResult;
@@ -26,6 +27,8 @@ import edu.ualberta.med.biobank.model.Center;
 
 public class CeventAttrBatchOpPojoReader implements
     IBatchOpPojoReader<CeventAttrBatchOpInputPojo> {
+
+    private static final org.xnap.commons.i18n.I18n i18n = I18nFactory.getI18n(CeventAttrBatchOpPojoReader.class);
 
     @SuppressWarnings("nls")
     private static final String CSV_FIRST_HEADER = "Patient Number";
@@ -76,6 +79,7 @@ public class CeventAttrBatchOpPojoReader implements
             && (csvHeaders.length == NAME_MAPPINGS.length);
     }
 
+    @SuppressWarnings("nls")
     @Override
     public Set<CeventAttrBatchOpInputPojo> readPojos(ICsvBeanReader reader)
         throws ClientBatchOpErrorsException, IOException {
@@ -91,7 +95,12 @@ public class CeventAttrBatchOpPojoReader implements
                 csvPojo.setLineNumber(reader.getLineNumber());
                 pojos.add(csvPojo);
             }
-
+            if (pojos.size() > CeventAttrBatchOpAction.SIZE_LIMIT) {
+                throw new ClientBatchOpErrorsException(
+                    i18n.tr("The file has {0} data rows, the maximum allowed is {1}",
+                        pojos.size(),
+                        CeventAttrBatchOpAction.SIZE_LIMIT));
+            }
             return pojos;
         } catch (SuperCSVReflectionException e) {
             throw new ClientBatchOpErrorsException(e);

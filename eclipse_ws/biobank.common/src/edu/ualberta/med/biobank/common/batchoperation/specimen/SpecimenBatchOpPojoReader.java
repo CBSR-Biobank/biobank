@@ -19,6 +19,8 @@ import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.exception.SuperCSVException;
 import org.supercsv.exception.SuperCSVReflectionException;
 import org.supercsv.io.ICsvBeanReader;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.IdResult;
@@ -39,6 +41,8 @@ import edu.ualberta.med.biobank.model.Center;
 @SuppressWarnings("nls")
 public class SpecimenBatchOpPojoReader implements
     IBatchOpPojoReader<SpecimenBatchOpInputPojo> {
+
+    private static final I18n i18n = I18nFactory.getI18n(SpecimenBatchOpPojoReader.class);
 
     private static final String CSV_FIRST_HEADER = "Inventory ID";
 
@@ -126,6 +130,12 @@ public class SpecimenBatchOpPojoReader implements
                 csvPojo.setLineNumber(reader.getLineNumber());
                 pojos.add(csvPojo);
             }
+            if (pojos.size() > SpecimenBatchOpAction.SIZE_LIMIT) {
+                throw new ClientBatchOpErrorsException(
+                    i18n.tr("The file has {0} data rows, the maximum allowed is {1}",
+                        pojos.size(),
+                        SpecimenBatchOpAction.SIZE_LIMIT));
+            }
             return pojos;
         } catch (SuperCSVReflectionException e) {
             throw new ClientBatchOpErrorsException(e);
@@ -142,9 +152,7 @@ public class SpecimenBatchOpPojoReader implements
     }
 
     @Override
-    public Action<IdResult> getAction() throws NoSuchAlgorithmException,
-        IOException {
-        return new SpecimenBatchOpAction(workingCenter, pojos,
-            new File(filename));
+    public Action<IdResult> getAction() throws NoSuchAlgorithmException, IOException {
+        return new SpecimenBatchOpAction(workingCenter, pojos, new File(filename));
     }
 }
