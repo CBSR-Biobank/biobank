@@ -102,10 +102,10 @@ sub findBiobankFilesInDir {
 
     opendir(my $dh, ".") || die "can't open current directory for reading: $!";
     while (readdir $dh) {
-        if ($_ =~ /^Biobank.*win32.x86.zip$/) {
+        if ($_ =~ /^BioBank.*win32.x86.zip$/) {
             $result{WIN32} = $_;
         }
-        if ($_ =~ /^Biobank.*linux.gtk.x86_64.zip$/) {
+        if ($_ =~ /^BioBank.*linux.gtk.x86_64.zip$/) {
             $result{LINUX64} = $_;
         }
         if ($_ =~ /^BiobankCli.*zip$/ && $_ !~ /with_jre/) {
