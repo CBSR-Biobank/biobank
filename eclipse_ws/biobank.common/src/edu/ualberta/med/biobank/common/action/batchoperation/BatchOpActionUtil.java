@@ -38,9 +38,9 @@ import edu.ualberta.med.biobank.model.User;
  * <p>
  * <strong>These methods should eventually be moved to DAO classes for the individual model
  * objects.</strong>
- * 
+ *
  * @author Nelson Loyola
- * 
+ *
  */
 @SuppressWarnings("nls")
 public class BatchOpActionUtil {
@@ -145,6 +145,18 @@ public class BatchOpActionUtil {
         return (Container) c.uniqueResult();
     }
 
+    public static Container getContainerByBarcode(Session session, String barcode) {
+        if (session == null) {
+            throw new NullPointerException("session is null");
+        }
+
+        Criteria c = session
+            .createCriteria(Container.class, "c")
+            .add(Restrictions.eq("productBarcode", barcode));
+
+        return (Container) c.uniqueResult();
+    }
+
     public static OriginInfo getOriginInfo(Session session, String waybill) {
         if (session == null) {
             throw new NullPointerException("session is null");
@@ -159,7 +171,7 @@ public class BatchOpActionUtil {
     }
 
     /*
-     * 
+     *
      */
     public static ShippingMethod getShippingMethod(Session session, String name) {
         if (session == null) {

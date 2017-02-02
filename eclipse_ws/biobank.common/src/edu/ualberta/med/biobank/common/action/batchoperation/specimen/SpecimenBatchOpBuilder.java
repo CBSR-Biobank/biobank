@@ -194,11 +194,15 @@ public class SpecimenBatchOpBuilder implements IBatchOpPojoHelper {
     boolean hasPosition() {
         // FIXME:
         // To specify a specimen position the following are possible:
-        // - columns 11 and 14 are filled in
-        // - columns 12, 13, and 14 are filled in
-        // - columns 11, 12, 13, and 14 are filled in, but is not recommended
+        // - columns 13 and 16 are filled in
+        // - columns 14, 15, and 16 are filled in
+        // - columns 13, 14, 15, and 16 are filled in, but is not recommended
         // since it is redundant
-        return (pojo.getPalletLabel() != null) && (pojo.getPalletPosition() != null);
+        boolean positionWithLabel = (pojo.getPalletLabel() != null)
+            && (pojo.getPalletPosition() != null);
+        boolean positionWithProductBarcode = (pojo.getPalletProductBarcode() != null)
+            && (pojo.getPalletPosition() != null);
+        return positionWithLabel || positionWithProductBarcode;
     }
 
     /**

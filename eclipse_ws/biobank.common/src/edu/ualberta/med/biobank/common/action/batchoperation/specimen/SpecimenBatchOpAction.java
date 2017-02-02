@@ -70,11 +70,11 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
     public static final Tr CSV_PARENT_SPC_INV_ID_ERROR =
         bundle.tr("parent inventory id does not exist: {0}");
 
-    private static final LString CSV_ALIQ_SPC_PATIENT_CEVENT_MISSING_ERROR =
+    public static final LString CSV_ALIQ_SPC_PATIENT_CEVENT_MISSING_ERROR =
         bundle.tr("when parent inventory id is not specified, "
             + "patient number, and visit number are required").format();
 
-    private static final LString CSV_PALLET_POS_ERROR =
+    public static final LString CSV_PALLET_POS_ERROR =
         bundle.tr("pallet position defined but not product barcode or label").format();
 
     private static final LString CSV_PROD_BARCODE_NO_POS_ERROR =
@@ -92,8 +92,14 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
     private static final Tr CSV_CONTAINER_LABEL_ERROR =
         bundle.tr("container with label \"{0}\" does not exist");
 
-    private static final Tr CSV_SPECIMEN_LABEL_ERROR =
+    private static final Tr CSV_CONTAINER_BARCODE_ERROR =
+        bundle.tr("container with product barcode \"{0}\" does not exist");
+
+    public static final Tr CSV_SPECIMEN_LABEL_ERROR =
         bundle.tr("specimen position \"{0}\" in container with label \"{1}\" is invalid");
+
+    public static final Tr CSV_SPECIMEN_BARCODE_ERROR =
+        bundle.tr("specimen position \"{0}\" in container with product barcode \"{1}\" is invalid");
 
     public static final Tr CSV_PATIENT_NUMBER_INVALID_ERROR =
         bundle.tr("patient number is invalid");
@@ -119,8 +125,13 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
         bundle.tr("invalid current center short name: {0}");
 
     private static final Tr CSV_CONTAINER_SPC_TYPE_ERROR =
-        bundle.tr("specimen type \"{0}\" "
-            + "cannot be stored in this container");
+        bundle.tr("specimen type \"{0}\" cannot be stored in this container");
+
+    public static final Tr CSV_CONTAINER_POS_OCCUPIED_ERROR =
+        bundle.tr("specimen position \"{0}\" in container with label \"{1}\" is occupied");
+
+    public static final Tr CSV_LABEL_POS_OCCUPIED_ERROR =
+        bundle.tr("specimen position \"{0}\" in container with label \"{1}\" is occupied");
 
     private final Integer workingCenterId;
 
@@ -403,27 +414,29 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
             }
         }
 
-        // check if only position defined and no label and no product barcode
-        if ((pojo.getPalletProductBarcode() == null)
-            && (pojo.getPalletLabel() == null)
-            && (pojo.getPalletPosition() != null)) {
+        String productBarcode = pojo.getPalletProductBarcode();
+        String label = pojo.getPalletLabel();
+        String position = pojo.getPalletPosition();
+        String rootContainerType = pojo.getRootContainerType();
+
+        boolean hasLabel = (label != null) && !label.isEmpty();
+        boolean hasProductBarcode = (productBarcode != null) && !productBarcode.isEmpty();
+        boolean hasPosition = (position != null) && !position.isEmpty();
+        boolean hasRootContainerType = (rootContainerType != null) && !rootContainerType.isEmpty();
+
+        if (hasPosition && !hasProductBarcode && !hasLabel) {
             errorSet.addError(pojo.getLineNumber(), CSV_PALLET_POS_ERROR);
         }
 
-        //
-        if ((pojo.getPalletProductBarcode() != null)
-            && (pojo.getPalletPosition() == null)) {
+        if (hasProductBarcode && !hasLabel && !hasPosition) {
             errorSet.addError(pojo.getLineNumber(), CSV_PROD_BARCODE_NO_POS_ERROR);
         }
 
-        if ((pojo.getPalletLabel() != null)
-            && (pojo.getPalletPosition() == null)) {
+        if (hasLabel && !hasProductBarcode && !hasPosition) {
             errorSet.addError(pojo.getLineNumber(), CSV_PALLET_POS_ERROR);
         }
 
-        if ((pojo.getPalletLabel() == null)
-            && (pojo.getRootContainerType() == null)
-            && (pojo.getPalletPosition() != null)) {
+        if (hasLabel && hasPosition && !hasRootContainerType) {
             errorSet.addError(pojo.getLineNumber(), CSV_PALLET_LABEL_NO_CTYPE_ERROR);
         }
 
@@ -586,39 +599,67 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
             }
         }
 
-        // TODO: replace with pallet product barcode?
-
         // only get container information if defined for this row
+
         if (pojoData.hasPosition()) {
-            Container container = BatchOpActionUtil.getContainer(
-                context.getSession(), inputPojo.getPalletLabel());
-            if (container == null) {
-                errorSet.addError(
-                    inputPojo.getLineNumber(),
-                    CSV_CONTAINER_LABEL_ERROR.format(inputPojo.getPalletLabel()));
-                return null;
+            String position = inputPojo.getPalletPosition();
+            String label = inputPojo.getPalletLabel();
+            String barcode = inputPojo.getPalletProductBarcode();
+            boolean hasLabel = (label != null) && !label.isEmpty();
+            Container container;
+
+            if (hasLabel) {
+                container = BatchOpActionUtil.getContainer(context.getSession(), label);
+
+                if (container == null) {
+                    errorSet.addError(inputPojo.getLineNumber(),
+                        CSV_CONTAINER_LABEL_ERROR.format(label));
+                    return null;
+                }
+            } else {
+                container = BatchOpActionUtil.getContainerByBarcode(context.getSession(), barcode);
+
+                if (container == null) {
+                    errorSet.addError(inputPojo.getLineNumber(), CSV_CONTAINER_BARCODE_ERROR.format(barcode));
+                    return null;
+                }
             }
 
             pojoData.setContainer(container);
 
             if (!container.getContainerType().getSpecimenTypes().contains(spcType)) {
-                errorSet.addError(
-                    inputPojo.getLineNumber(),
+                errorSet.addError(inputPojo.getLineNumber(),
                     CSV_CONTAINER_SPC_TYPE_ERROR.format(spcType.getName()));
                 return null;
             }
 
             try {
-                RowColPos pos = container.getPositionFromLabelingScheme(
-                    inputPojo.getPalletPosition());
+                RowColPos pos = container.getPositionFromLabelingScheme(position);
+
+                // is container position empty?
+                if (!container.isPositionFree(pos)) {
+                    if (hasLabel) {
+                        errorSet.addError(inputPojo.getLineNumber(),
+                            CSV_LABEL_POS_OCCUPIED_ERROR.format(position, label));
+                    } else {
+                        errorSet.addError(inputPojo.getLineNumber(),
+                            CSV_CONTAINER_POS_OCCUPIED_ERROR.format(position, barcode));
+                    }
+                    return null;
+                }
+
                 pojoData.setSpecimenPos(pos);
             } catch (Exception e) {
-                errorSet.addError(inputPojo.getLineNumber(),
-                    CSV_SPECIMEN_LABEL_ERROR.format(
-                        inputPojo.getPalletPosition(),
-                        inputPojo.getPalletLabel()));
+                if (hasLabel) {
+                    errorSet.addError(inputPojo.getLineNumber(),
+                        CSV_SPECIMEN_LABEL_ERROR.format(position, label));
+                } else {
+                    errorSet.addError(inputPojo.getLineNumber(),
+                        CSV_SPECIMEN_BARCODE_ERROR.format(position, barcode));
+                }
                 return null;
             }
+
         }
 
         return pojoData;

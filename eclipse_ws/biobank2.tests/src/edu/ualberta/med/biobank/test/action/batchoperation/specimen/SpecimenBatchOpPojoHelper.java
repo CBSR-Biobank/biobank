@@ -24,9 +24,9 @@ import edu.ualberta.med.biobank.test.NameGenerator;
 import edu.ualberta.med.biobank.test.Utils;
 
 /**
- * 
+ *
  * @author Nelson Loyola
- * 
+ *
  */
 @SuppressWarnings("nls")
 class SpecimenBatchOpPojoHelper {
@@ -41,7 +41,7 @@ class SpecimenBatchOpPojoHelper {
 
     /**
      * Creates specimen BatchOp pojos with source specimens and aliquoted specimens.
-     * 
+     *
      * @param csvname the file name to save the data to.
      * @param study the study the the patients belong to. Note that the study must have valid source
      *            specimens and aliquoted specimens defined.
@@ -124,7 +124,7 @@ class SpecimenBatchOpPojoHelper {
 
     /**
      * Creates aliquotedSpecimens.size() specimens for each parentSpecimen.
-     * 
+     *
      * specimenInfoMap is a map of: specimen inventory id => patient number
      */
     private Set<SpecimenBatchOpInputPojo> aliquotedSpecimensCreate(
@@ -194,7 +194,8 @@ class SpecimenBatchOpPojoHelper {
 
     public void fillContainersWithSpecimenBatchOpPojos(
         List<SpecimenBatchOpInputPojo> specimenCsvInfos,
-        Set<Container> containers) {
+        Set<Container> containers,
+        boolean useProductBarcode) {
 
         // fill as many containers as space will allow
         int count = 0;
@@ -214,10 +215,13 @@ class SpecimenBatchOpPojoHelper {
                         specimenCsvInfos.get(count);
                     RowColPos pos = new RowColPos(r, c);
                     csvInfo.setPalletPosition(ctype.getPositionString(pos));
-                    csvInfo.setPalletLabel(container.getLabel());
-                    csvInfo.setPalletProductBarcode(container
-                        .getProductBarcode());
-                    csvInfo.setRootContainerType(ctype.getNameShort());
+
+                    if (useProductBarcode) {
+                       csvInfo.setPalletProductBarcode(container.getProductBarcode());
+                    } else {
+                       csvInfo.setPalletLabel(container.getLabel());
+                       csvInfo.setRootContainerType(ctype.getNameShort());
+                    }
 
                     count++;
                 }
