@@ -47,6 +47,7 @@ SRV_USER=""
 SRV_PWD=""
 DFLT_SRV_HOST="localhost"
 DFLT_SRV_PORT="443"
+MAIN_CLASS="edu.ualberta.med.biobank.tools.cli.BiobankCli"
 
 while true; do
     case "$1" in
@@ -96,6 +97,6 @@ if [ -z "$COMMAND" ]; then
     read -p "Enter command: " COMMAND
 fi
 
-#echo "$JAVA -jar $JAR -H $SRV_HOST --port $SRV_PORT -u $SRV_USER -w $SRV_PWD \"$COMMAND\""
+#echo "$JAVA -cp \"$JAR:lib/*\" $MAIN_CLASS -H $SRV_HOST --port $SRV_PORT -u $SRV_USER -w $SRV_PWD \"$COMMAND\""
 
-$JAVA -jar $JAR -H $SRV_HOST --port $SRV_PORT -u $SRV_USER -w $SRV_PWD "$COMMAND"
+$JAVA -cp "$JAR:lib/*" $MAIN_CLASS -H $SRV_HOST --port $SRV_PORT -u $SRV_USER -w $SRV_PWD "$COMMAND"
