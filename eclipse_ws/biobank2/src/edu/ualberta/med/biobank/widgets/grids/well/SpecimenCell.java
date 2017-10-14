@@ -157,6 +157,8 @@ public class SpecimenCell extends AbstractUIWell {
                 specimenBriefInfo.getSpecimen());
         } else {
             specimen = new SpecimenWrapper(SessionManager.getAppService());
+            specimen.setId(cell.getSpecimenId());
+            specimen.setInventoryId(cell.getValue());
         }
         setExpectedSpecimen(specimen);
         return specimen;
