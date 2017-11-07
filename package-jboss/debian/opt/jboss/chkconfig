@@ -150,7 +150,7 @@ sub getNonInnoDbTables() {
 # check for InnoDB
 my $testResult = createTestResult("checking MySQL for InnoDB...", 1);
 $testResult->{'result'} = (`$MYSQL -h$DBHOST -u$DBUSER -p$DBPASSWORD -e "show variables" $DBNAME |
-        $GREP -e "^storage_engine"` =~ /InnoDB/);
+        $GREP -e "^default_storage_engine"` =~ /InnoDB/);
 
 # checkMysqlLowerCaseTableNames
 $testResult = createTestResult("checking MySQL for lower case table names...", 1);

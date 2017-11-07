@@ -1,0 +1,15 @@
+[Unit]
+Description=Jboss Application Server
+After=network.target
+
+[Service]
+Type=idle
+Environment=JAVA_HOME=/usr/lib/jvm/java-6-oracle JBOSS_HOME=/opt/jboss/jboss-4.0.5.GA JAVA=/usr/lib/jvm/java-6-oracle/bin/java JBOSS_LOG_DIR=/var/log/jboss
+User=jboss
+Group=jboss
+ExecStart=/opt/jboss/jboss-4.0.5.GA/bin/run.sh
+TimeoutStartSec=600
+TimeoutStopSec=600
+
+[Install]
+WantedBy=multi-user.target

@@ -836,16 +836,6 @@
 	  tofile="biobank-server-${server.version.num}.deb"
 	  overwrite="true" />
 
-
   </target>
 
-<!-- (setq nxml-slash-auto-complete-flag t) -->
-
-
 </project>
-
-<!--
-    Local Variables:
-    compile-command: "ant"
-    End:
--->
