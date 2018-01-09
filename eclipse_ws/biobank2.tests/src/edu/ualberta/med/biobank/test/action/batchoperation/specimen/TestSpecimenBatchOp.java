@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.test.action.batchoperation.specimen;
 
+import static edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpActionErrors.*;
+
 import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
@@ -45,9 +47,9 @@ import edu.ualberta.med.biobank.test.action.batchoperation.AssertBatchOpExceptio
 import edu.ualberta.med.biobank.test.action.batchoperation.CsvUtil;
 
 /**
- * 
+ *
  * @author Nelson Loyola
- * 
+ *
  */
 public class TestSpecimenBatchOp extends TestAction {
 
@@ -336,7 +338,7 @@ public class TestSpecimenBatchOp extends TestAction {
 
     /*
      * Test if we can import aliquoted specimens only.
-     * 
+     *
      * The CSV file has no positions here.
      */
     @Test
@@ -420,7 +422,7 @@ public class TestSpecimenBatchOp extends TestAction {
             Assert.fail("should not be allowed to create aliquot specimens with no parent specimens");
         } catch (BatchOpErrorsException e) {
             new AssertBatchOpException()
-                .withMessage(SpecimenBatchOpAction.CSV_PARENT_SPC_INV_ID_ERROR.format())
+                .withMessage(CSV_PARENT_SPC_INV_ID_ERROR.format())
                 .assertIn(e);
         }
     }
@@ -444,7 +446,7 @@ public class TestSpecimenBatchOp extends TestAction {
             Assert.fail("should not be allowed to create aliquot specimens with no collection events");
         } catch (BatchOpErrorsException e) {
             new AssertBatchOpException()
-                .withMessage(SpecimenBatchOpAction.CSV_ALIQ_SPC_PATIENT_CEVENT_MISSING_ERROR)
+                .withMessage(CSV_ALIQ_SPC_PATIENT_CEVENT_MISSING_ERROR)
                 .assertIn(e);
         }
     }
@@ -478,7 +480,7 @@ public class TestSpecimenBatchOp extends TestAction {
             Assert.fail("should not be allowed to create aliquot specimens with invalid patients");
         } catch (BatchOpErrorsException e) {
             new AssertBatchOpException()
-                .withMessage(SpecimenBatchOpAction.CSV_PATIENT_NUMBER_INVALID_ERROR.format())
+                .withMessage(CSV_PATIENT_NUMBER_INVALID_ERROR.format())
                 .assertIn(e);
         }
     }
@@ -545,7 +547,7 @@ public class TestSpecimenBatchOp extends TestAction {
             Assert.fail("should not be allowed to invalid specimen types");
         } catch (BatchOpErrorsException e) {
             new AssertBatchOpException()
-                .withMessage(SpecimenBatchOpAction.CSV_SPECIMEN_TYPE_ERROR.format())
+                .withMessage(CSV_SPECIMEN_TYPE_ERROR.format())
                 .assertIn(e);
         }
     }
@@ -585,7 +587,7 @@ public class TestSpecimenBatchOp extends TestAction {
             Assert.fail("should not be allowed to invalid specimen types");
         } catch (BatchOpErrorsException e) {
             new AssertBatchOpException()
-                .withMessage(SpecimenBatchOpAction.CSV_SPECIMEN_TYPE_ERROR.format())
+                .withMessage(CSV_SPECIMEN_TYPE_ERROR.format())
                 .assertIn(e);
         }
     }
@@ -642,28 +644,27 @@ public class TestSpecimenBatchOp extends TestAction {
         patients.add(factory.createPatient());
         patients.add(factory.createPatient());
 
-        Set<SourceSpecimen> sourceSpecimens = new HashSet<SourceSpecimen>();
-        sourceSpecimens.add(factory.createSourceSpecimen());
-        factory.createSpecimenType();
-        sourceSpecimens.add(factory.createSourceSpecimen());
-        factory.createSpecimenType();
-        sourceSpecimens.add(factory.createSourceSpecimen());
+        factory.createSourceSpecimen();
+        factory.createSourceSpecimen();
+        factory.createSourceSpecimen();
 
-        // create a new specimen type for the aliquoted specimens
         SpecimenType aqSpecimenType = factory.createSpecimenType();
-        Set<AliquotedSpecimen> aliquotedSpecimens =
-            new HashSet<AliquotedSpecimen>();
-        aliquotedSpecimens.add(factory.createAliquotedSpecimen());
-        aliquotedSpecimens.add(factory.createAliquotedSpecimen());
-        aliquotedSpecimens.add(factory.createAliquotedSpecimen());
+        factory.setDefaultAliquotedSpecimenType(aqSpecimenType);
+
+        factory.createAliquotedSpecimen();
+        factory.createAliquotedSpecimen();
+        factory.createAliquotedSpecimen();
 
         Set<Container> childL2Containers = createContainers(aqSpecimenType);
 
         session.getTransaction().commit();
 
         Set<SpecimenBatchOpInputPojo> csvInfos = new HashSet<SpecimenBatchOpInputPojo>();
-        csvInfos = specimenCsvHelper.createAllSpecimens(
-            factory.getDefaultStudy(), originInfos, patients);
+        csvInfos = specimenCsvHelper.createAllSpecimens(factory.getDefaultStudy(),
+                                                        originInfos,
+                                                        patients);
+
+        Assert.assertTrue("have CSV data", csvInfos.size() > 0);
 
         // only the aliquoted specimens will have a position
         List<SpecimenBatchOpInputPojo> aliquotedSpecimensCsvInfos =
@@ -680,8 +681,9 @@ public class TestSpecimenBatchOp extends TestAction {
         SpecimenBatchOpCsvWriter.write(CSV_NAME, csvInfos);
 
         try {
-            SpecimenBatchOpAction importAction = new SpecimenBatchOpAction(
-                factory.getDefaultSite(), csvInfos, new File(CSV_NAME));
+            SpecimenBatchOpAction importAction = new SpecimenBatchOpAction(factory.getDefaultSite(),
+                                                                           csvInfos,
+                                                                           new File(CSV_NAME));
             exec(importAction);
         } catch (BatchOpErrorsException e) {
             CsvUtil.showErrorsInLog(log, e);
@@ -807,7 +809,7 @@ public class TestSpecimenBatchOp extends TestAction {
         } catch (BatchOpErrorsException e) {
             CsvUtil.showErrorsInLog(log, e);
             new AssertBatchOpException()
-                .withMessage(SpecimenBatchOpAction.CSV_PALLET_POS_ERROR)
+                .withMessage(CSV_PALLET_POS_ERROR)
                 .assertIn(e);
         }
     }
@@ -859,7 +861,7 @@ public class TestSpecimenBatchOp extends TestAction {
         } catch (BatchOpErrorsException e) {
             CsvUtil.showErrorsInLog(log, e);
             new AssertBatchOpException()
-                .withMessage(SpecimenBatchOpAction.CSV_CONTAINER_POS_OCCUPIED_ERROR.format())
+                .withMessage(CSV_CONTAINER_POS_OCCUPIED_ERROR.format())
                 .assertIn(e);
         }
     }
@@ -911,13 +913,13 @@ public class TestSpecimenBatchOp extends TestAction {
         } catch (BatchOpErrorsException e) {
             CsvUtil.showErrorsInLog(log, e);
             new AssertBatchOpException()
-                .withMessage(SpecimenBatchOpAction.CSV_LABEL_POS_OCCUPIED_ERROR.format())
+                .withMessage(CSV_LABEL_POS_OCCUPIED_ERROR.format())
                 .assertIn(e);
         }
     }
 
     @Test
-    public void withExistingPevents() throws IOException, NoSuchAlgorithmException {
+    public void withExistingPevents() throws IOException, NoSuchAlgorithmException, ClassNotFoundException {
         Set<Patient> patients = new HashSet<Patient>();
         Set<Specimen> parentSpecimens = new HashSet<Specimen>();
         Map<String, ProcessingEvent> peventMap = new HashMap<String, ProcessingEvent>();
@@ -973,7 +975,7 @@ public class TestSpecimenBatchOp extends TestAction {
     }
 
     @Test
-    public void aliquotsWithNoParentSpc() throws IOException, NoSuchAlgorithmException {
+    public void aliquotsWithNoParentSpc() throws IOException, NoSuchAlgorithmException, ClassNotFoundException {
         Set<Patient> patients = new HashSet<Patient>();
 
         for (int i = 0; i < 3; i++) {
@@ -1008,9 +1010,9 @@ public class TestSpecimenBatchOp extends TestAction {
         checkCsvInfoAgainstDb(csvInfos);
     }
 
-    // This test should fail since a single aliquot cannot have to parent specimens
+    // This test should fail since a single aliquot cannot have two parent specimens
     @Test
-    public void aliquotWithTwoParentSpc() throws IOException, NoSuchAlgorithmException {
+    public void aliquotWithTwoParentSpc() throws IOException, NoSuchAlgorithmException, ClassNotFoundException {
         Set<Patient> patients = new HashSet<Patient>();
         Set<AliquotedSpecimen> aliquotedSpecimens = new HashSet<AliquotedSpecimen>();
 
@@ -1224,12 +1226,13 @@ public class TestSpecimenBatchOp extends TestAction {
     /**
      * Parent specimens should not be imported if the specimen type is not in the list of source
      * specimens for a study.
-     * 
+     *
      * @throws IOException
      * @throws NoSuchAlgorithmException
+     * @throws ClassNotFoundException
      */
     @Test
-    public void studySourceSpecimens() throws IOException, NoSuchAlgorithmException {
+    public void studySourceSpecimens() throws IOException, NoSuchAlgorithmException, ClassNotFoundException {
         Set<Patient> patients = new HashSet<Patient>();
         patients.add(factory.createPatient());
         factory.createSourceSpecimen();
@@ -1257,7 +1260,7 @@ public class TestSpecimenBatchOp extends TestAction {
         } catch (BatchOpErrorsException e) {
             CsvUtil.showErrorsInLog(log, e);
             new AssertBatchOpException()
-                .withMessage(SpecimenBatchOpAction.CSV_STUDY_SOURCE_SPC_TYPE_ERROR.format())
+                .withMessage(CSV_STUDY_SOURCE_SPC_TYPE_ERROR.format())
                 .assertIn(e);
         }
     }
@@ -1265,7 +1268,7 @@ public class TestSpecimenBatchOp extends TestAction {
     /**
      * Child specimens should not be imported if the specimen type is not in the list of aliquoted
      * specimens for a study.
-     * 
+     *
      * @throws IOException
      * @throws NoSuchAlgorithmException
      */
@@ -1285,7 +1288,7 @@ public class TestSpecimenBatchOp extends TestAction {
         Set<SpecimenBatchOpInputPojo> inputPojos = specimenCsvHelper.createAliquotedSpecimens(
             factory.getDefaultStudy(), parentSpecimens);
 
-        // change the parent's inventory id to something that does not exist
+        // change the specimen type to something that does not exist
         for (SpecimenBatchOpInputPojo inputPojo : inputPojos) {
             inputPojo.setSpecimenType(specimenType.getNameShort());
         }
@@ -1300,7 +1303,7 @@ public class TestSpecimenBatchOp extends TestAction {
         } catch (BatchOpErrorsException e) {
             CsvUtil.showErrorsInLog(log, e);
             new AssertBatchOpException()
-                .withMessage(SpecimenBatchOpAction.CSV_STUDY_ALIQUOTED_SPC_TYPE_ERROR.format())
+                .withMessage(CSV_STUDY_ALIQUOTED_SPC_TYPE_ERROR.format())
                 .assertIn(e);
         }
     }
@@ -1336,7 +1339,7 @@ public class TestSpecimenBatchOp extends TestAction {
         } catch (BatchOpErrorsException e) {
             CsvUtil.showErrorsInLog(log, e);
             new AssertBatchOpException()
-                .withMessage(SpecimenBatchOpAction.CSV_ORIGIN_CENTER_SHORT_NAME_ERROR.format())
+                .withMessage(CSV_ORIGIN_CENTER_SHORT_NAME_ERROR.format())
                 .assertIn(e);
         }
     }
@@ -1409,7 +1412,7 @@ public class TestSpecimenBatchOp extends TestAction {
         } catch (BatchOpErrorsException e) {
             CsvUtil.showErrorsInLog(log, e);
             new AssertBatchOpException()
-                .withMessage(SpecimenBatchOpAction.CSV_CURRENT_CENTER_SHORT_NAME_ERROR.format())
+                .withMessage(CSV_CURRENT_CENTER_SHORT_NAME_ERROR.format())
                 .assertIn(e);
         }
     }

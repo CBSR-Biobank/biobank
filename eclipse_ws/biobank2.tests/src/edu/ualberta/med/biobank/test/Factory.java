@@ -54,9 +54,9 @@ import edu.ualberta.med.biobank.model.type.LabelingLayout;
 /**
  * Tries to make setting up test data easier by requiring the absolute minimum amount of data and
  * remembering the last created object and using that as a default for other objects.
- * 
+ *
  * @author Jonathan Ferland
- * 
+ *
  */
 public class Factory {
     private static final Random R = new Random();
@@ -562,6 +562,10 @@ public class Factory {
         return clinic;
     }
 
+    /**
+     * These are used in Study configuration.
+     *
+     */
     public SourceSpecimen createSourceSpecimen() {
         SourceSpecimen sourceSpecimen = new SourceSpecimen();
         sourceSpecimen.setStudy(getDefaultStudy());
@@ -574,12 +578,16 @@ public class Factory {
         return sourceSpecimen;
     }
 
+    /**
+     * These are used in Study configuration.
+     *
+     */
     public AliquotedSpecimen createAliquotedSpecimen() {
         AliquotedSpecimen aliquotedSpecimen = new AliquotedSpecimen();
         aliquotedSpecimen.setStudy(getDefaultStudy());
         aliquotedSpecimen.setVolume(new BigDecimal("1.00"));
         aliquotedSpecimen.setQuantity(1);
-        aliquotedSpecimen.setSpecimenType(getDefaultSourceSpecimenType());
+        aliquotedSpecimen.setSpecimenType(getDefaultAliquotedSpecimenType());
 
         getDefaultStudy().getAliquotedSpecimens().add(aliquotedSpecimen);
         setDefaultAliquotedSpecimen(aliquotedSpecimen);

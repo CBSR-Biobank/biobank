@@ -369,7 +369,7 @@ public class CbsrTecanSpecimenPojoReader implements
 
     @Override
     public Action<IdResult> getAction() throws NoSuchAlgorithmException,
-        IOException {
+        IOException, ClassNotFoundException {
         return new SpecimenBatchOpAction(workingCenter, convertedPojos,
             new File(filename));
     }

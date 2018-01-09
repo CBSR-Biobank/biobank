@@ -22,8 +22,7 @@ Bundle-ClassPath: .,
  lib/DynamicJasper.jar,
  lib/itext.jar,
  lib/commons-collections.jar,
- lib/jdtcore.jar,
- lib/commons-lang3.jar
+ lib/jdtcore.jar
 Export-Package: ar.com.fdvs.dj.core,
  ar.com.fdvs.dj.core.layout,
  ar.com.fdvs.dj.core.registration,
@@ -163,6 +162,4 @@ Export-Package: ar.com.fdvs.dj.core,
  org.apache.commons.io.comparator,
  org.apache.commons.io.filefilter,
  org.apache.commons.io.input,
- org.apache.commons.io.output,
- org.apache.commons.lang3,
- org.apache.commons.lang3.tuple
+ org.apache.commons.io.output

@@ -29,9 +29,9 @@ import edu.ualberta.med.biobank.util.CompressedReference;
 
 /**
  * This action creates aliquot specimens, creates a processing event and updates source specimens.
- * 
+ *
  * @author Brian Allen
- * 
+ *
  */
 public class OhsTecanSpecimenBatchOpAction implements Action<IdResult> {
     private static final long serialVersionUID = 1L;
@@ -76,7 +76,7 @@ public class OhsTecanSpecimenBatchOpAction implements Action<IdResult> {
         String worksheet,
         Date timestamp,
         String technician,
-        boolean dnaQuant) throws NoSuchAlgorithmException, IOException {
+        boolean dnaQuant) throws NoSuchAlgorithmException, IOException, ClassNotFoundException {
         this.worksheet = worksheet;
         this.timestamp = timestamp;
         this.technician = technician;

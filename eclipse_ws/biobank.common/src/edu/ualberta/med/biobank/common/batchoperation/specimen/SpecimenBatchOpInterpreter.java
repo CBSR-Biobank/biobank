@@ -37,7 +37,7 @@ public class SpecimenBatchOpInterpreter {
     @SuppressWarnings("nls")
     public Integer processFile(BiobankApplicationService service, Center center,
         final String filename) throws IOException,
-        NoSuchAlgorithmException, ApplicationException {
+        NoSuchAlgorithmException, ApplicationException, ClassNotFoundException {
         ICsvBeanReader reader = new CsvBeanReader(
             new FileReader(filename), CsvPreference.EXCEL_PREFERENCE);
 

@@ -17,8 +17,10 @@ import edu.ualberta.med.biobank.model.Center;
 public class SpecimenPojoReaderFactory {
 
     @SuppressWarnings("nls")
-    public static IBatchOpPojoReader<SpecimenBatchOpInputPojo> createPojoReader(
-        Center workingCenter, String filename, String[] csvHeaders) {
+    public static IBatchOpPojoReader<SpecimenBatchOpInputPojo>
+    createPojoReader(Center workingCenter,
+                     String filename,
+                     String[] csvHeaders) {
         IBatchOpPojoReader<SpecimenBatchOpInputPojo> pojoReader = null;
 
         if (SpecimenBatchOpPojoReader.isHeaderValid(csvHeaders)) {

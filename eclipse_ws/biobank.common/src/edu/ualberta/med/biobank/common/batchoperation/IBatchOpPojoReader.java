@@ -18,6 +18,6 @@ public interface IBatchOpPojoReader<T extends IBatchOpInputPojo> {
     public ClientBatchOpInputErrorList getErrorList();
 
     public Action<IdResult> getAction() throws NoSuchAlgorithmException,
-        IOException;
+        IOException, ClassNotFoundException;
 
 }

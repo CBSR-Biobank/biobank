@@ -42,15 +42,15 @@ class SpecimenBatchOpPojoHelper {
     /**
      * Creates specimen BatchOp pojos with source specimens and aliquoted specimens.
      *
-     * @param csvname the file name to save the data to.
      * @param study the study the the patients belong to. Note that the study must have valid source
-     *            specimens and aliquoted specimens defined.
-     * @param originCenter the center where the specimens came from.
-     * @param currentCenter the center where the specimens are stored.
+     *        specimens and aliquoted specimens defined.
+     * @param originInfos the center information for where the specimens originated from and are
+     *        currently at.
      * @param patients the patients that these specimens will belong to.
      */
-    Set<SpecimenBatchOpInputPojo> createAllSpecimens(Study study,
-        Set<OriginInfo> originInfos, Set<Patient> patients) {
+    Set<SpecimenBatchOpInputPojo> createAllSpecimens(Study           study,
+                                                     Set<OriginInfo> originInfos,
+                                                     Set<Patient>    patients) {
         if (study.getSourceSpecimens().size() == 0) {
             throw new IllegalStateException(
                 "study does not have any source specimens");
@@ -71,7 +71,7 @@ class SpecimenBatchOpPojoHelper {
         }
 
         specimenInfos.addAll(aliquotedSpecimensCreate(parentSpecimenInfoMap,
-            study.getAliquotedSpecimens()));
+                                                      study.getAliquotedSpecimens()));
 
         return specimenInfos;
     }
@@ -108,7 +108,7 @@ class SpecimenBatchOpPojoHelper {
      * be present in the database.
      */
     Set<SpecimenBatchOpInputPojo> createAliquotedSpecimens(Study study,
-        Collection<Specimen> parentSpecimens) {
+                                                           Collection<Specimen> parentSpecimens) {
         if (study.getAliquotedSpecimens().size() == 0) {
             throw new IllegalStateException("study does not have any aliquoted specimens");
         }
@@ -127,15 +127,15 @@ class SpecimenBatchOpPojoHelper {
      *
      * specimenInfoMap is a map of: specimen inventory id => patient number
      */
-    private Set<SpecimenBatchOpInputPojo> aliquotedSpecimensCreate(
-        Map<String, String> parentSpecimenInfoMap,
-        Set<AliquotedSpecimen> aliquotedSpecimens) {
+    private Set<SpecimenBatchOpInputPojo> aliquotedSpecimensCreate(Map<String, String>    parentSpecimenInfoMap,
+                                                                   Set<AliquotedSpecimen> aliquotedSpecimens) {
         Set<SpecimenBatchOpInputPojo> specimenInfos = new HashSet<SpecimenBatchOpInputPojo>();
 
         for (Entry<String, String> parentSpecimenInfo : parentSpecimenInfoMap.entrySet()) {
             for (AliquotedSpecimen as : aliquotedSpecimens) {
-                SpecimenBatchOpInputPojo specimenInfo = aliquotedSpecimenCreate(
-                    parentSpecimenInfo.getKey(), as.getSpecimenType().getName());
+                SpecimenBatchOpInputPojo specimenInfo =
+                    aliquotedSpecimenCreate(parentSpecimenInfo.getKey(),
+                                            as.getSpecimenType().getName());
                 specimenInfos.add(specimenInfo);
             }
         }
@@ -143,17 +143,29 @@ class SpecimenBatchOpPojoHelper {
         return specimenInfos;
     }
 
-    public Set<SpecimenBatchOpInputPojo> aliquotedSpecimensCreate(
-        Set<Patient> patients, Set<AliquotedSpecimen> aliquotedSpecimens) {
-        Set<SpecimenBatchOpInputPojo> specimenInfos =
-            new HashSet<SpecimenBatchOpInputPojo>();
+    private SpecimenBatchOpInputPojo sourceSpecimenCreate(String specimenTypeName,
+                                                          String patientNumber,
+                                                          String waybill) {
+        SpecimenBatchOpInputPojo specimenInfo = aliquotedSpecimenCreate(null, specimenTypeName);
+        specimenInfo.setPatientNumber(patientNumber);
+        specimenInfo.setVisitNumber(1);
+        specimenInfo.setWaybill(waybill);
+        specimenInfo.setWorksheet(nameGenerator.next(ProcessingEvent.class));
+        specimenInfo.setSourceSpecimen(true);
+        specimenInfo.setLineNumber(-1);
+        return specimenInfo;
+    }
 
-        for (AliquotedSpecimen as : aliquotedSpecimens) {
-            for (Patient patient : patients) {
-                for (CollectionEvent ce : patient.getCollectionEvents()) {
+    public Set<SpecimenBatchOpInputPojo>
+    aliquotedSpecimensCreate(Set<Patient>           patients,
+                             Set<AliquotedSpecimen> aliquotedSpecimens) {
+        Set<SpecimenBatchOpInputPojo> specimenInfos = new HashSet<SpecimenBatchOpInputPojo>();
+
+        for (Patient patient : patients) {
+            for (CollectionEvent ce : patient.getCollectionEvents()) {
+                for (AliquotedSpecimen as : aliquotedSpecimens) {
                     SpecimenBatchOpInputPojo specimenInfo =
-                        aliquotedSpecimenCreate(null, as.getSpecimenType()
-                            .getName());
+                        aliquotedSpecimenCreate(null, as.getSpecimenType().getName());
                     specimenInfo.setPatientNumber(patient.getPnumber());
                     specimenInfo.setVisitNumber(ce.getVisitNumber());
 
@@ -165,19 +177,8 @@ class SpecimenBatchOpPojoHelper {
         return specimenInfos;
     }
 
-    private SpecimenBatchOpInputPojo sourceSpecimenCreate(
-        String specimenTypeName, String patientNumber, String waybill) {
-        SpecimenBatchOpInputPojo specimenInfo = aliquotedSpecimenCreate(null, specimenTypeName);
-        specimenInfo.setPatientNumber(patientNumber);
-        specimenInfo.setVisitNumber(1);
-        specimenInfo.setWaybill(waybill);
-        specimenInfo.setWorksheet(nameGenerator.next(ProcessingEvent.class));
-        specimenInfo.setSourceSpecimen(true);
-        return specimenInfo;
-    }
-
-    public SpecimenBatchOpInputPojo aliquotedSpecimenCreate(
-        String parentInventoryId, String specimenTypeName) {
+    public SpecimenBatchOpInputPojo aliquotedSpecimenCreate(String parentInventoryId,
+                                                            String specimenTypeName) {
         ++lineNumber;
 
         SpecimenBatchOpInputPojo specimenInfo = new SpecimenBatchOpInputPojo();
@@ -189,13 +190,13 @@ class SpecimenBatchOpPojoHelper {
         }
         specimenInfo.setSpecimenType(specimenTypeName);
         specimenInfo.setCreatedAt(Utils.getRandomDate());
+        specimenInfo.setLineNumber(-1);
         return specimenInfo;
     }
 
-    public void fillContainersWithSpecimenBatchOpPojos(
-        List<SpecimenBatchOpInputPojo> specimenCsvInfos,
-        Set<Container> containers,
-        boolean useProductBarcode) {
+    public void fillContainersWithSpecimenBatchOpPojos(List<SpecimenBatchOpInputPojo> specimenCsvInfos,
+                                                       Set<Container>                 containers,
+                                                       boolean                        useProductBarcode) {
 
         // fill as many containers as space will allow
         int count = 0;

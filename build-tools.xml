@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="biobank-tools" basedir=".">
+<project name="biobank-tools" basedir="."
+         xmlns:if="ant:if"
+         xmlns:unless="ant:unless">
   <property file="build.properties" />
 
   <property name="tools.build.dir" value="${eclipse.proj.dir.tools}/output" />
@@ -51,12 +53,13 @@
   <target name="test-config-create"
 	  depends="tools-compile"
 	  description="creates a testing configuration in the database. Uses db.properties to
-		       connect to the database.">
+connect to the database. Use '-Dgrandchild=true' to create granchild specimen types">
     <java classname="edu.ualberta.med.biobank.tools.testconfig.TestConfigCreate"
 	  fork="true">
       <sysproperty key="db.properties" value="db.properties"/>
       <!--arg value="-h"/-->
       <classpath refid="tools.run.classpath" />
+      <arg value="--grandchild" if:true="${grandchild}" />
     </java>
   </target>
 
