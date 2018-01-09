@@ -13,6 +13,15 @@ import edu.ualberta.med.biobank.model.BatchOperation;
 import edu.ualberta.med.biobank.model.BatchOperationSpecimen;
 import edu.ualberta.med.biobank.model.Specimen;
 
+/**
+ * Returns the specimens that were added by a specimen CSV import.
+ *
+ * <p>
+ * Works for both {@link SpecimenBatchOpAction} and GrandchildSpecimenBatchOpAction.
+ *
+ * @author nelson
+ *
+ */
 public class SpecimenBatchOpGetAction
     implements Action<BatchOpGetResult<Specimen>> {
     private static final long serialVersionUID = 1L;

@@ -610,7 +610,7 @@ public class OhsTecanSpecimenPojoReader implements
 
     @Override
     public Action<IdResult> getAction() throws NoSuchAlgorithmException,
-        IOException {
+        IOException, ClassNotFoundException {
         return new OhsTecanSpecimenBatchOpAction(workingCenter, aliquotSpecimens,
             new File(filename), sourceSpecimens,
             new File(filename).getName(),

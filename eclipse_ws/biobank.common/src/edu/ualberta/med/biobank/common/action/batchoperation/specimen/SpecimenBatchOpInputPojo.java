@@ -3,21 +3,19 @@ package edu.ualberta.med.biobank.common.action.batchoperation.specimen;
 import java.math.BigDecimal;
 import java.util.Date;
 
-import edu.ualberta.med.biobank.common.action.batchoperation.IBatchOpInputPojo;
-
 /**
  * POJO used by the Specimen Batch Operation feature to import specimen information. The information
  * can come from the following sources:
- * 
+ *
  * <ol>
  * <li>A legacy import of specimen data</li>
  * <li>A TECAN output file. This can be a TECAN output file from OHS or CBSR.</li>
  * </ol>
- * 
+ *
  * @author Nelson Loyola
- * 
+ *
  */
-public class SpecimenBatchOpInputPojo implements IBatchOpInputPojo {
+public class SpecimenBatchOpInputPojo implements IBatchOpSpecimenInputPojo {
     private static final long serialVersionUID = 1L;
 
     private int lineNumber;
@@ -64,6 +62,7 @@ public class SpecimenBatchOpInputPojo implements IBatchOpInputPojo {
         this.inventoryId = inventoryId;
     }
 
+    @Override
     public String getParentInventoryId() {
         return parentInventoryId;
     }
@@ -96,6 +95,7 @@ public class SpecimenBatchOpInputPojo implements IBatchOpInputPojo {
         this.createdAt = createAt;
     }
 
+    @Override
     public String getPatientNumber() {
         return patientNumber;
     }
@@ -263,7 +263,7 @@ public class SpecimenBatchOpInputPojo implements IBatchOpInputPojo {
     }
 
     public boolean hasProductBarcodeAndLabel() {
-        return (parentInventoryId != null) && (palletLabel != null);
+        return (palletProductBarcode != null) && (palletLabel != null);
     }
 
 }

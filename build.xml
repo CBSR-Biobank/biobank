@@ -65,6 +65,7 @@
     <include name="spiffy-all.jar" />
     <include name="supercsv.jar" />
     <include name="commons-lang.jar" />
+    <include name="commons-lang3.jar" />
   </fileset>
 
   <fileset id="biobank.common.client.build.classpath" dir="${eclipse.proj.dir.common}/lib/client">
@@ -218,7 +219,7 @@
   </target>
 
   <target name="resolve" depends="init-ivy,check-dependencies-uptodate" unless="dependencies.uptodate"
-	  description="--> retrieve dependencies with ivy">
+	  description="retrieve dependencies with ivy">
 
     <ivy:retrieve pattern="lib/build/[artifact].[ext]" conf="biobank.build"  type="jar" />
     <ivy:retrieve pattern="lib/[conf]/[artifact].[ext]"
@@ -243,19 +244,19 @@
     <touch file="${lib.dir}/.dependencies.resolved" />
   </target>
 
-  <target name="report" depends="resolve" description="--> generates a report of dependencies">
+  <target name="report" depends="resolve" description="generates a report of dependencies">
     <ivy:report todir="${output.dir}"
 		conf="biobank.common.client,biobank.common.server,biobank.gui.common,biobank.mvp,biobank2,biobank2.tools,biobank2.tests" />
   </target>
 
   <target name="clean-ivy" depends="init-ivy"
-	  description="--> cleans ivy temporary files">
+	  description="cleans ivy temporary files">
     <delete>
       <fileset dir="${lib.dir}" includes=".dependencies.resolved"/>
     </delete>
   </target>
 
-  <target name="clean-cache" depends="init-ivy" description="--> cleans the ivy cache">
+  <target name="clean-cache" depends="init-ivy" description="cleans the ivy cache">
     <ivy:cleancache />
   </target>
 
@@ -271,11 +272,11 @@
 
   <target name="versions-update"
           depends="server-manifest,biobank-version-modify"
-	  description="--> update version strings on server and client">
+	  description="update version strings on server and client">
   </target>
 
   <target name="deploy-eclipse" depends="resolve,client-branding,create-messages-jar,biobank-version-modify"
-	  description="--> retrieve dependencies for eclipse projects">
+	  description="retrieve dependencies for eclipse projects">
     <copy file="${lib.dir}/messages.jar" todir="${eclipse.proj.dir}/lib"/>
     <copy file="${lib.dir}/messages.jar" todir="${eclipse.proj.dir.common}/lib/client"/>
 

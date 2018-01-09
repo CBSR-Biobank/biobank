@@ -39,11 +39,11 @@ public class GenericAppArgs {
         options = new Options();
         parser = new GnuParser();
 
-        options.addOption(OPT_HELP, "help", false, "Displays this help text.");
-        options.addOption(OPT_HOST, "hostname", true, "The host name for the Biobank server.");
-        options.addOption(OPT_USER, "user", true, "The user name on Biobank server.");
+        options.addOption(OPT_HELP,    "help", false, "Displays this help text.");
+        options.addOption(OPT_HOST,    "hostname", true, "The host name for the Biobank server.");
+        options.addOption(OPT_USER,    "user", true, "The user name on Biobank server.");
         options.addOption(OPT_VERBOSE, "verbose", false, "Use to enable debug information.");
-        options.addOption(OPT_PWD, "password", true, "The user's password.");
+        options.addOption(OPT_PWD,     "password", true, "The user's password.");
 
         options.addOption(OptionBuilder.withArgName(OPT_PORT)
             .withLongOpt("port")

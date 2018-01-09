@@ -10,9 +10,7 @@ import java.util.Set;
 
 import org.supercsv.cellprocessor.Optional;
 import org.supercsv.cellprocessor.ParseBigDecimal;
-import org.supercsv.cellprocessor.ParseBool;
 import org.supercsv.cellprocessor.ParseDate;
-import org.supercsv.cellprocessor.ParseInt;
 import org.supercsv.cellprocessor.constraint.StrNotNullOrEmpty;
 import org.supercsv.cellprocessor.constraint.Unique;
 import org.supercsv.cellprocessor.ift.CellProcessor;
@@ -24,8 +22,9 @@ import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.IdResult;
+import edu.ualberta.med.biobank.common.action.batchoperation.specimen.GrandchildSpecimenBatchOpAction;
+import edu.ualberta.med.biobank.common.action.batchoperation.specimen.GrandchildSpecimenBatchOpInputPojo;
 import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpAction;
-import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpInputPojo;
 import edu.ualberta.med.biobank.common.batchoperation.ClientBatchOpErrorsException;
 import edu.ualberta.med.biobank.common.batchoperation.ClientBatchOpInputErrorList;
 import edu.ualberta.med.biobank.common.batchoperation.IBatchOpPojoReader;
@@ -39,10 +38,10 @@ import edu.ualberta.med.biobank.model.Center;
  *
  */
 @SuppressWarnings("nls")
-public class SpecimenBatchOpPojoReader implements
-    IBatchOpPojoReader<SpecimenBatchOpInputPojo> {
+public class GrandchildSpecimenBatchOpPojoReader implements
+                                                IBatchOpPojoReader<GrandchildSpecimenBatchOpInputPojo> {
 
-    private static final I18n i18n = I18nFactory.getI18n(SpecimenBatchOpPojoReader.class);
+    private static final I18n i18n = I18nFactory.getI18n(GrandchildSpecimenBatchOpPojoReader.class);
 
     private static final String CSV_FIRST_HEADER = "Inventory ID";
 
@@ -53,10 +52,6 @@ public class SpecimenBatchOpPojoReader implements
         "specimenType",
         "createdAt",
         "patientNumber",
-        "visitNumber",
-        "waybill",
-        "sourceSpecimen",
-        "worksheet",
         "originCenter",
         "currentCenter",
         "palletProductBarcode",
@@ -70,21 +65,19 @@ public class SpecimenBatchOpPojoReader implements
 
     private final String filename;
 
-    private final ClientBatchOpInputErrorList errorList =
-        new ClientBatchOpInputErrorList();
+    private final ClientBatchOpInputErrorList errorList = new ClientBatchOpInputErrorList();
 
-    private final Set<SpecimenBatchOpInputPojo> pojos =
-        new LinkedHashSet<SpecimenBatchOpInputPojo>(0);
+    private final Set<GrandchildSpecimenBatchOpInputPojo> pojos =
+        new LinkedHashSet<GrandchildSpecimenBatchOpInputPojo>(0);
 
-    public SpecimenBatchOpPojoReader(Center workingCenter, String filename) {
+    public GrandchildSpecimenBatchOpPojoReader(Center workingCenter, String filename) {
         this.workingCenter = workingCenter;
         this.filename = filename;
     }
 
     // cell processors have to be recreated every time the file is read
     public CellProcessor[] getCellProcessors() {
-        Map<String, CellProcessor> aMap =
-            new LinkedHashMap<String, CellProcessor>();
+        Map<String, CellProcessor> aMap = new LinkedHashMap<String, CellProcessor>();
 
         aMap.put("inventoryId", new Unique());
         aMap.put("parentInventoryId", new Optional());
@@ -92,10 +85,6 @@ public class SpecimenBatchOpPojoReader implements
         aMap.put("specimenType", new StrNotNullOrEmpty());
         aMap.put("createdAt", new ParseDate("yyyy-MM-dd HH:mm"));
         aMap.put("patientNumber", new Optional());
-        aMap.put("visitNumber", new Optional(new ParseInt()));
-        aMap.put("waybill", new Optional());
-        aMap.put("sourceSpecimen", new ParseBool());
-        aMap.put("worksheet", new Optional());
         aMap.put("originCenter", new Optional());
         aMap.put("currentCenter", new Optional());
         aMap.put("palletProductBarcode", new Optional());
@@ -118,23 +107,24 @@ public class SpecimenBatchOpPojoReader implements
     }
 
     @Override
-    public Set<SpecimenBatchOpInputPojo> readPojos(ICsvBeanReader reader)
+    public Set<GrandchildSpecimenBatchOpInputPojo> readPojos(ICsvBeanReader reader)
         throws ClientBatchOpErrorsException {
 
-        SpecimenBatchOpInputPojo csvPojo;
+        GrandchildSpecimenBatchOpInputPojo csvPojo;
         CellProcessor[] cellProcessors = getCellProcessors();
 
         try {
-            while ((csvPojo =
-                reader.read(SpecimenBatchOpInputPojo.class, NAME_MAPPINGS, cellProcessors)) != null) {
+            while ((csvPojo = reader.read(GrandchildSpecimenBatchOpInputPojo.class,
+                                          NAME_MAPPINGS,
+                                          cellProcessors)) != null) {
                 csvPojo.setLineNumber(reader.getLineNumber());
                 pojos.add(csvPojo);
             }
             if (pojos.size() > SpecimenBatchOpAction.SIZE_LIMIT) {
-                throw new ClientBatchOpErrorsException(
-                    i18n.tr("The file has {0} data rows, the maximum allowed is {1}",
-                        pojos.size(),
-                        SpecimenBatchOpAction.SIZE_LIMIT));
+                String message = i18n.tr("The file has {0} data rows, the maximum allowed is {1}",
+                                         pojos.size(),
+                                         SpecimenBatchOpAction.SIZE_LIMIT);
+                throw new ClientBatchOpErrorsException(message);
             }
             return pojos;
         } catch (SuperCSVReflectionException e) {
@@ -152,7 +142,9 @@ public class SpecimenBatchOpPojoReader implements
     }
 
     @Override
-    public Action<IdResult> getAction() throws NoSuchAlgorithmException, IOException, ClassNotFoundException {
-        return new SpecimenBatchOpAction(workingCenter, pojos, new File(filename));
+    public Action<IdResult> getAction() throws NoSuchAlgorithmException,
+                                       IOException,
+                                       ClassNotFoundException {
+        return new GrandchildSpecimenBatchOpAction(workingCenter, pojos, new File(filename));
     }
 }

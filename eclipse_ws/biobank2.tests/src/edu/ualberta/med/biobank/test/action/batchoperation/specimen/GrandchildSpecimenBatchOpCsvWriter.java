@@ -11,19 +11,13 @@ import org.supercsv.io.CsvMapWriter;
 import org.supercsv.io.ICsvMapWriter;
 import org.supercsv.prefs.CsvPreference;
 
-import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpInputPojo;
+import edu.ualberta.med.biobank.common.action.batchoperation.specimen.GrandchildSpecimenBatchOpInputPojo;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 
-/**
- * Used for writing SpecimenBatchOpInputPojo to CSV files.
- *
- * @author Nelson Loyola
- *
- */
-class SpecimenBatchOpCsvWriter {
+public class GrandchildSpecimenBatchOpCsvWriter {
 
     /**
-     * Generates a Specimen CSV file with random patient numbers.
+     * Generates a Grandchild Specimens CSV file with random patient numbers.
      *
      * @param filename The name of the CSV file to be saved.
      * @param pojos The information to write to the CSV file.
@@ -31,8 +25,9 @@ class SpecimenBatchOpCsvWriter {
      * @throws IOException If the file could not be saved.
      */
     @SuppressWarnings("nls")
-    static void write(String filename, Set<SpecimenBatchOpInputPojo> specimenInfos)
-        throws IOException {
+    static void write(String filename,
+                      Set<GrandchildSpecimenBatchOpInputPojo> pojos)
+                          throws IOException {
         final String[] header = new String[] {
             "inventoryId",
             "parentInventoryID",
@@ -40,10 +35,6 @@ class SpecimenBatchOpCsvWriter {
             "specimenType",
             "createdAt",
             "patientNumber",
-            "visitNumber",
-            "waybill",
-            "sourceSpecimen",
-            "worksheet",
             "originCenter",
             "currentCenter",
             "palletProductBarcode",
@@ -53,14 +44,10 @@ class SpecimenBatchOpCsvWriter {
             "comment"
         };
 
-        ICsvMapWriter writer = new CsvMapWriter(new FileWriter(filename),
-            CsvPreference.EXCEL_PREFERENCE);
+        ICsvMapWriter writer =
+            new CsvMapWriter(new FileWriter(filename), CsvPreference.EXCEL_PREFERENCE);
 
         final CellProcessor[] processing = new CellProcessor[] {
-            new ConvertNullTo(""),
-            new ConvertNullTo(""),
-            new ConvertNullTo(""),
-            new ConvertNullTo(""),
             new ConvertNullTo(""),
             new ConvertNullTo(""),
             new ConvertNullTo(""),
@@ -79,25 +66,21 @@ class SpecimenBatchOpCsvWriter {
         try {
             writer.writeHeader(header);
 
-            for (SpecimenBatchOpInputPojo info : specimenInfos) {
+            for (GrandchildSpecimenBatchOpInputPojo pojo : pojos) {
                 final HashMap<String, ? super Object> data = new HashMap<String, Object>();
-                data.put(header[0], info.getInventoryId());
-                data.put(header[1], info.getParentInventoryId());
-                data.put(header[2], info.getVolume());
-                data.put(header[3], info.getSpecimenType());
-                data.put(header[4], DateFormatter.formatAsDateTime(info.getCreatedAt()));
-                data.put(header[5], info.getPatientNumber());
-                data.put(header[6], info.getVisitNumber());
-                data.put(header[7], info.getWaybill());
-                data.put(header[8], info.getSourceSpecimen());
-                data.put(header[9], info.getWorksheet());
-                data.put(header[10], info.getOriginCenter());
-                data.put(header[11], info.getCurrentCenter());
-                data.put(header[12], info.getPalletProductBarcode());
-                data.put(header[13], info.getRootContainerType());
-                data.put(header[14], info.getPalletLabel());
-                data.put(header[15], info.getPalletPosition());
-                data.put(header[16], info.getComment());
+                data.put(header[0], pojo.getInventoryId());
+                data.put(header[1], pojo.getParentInventoryId());
+                data.put(header[2], pojo.getVolume());
+                data.put(header[3], pojo.getSpecimenType());
+                data.put(header[4], DateFormatter.formatAsDateTime(pojo.getCreatedAt()));
+                data.put(header[5], pojo.getPatientNumber());
+                data.put(header[6], pojo.getOriginCenter());
+                data.put(header[7], pojo.getCurrentCenter());
+                data.put(header[8], pojo.getPalletProductBarcode());
+                data.put(header[9], pojo.getRootContainerType());
+                data.put(header[10], pojo.getPalletLabel());
+                data.put(header[11], pojo.getPalletPosition());
+                data.put(header[12], pojo.getComment());
                 writer.write(data, header, processing);
             }
         } finally {

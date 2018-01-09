@@ -162,6 +162,7 @@
     <dependency org="cacore" name="csmapi" rev="4.1" conf="biobank.common.server->default" />
     <dependency org="cacore" name="sdk-writable-core" rev="4.1.1" conf="biobank.common.server->default" />
     <dependency org="com.googlecode.flyway" name="flyway-core" rev="2.0.2" conf="biobank.common.server->default,sources" />
+    <dependency org="org.apache.commons" name="commons-lang3" rev="3.0" conf="biobank.common.server->default,sources" />
 
     <!-- for biobank.gui.common -->
     <dependency org="ar.com.fdvs" name="DynamicJasper" rev="3.0.13" conf="biobank.gui.common->default,sources" >
@@ -183,7 +184,6 @@
     </dependency>
     <dependency org="commons-io" name="commons-io" rev="1.4" conf="biobank.gui.common->default,sources" />
     <dependency org="commons-collections" name="commons-collections" rev="3.2.1" conf="biobank.gui.common->default,sources" />
-    <dependency org="org.apache.commons" name="commons-lang3" rev="3.0" conf="biobank.gui.common->default,sources" />
 
 
     <!-- for biobank.mvp -->
@@ -213,4 +213,3 @@
 
   </dependencies>
 </ivy-module>
-

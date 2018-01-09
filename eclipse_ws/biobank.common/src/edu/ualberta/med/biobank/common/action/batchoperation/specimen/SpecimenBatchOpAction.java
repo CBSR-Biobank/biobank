@@ -12,135 +12,40 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import edu.ualberta.med.biobank.CommonBundle;
-import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.batchoperation.BatchOpActionUtil;
 import edu.ualberta.med.biobank.common.action.batchoperation.BatchOpInputErrorSet;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.exception.BatchOpErrorsException;
-import edu.ualberta.med.biobank.i18n.Bundle;
-import edu.ualberta.med.biobank.i18n.LString;
-import edu.ualberta.med.biobank.i18n.Tr;
 import edu.ualberta.med.biobank.model.BatchOperation;
 import edu.ualberta.med.biobank.model.BatchOperationSpecimen;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.FileData;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.Patient;
-import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
-import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.util.CompressedReference;
 
 /**
  * This action takes a list of Specimen Batch Operation beans as input, verifies that the data is
  * valid, and if valid saves the data to the database.
- * 
+ *
  * @author Nelson Loyola
- * 
+ *
  */
 @SuppressWarnings("nls")
-public class SpecimenBatchOpAction implements Action<IdResult> {
+public class SpecimenBatchOpAction extends CommonSpecimenBatchOpAction<SpecimenBatchOpInputPojo> {
     private static final long serialVersionUID = 1L;
-
-    private static final Bundle bundle = new CommonBundle();
 
     private static Logger log = LoggerFactory.getLogger(SpecimenBatchOpAction.class);
 
     public static final int SIZE_LIMIT = 1000;
-
-    private static final LString SPC_ALREADY_EXISTS_ERROR =
-        bundle.tr("specimen already exists").format();
-
-    public static final Tr CSV_CEVENT_ERROR =
-        bundle.tr("collection event for patient {0} with visit number \"{1}\" does not exist");
-
-    private static final LString CSV_PARENT_SPC_ERROR =
-        bundle.tr("specimen declared a source specimen but parent inventory ID present").format();
-
-    public static final Tr CSV_PARENT_SPC_INV_ID_ERROR =
-        bundle.tr("parent inventory id does not exist: {0}");
-
-    public static final LString CSV_ALIQ_SPC_PATIENT_CEVENT_MISSING_ERROR =
-        bundle.tr("when parent inventory id is not specified, "
-            + "patient number, and visit number are required").format();
-
-    public static final LString CSV_PALLET_POS_ERROR =
-        bundle.tr("pallet position defined but not product barcode or label").format();
-
-    private static final LString CSV_PROD_BARCODE_NO_POS_ERROR =
-        bundle.tr("pallet product barcode defined but not position").format();
-
-    private static final LString CSV_PALLET_LABEL_NO_CTYPE_ERROR =
-        bundle.tr("pallet label defined but not container type").format();
-
-    private static final Tr CSV_WAYBILL_ERROR =
-        bundle.tr("waybill \"{0}\" does not exist");
-
-    public static final Tr CSV_SPECIMEN_TYPE_ERROR =
-        bundle.tr("specimen type with name \"{0}\" does not exist");
-
-    private static final Tr CSV_CONTAINER_LABEL_ERROR =
-        bundle.tr("container with label \"{0}\" does not exist");
-
-    private static final Tr CSV_CONTAINER_BARCODE_ERROR =
-        bundle.tr("container with product barcode \"{0}\" does not exist");
-
-    public static final Tr CSV_SPECIMEN_LABEL_ERROR =
-        bundle.tr("specimen position \"{0}\" in container with label \"{1}\" is invalid");
-
-    public static final Tr CSV_SPECIMEN_BARCODE_ERROR =
-        bundle.tr("specimen position \"{0}\" in container with product barcode \"{1}\" is invalid");
-
-    public static final Tr CSV_PATIENT_NUMBER_INVALID_ERROR =
-        bundle.tr("patient number is invalid");
-
-    private static final Tr CSV_PATIENT_MATCH_ERROR =
-        bundle.tr("patient number \"{0}\" does not match "
-            + "the patient on the source specimen \"{1}\"");
-
-    private static final Tr CSV_CEVENT_MATCH_ERROR =
-        bundle.tr("collection event with visit number \"{0}\" "
-            + "does match the source specimen's collection event");
-
-    public static final Tr CSV_STUDY_SOURCE_SPC_TYPE_ERROR =
-        bundle.tr("specimen type \"{0}\" is invalid for parent specimens in study \"{1}\"");
-
-    public static final Tr CSV_STUDY_ALIQUOTED_SPC_TYPE_ERROR =
-        bundle.tr("specimen type \"{0}\" is invalid for child specimens in study \"{1}\"");
-
-    public static final Tr CSV_ORIGIN_CENTER_SHORT_NAME_ERROR =
-        bundle.tr("invalid origin center short name: {0}");
-
-    public static final Tr CSV_CURRENT_CENTER_SHORT_NAME_ERROR =
-        bundle.tr("invalid current center short name: {0}");
-
-    private static final Tr CSV_CONTAINER_SPC_TYPE_ERROR =
-        bundle.tr("specimen type \"{0}\" cannot be stored in this container");
-
-    public static final Tr CSV_CONTAINER_POS_OCCUPIED_ERROR =
-        bundle.tr("specimen position \"{0}\" in container with label \"{1}\" is occupied");
-
-    public static final Tr CSV_LABEL_POS_OCCUPIED_ERROR =
-        bundle.tr("specimen position \"{0}\" in container with label \"{1}\" is occupied");
-
-    private final Integer workingCenterId;
-
-    private Center workingCenterOnServerSide;
-    private final CompressedReference<ArrayList<SpecimenBatchOpInputPojo>> compressedList;
-
-    private final FileData fileData;
-
-    private ArrayList<SpecimenBatchOpInputPojo> pojos = null;
 
     private final Map<String, Specimen> parentSpecimens = new HashMap<String, Specimen>(0);
 
@@ -149,33 +54,19 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
 
     private final BatchOpInputErrorSet errorSet = new BatchOpInputErrorSet();
 
-    public SpecimenBatchOpAction(
-        Center workingCenter,
-        Set<SpecimenBatchOpInputPojo> batchOpSpecimens,
-        File inputFile)
-        throws NoSuchAlgorithmException, IOException {
-
-        if (batchOpSpecimens.isEmpty()) {
-            throw new IllegalArgumentException("pojo list is empty");
-        }
-
-        if (batchOpSpecimens.size() > SIZE_LIMIT) {
-            throw new IllegalArgumentException(
-                "Number of rows in file greater than maximum: " + batchOpSpecimens.size());
-        }
-
-        this.workingCenterId = workingCenter.getId();
-        this.fileData = FileData.fromFile(inputFile);
-
-        compressedList = new CompressedReference<ArrayList<SpecimenBatchOpInputPojo>>(
-            new ArrayList<SpecimenBatchOpInputPojo>(batchOpSpecimens));
-        log.debug("constructor exit");
+    public SpecimenBatchOpAction(Center                        workingCenter,
+                                 Set<SpecimenBatchOpInputPojo> batchOpSpecimens,
+                                 File                          inputFile)
+        throws NoSuchAlgorithmException, IOException, ClassNotFoundException {
+        super(workingCenter,
+              new CompressedReference<ArrayList<SpecimenBatchOpInputPojo>>(
+                new ArrayList<SpecimenBatchOpInputPojo>(batchOpSpecimens)),
+              inputFile);
     }
 
-    private void decompressData() {
-        if (compressedList == null) {
-            throw new IllegalStateException("compressed list is null");
-        }
+    @Override
+    protected void decompressData() {
+        super.decompressData();
 
         try {
             pojos = compressedList.get();
@@ -185,78 +76,6 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
             throw new IllegalStateException(e);
         }
 
-    }
-
-    @Override
-    public boolean isAllowed(ActionContext context) throws ActionException {
-        log.debug("isAllowed: start");
-        if (compressedList == null) {
-            throw new IllegalStateException("compressed list is null");
-        }
-
-        decompressData();
-
-        User user = context.getUser();
-        workingCenterOnServerSide = context.load(Center.class, workingCenterId);
-
-        return PermissionEnum.BATCH_OPERATIONS.isAllowed(user,
-            workingCenterOnServerSide)
-            && hasPermissionOnStudies(user, getStudies(context));
-
-    }
-
-    private boolean hasPermissionOnStudies(User user, Set<Study> studies) {
-        for (Study study : studies) {
-            if (!PermissionEnum.BATCH_OPERATIONS.isAllowed(user, study)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /*
-     * Returns a list of studies that existing specimens and patients in the pojo data belong to.
-     */
-    private Set<Study> getStudies(ActionContext context) {
-        Set<Specimen> existingSpecimens = new HashSet<Specimen>();
-        Set<Patient> existingPatients = new HashSet<Patient>();
-
-        for (SpecimenBatchOpInputPojo pojo : pojos) {
-            String parentInvId = pojo.getParentInventoryId();
-            if ((parentInvId == null) || parentInvId.isEmpty()) continue;
-            Specimen specimen = BatchOpActionUtil.getSpecimen(context.getSession(), parentInvId);
-            if (specimen != null) {
-                existingSpecimens.add(specimen);
-            }
-        }
-
-        for (SpecimenBatchOpInputPojo pojo : pojos) {
-            String pnumber = pojo.getPatientNumber();
-            if ((pnumber == null) || pnumber.isEmpty()) continue;
-            Patient patient = BatchOpActionUtil.getPatient(context.getSession(), pnumber);
-            if (patient != null) {
-                existingPatients.add(patient);
-            }
-        }
-
-        // get all collection events
-        for (Specimen specimen : existingSpecimens) {
-            specimen.getCollectionEvent();
-        }
-
-        // get all patients from specimens
-        for (Specimen specimen : existingSpecimens) {
-            specimen.getCollectionEvent().getPatient();
-        }
-
-        Set<Study> studies = new HashSet<Study>();
-        for (Specimen specimen : existingSpecimens) {
-            studies.add(specimen.getCollectionEvent().getPatient().getStudy());
-        }
-        for (Patient patient : existingPatients) {
-            studies.add(patient.getStudy());
-        }
-        return studies;
     }
 
     @Override
@@ -337,7 +156,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
                 if ((pojoData.getParentSpecimen() != null)
                     && (pojoData.getParentSpecimen().getCollectionEvent() == null)) {
                     errorSet.addError(pojo.getLineNumber(),
-                        CSV_CEVENT_ERROR.format(pojo.getPatientNumber(), pojo.getVisitNumber()));
+                        SpecimenBatchOpActionErrors.CSV_CEVENT_ERROR.format(pojo.getPatientNumber(), pojo.getVisitNumber()));
                 }
             }
         }
@@ -379,7 +198,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
                     parentSpecimens.get(info.getParentInventoryId());
                 if (parentSpc == null) {
                     errorSet.addError(info.getPojo().getLineNumber(),
-                        CSV_PARENT_SPC_INV_ID_ERROR.format(info.getPojo().getParentInventoryId()));
+                        SpecimenBatchOpActionErrors.CSV_PARENT_SPC_INV_ID_ERROR.format(info.getPojo().getParentInventoryId()));
                 } else {
                     info.setParentSpecimen(parentSpc);
                 }
@@ -402,7 +221,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
     private void validatePojo(SpecimenBatchOpInputPojo pojo) {
         if (pojo.getSourceSpecimen()) {
             if ((pojo.getParentInventoryId() != null)) {
-                errorSet.addError(pojo.getLineNumber(), CSV_PARENT_SPC_ERROR);
+                errorSet.addError(pojo.getLineNumber(), SpecimenBatchOpActionErrors.CSV_PARENT_SPC_ERROR);
             }
 
             checkForPatientAndCollectionEvent(pojo);
@@ -425,32 +244,21 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
         boolean hasRootContainerType = (rootContainerType != null) && !rootContainerType.isEmpty();
 
         if (hasPosition && !hasProductBarcode && !hasLabel) {
-            errorSet.addError(pojo.getLineNumber(), CSV_PALLET_POS_ERROR);
+            errorSet.addError(pojo.getLineNumber(), SpecimenBatchOpActionErrors.CSV_PALLET_POS_ERROR);
         }
 
         if (hasProductBarcode && !hasLabel && !hasPosition) {
-            errorSet.addError(pojo.getLineNumber(), CSV_PROD_BARCODE_NO_POS_ERROR);
+            errorSet.addError(pojo.getLineNumber(), SpecimenBatchOpActionErrors.CSV_PROD_BARCODE_NO_POS_ERROR);
         }
 
         if (hasLabel && !hasProductBarcode && !hasPosition) {
-            errorSet.addError(pojo.getLineNumber(), CSV_PALLET_POS_ERROR);
+            errorSet.addError(pojo.getLineNumber(), SpecimenBatchOpActionErrors.CSV_PALLET_POS_ERROR);
         }
 
         if (hasLabel && hasPosition && !hasRootContainerType) {
-            errorSet.addError(pojo.getLineNumber(), CSV_PALLET_LABEL_NO_CTYPE_ERROR);
+            errorSet.addError(pojo.getLineNumber(), SpecimenBatchOpActionErrors.CSV_PALLET_LABEL_NO_CTYPE_ERROR);
         }
 
-    }
-
-    private void checkForPatientAndCollectionEvent(
-        SpecimenBatchOpInputPojo csvPojo) {
-
-        if (!csvPojo.hasPatientAndCollectionEvent()) {
-            // no parent inventory id and does not have patient number and visit
-            // number
-            errorSet.addError(csvPojo.getLineNumber(),
-                CSV_ALIQ_SPC_PATIENT_CEVENT_MISSING_ERROR);
-        }
     }
 
     // get referenced items that exist in the database
@@ -460,7 +268,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
         Specimen spc = BatchOpActionUtil.getSpecimen(context.getSession(), inputPojo.getInventoryId());
         if (spc != null) {
             errorSet.addError(inputPojo.getLineNumber(),
-                SPC_ALREADY_EXISTS_ERROR);
+                SpecimenBatchOpActionErrors.SPC_ALREADY_EXISTS_ERROR);
             return null;
         }
 
@@ -485,7 +293,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
             inputPojo.getSpecimenType());
         if (spcType == null) {
             errorSet.addError(inputPojo.getLineNumber(),
-                CSV_SPECIMEN_TYPE_ERROR.format(inputPojo.getSpecimenType()));
+                SpecimenBatchOpActionErrors.CSV_SPECIMEN_TYPE_ERROR.format(inputPojo.getSpecimenType()));
         } else {
             pojoData.setSpecimenType(spcType);
         }
@@ -494,7 +302,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
             patient = BatchOpActionUtil.getPatient(context.getSession(), inputPojo.getPatientNumber());
             if (patient == null) {
                 errorSet.addError(inputPojo.getLineNumber(),
-                    CSV_PATIENT_NUMBER_INVALID_ERROR.format());
+                    SpecimenBatchOpActionErrors.CSV_PATIENT_NUMBER_INVALID_ERROR.format());
                 return null;
             }
             pojoData.setPatient(patient);
@@ -507,7 +315,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
 
             if ((spcType != null) && !siteSourceSpecimenTypes.contains(spcType)) {
                 errorSet.addError(inputPojo.getLineNumber(),
-                    CSV_STUDY_SOURCE_SPC_TYPE_ERROR.format(
+                    SpecimenBatchOpActionErrors.CSV_STUDY_SOURCE_SPC_TYPE_ERROR.format(
                         spcType.getName(), patient.getStudy().getNameShort()));
                 return null;
             }
@@ -529,7 +337,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
 
                 if ((spcType != null) && !siteAliquotedSpecimenTypes.contains(spcType)) {
                     errorSet.addError(inputPojo.getLineNumber(),
-                        CSV_STUDY_ALIQUOTED_SPC_TYPE_ERROR.format(
+                        SpecimenBatchOpActionErrors.CSV_STUDY_ALIQUOTED_SPC_TYPE_ERROR.format(
                             spcType.getName(), patient.getStudy().getNameShort()));
                     return null;
                 }
@@ -545,7 +353,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
                 if (pojoData.getParentInventoryId() == null) {
                     errorSet.addError(
                         inputPojo.getLineNumber(),
-                        CSV_CEVENT_ERROR.format(inputPojo.getPatientNumber(),
+                        SpecimenBatchOpActionErrors.CSV_CEVENT_ERROR.format(inputPojo.getPatientNumber(),
                             inputPojo.getVisitNumber()));
                 }
             }
@@ -559,7 +367,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
                 BatchOpActionUtil.getOriginInfo(context.getSession(), inputPojo.getWaybill());
             if (originInfo == null) {
                 errorSet.addError(inputPojo.getLineNumber(),
-                    CSV_WAYBILL_ERROR.format(inputPojo.getWaybill()));
+                    SpecimenBatchOpActionErrors.CSV_WAYBILL_ERROR.format(inputPojo.getWaybill()));
             } else {
                 pojoData.setOriginInfo(originInfo);
             }
@@ -582,7 +390,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
                 log.trace("found origin center: center={}", inputPojo.getOriginCenter());
             } else {
                 errorSet.addError(inputPojo.getLineNumber(),
-                    CSV_ORIGIN_CENTER_SHORT_NAME_ERROR.format(inputPojo.getOriginCenter()));
+                    SpecimenBatchOpActionErrors.CSV_ORIGIN_CENTER_SHORT_NAME_ERROR.format(inputPojo.getOriginCenter()));
                 return null;
             }
         }
@@ -594,7 +402,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
                 log.trace("found current center: center={}", inputPojo.getCurrentCenter());
             } else {
                 errorSet.addError(inputPojo.getLineNumber(),
-                    CSV_CURRENT_CENTER_SHORT_NAME_ERROR.format(inputPojo.getCurrentCenter()));
+                    SpecimenBatchOpActionErrors.CSV_CURRENT_CENTER_SHORT_NAME_ERROR.format(inputPojo.getCurrentCenter()));
                 return null;
             }
         }
@@ -613,14 +421,14 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
 
                 if (container == null) {
                     errorSet.addError(inputPojo.getLineNumber(),
-                        CSV_CONTAINER_LABEL_ERROR.format(label));
+                        SpecimenBatchOpActionErrors.CSV_CONTAINER_LABEL_ERROR.format(label));
                     return null;
                 }
             } else {
                 container = BatchOpActionUtil.getContainerByBarcode(context.getSession(), barcode);
 
                 if (container == null) {
-                    errorSet.addError(inputPojo.getLineNumber(), CSV_CONTAINER_BARCODE_ERROR.format(barcode));
+                    errorSet.addError(inputPojo.getLineNumber(), SpecimenBatchOpActionErrors.CSV_CONTAINER_BARCODE_ERROR.format(barcode));
                     return null;
                 }
             }
@@ -629,7 +437,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
 
             if (!container.getContainerType().getSpecimenTypes().contains(spcType)) {
                 errorSet.addError(inputPojo.getLineNumber(),
-                    CSV_CONTAINER_SPC_TYPE_ERROR.format(spcType.getName()));
+                    SpecimenBatchOpActionErrors.CSV_CONTAINER_SPC_TYPE_ERROR.format(spcType.getName()));
                 return null;
             }
 
@@ -640,10 +448,10 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
                 if (!container.isPositionFree(pos)) {
                     if (hasLabel) {
                         errorSet.addError(inputPojo.getLineNumber(),
-                            CSV_LABEL_POS_OCCUPIED_ERROR.format(position, label));
+                            SpecimenBatchOpActionErrors.CSV_LABEL_POS_OCCUPIED_ERROR.format(position, label));
                     } else {
                         errorSet.addError(inputPojo.getLineNumber(),
-                            CSV_CONTAINER_POS_OCCUPIED_ERROR.format(position, barcode));
+                            SpecimenBatchOpActionErrors.CSV_CONTAINER_POS_OCCUPIED_ERROR.format(position, barcode));
                     }
                     return null;
                 }
@@ -652,10 +460,10 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
             } catch (Exception e) {
                 if (hasLabel) {
                     errorSet.addError(inputPojo.getLineNumber(),
-                        CSV_SPECIMEN_LABEL_ERROR.format(position, label));
+                        SpecimenBatchOpActionErrors.CSV_SPECIMEN_LABEL_ERROR.format(position, label));
                 } else {
                     errorSet.addError(inputPojo.getLineNumber(),
-                        CSV_SPECIMEN_BARCODE_ERROR.format(position, barcode));
+                        SpecimenBatchOpActionErrors.CSV_SPECIMEN_BARCODE_ERROR.format(position, barcode));
                 }
                 return null;
             }
@@ -735,6 +543,16 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
         return spc;
     }
 
+    protected void checkForPatientAndCollectionEvent(SpecimenBatchOpInputPojo csvPojo) {
+
+        if (!csvPojo.hasPatientAndCollectionEvent()) {
+            // no parent inventory id and does not have patient number and visit
+            // number
+            errorSet.addError(csvPojo.getLineNumber(),
+                SpecimenBatchOpActionErrors.CSV_ALIQ_SPC_PATIENT_CEVENT_MISSING_ERROR);
+        }
+    }
+
     // find the collection event for this specimen
     private CollectionEvent getAndVerifyCollectionEvent(ActionContext context,
         SpecimenBatchOpInputPojo inputPojo, Specimen parentSpecimen) {
@@ -743,7 +561,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
         if (inputPojo.getParentInventoryId() == null) {
             if (inputPojo.getPatientNumber() == null) {
                 errorSet.addError(inputPojo.getLineNumber(),
-                    CSV_PATIENT_NUMBER_INVALID_ERROR.format());
+                    SpecimenBatchOpActionErrors.CSV_PATIENT_NUMBER_INVALID_ERROR.format());
                 return null;
             }
 
@@ -759,14 +577,14 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
             // ensure they match with the cevent and patient
             if ((inputPojo.getPatientNumber() != null) && !inputPojo.getPatientNumber().isEmpty()
                 && !cevent.getPatient().getPnumber().equals(inputPojo.getPatientNumber())) {
-                errorSet.addError(inputPojo.getLineNumber(), CSV_PATIENT_MATCH_ERROR.format(
+                errorSet.addError(inputPojo.getLineNumber(), SpecimenBatchOpActionErrors.CSV_PATIENT_MATCH_ERROR.format(
                     inputPojo.getPatientNumber(), cevent.getPatient().getPnumber()));
             }
 
             if ((inputPojo.getVisitNumber() != null)
                 && !cevent.getVisitNumber().equals(inputPojo.getVisitNumber())) {
                 errorSet.addError(inputPojo.getLineNumber(),
-                    CSV_CEVENT_MATCH_ERROR.format(
+                    SpecimenBatchOpActionErrors.CSV_CEVENT_MATCH_ERROR.format(
                         inputPojo.getVisitNumber()));
             }
         }
@@ -775,7 +593,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
         return cevent;
     }
 
-    private ProcessingEvent createProcessignEventIfRequired(ActionContext context,
+    protected ProcessingEvent createProcessignEventIfRequired(ActionContext context,
         SpecimenBatchOpBuilder pojoData) {
         ProcessingEvent pevent = null;
 

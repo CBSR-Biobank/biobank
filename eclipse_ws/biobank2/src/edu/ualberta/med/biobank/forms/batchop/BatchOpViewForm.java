@@ -233,8 +233,7 @@ public abstract class BatchOpViewForm extends BiobankViewForm {
         this.fileMetaData = fileMetaData;
     }
 
-    public static class SpecimenBatchOpViewFormInput
-        extends FormInput {
+    public static class SpecimenBatchOpViewFormInput extends FormInput {
 
         @SuppressWarnings("nls")
         public SpecimenBatchOpViewFormInput(Integer batchOpId) {
