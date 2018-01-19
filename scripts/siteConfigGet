@@ -19,114 +19,90 @@ PWD=$3
 DBNAME=$4
 SITE_NAME=$5
 OUTPUT=$6
-
-echo "$*" > $OUTPUT
-echo "" >> $OUTPUT
-echo "---------------------" >> $OUTPUT
-echo "" >> $OUTPUT
+COUNTER=1
 
 function mysqlCsv {
     #echo "parms: $*"
-    $MYSQL -h$HOST -u$USER -p$PWD -D$DBNAME -B -e "$*" | $SED 's/\t/\",\"/g;s/^/\"/;s/$/\"/;s/\n//g;s/\"NULL\"/null/g' >> $OUTPUT
+    $MYSQL -h$HOST -u$USER -p$PWD -D$DBNAME -B -e "$*" | $SED 's/\t/\",\"/g;s/^/\"/;s/$/\"/;s/\n//g;s/\"NULL\"/null/g' >> $COUNTER$OUTPUT
 }
 
-QUERIES[0]="select clinic.name, clinic.name_short,sends_shipments,activity_status.name,
-clinic.comment, street1, street2, city,province, postal_code
-from clinic
+QUERIES[0]="select clinic.name, clinic.name_short,clinic.sends_shipments,clinic.activity_status_id,
+street1, street2, city,province, postal_code
+from center clinic
 join address on address.id=clinic.address_id
-join activity_status on activity_status.id=clinic.activity_status_id
-join site on site.id=clinic.site_id
-where site.name_short='$SITE_NAME'
+where discriminator='Clinic'
 order by clinic.name"
 
 QUERIES[1]="select clinic.name_short, contact.name, contact.title,
-contact.office_number, contact.fax_number, contact.email_address from clinic
+contact.office_number, contact.fax_number, contact.email_address
+from center clinic
 join contact on contact.clinic_id=clinic.id
-join site on site.id=clinic.site_id
-where site.name_short='$SITE_NAME'
+where discriminator='Clinic'
 order by clinic.name, contact.name"
 
 QUERIES[2]="select container.label, container.product_barcode,
-activity_status.name, container.comment, container.temperature,
-abstract_position.row, abstract_position.col,container_type.name_short
+container.activity_status_id, container.temperature,
+container_type.name_short
 from container
 join container_type on container_type.id=container.container_type_id
-left join container_position on container_position.abstract_position_id=container.position_id
-left join abstract_position on abstract_position.id=container.position_id
-join activity_status on activity_status.id=container.activity_status_id
-join site on site.id=container.site_id
+join center site on site.id=container.site_id
 where site.name_short='$SITE_NAME'
 order by label"
 
 QUERIES[3]="select container_type.name,  container_type.name_short, top_level,
-default_temperature, container_type.comment, activity_status.name, row_capacity, col_capacity,
+default_temperature, container_type.activity_status_id, row_capacity, col_capacity,
 container_labeling_scheme.name from container_type
-join capacity on capacity.id=container_type.capacity_id
 join container_labeling_scheme on container_labeling_scheme.id=container_type.child_labeling_scheme_id
-join activity_status on activity_status.id=container_type.activity_status_id
-join site on site.id=container_type.site_id
+join center site on site.id=container_type.site_id
 where site.name_short='$SITE_NAME'
 order by container_type.name_short"
 
-QUERIES[4]="select container_type.name_short, parent_ct.name_short from
-container_type join (select name_short, child_container_type_id from
+QUERIES[4]="select container_type.name_short, parent_ct.name_short
+from container_type
+join (select name_short, child_container_type_id from
 container_type join container_type_container_type on
 container_type_container_type.parent_container_type_id=container_type.id) as
 parent_ct on parent_ct.child_container_type_id=container_type.id
-join site on site.id=container_type.site_id
+join center site on site.id=container_type.site_id
 where site.name_short='$SITE_NAME'
 order by container_type.name_short, parent_ct.name_short"
 
-QUERIES[5]="select container_type.name_short, sample_type.name_short
+QUERIES[5]="select container_type.name_short, specimen_type.name_short
 from container_type
-join container_type_sample_type on container_type_sample_type.container_type_id=container_type.id
-join sample_type on sample_type.id=container_type_sample_type.sample_type_id
-join site on site.id=container_type.site_id
+join container_type_specimen_type on container_type_specimen_type.container_type_id=container_type.id
+join specimen_type on specimen_type.id=container_type_specimen_type.specimen_type_id
+join center site on site.id=container_type.site_id
 where site.name_short='$SITE_NAME'
-order by container_type.name_short,sample_type.name_short"
+order by container_type.name_short,specimen_type.name_short"
 
-QUERIES[6]="select study.name_short, source_vessel.name
+QUERIES[6]="select study.name_short, st.name
 from study
-join study_source_vessel on study_source_vessel.study_id=study.id
-join source_vessel on source_vessel.id=study_source_vessel.source_vessel_id
-join site on site.id=study.site_id
-where site.name_short='$SITE_NAME'
-order by name_short,source_vessel.name"
+join source_specimen on source_specimen.study_id=study.id
+join specimen_type st on st.id=source_specimen.specimen_type_id
+order by name_short,st.name"
 
-QUERIES[7]="select study.name_short, sample_type.name_short, quantity, volume,
-activity_status.name
+QUERIES[7]="select study.name_short, specimen_type.name_short, quantity, volume
 from study
-join sample_storage on sample_storage.study_id=study.id
-join sample_type on sample_type.id=sample_storage.sample_type_id
-join activity_status on activity_status.id=sample_storage.activity_status_id
-join site on site.id=study.site_id
-where site.name_short='$SITE_NAME'
-order by study.name_short, sample_type.name_short"
+join aliquoted_specimen on aliquoted_specimen.study_id=study.id
+join specimen_type on specimen_type.id=aliquoted_specimen.specimen_type_id
+order by study.name_short, specimen_type.name_short"
 
-QUERIES[8]="select name, name_short from sample_type order by name"
+QUERIES[8]="select name, name_short from specimen_type order by name"
 
-QUERIES[9]="select study.name, study.name_short, activity_status.name, study.comment
+QUERIES[9]="select study.name, study.name_short, study.activity_status_id
 from study
-join activity_status on activity_status.id=study.activity_status_id
-join site on site.id=study.site_id
-where site.name_short='$SITE_NAME'
 order by study.name"
 
 QUERIES[10]="select study.name_short, contact.name, clinic.name_short
 from study
 join study_contact on study_contact.study_id=study.id
 join contact on contact.id=study_contact.contact_id
-join clinic on clinic.id=contact.clinic_id
-join site on site.id=study.site_id
-where site.name_short='$SITE_NAME'
+join center clinic on clinic.id=contact.clinic_id
 order by study.name_short, contact.name, clinic.name_short"
 
 for qry in "${QUERIES[@]}"
 do
-    echo "$qry" >> $OUTPUT
-    echo "" >> $OUTPUT
+    #echo "$qry" >> $COUNTER$OUTPUT
     mysqlCsv $qry
-    echo "" >> $OUTPUT
-    echo "---------------------" >> $OUTPUT
-    echo "" >> $OUTPUT
+    COUNTER=$[COUNTER + 1]
 done
