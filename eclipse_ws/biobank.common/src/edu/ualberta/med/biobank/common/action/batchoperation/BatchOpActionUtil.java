@@ -73,6 +73,24 @@ public class BatchOpActionUtil {
         return (Specimen) c.uniqueResult();
     }
 
+    public static Set<Study> getStudiesForSpecimens(Set<Specimen> specimens) {
+        // get all collection events
+        for (Specimen specimen : specimens) {
+            specimen.getCollectionEvent();
+        }
+
+        // get all patients from specimens
+        for (Specimen specimen : specimens) {
+            specimen.getCollectionEvent().getPatient();
+        }
+
+        Set<Study> studies = new HashSet<Study>();
+        for (Specimen specimen : specimens) {
+            studies.add(specimen.getCollectionEvent().getPatient().getStudy());
+        }
+        return studies;
+    }
+
     public static SpecimenType getSpecimenType(Session session, String name) {
         if (session == null) {
             throw new NullPointerException("session is null");
@@ -236,8 +254,9 @@ public class BatchOpActionUtil {
             .uniqueResult();
     }
 
-    public static BatchOperation createBatchOperation(Session session, User user,
-        final FileData fileData) {
+    public static BatchOperation createBatchOperation(Session session,
+                                                      User user,
+                                                      final FileData fileData) {
         if (session == null) {
             throw new NullPointerException("session is null");
         }

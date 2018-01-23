@@ -34,6 +34,9 @@ public class SpecimenBatchOpActionErrors {
         bundle.tr("when parent inventory id is not specified, "
             + "patient number, and visit number are required").format();
 
+    public static final LString CSV_PALLET_POS_INFO_INALID_ERROR =
+        bundle.tr("position information invalid, missing all of these: product barcode, label, and position").format();
+
     public static final LString CSV_PALLET_POS_ERROR =
         bundle.tr("pallet position defined but not product barcode or label").format();
 
@@ -88,7 +91,7 @@ public class SpecimenBatchOpActionErrors {
         bundle.tr("specimen type \"{0}\" cannot be stored in this container");
 
     public static final Tr CSV_CONTAINER_POS_OCCUPIED_ERROR =
-        bundle.tr("specimen position \"{0}\" in container with label \"{1}\" is occupied");
+        bundle.tr("specimen position \"{0}\" in container with barcode \"{1}\" is occupied");
 
     public static final Tr CSV_LABEL_POS_OCCUPIED_ERROR =
         bundle.tr("specimen position \"{0}\" in container with label \"{1}\" is occupied");

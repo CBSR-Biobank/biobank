@@ -43,6 +43,7 @@ public class BatchOpInputErrorSet implements IBatchOpInputErrorList<LString>,
     }
 
     public void addAll(BatchOpInputErrorSet subset) {
+        if (subset == null) return;
         errors.addAll(subset.errors);
     }
 

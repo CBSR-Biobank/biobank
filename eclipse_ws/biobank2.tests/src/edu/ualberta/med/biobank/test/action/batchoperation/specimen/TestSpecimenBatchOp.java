@@ -861,7 +861,7 @@ public class TestSpecimenBatchOp extends TestAction {
         } catch (BatchOpErrorsException e) {
             CsvUtil.showErrorsInLog(log, e);
             new AssertBatchOpException()
-                .withMessage(CSV_CONTAINER_POS_OCCUPIED_ERROR.format())
+                .withMessage(CSV_LABEL_POS_OCCUPIED_ERROR.format())
                 .assertIn(e);
         }
     }
@@ -913,7 +913,7 @@ public class TestSpecimenBatchOp extends TestAction {
         } catch (BatchOpErrorsException e) {
             CsvUtil.showErrorsInLog(log, e);
             new AssertBatchOpException()
-                .withMessage(CSV_LABEL_POS_OCCUPIED_ERROR.format())
+                .withMessage(CSV_CONTAINER_POS_OCCUPIED_ERROR.format())
                 .assertIn(e);
         }
     }
@@ -938,8 +938,8 @@ public class TestSpecimenBatchOp extends TestAction {
                 parentSpecimens.add(parentSpecimen);
 
                 peventMap.put(parentSpecimen.getInventoryId(), pevent);
-                log.debug("added processing event: invId={} worsheet={}",
-                    parentSpecimen.getInventoryId(), pevent.getWorksheet());
+                log.trace("added processing event: invId={} worsheet={}",
+                          parentSpecimen.getInventoryId(), pevent.getWorksheet());
             }
         }
 

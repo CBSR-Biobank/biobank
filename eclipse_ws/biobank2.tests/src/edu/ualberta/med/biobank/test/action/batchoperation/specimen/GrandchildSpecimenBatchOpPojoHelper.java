@@ -33,11 +33,8 @@ class GrandchildSpecimenBatchOpPojoHelper {
 
     private final NameGenerator nameGenerator;
 
-    private int lineNumber;
-
     GrandchildSpecimenBatchOpPojoHelper(NameGenerator nameGenerator) {
         this.nameGenerator = nameGenerator;
-        this.lineNumber = 0;
     }
 
     /**
@@ -100,10 +97,7 @@ class GrandchildSpecimenBatchOpPojoHelper {
         Set<GrandchildSpecimenBatchOpInputPojo> pojos = new HashSet<GrandchildSpecimenBatchOpInputPojo>();
 
         for (SpecimenType grandchildSpecimenType : parentSpecimen.getSpecimenType().getChildSpecimenTypes()) {
-            ++lineNumber;
-
             GrandchildSpecimenBatchOpInputPojo specimenInfo = new GrandchildSpecimenBatchOpInputPojo();
-            specimenInfo.setLineNumber(lineNumber);
             specimenInfo.setInventoryId(nameGenerator.next(Specimen.class));
             specimenInfo.setPatientNumber(patient.getPnumber());
             specimenInfo.setParentInventoryId(parentSpecimen.getInventoryId());

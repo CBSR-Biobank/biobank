@@ -35,9 +35,9 @@ import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.util.CompressedReference;
 
 /**
- * 
+ *
  * @author Nelson Loyola
- * 
+ *
  */
 @SuppressWarnings("nls")
 public class PatientBatchOpAction implements Action<IdResult> {
@@ -71,7 +71,8 @@ public class PatientBatchOpAction implements Action<IdResult> {
     private Center workingCenterOnServerSide;
 
     public PatientBatchOpAction(Center workingCenter,
-        Set<PatientBatchOpInputPojo> inputPojos, File inputFile)
+                                Set<PatientBatchOpInputPojo> inputPojos,
+                                File inputFile)
         throws IOException, NoSuchAlgorithmException {
 
         if (inputPojos.size() > SIZE_LIMIT) {
@@ -196,7 +197,7 @@ public class PatientBatchOpAction implements Action<IdResult> {
         Study study = BatchOpActionUtil.getStudy(context.getSession(), pojo.getStudyName());
         if (study == null) {
             errorSet.addError(pojo.getLineNumber(),
-                CSV_STUDY_ERROR.format(pojo.getStudyName()));
+                              CSV_STUDY_ERROR.format(pojo.getStudyName()));
         }
 
         PatientBatchOpPojoData pojoData = new PatientBatchOpPojoData(pojo);

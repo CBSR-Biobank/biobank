@@ -55,8 +55,9 @@ public class SpecimenActionHelper {
     }
 
     @SuppressWarnings("nls")
-    public static void createOrChangePosition(Specimen specimen,
-        Container container, RowColPos rcp) {
+    public static SpecimenPosition createOrChangePosition(Specimen specimen,
+                                                          Container container,
+                                                          RowColPos rcp) {
         if (container == null) {
             throw new NullPointerException("container is null");
         }
@@ -76,10 +77,14 @@ public class SpecimenActionHelper {
 
         pos.setContainer(container);
         ContainerType type = container.getContainerType();
-        String positionString = ContainerLabelingScheme.getPositionString(
-            rcp, type.getChildLabelingScheme().getId(), type.getCapacity().getRowCapacity(),
-            type.getCapacity().getColCapacity(), type.getLabelingLayout());
+        String positionString =
+            ContainerLabelingScheme.getPositionString(rcp,
+                                                      type.getChildLabelingScheme().getId(),
+                                                      type.getCapacity().getRowCapacity(),
+                                                      type.getCapacity().getColCapacity(),
+                                                      type.getLabelingLayout());
         pos.setPositionString(positionString);
+        return pos;
     }
 
     @SuppressWarnings("nls")
@@ -131,7 +136,7 @@ public class SpecimenActionHelper {
 
     /**
      * Returns the "brief" information for a specimen. It is meant to only be called by actions.
-     * 
+     *
      * @param context The context the action is running under.
      * @param specimenId The specimen id. Can be null.
      * @param inventoryId The inventory id. Can be null.
@@ -243,7 +248,7 @@ public class SpecimenActionHelper {
 
     /**
      * Returns the "brief" information for a specimen. It is meant to only be called by actions.
-     * 
+     *
      * @param context The context the action is running under.
      * @param specimenId The specimen id. Can be null.
      * @return The specimen informaiton along with many of its associations.
