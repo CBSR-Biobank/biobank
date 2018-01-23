@@ -101,7 +101,7 @@ public class SessionProvider {
                 }
             }
 
-            log.info("dbName: {}, dbUser: {}", dbName, dbUser);
+            log.debug("dbName: {}, dbUser: {}", dbName, dbUser);
             String url = MessageFormat.format("jdbc:mysql://{0}:3306/{1}", dbHost, dbName);
 
             // Construct DataSource

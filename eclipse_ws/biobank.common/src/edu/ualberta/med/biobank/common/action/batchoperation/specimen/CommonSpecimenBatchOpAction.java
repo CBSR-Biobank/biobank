@@ -85,7 +85,7 @@ public abstract class CommonSpecimenBatchOpAction<T extends IBatchOpSpecimenInpu
         workingCenterOnServerSide = context.load(Center.class, workingCenterId);
 
         return PermissionEnum.BATCH_OPERATIONS.isAllowed(user, workingCenterOnServerSide)
-            && hasPermissionOnStudies(user, getStudies(context));
+            && BatchOpActionUtil.hasPermissionOnStudies(user, getStudies(context));
 
     }
 
@@ -93,15 +93,6 @@ public abstract class CommonSpecimenBatchOpAction<T extends IBatchOpSpecimenInpu
         if (compressedList == null) {
             throw new IllegalStateException("compressed list is null");
         }
-    }
-
-    protected boolean hasPermissionOnStudies(User user, Set<Study> studies) {
-        for (Study study : studies) {
-            if (!PermissionEnum.BATCH_OPERATIONS.isAllowed(user, study)) {
-                return false;
-            }
-        }
-        return true;
     }
 
     /*
@@ -119,6 +110,7 @@ public abstract class CommonSpecimenBatchOpAction<T extends IBatchOpSpecimenInpu
                 existingSpecimens.add(specimen);
             }
         }
+        Set<Study> studies = BatchOpActionUtil.getStudiesForSpecimens(existingSpecimens);
 
         for (T pojo : pojos) {
             String pnumber = pojo.getPatientNumber();
@@ -129,17 +121,6 @@ public abstract class CommonSpecimenBatchOpAction<T extends IBatchOpSpecimenInpu
             }
         }
 
-        // get all collection events
-        for (Specimen specimen : existingSpecimens) {
-            specimen.getCollectionEvent();
-        }
-
-        // get all patients from specimens
-        for (Specimen specimen : existingSpecimens) {
-            specimen.getCollectionEvent().getPatient();
-        }
-
-        Set<Study> studies = new HashSet<Study>();
         for (Specimen specimen : existingSpecimens) {
             studies.add(specimen.getCollectionEvent().getPatient().getStudy());
         }

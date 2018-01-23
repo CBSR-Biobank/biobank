@@ -54,7 +54,7 @@ class SpecimenBatchOpCsvWriter {
         };
 
         ICsvMapWriter writer = new CsvMapWriter(new FileWriter(filename),
-            CsvPreference.EXCEL_PREFERENCE);
+                                                CsvPreference.EXCEL_PREFERENCE);
 
         final CellProcessor[] processing = new CellProcessor[] {
             new ConvertNullTo(""),

@@ -208,7 +208,7 @@ public class TestGrandchildSpecimenBatchOp extends TestAction {
                                                     pojos,
                                                     new File(CSV_NAME));
             exec(importAction);
-            Assert.fail("should not be allowed to import spcecimens when patient number is missing");
+            Assert.fail("should not be allowed to import spcecimensfixture when patient number is missing");
         } catch (BatchOpErrorsException e) {
             new AssertBatchOpException()
                 .withMessage(CSV_PATIENT_NUMBER_REQUIRED_ERROR)
@@ -452,7 +452,7 @@ public class TestGrandchildSpecimenBatchOp extends TestAction {
         } catch (BatchOpErrorsException e) {
             CsvUtil.showErrorsInLog(log, e);
             new AssertBatchOpException()
-                .withMessage(CSV_CONTAINER_POS_OCCUPIED_ERROR.format())
+                .withMessage(CSV_LABEL_POS_OCCUPIED_ERROR.format())
                 .assertIn(e);
         }
     }
@@ -514,7 +514,7 @@ public class TestGrandchildSpecimenBatchOp extends TestAction {
         } catch (BatchOpErrorsException e) {
             CsvUtil.showErrorsInLog(log, e);
             new AssertBatchOpException()
-                .withMessage(CSV_LABEL_POS_OCCUPIED_ERROR.format())
+                .withMessage(CSV_CONTAINER_POS_OCCUPIED_ERROR.format())
                 .assertIn(e);
         }
     }
@@ -802,7 +802,7 @@ final class TestFixture {
             factory.setDefaultSourceSpecimen(sourceSpecimen);
 
             SpecimenType childSpecimenType = factory.createSpecimenType();
-            childSpecimenTypes.add(parentSpecimenType);
+            childSpecimenTypes.add(childSpecimenType);
 
             factory.setDefaultAliquotedSpecimenType(childSpecimenType);
             addChildSpecimenType(parentSpecimenType, childSpecimenType);

@@ -290,13 +290,11 @@ public class GrandchildSpecimenBatchOpAction
 
             if (hasLabel) {
                 container = BatchOpActionUtil.getContainer(context.getSession(), label);
-
                 if (container == null) {
                     return errorResult(inputPojo, CSV_CONTAINER_LABEL_ERROR.format(label));
                 }
             } else {
                 container = BatchOpActionUtil.getContainerByBarcode(context.getSession(), barcode);
-
                 if (container == null) {
                     return errorResult(inputPojo, CSV_CONTAINER_BARCODE_ERROR.format(barcode));
                 }
@@ -314,22 +312,18 @@ public class GrandchildSpecimenBatchOpAction
 
                 // is container position empty?
                 if (!container.isPositionFree(pos)) {
-                    if (hasLabel) {
-                        return errorResult(inputPojo,
-                                           CSV_LABEL_POS_OCCUPIED_ERROR.format(position, label));
-                    }
-                    return errorResult(inputPojo,
-                                       CSV_CONTAINER_POS_OCCUPIED_ERROR.format(position, barcode));
+                    LString message = (hasLabel)
+                        ? CSV_LABEL_POS_OCCUPIED_ERROR.format(position, label)
+                            : CSV_CONTAINER_POS_OCCUPIED_ERROR.format(position, barcode);
+                    return errorResult(inputPojo, message);
                 }
 
                 pojoData.setSpecimenPos(pos);
             } catch (Exception e) {
-                if (hasLabel) {
-                    return errorResult(inputPojo,
-                                       CSV_LABEL_POS_OCCUPIED_ERROR.format(position, label));
-                }
-                return errorResult(inputPojo,
-                                   CSV_CONTAINER_POS_OCCUPIED_ERROR.format(position, barcode));
+                LString message = (hasLabel)
+                    ? CSV_LABEL_POS_OCCUPIED_ERROR.format(position, label)
+                        : CSV_CONTAINER_POS_OCCUPIED_ERROR.format(position, barcode);
+                return errorResult(inputPojo, message);
             }
 
         }

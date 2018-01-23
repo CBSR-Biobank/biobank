@@ -36,9 +36,9 @@ import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.util.CompressedReference;
 
 /**
- * 
+ *
  * @author Nelson Loyola
- * 
+ *
  */
 @SuppressWarnings("nls")
 public class ShipmentBatchOpAction implements Action<BooleanResult> {
@@ -46,8 +46,7 @@ public class ShipmentBatchOpAction implements Action<BooleanResult> {
 
     private static final Bundle bundle = new CommonBundle();
 
-    private static final I18n i18n = I18nFactory
-        .getI18n(SpecimenBatchOpAction.class);
+    private static final I18n i18n = I18nFactory.getI18n(SpecimenBatchOpAction.class);
 
     public static final Tr CSV_SENDING_CENTER_ERROR =
         bundle.tr("sending center with name \"{0}\" does not exist");
@@ -77,8 +76,7 @@ public class ShipmentBatchOpAction implements Action<BooleanResult> {
 
     private final BatchOpInputErrorSet errorList = new BatchOpInputErrorSet();
 
-    private CompressedReference<ArrayList<ShipmentBatchOpInputRow>> compressedList =
-        null;
+    private CompressedReference<ArrayList<ShipmentBatchOpInputRow>> compressedList = null;
 
     private final Set<ShipmentBatchOpHelper> shipmentImportInfos =
         new HashSet<ShipmentBatchOpHelper>(0);
@@ -88,8 +86,8 @@ public class ShipmentBatchOpAction implements Action<BooleanResult> {
     }
 
     private void setCsvFile(String filename) throws IOException {
-        ICsvBeanReader reader = new CsvBeanReader(
-            new FileReader(filename), CsvPreference.EXCEL_PREFERENCE);
+        ICsvBeanReader reader = new CsvBeanReader(new FileReader(filename),
+                                                  CsvPreference.EXCEL_PREFERENCE);
 
         final String[] header = new String[] {
             "dateReceived",
@@ -101,13 +99,13 @@ public class ShipmentBatchOpAction implements Action<BooleanResult> {
         };
 
         try {
-            ArrayList<ShipmentBatchOpInputRow> csvInfos =
-                new ArrayList<ShipmentBatchOpInputRow>(0);
+            ArrayList<ShipmentBatchOpInputRow> csvInfos = new ArrayList<ShipmentBatchOpInputRow>(0);
 
             ShipmentBatchOpInputRow csvInfo;
             reader.getCSVHeader(true);
-            while ((csvInfo =
-                reader.read(ShipmentBatchOpInputRow.class, header, PROCESSORS)) != null) {
+            while ((csvInfo = reader.read(ShipmentBatchOpInputRow.class,
+                                          header,
+                                          PROCESSORS)) != null) {
 
                 csvInfo.setLineNumber(reader.getLineNumber());
                 csvInfos.add(csvInfo);
@@ -118,13 +116,12 @@ public class ShipmentBatchOpAction implements Action<BooleanResult> {
             }
 
             compressedList =
-                new CompressedReference<ArrayList<ShipmentBatchOpInputRow>>(
-                    csvInfos);
+                new CompressedReference<ArrayList<ShipmentBatchOpInputRow>>(csvInfos);
 
         } catch (SuperCSVException e) {
-            throw new IllegalStateException(
-                i18n.tr(BatchOpActionUtil.CSV_PARSE_ERROR, e.getMessage(),
-                    e.getCsvContext()));
+            throw new IllegalStateException(i18n.tr(BatchOpActionUtil.CSV_PARSE_ERROR,
+                                                    e.getMessage(),
+                                                    e.getCsvContext()));
         } finally {
             reader.close();
         }

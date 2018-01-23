@@ -21,14 +21,13 @@ public class AllTestsSuite {
 
     @BeforeClass
     public static void setUp() throws Exception {
-        // appService = connect(userLogin, userPwd);
-        // DbHelper.setAppService(appService);
     }
 
     @AfterClass
     public static void tearDown() throws Exception {
     }
 
+    @Deprecated
     public static BiobankApplicationService connect(String user, String password)
         throws Exception {
         return ServiceConnection.getAppService(

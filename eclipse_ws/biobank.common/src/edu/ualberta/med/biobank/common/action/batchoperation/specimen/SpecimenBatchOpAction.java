@@ -165,8 +165,9 @@ public class SpecimenBatchOpAction extends CommonSpecimenBatchOpAction<SpecimenB
             throw new BatchOpErrorsException(errorSet.getErrors());
         }
 
-        BatchOperation batchOp = BatchOpActionUtil.createBatchOperation(
-            context.getSession(), context.getUser(), fileData);
+        BatchOperation batchOp = BatchOpActionUtil.createBatchOperation(context.getSession(),
+                                                                        context.getUser(),
+                                                                        fileData);
 
         // add all source specimens first
         log.debug("SpecimenBatchOpAction: adding source specimens");

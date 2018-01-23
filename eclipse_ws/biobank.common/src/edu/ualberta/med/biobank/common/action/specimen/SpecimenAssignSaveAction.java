@@ -69,12 +69,12 @@ public class SpecimenAssignSaveAction implements Action<SpecimenAssignResInfo> {
     @SuppressWarnings("nls")
     @Override
     public SpecimenAssignResInfo run(ActionContext context)
-        throws ActionException {
+                                                           throws ActionException {
         SpecimenAssignResInfo res = new SpecimenAssignResInfo();
-        if (containerId == null && containerId == null)
-            throw new LocalizedException(
-                bundle.tr("Problem with sent data. Container id is null")
-                    .format());
+        if ((containerId == null) && (containerId == null)) {
+            throw new LocalizedException(bundle.tr("Problem with sent data. Container id is null")
+                .format());
+        }
         res.parentContainerId = containerId;
 
         Container container = context.load(Container.class, containerId);
@@ -87,33 +87,32 @@ public class SpecimenAssignSaveAction implements Action<SpecimenAssignResInfo> {
             smi.position = si.position;
             specimenMicroplateInfos.add(smi);
         }
-        new SpecimenMicroplateConsistentAction(
-                container.getSite().getId(), false, specimenMicroplateInfos).run(context);
+        new SpecimenMicroplateConsistentAction(container.getSite().getId(),
+                                               false,
+                                               specimenMicroplateInfos).run(context);
 
         res.parentBarcode = container.getProductBarcode();
         res.parentTypeName = container.getContainerType().getName();
         res.parentLabel = container.getLabel();
         res.siteName = container.getSite().getNameShort();
 
-        res.specimens =
-            new ArrayList<SpecimenAssignSaveAction.SpecimenResInfo>();
+        res.specimens = new ArrayList<SpecimenAssignSaveAction.SpecimenResInfo>();
         for (SpecimenInfo si : specInfos) {
-            Specimen specimen =
-                context.load(Specimen.class, si.specimenId);
-            SpecimenActionHelper.setPosition(context, specimen,
-                si.position, containerId);
+            Specimen specimen = context.load(Specimen.class, si.specimenId);
+            SpecimenActionHelper.setPosition(context,
+                                             specimen,
+                                             si.position,
+                                             containerId);
             context.getSession().saveOrUpdate(specimen);
 
             SpecimenResInfo rInfo = new SpecimenResInfo();
             rInfo.specimenId = specimen.getId();
             rInfo.position = SpecimenActionHelper.getPositionString(specimen,
-                true, false);
+                                                                    true, false);
             rInfo.inventoryId = specimen.getInventoryId();
             rInfo.typeName = specimen.getSpecimenType().getName();
-            rInfo.patientPNumber = specimen.getCollectionEvent().getPatient()
-                .getPnumber();
-            rInfo.visitNumber = specimen.getCollectionEvent().getVisitNumber()
-                .toString();
+            rInfo.patientPNumber = specimen.getCollectionEvent().getPatient().getPnumber();
+            rInfo.visitNumber = specimen.getCollectionEvent().getVisitNumber().toString();
             rInfo.centerName = specimen.getCurrentCenter().getNameShort();
             res.specimens.add(rInfo);
         }
