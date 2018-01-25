@@ -370,6 +370,10 @@
           overwrite="true" />
   </target>
 
+  <target name="keystore-status" depends="keystore-check" unless="keystore.available">
+    <echo message="${secu-log.dir}/jboss/biobank.keystore not found. Use target 'keystore-gen' to generate a temporary key or create your own manually." />
+  </target>
+
   <!-- version number on server side -->
   <target name="server-manifest">
     <manifest file="${eclipse.proj.dir.common}/META-INF/MANIFEST.MF"
@@ -413,16 +417,29 @@
   </target>
 
   <target name="check-db-properties">
-    <available file="db.properties" property="db.properties.available" />
+    <available file="db.properties" property="db.properties.present" />
   </target>
 
-  <target name="db-properties-copy" depends="check-db-properties">
-    <fail unless="db.properties.available"
-          message="File 'db.properties' not found in project's root directory. Copy 'db.properties.template' to 'db.properties' and modify accordingly." />
+  <target name="db-properties-copy" depends="check-db-properties" unless="db.properties.present">
     <copy file="db.properties.template"
           tofile="db.properties"
           overwrite="false" />
+    <echo message="Copied 'db.properties.template' to 'db.properties'. Please modify accordingly." />
   </target>
+
+  <target name="check-dot-options">
+    <available file=".options" property="dot.options.present" />
+  </target>
+
+  <target name="dot-options-copy" depends="check-dot-options" unless="dot.options.present">
+    <copy file="eclipse_ws/biobank2/.options.example"
+          tofile=".options"
+          overwrite="false" />
+    <echo message="Copied 'eclipse_ws/biobank2/.options.example' to '.options'. Please modify accordingly." />
+  </target>
+
+  <target name="init" depends="db-properties-copy,dot-options-copy,keystore-status"
+          description="Run this fist to check the status of the project build directory." />
 
   <target name="jboss.home.env">
     <fail unless="env.JBOSS_HOME"
