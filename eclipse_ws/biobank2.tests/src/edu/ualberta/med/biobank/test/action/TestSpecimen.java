@@ -235,15 +235,17 @@ public class TestSpecimen extends TestAction {
         session.beginTransaction();
         factory.createStudy();
 
-        factory.createSpecimenType();
-        factory.createSourceSpecimen();
-        factory.createSpecimenType();
-        factory.createSourceSpecimen();
+        for (int i = 0; i < 2; ++i) {
+            factory.createSpecimenType();
+            factory.createSourceSpecimen();
+        }
 
-        specimenTypes.add(factory.createSpecimenType());
-        factory.createAliquotedSpecimen();
-        specimenTypes.add(factory.createSpecimenType());
-        factory.createAliquotedSpecimen();
+        for (int i = 0; i < 2; ++i) {
+            SpecimenType specimenType = factory.createSpecimenType();
+            factory.setDefaultAliquotedSpecimenType(specimenType);
+            factory.createAliquotedSpecimen();
+            specimenTypes.add(specimenType);
+        }
 
         factory.createCollectionEvent();
         factory.createParentSpecimen();
