@@ -20,12 +20,12 @@ import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.Study;
 
 /**
- * Used to get the possilbe specimen types that an existing specimen can be changed to. If the
+ * Used to get the possible specimen types that an existing specimen can be changed to. If the
  * specimen is a child specimen, then the corresponding volumes for the specimen types are also
  * returned. The information comes from the study's source specimens and aliquoted specimens.
- * 
+ *
  * @author Nelson Loyola
- * 
+ *
  */
 public class SpecimenGetPossibleTypesAction implements Action<SpecimenTypeData> {
     private static final long serialVersionUID = 1L;
@@ -75,9 +75,9 @@ public class SpecimenGetPossibleTypesAction implements Action<SpecimenTypeData> 
 
     /**
      * volumeMap is only filled in if the specimen is a child specimen
-     * 
+     *
      * @author Nelson Loyola
-     * 
+     *
      */
     public static class SpecimenTypeData implements ActionResult {
         private static final long serialVersionUID = 1L;
