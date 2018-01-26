@@ -94,3 +94,5 @@ decode.png
 *.sql.gz
 /eclipse_ws/Servers/
 BiobankCli*.zip
+import_*.csv
+testing/
