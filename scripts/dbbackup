@@ -17,6 +17,7 @@ HOST=$1
 USER=$2
 PWD=$3
 DBNAME=$4
+FILENAME="./${DBNAME}_`date +%Y%m%d`.sql.gz"
 
 # tables to skip
 skip_tables=( log_message object_attribute objectattributes )
@@ -31,4 +32,5 @@ for (( i = 0; i < n; i++ )) do
         OPTS[$i]="--ignore-table=${DBNAME}.${skip_tables[$i]}"
 done
 
-$MYSQLDUMP ${OPTS[*]} -h$HOST -u$USER -p$PWD $DBNAME | gzip > ${DBNAME}_`date +%Y%m%d`.sql.gz
+$MYSQLDUMP ${OPTS[*]} -h$HOST -u$USER -p$PWD $DBNAME | gzip > $FILENAME
+echo "Database dumped to $FILENAME"
