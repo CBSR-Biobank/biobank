@@ -17,10 +17,10 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import edu.ualberta.med.biobank.common.action.batchoperation.BatchOpGetResult;
-import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpGetAction;
 import edu.ualberta.med.biobank.common.action.batchoperation.specimenPosition.PositionBatchOpAction;
 import edu.ualberta.med.biobank.common.action.batchoperation.specimenPosition.PositionBatchOpPojo;
+import edu.ualberta.med.biobank.common.action.batchoperation.specimenPosition.SpecimenPositionBatchOpGetAction;
+import edu.ualberta.med.biobank.common.action.batchoperation.specimenPosition.SpecimenPositionBatchOpGetResult;
 import edu.ualberta.med.biobank.common.action.exception.BatchOpErrorsException;
 import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.i18n.LString;
@@ -259,8 +259,9 @@ public class TestPositionBatchOp extends TestAction {
         try {
             Integer bachOpId = exec(createAction(pojos)).getId();
             checkCsvInfoAgainstDb(pojos);
-            BatchOpGetResult<Specimen> batchOpResult = exec(new SpecimenBatchOpGetAction(bachOpId));
-            Assert.assertEquals(pojos.size(), batchOpResult.getModelObjects().size());
+            SpecimenPositionBatchOpGetResult batchOpResult =
+                exec(new SpecimenPositionBatchOpGetAction(bachOpId));
+            Assert.assertEquals(pojos.size(), batchOpResult.getSpecimenData().size());
         } catch (BatchOpErrorsException e) {
             CsvUtil.showErrorsInLog(log, e);
             Assert.fail("errors in CVS data: " + e.getMessage());
