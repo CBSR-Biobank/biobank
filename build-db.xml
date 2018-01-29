@@ -133,10 +133,22 @@
   <target name="dbbackup"
           description="exports the current database to a file"
           depends="check-db">
-    <echo message="running scripts/dbbackup..." />
-    <exec executable="scripts/dbbackup"
-          failonerror="true">
-      <arg line="${database.host} ${database.exec.username} ${database.exec.password} ${database.name}" />
+    <tstamp>
+      <format property="DAY_TIME_NOW" pattern="yyyy-MM-dd_HH.mm.ss" />
+    </tstamp>
+    <property name="dump.filename" value="${database.name}_dump_${DAY_TIME_NOW}.sql"/>
+    <exec executable="mysqldump" output="${dump.filename}">
+        <arg value="--user=${database.exec.username}" />
+        <arg value="--password=${database.exec.password}" />
+        <arg value="--host=${database.host}" />
+        <arg value="--port=3306" />
+        <arg value="${database.name}" />
     </exec>
+
+    <!-- Compress the dumped file(*.sql) -->
+    <gzip src="${dump.filename}" zipfile="${dump.filename}.gz" />
+
+    <!-- Delete the dumped file(*.sql) -->
+    <delete file="${dump.filename}"/>
   </target>
 </project>
