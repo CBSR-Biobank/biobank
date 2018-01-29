@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.common.action.batchoperation;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.hibernate.Criteria;
@@ -89,6 +90,11 @@ public class BatchOpActionUtil {
             studies.add(specimen.getCollectionEvent().getPatient().getStudy());
         }
         return studies;
+    }
+
+    public static Set<Study> getStudiesForSpecimens(List<Specimen> specimens) {
+        Set<Specimen> specimensAsSet = new HashSet<Specimen>(specimens);
+        return getStudiesForSpecimens(specimensAsSet);
     }
 
     public static SpecimenType getSpecimenType(Session session, String name) {

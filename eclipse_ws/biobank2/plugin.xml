@@ -282,6 +282,11 @@
              name="%SpecimenImport.command">
        </command>
        <command
+             categoryId="org.eclipse.ui.category.window"
+             id="edu.ualberta.med.biobank.commands.specimenPosition.import"
+             name="%SpecimenPositionImport.command">
+       </command>
+       <command
              categoryId="org.eclipse.ui.category.edit"
              id="edu.ualberta.med.biobank.commands.researchGroupAdd"
              name="Add Research Group">
@@ -838,6 +843,25 @@
          </enabledWhen>
       </handler>
       <handler
+            class="edu.ualberta.med.biobank.handlers.SpecimenPositionImportHandler"
+            commandId="edu.ualberta.med.biobank.commands.specimenPosition.import">
+         <activeWhen>
+            <and>
+               <reference
+                     definitionId="biobank.processingPerspectiveSelected">
+               </reference>
+               <reference
+                     definitionId="edu.ualberta.med.biobank.gui.common.batchOperationPermission">
+               </reference>
+            </and>
+         </activeWhen>
+         <enabledWhen>
+            <reference
+                  definitionId="biobank.processingPerspectiveSelected">
+            </reference>
+         </enabledWhen>
+      </handler>
+      <handler
             class="edu.ualberta.med.biobank.handlers.ResearchGroupAddHandler"
             commandId="edu.ualberta.med.biobank.commands.researchGroupAdd">
          <activeWhen>
@@ -940,16 +964,16 @@
                       id="edu.ualberta.med.biobank.menu.editShippingMethods"
                       style="push">
                 </command>
-                
+
                 <!-- comment this out for now, it may be required in the future
-                
+
                 <command
                       commandId="edu.ualberta.med.biobank.commands.maintenanceModeChange"
                       id="edu.ualberta.med.biobank.menu.maintenanceModeChange"
                       style="push">
                 </command>
                 -->
-                
+
                 <command
                       commandId="edu.ualberta.med.biobank.commands.userManagement"
                       id="edu.ualberta.med.biobank.menu.userManagement"
@@ -1034,6 +1058,11 @@
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.specimen.import"
+                  icon="icons/database_go.png"
+                  style="push">
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.specimenPosition.import"
                   icon="icons/database_go.png"
                   style="push">
             </command>
@@ -1883,16 +1912,25 @@
       name="%SpecimenImport.editor">
 </editor>
 <editor
-      class="edu.ualberta.med.biobank.forms.batchop.SpecimenBatchOpViewForm"
-      default="false"
-      id="edu.ualberta.med.biobank.forms.SpecimenBatchOpViewForm"
-      name="%SpecimenImport.editor">
+  class="edu.ualberta.med.biobank.forms.batchop.SpecimenPositionImportForm"
+  default="false"
+  id="edu.ualberta.med.biobank.forms.SpecimenPositionImportForm"
+  name="%SpecimenPositionImport.editor">
 </editor>
-<editor
-      class="edu.ualberta.med.biobank.forms.linkassign.SpecimenAssignEntryForm"
-      default="false"
-      id="edu.ualberta.med.biobank.forms.SpecimenAssignEntryForm"
-      name="%SpecimenAssign.editor">
+<editor class="edu.ualberta.med.biobank.forms.batchop.SpecimenBatchOpViewForm"
+        default="false"
+        id="edu.ualberta.med.biobank.forms.SpecimenBatchOpViewForm"
+        name="%SpecimenImport.editor">
+</editor>
+<editor class="edu.ualberta.med.biobank.forms.batchop.SpecimenPositionBatchOpViewForm"
+        default="false"
+        id="edu.ualberta.med.biobank.forms.SpecimenPositionBatchOpViewForm"
+        name="%SpecimenPositionImport.editor">
+</editor>
+<editor class="edu.ualberta.med.biobank.forms.linkassign.SpecimenAssignEntryForm"
+        default="false"
+        id="edu.ualberta.med.biobank.forms.SpecimenAssignEntryForm"
+        name="%SpecimenAssign.editor">
 </editor>
 <editor
       class="edu.ualberta.med.biobank.forms.ResearchGroupEntryForm"
