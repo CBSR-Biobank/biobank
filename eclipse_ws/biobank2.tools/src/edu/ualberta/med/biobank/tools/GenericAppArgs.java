@@ -1,12 +1,19 @@
 package edu.ualberta.med.biobank.tools;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+
+import edu.ualberta.med.biobank.common.util.StringUtil;
 
 @SuppressWarnings("nls")
 public class GenericAppArgs {
@@ -18,72 +25,91 @@ public class GenericAppArgs {
     public static final String OPT_PWD = "w";
     public static final String OPT_VERBOSE = "v";
 
+    @SuppressWarnings("static-access")
+    private static List<Option> OPTIONS =
+        Arrays.asList(new Option(OPT_HELP, "help", false, "Displays this help text."),
+                      new Option(OPT_HOST, "hostname", true,
+                                 "The host name for the Biobank server."),
+                      new Option(OPT_USER, "user", true, "The user name on Biobank server."),
+                      new Option(OPT_VERBOSE, "verbose", false, "Use to enable debug information."),
+                      new Option(OPT_PWD, "password", true, "The user's password."),
+                      OptionBuilder.withArgName(OPT_PORT)
+                          .withLongOpt("port")
+                          .withType(Number.class)
+                          .hasArg()
+                          .withDescription("The port number used by the Biobank server.")
+                          .create());
+
     protected final Options options;
     protected final CommandLineParser parser;
     protected CommandLine line;
     public boolean error = false;
     public String errorMsg;
 
-    public boolean help = false;
-    public boolean verbose = false;
-    public String hostname = "localhost";
-    public String username = "testuser";
-    public String password = "test";
-    public int port = 443;
-
     /**
      * Parses the command line arguments.
+     * @throws ParseException
      */
-    @SuppressWarnings("static-access")
-    public GenericAppArgs() {
+    public GenericAppArgs(String[] argv, List<Option> extraOptions) throws ParseException {
         options = new Options();
         parser = new GnuParser();
 
-        options.addOption(OPT_HELP,    "help", false, "Displays this help text.");
-        options.addOption(OPT_HOST,    "hostname", true, "The host name for the Biobank server.");
-        options.addOption(OPT_USER,    "user", true, "The user name on Biobank server.");
-        options.addOption(OPT_VERBOSE, "verbose", false, "Use to enable debug information.");
-        options.addOption(OPT_PWD,     "password", true, "The user's password.");
+        List<Option> optionList = new ArrayList<Option>(OPTIONS);
+        optionList.addAll(extraOptions);
+        for (Option option : optionList) {
+            options.addOption(option);
+        }
 
-        options.addOption(OptionBuilder.withArgName(OPT_PORT)
-            .withLongOpt("port")
-            .withType(Number.class)
-            .hasArg()
-            .withDescription("The port number used by the Biobank server.")
-            .create());
+        line = parser.parse(options, argv);
     }
 
-    public void parse(String[] argv) {
+    /**
+     * Parses the command line arguments.
+     * @throws ParseException
+     */
+    public GenericAppArgs(String[] argv) throws ParseException {
+        this(argv, new ArrayList<Option>(0));
+    }
+
+    public boolean helpOption() {
+        return hasOption(OPT_HELP);
+    }
+
+    public boolean verboseOption() {
+        return hasOption(OPT_VERBOSE);
+    }
+
+    public String hostOption() {
+        if (hasOption(OPT_HOST)) {
+            return line.getOptionValue(OPT_HOST);
+        }
+        return StringUtil.EMPTY_STRING;
+    }
+
+    public int portOption() {
         try {
-            line = parser.parse(options, argv);
-
-            if (line.hasOption(OPT_HELP)) {
-                this.help = true;
-            }
-
-            if (line.hasOption(OPT_VERBOSE)) {
-                this.verbose = true;
-            }
-
-            if (line.hasOption(OPT_HOST)) {
-                this.hostname = line.getOptionValue(OPT_HOST);
-            }
-
-            if (line.hasOption("port")) {
-                this.port = ((Number) line.getParsedOptionValue("port")).intValue();
-            }
-
-            if (line.hasOption(OPT_USER)) {
-                this.username = line.getOptionValue(OPT_USER);
-            }
-
-            if (line.hasOption(OPT_PWD)) {
-                this.password = line.getOptionValue(OPT_PWD);
+            if (hasOption("port")) {
+                return ((Number) line.getParsedOptionValue("port")).intValue();
             }
         } catch (ParseException e) {
             error = true;
             errorMsg = e.getMessage();
         }
+        return -1;
+    }
+
+    public String userOption() {
+        if (hasOption(OPT_USER)) {
+            return line.getOptionValue(OPT_USER);
+        }
+        return StringUtil.EMPTY_STRING;
+    }
+
+    public String passwordOption() {
+        if (hasOption(OPT_PWD)) {
+            return line.getOptionValue(OPT_PWD);
+        }
+        return StringUtil.EMPTY_STRING;
     }
 
     public String[] getRemainingArgs() {
@@ -107,13 +133,29 @@ public class GenericAppArgs {
     public String toString() {
         StringBuffer buf = new StringBuffer();
 
-        buf.append("h: ").append(hostname);
-        buf.append(", p: ").append(port);
-        buf.append(", u: ").append(username);
-        buf.append(", w: ").append(password);
+        buf.append("h: ").append(hostOption());
+        buf.append(", p: ").append(portOption());
+        buf.append(", u: ").append(userOption());
+        buf.append(", w: ").append(passwordOption());
         buf.append(", errmsg").append(errorMsg);
 
         return buf.toString();
+    }
+
+    protected boolean hasOption(String opt) {
+        if (error) {
+            throw new IllegalArgumentException("command line parsing failed!");
+        }
+        return line.hasOption(opt);
+
+    }
+
+    protected boolean hasOption(String opt, String longOpt) {
+        if (error) {
+            throw new IllegalArgumentException("command line parsing failed!");
+        }
+        return (line.hasOption(opt) || line.hasOption(longOpt));
+
     }
 
 }

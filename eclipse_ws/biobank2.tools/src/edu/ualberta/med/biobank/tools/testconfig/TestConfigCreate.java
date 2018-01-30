@@ -28,9 +28,8 @@ public class TestConfigCreate {
 
     public static void main(String[] argv) {
         try {
-            AppArgs args = new AppArgs();
-            args.parse(argv);
-            if (args.help) {
+            AppArgs args = new AppArgs(argv);
+            if (args.helpOption()) {
                 System.out.println(USAGE);
                 System.exit(0);
             } else if (args.error) {
@@ -38,8 +37,10 @@ public class TestConfigCreate {
                 System.exit(-1);
             }
 
-            if (args.grandchidSpecimenTypes) {
+            if (args.grandchildOption()) {
                 new GrandchildSpecimenTypeTestConfig(args);
+            } else if (args.aliquotsOption()) {
+                new AliquotsTestConfig(args);
             } else {
                 new TestConfig(args);
             }

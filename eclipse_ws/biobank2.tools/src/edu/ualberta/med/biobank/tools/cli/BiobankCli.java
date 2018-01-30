@@ -1,5 +1,10 @@
 package edu.ualberta.med.biobank.tools.cli;
 
+import java.util.Arrays;
+import java.util.List;
+
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,11 +26,11 @@ import edu.ualberta.med.biobank.tools.utils.HostUrl;
 
 /**
  * Provides a Command Line Interface (CLI) to a Biobank server.
- * 
+ *
  * The CLI provides a number commands that can be used to add information to a Biobank installation.
- * 
+ *
  * @author loyola
- * 
+ *
  */
 public class BiobankCli extends Application implements CliProvider {
 
@@ -41,23 +46,16 @@ public class BiobankCli extends Application implements CliProvider {
 
     public static class AppArgs extends GenericAppArgs {
 
-        public boolean useDatabase = false;
+        private static List<Option> EXTRA_OPTIONS =
+            Arrays.asList(new Option("d", "database", false,
+                          "Use a database connection rather than connect to the Biobank server via HTTPS."));
 
-        public AppArgs() {
-            super();
-            options.addOption("d", "database", false,
-                "Use a database connection rather than connect to the Biobank server via HTTPS.");
+        public AppArgs(String[] argv) throws ParseException {
+            super(argv, EXTRA_OPTIONS);
         }
 
-        @Override
-        public void parse(String[] argv) {
-            super.parse(argv);
-
-            if (!error) {
-                if (line.hasOption("d") || line.hasOption("database")) {
-                    this.useDatabase = true;
-                }
-            }
+        public boolean databaseOption() {
+            return hasOption("d", "database");
         }
     }
 
@@ -68,11 +66,15 @@ public class BiobankCli extends Application implements CliProvider {
     private AppArgs options;
 
     public static void main(String[] argv) {
-        new BiobankCli(argv);
+        try {
+            new BiobankCli(argv);
+        } catch (ParseException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
-    public BiobankCli(String[] argv) {
-        super(APP_NAME, USAGE, argv, new AppArgs());
+    public BiobankCli(String[] argv) throws ParseException {
+        super(APP_NAME, USAGE, new AppArgs(argv));
     }
 
     @Override
@@ -120,14 +122,14 @@ public class BiobankCli extends Application implements CliProvider {
             System.exit(0);
         }
 
-        if (!this.options.useDatabase) {
-            String hostUrl = HostUrl.getHostUrl(args.hostname, args.port);
+        if (!this.options.databaseOption()) {
+            String hostUrl = HostUrl.getHostUrl(args.hostOption(), args.portOption());
 
             try {
                 checkCertificates(hostUrl);
 
                 appService = ServiceConnection.getAppService(
-                    hostUrl, args.username, args.password);
+                    hostUrl, args.userOption(), args.passwordOption());
 
                 // validate that we are connected with a valid version of the server
                 if (clientVersion != null) {

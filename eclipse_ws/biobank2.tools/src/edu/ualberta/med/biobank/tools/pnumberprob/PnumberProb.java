@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 
+import org.apache.commons.cli.ParseException;
+
 import edu.ualberta.med.biobank.tools.GenericAppArgs;
 
 @SuppressWarnings("nls")
@@ -44,9 +46,8 @@ public class PnumberProb {
         pnumberProbMap = Collections.unmodifiableMap(aMap);
     }
 
-    public PnumberProb(String argv[]) {
-        GenericAppArgs args = new GenericAppArgs();
-        args.parse(argv);
+    public PnumberProb(String argv[]) throws ParseException {
+        GenericAppArgs args = new GenericAppArgs(argv);
 
         String[] remainingArgs = args.getRemainingArgs();
         if (remainingArgs.length < 1) {

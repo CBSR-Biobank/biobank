@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.cli.ParseException;
 import org.apache.log4j.Logger;
 
 import edu.ualberta.med.biobank.client.util.ServiceConnection;
@@ -27,9 +28,9 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 /**
  * Fixes Issue #1487 - the HEART study problem where the tech's in Calgary entered processing
  * information into the cbsr-training server instead of the production server.
- * 
+ *
  * See the PNUMBERS array below for the patient numbers who's information must be copied over.
- * 
+ *
  */
 @SuppressWarnings("nls")
 @Deprecated
@@ -404,12 +405,11 @@ public class ProblemFixer {
     /*
      * Parses the command line arguments and returns them in an AppArgs object.
      */
-    private static AppArgs parseCommandLine(String argv[]) {
+    private static AppArgs parseCommandLine(String argv[]) throws ParseException {
         AppArgs appArgs = new AppArgs();
 
-        GenericAppArgs args = new GenericAppArgs();
-        args.parse(argv);
-        if (args.help) {
+        GenericAppArgs args = new GenericAppArgs(argv);
+        if (args.helpOption()) {
             args.printHelp(APP_NAME);
             System.exit(0);
         } else if (args.error) {
