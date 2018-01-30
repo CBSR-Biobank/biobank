@@ -34,7 +34,6 @@ import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.model.type.LabelingLayout;
-import edu.ualberta.med.biobank.tools.GenericAppArgs;
 import edu.ualberta.med.biobank.tools.SessionProvider;
 import edu.ualberta.med.biobank.tools.SessionProvider.Mode;
 
@@ -73,7 +72,7 @@ public class TestConfig {
 
     protected final HashSet<Study> studies;
 
-    public TestConfig(GenericAppArgs appArgs) throws Exception {
+    public TestConfig(AppArgs appArgs) throws Exception {
         sessionProvider = new SessionProvider(Mode.RUN);
         session = sessionProvider.openSession();
 
@@ -85,7 +84,7 @@ public class TestConfig {
             throw new RuntimeException(globalAdminUserLogin + " user not found");
         }
 
-        log.debug("username: {}", appArgs.username);
+        log.debug("username: {}", appArgs.userOption());
 
         Clinic clinic = createClinic("Clinic1", "CL1");
 

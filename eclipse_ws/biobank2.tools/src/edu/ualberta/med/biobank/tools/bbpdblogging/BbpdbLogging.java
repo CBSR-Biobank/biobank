@@ -62,8 +62,7 @@ public class BbpdbLogging {
 
     public static void main(String[] argv) {
         try {
-            GenericAppArgs args = new GenericAppArgs();
-            args.parse(argv);
+            GenericAppArgs args = new GenericAppArgs(argv);
             if (args.error) {
                 System.out.println(args.errorMsg + "\n" + USAGE);
                 System.exit(-1);
@@ -78,11 +77,11 @@ public class BbpdbLogging {
     public BbpdbLogging(GenericAppArgs args) throws Exception {
         this.args = args;
         PropertyConfigurator.configure("conf/log4j.properties");
-        bbpdbCon = DriverManager.getConnection("jdbc:mysql://" + args.hostname
+        bbpdbCon = DriverManager.getConnection("jdbc:mysql://" + args.hostOption()
             + ":3306/bbpdb", "dummy", "ozzy498");
 
         biobank2Con =
-            DriverManager.getConnection("jdbc:mysql://" + args.hostname
+            DriverManager.getConnection("jdbc:mysql://" + args.hostOption()
                 + ":3306/biobank2", "dummy", "ozzy498");
 
         importPass1();

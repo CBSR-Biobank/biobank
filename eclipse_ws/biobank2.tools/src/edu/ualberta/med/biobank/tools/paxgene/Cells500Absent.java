@@ -23,15 +23,15 @@ import edu.ualberta.med.biobank.tools.utils.HostUrl;
 
 /**
  * Matthew Klassen sent the following email on Jan 10, 2011:
- * 
+ *
  * On the weekend we finished pulling all Cells500 samples from our freezer 1 and 2 however there
  * are still 470 samples still listed in biobank as in freezer 1 & 2. I have personally verified
  * that all of these aliquots are no longer in the freezer. Would you be able to change the activity
  * status of all the samples in the attached list to closed and add the comment
  * "Sample was absent during Cell Pull MK."
- * 
+ *
  * Thanks
- * 
+ *
  * The email has a CSV file attached.
  */
 @Deprecated
@@ -284,12 +284,13 @@ public class Cells500Absent {
             return;
         }
 
-        LOGGER.debug("username: " + appArgs.username);
+        LOGGER.debug("username: " + appArgs.userOption());
 
-        String hostUrl = HostUrl.getHostUrl(appArgs.hostname, appArgs.port);
+        String hostUrl = HostUrl.getHostUrl(appArgs.hostOption(), appArgs.portOption());
 
-        appService = ServiceConnection.getAppService(hostUrl, appArgs.username,
-            appArgs.password);
+        appService = ServiceConnection.getAppService(hostUrl,
+                                                     appArgs.userOption(),
+                                                     appArgs.passwordOption());
 
         processSpecimens(parseCsv(remainingArgs[0]));
     }
@@ -391,9 +392,8 @@ public class Cells500Absent {
 
     public static void main(String[] argv) {
         try {
-            GenericAppArgs args = new GenericAppArgs();
-            args.parse(argv);
-            if (args.help) {
+            GenericAppArgs args = new GenericAppArgs(argv);
+            if (args.helpOption()) {
                 System.out.println(USAGE);
                 System.exit(0);
             } else if (args.error) {

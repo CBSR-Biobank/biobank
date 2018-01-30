@@ -25,9 +25,9 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 /**
  * A tool that can be used to change or query the Biobank Server's Maintenante Mode setting. This
  * tool can be run as a command from the project's maint Ant build file or standalone.
- * 
+ *
  * @author loyola
- * 
+ *
  */
 public class MaintenanceModeTool {
 
@@ -48,10 +48,8 @@ public class MaintenanceModeTool {
     public static void main(String[] argv) {
         try {
             log.trace("args: " + StringUtils.join(argv, " "));
-            GenericAppArgs args = new GenericAppArgs();
-            args.parse(argv);
-
-            if (args.help) {
+            GenericAppArgs args = new GenericAppArgs(argv);
+            if (args.helpOption()) {
                 System.out.println(USAGE);
                 System.exit(0);
             } else if (args.error) {
@@ -65,13 +63,14 @@ public class MaintenanceModeTool {
     }
 
     public MaintenanceModeTool(GenericAppArgs appArgs) throws Exception {
-        String hostUrl = HostUrl.getHostUrl(appArgs.hostname, appArgs.port);
+        String hostUrl = HostUrl.getHostUrl(appArgs.hostOption(), appArgs.portOption());
 
         try {
             checkCertificates(hostUrl);
 
-            appService = ServiceConnection.getAppService(
-                hostUrl, appArgs.username, appArgs.password);
+            appService = ServiceConnection.getAppService(hostUrl,
+                                                         appArgs.userOption(),
+                                                         appArgs.passwordOption());
 
             String[] remainingArgs = appArgs.getRemainingArgs();
 

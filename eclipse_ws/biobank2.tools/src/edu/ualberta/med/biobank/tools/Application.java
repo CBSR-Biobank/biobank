@@ -8,6 +8,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.util.List;
 
+import org.apache.commons.cli.ParseException;
+
 import edu.ualberta.med.biobank.client.util.TrustStore;
 import edu.ualberta.med.biobank.client.util.TrustStore.Cert;
 
@@ -15,17 +17,15 @@ public abstract class Application {
 
     private static Boolean firstConnection = true;
 
-    protected Application(String appName, String header, String[] argv, GenericAppArgs appArgs) {
+    protected Application(String appName, String header, GenericAppArgs appArgs) {
         try {
-            appArgs.parse(argv);
-
             if (appArgs.error) {
                 System.out.println("Error: " + appArgs.errorMsg + "\n");
                 appArgs.printHelp(appName);
                 System.exit(1);
             }
 
-            if (appArgs.help) {
+            if (appArgs.helpOption()) {
                 appArgs.printUsage(appName, header);
                 System.exit(0);
             }
@@ -36,8 +36,8 @@ public abstract class Application {
         }
     }
 
-    protected Application(String appName, String usage, String[] argv) {
-        this(appName, usage, argv, new GenericAppArgs());
+    protected Application(String appName, String usage, String[] argv) throws ParseException {
+        this(appName, usage, new GenericAppArgs(argv));
 
     }
 

@@ -27,9 +27,9 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 /**
  * See USAGE constant below for a description of this class.
- * 
+ *
  * This class fixes this problem in the current BioBank database.
- * 
+ *
  */
 @SuppressWarnings("nls")
 public class BbpdbConsent {
@@ -66,9 +66,8 @@ public class BbpdbConsent {
 
     public static void main(String[] argv) {
         try {
-            GenericAppArgs args = new GenericAppArgs();
-            args.parse(argv);
-            if (args.help) {
+            GenericAppArgs args = new GenericAppArgs(argv);
+            if (args.helpOption()) {
                 args.printHelp(APP_NAME);
                 System.exit(0);
             } else if (args.error) {
@@ -82,10 +81,10 @@ public class BbpdbConsent {
     }
 
     public BbpdbConsent(GenericAppArgs args) throws Exception {
-        bbpdbCon = DriverManager.getConnection("jdbc:mysql://" + args.hostname
+        bbpdbCon = DriverManager.getConnection("jdbc:mysql://" + args.hostOption()
             + ":3306/bbpdb", "dummy", "ozzy498");
 
-        String hostUrl = HostUrl.getHostUrl(args.hostname, args.port);
+        String hostUrl = HostUrl.getHostUrl(args.hostOption(), args.portOption());
 
         LOGGER.info("host url is " + hostUrl);
 
@@ -95,8 +94,9 @@ public class BbpdbConsent {
                 "no matching consent information found in bbpdb databse");
         }
 
-        appService = ServiceConnection.getAppService(hostUrl, args.username,
-            args.password);
+        appService = ServiceConnection.getAppService(hostUrl,
+                                                     args.userOption(),
+                                                     args.passwordOption());
 
         fixConsentInfo();
     }

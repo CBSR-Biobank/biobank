@@ -13,9 +13,9 @@ import edu.ualberta.med.biobank.tools.utils.HostUrl;
  * The Calgary techs for the HEART study were adding PAXgene tubes to collection events, unaware
  * that they should not be doing this. These source specimens must be set back to active activity
  * status.
- * 
+ *
  * The list of PAXgene source specimens were sent in an email to Elizabeth Taylor on Dec 2, 2011.
- * 
+ *
  */
 @SuppressWarnings("nls")
 @Deprecated
@@ -63,12 +63,13 @@ public class CalgaryPaxgeneFix {
     private final BiobankApplicationService appService;
 
     public CalgaryPaxgeneFix(GenericAppArgs appArgs) throws Exception {
-        LOGGER.debug("username: " + appArgs.username);
+        LOGGER.debug("username: " + appArgs.userOption());
 
-        String hostUrl = HostUrl.getHostUrl(appArgs.hostname, appArgs.port);
+        String hostUrl = HostUrl.getHostUrl(appArgs.hostOption(), appArgs.portOption());
 
-        appService = ServiceConnection.getAppService(hostUrl, appArgs.username,
-            appArgs.password);
+        appService = ServiceConnection.getAppService(hostUrl,
+                                                     appArgs.userOption(),
+                                                     appArgs.passwordOption());
 
         for (String invId : PAXGENE_INV_IDS) {
             SpecimenWrapper spc = SpecimenWrapper
@@ -98,9 +99,8 @@ public class CalgaryPaxgeneFix {
 
     public static void main(String[] argv) {
         try {
-            GenericAppArgs args = new GenericAppArgs();
-            args.parse(argv);
-            if (args.help) {
+            GenericAppArgs args = new GenericAppArgs(argv);
+            if (args.helpOption()) {
                 System.out.println(USAGE);
                 System.exit(0);
             } else if (args.error) {

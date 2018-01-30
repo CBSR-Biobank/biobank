@@ -24,9 +24,9 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 /**
  * See USAGE constant below for a description of this class.
- * 
+ *
  * This class fixes copies clinics from one BioBank database to another.
- * 
+ *
  */
 @Deprecated
 @SuppressWarnings({ "unused", "nls" })
@@ -74,9 +74,8 @@ public class ClinicCopy {
 
     public static void main(String[] argv) {
         try {
-            GenericAppArgs args = new GenericAppArgs();
-            args.parse(argv);
-            if (args.help) {
+            GenericAppArgs args = new GenericAppArgs(argv);
+            if (args.helpOption()) {
                 System.out.println(USAGE);
                 System.exit(0);
             } else if (args.error) {
@@ -90,14 +89,15 @@ public class ClinicCopy {
     }
 
     public ClinicCopy(GenericAppArgs appArgs) throws Exception {
-        tsAppService = ServiceConnection.getAppService(
-            "https://cbsr-training.med.ualberta.ca/biobank", appArgs.username,
-            appArgs.password);
+        tsAppService = ServiceConnection.getAppService("https://cbsr-training.med.ualberta.ca/biobank",
+                                                       appArgs.userOption(),
+                                                       appArgs.passwordOption());
 
-        String hostUrl = HostUrl.getHostUrl(appArgs.hostname, appArgs.port);
+        String hostUrl = HostUrl.getHostUrl(appArgs.hostOption(), appArgs.portOption());
 
-        appService = ServiceConnection.getAppService(hostUrl, appArgs.username,
-            appArgs.password);
+        appService = ServiceConnection.getAppService(hostUrl,
+                                                     appArgs.userOption(),
+                                                     appArgs.passwordOption());
 
         refineStudyOnProd = null;
         for (StudyWrapper study : StudyWrapper.getAllStudies(appService)) {

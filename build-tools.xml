@@ -52,14 +52,20 @@
 
   <target name="test-config-create"
 	  depends="tools-compile"
-	  description="creates a testing configuration in the database. Uses db.properties to
-connect to the database. Use '-Dgrandchild=true' to create granchild specimen types">
+	  description="creates a testing configuration in the database. Uses db.properties to connect to the database. Use '-DconfigType=aliquots' to create aliquot
+                specimens. . Use '-DconfigType=grandchild' to create aliquots specimens, and grandchild specimen types.">
+    <condition property="configTypeAliquots">
+      <equals arg1="${configType}" arg2="aliquots" casesensitive="false" trim="true" />
+    </condition>
+    <condition property="configTypeGrandchild">
+      <equals arg1="${configType}" arg2="grandchild" casesensitive="false" trim="true" />
+    </condition>
     <java classname="edu.ualberta.med.biobank.tools.testconfig.TestConfigCreate"
 	  fork="true">
       <sysproperty key="db.properties" value="db.properties"/>
-      <!--arg value="-h"/-->
       <classpath refid="tools.run.classpath" />
-      <arg value="--grandchild" if:true="${grandchild}" />
+      <arg value="--aliquots" if:true="${configTypeAliquots}" />
+      <arg value="--grandchild" if:true="${configTypeGrandchild}" />
     </java>
   </target>
 

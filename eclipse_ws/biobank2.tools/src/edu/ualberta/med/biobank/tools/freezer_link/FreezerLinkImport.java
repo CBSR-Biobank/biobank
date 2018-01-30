@@ -45,18 +45,18 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 /**
  * Fixes issue #520.
- * 
+ *
  * Some aliquots in the freezer_link table of the BBPDB database were not imported into BioBank.
- * 
+ *
  * Note: time zone conversions are not required. The BBPDB database has times stored as Canada
  * Mountain time. Biobank is accessed via the JBoss server which converts the times to Canada
  * Mountain time for us.
- * 
+ *
  * RUN AS: java -Dlog4j.configuration=file:///apth/log4j.properties -jar bbpdb_freezer_link.jar
  * OPTIONS
- * 
+ *
  * @author Nelson
- * 
+ *
  */
 @SuppressWarnings("nls")
 public class FreezerLinkImport {
@@ -120,9 +120,8 @@ public class FreezerLinkImport {
 
     public static void main(String[] argv) {
         try {
-            GenericAppArgs args = new GenericAppArgs();
-            args.parse(argv);
-            if (args.help) {
+            GenericAppArgs args = new GenericAppArgs(argv);
+            if (args.helpOption()) {
                 System.out.println(USAGE);
                 System.exit(0);
             } else if (args.error) {
@@ -136,15 +135,16 @@ public class FreezerLinkImport {
     }
 
     private FreezerLinkImport(GenericAppArgs args) throws Exception {
-        bbpdbCon = DriverManager.getConnection("jdbc:mysql://" + args.hostname
+        bbpdbCon = DriverManager.getConnection("jdbc:mysql://" + args.hostOption()
             + ":3306/bbpdb", "dummy", "ozzy498");
 
-        String hostUrl = HostUrl.getHostUrl(args.hostname, args.port);
+        String hostUrl = HostUrl.getHostUrl(args.hostOption(), args.portOption());
 
         log.info("host url is {}", hostUrl);
 
-        appService = ServiceConnection.getAppService(hostUrl, args.username,
-            args.password);
+        appService = ServiceConnection.getAppService(hostUrl,
+                                                     args.userOption(),
+                                                     args.passwordOption());
 
         cbsrSite = getCbsrSiteByNameShort("CBSR");
 
