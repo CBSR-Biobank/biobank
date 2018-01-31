@@ -1,7 +1,6 @@
-package edu.ualberta.med.biobank.common.action.batchoperation.specimenPosition;
+package edu.ualberta.med.biobank.common.action.batchoperation.specimen.position;
 
-import static edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpActionErrors.*;
-import static edu.ualberta.med.biobank.common.action.batchoperation.specimenPosition.PositionBatchOpActionErrors.*;
+import static edu.ualberta.med.biobank.common.action.batchoperation.specimen.position.PositionBatchOpActionErrors.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,7 +8,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -17,69 +15,42 @@ import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.batchoperation.BatchOpActionUtil;
 import edu.ualberta.med.biobank.common.action.batchoperation.BatchOpInputErrorSet;
+import edu.ualberta.med.biobank.common.action.batchoperation.specimen.GenericSpecimenPositionBatchOpAction;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.exception.BatchOpErrorsException;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenActionHelper;
-import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.model.BatchOperation;
 import edu.ualberta.med.biobank.model.BatchOperationSpecimen;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.FileData;
-import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenPosition;
-import edu.ualberta.med.biobank.model.SpecimenType;
-import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.model.User;
-import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.util.CompressedReference;
 
 @SuppressWarnings("nls")
-public class PositionBatchOpAction implements Action<IdResult> {
+public class PositionBatchOpAction extends GenericSpecimenPositionBatchOpAction<PositionBatchOpPojo> {
     private static final long serialVersionUID = 1L;
 
     private static Logger log = LoggerFactory.getLogger(PositionBatchOpAction.class);
 
-    public static final int SIZE_LIMIT = 1000;
-
-    private final Integer workingCenterId;
-
-    private final FileData fileData;
-
-    private final CompressedReference<ArrayList<PositionBatchOpPojo>> compressedList;
-
-    private ArrayList<PositionBatchOpPojo> pojos = null;
-
-    private Center workingCenterOnServerSide;
-
     public PositionBatchOpAction(Center workingCenter,
                                  Set<PositionBatchOpPojo> pojos,
                                  File inputFile)
-                                                throws IOException, NoSuchAlgorithmException {
-
-        if (pojos.size() > SIZE_LIMIT) {
-            throw new IllegalArgumentException("pojo list size exceeds maximum");
-        }
-
-        this.workingCenterId = workingCenter.getId();
-        this.fileData = FileData.fromFile(inputFile);
-
-        compressedList = new CompressedReference<ArrayList<PositionBatchOpPojo>>(
-            new ArrayList<PositionBatchOpPojo>(pojos));
-        log.debug("constructor exit");
+        throws IOException, NoSuchAlgorithmException, ClassNotFoundException {
+        super(workingCenter,
+              new CompressedReference<ArrayList<PositionBatchOpPojo>>(
+                new ArrayList<PositionBatchOpPojo>(pojos)),
+              inputFile);
     }
 
-    private void decompressData() {
-        if (compressedList == null) {
-            throw new IllegalStateException("compressed list is null");
-        }
+    @Override
+    protected void decompressData() {
+        super.decompressData();
 
         try {
             pojos = compressedList.get();
@@ -88,24 +59,6 @@ public class PositionBatchOpAction implements Action<IdResult> {
         } catch (ClassNotFoundException e) {
             throw new IllegalStateException(e);
         }
-
-    }
-
-    @Override
-    public boolean isAllowed(ActionContext context) throws ActionException {
-        log.debug("isAllowed: start");
-        if (compressedList == null) {
-            throw new IllegalStateException("compressed list is null");
-        }
-
-        decompressData();
-        User user = context.getUser();
-        workingCenterOnServerSide = context.load(Center.class, workingCenterId);
-
-        Set<Study> studies =
-            BatchOpActionUtil.getStudiesForSpecimens(getValidSpecimens(context, pojos));
-        return PermissionEnum.BATCH_OPERATIONS.isAllowed(user, workingCenterOnServerSide)
-               && BatchOpActionUtil.hasPermissionOnStudies(user, studies);
     }
 
     @Override
@@ -156,7 +109,8 @@ public class PositionBatchOpAction implements Action<IdResult> {
      * Returns all the specimens that correspond to the inventory IDs. If an inventory ID does not
      * exist, an error is returned in the errorSet.
      */
-    private Set<Specimen> getValidSpecimens(ActionContext context, List<PositionBatchOpPojo> pojos) {
+    @Override
+    protected Set<Specimen> getValidSpecimens(ActionContext context) {
         Set<Specimen> specimens = new HashSet<Specimen>();
 
         for (PositionBatchOpPojo pojo : pojos) {
@@ -175,7 +129,6 @@ public class PositionBatchOpAction implements Action<IdResult> {
         Session session = context.getSession();
         int lineNumber = pojo.getLineNumber();
         BatchOpInputErrorSet errors = new BatchOpInputErrorSet();
-        Container container;
         Specimen specimen = BatchOpActionUtil.getSpecimen(session, pojo.getInventoryId());
 
         if (specimen == null) {
@@ -195,93 +148,24 @@ public class PositionBatchOpAction implements Action<IdResult> {
             }
         }
 
-        if (!pojo.hasLabelAndPosition() && !pojo.hasProductBarcodeAndPosition()) {
-            if (!pojo.hasLabelAndPosition()) {
-                errors.addError(lineNumber, CSV_LABEL_AND_POSITION_INVALID_ERROR);
-            } else {
-                errors.addError(lineNumber, CSV_BARCODE_AND_LABEEL_INFO_INVALID_ERROR);
-            }
-        }
+        Pair<BatchOpInputErrorSet, SpecimenPositionPojoData> validation =
+            validatePositionInfo(session,
+                                 pojo,
+                                 specimen.getSpecimenType().getName());
 
-        String palletPosition = pojo.getPalletPosition();
-        String barcode = pojo.getPalletProductBarcode();
-        String label = pojo.getPalletLabel();
-        String rootContainerType = pojo.getRootContainerType();
-        boolean hasPosition = (palletPosition != null) && !palletPosition.isEmpty();
-        boolean hasProductBarcode = (barcode != null) && !barcode.isEmpty();
-        boolean hasLabel = (label != null) && !label.isEmpty();
-        boolean hasRootContainerType = (rootContainerType != null) && !rootContainerType.isEmpty();
-
-        if (!hasPosition && !hasProductBarcode && !hasLabel) {
-            errors.addError(pojo.getLineNumber(), CSV_PALLET_POS_INFO_INALID_ERROR);
-        }
-
-        if (hasPosition && !hasProductBarcode && !hasLabel) {
-            errors.addError(pojo.getLineNumber(), CSV_PALLET_POS_ERROR);
-        }
-
-        if (hasLabel && !hasProductBarcode && !hasPosition) {
-            errors.addError(pojo.getLineNumber(), CSV_PALLET_POS_ERROR);
-        }
-
-        if (hasProductBarcode && !hasLabel && !hasPosition) {
-            errors.addError(pojo.getLineNumber(), CSV_PROD_BARCODE_NO_POS_ERROR);
-        }
-
-        if (hasLabel && hasPosition && !hasRootContainerType) {
-            errors.addError(pojo.getLineNumber(), CSV_PALLET_LABEL_NO_CTYPE_ERROR);
-        }
+        BatchOpInputErrorSet validationErrors = validation.getLeft();
+        errors.addAll(validationErrors);
 
         if (!errors.isEmpty()) {
             return Pair.of(errors, null);
         }
 
-        if (hasLabel) {
-            container = BatchOpActionUtil.getContainer(session, label);
-            if (container == null) {
-                errors.addError(lineNumber, CSV_CONTAINER_LABEL_ERROR.format(label));
-            }
-        } else {
-            container = BatchOpActionUtil.getContainerByBarcode(session, barcode);
-            if (container == null) {
-                errors.addError(lineNumber,
-                                CSV_CONTAINER_BARCODE_ERROR.format(barcode));
-            }
-        }
-
-        SpecimenType specimenType = specimen.getSpecimenType();
-        if (!container.getContainerType().getSpecimenTypes().contains(specimenType)) {
-            log.info("getDbInfo: specimen with bad specimen type: inventoryId: "
-                + specimen.getInventoryId()
-                + ", specimen type: " + specimen.getSpecimenType().getName());
-            errors.addError(lineNumber, CSV_CONTAINER_SPC_TYPE_ERROR.format(specimenType.getName()));
-        }
-
-        try {
-            RowColPos position = container.getPositionFromLabelingScheme(palletPosition);
-
-            // is container position empty?
-            if (!container.isPositionFree(position)) {
-                LString message = (hasLabel)
-                    ? CSV_LABEL_POS_OCCUPIED_ERROR.format(position, label)
-                    : CSV_CONTAINER_POS_OCCUPIED_ERROR.format(position, barcode);
-                errors.addError(lineNumber, message);
-            }
-
-            if (errors.isEmpty()) {
-                PositionBatchOpPojoInfo pojoData = new PositionBatchOpPojoInfo(pojo);
-                pojoData.setSpecimen(specimen);
-                pojoData.setContainer(container);
-                pojoData.setPosition(position);
-                return Pair.of(null, pojoData);
-            }
-        } catch (Exception e) {
-            LString message = (hasLabel)
-                ? CSV_LABEL_POS_OCCUPIED_ERROR.format(palletPosition, label)
-                : CSV_CONTAINER_POS_OCCUPIED_ERROR.format(palletPosition, barcode);
-            errors.addError(lineNumber, message);
-        }
-        return Pair.of(errors, null);
+        SpecimenPositionPojoData info = validation.getRight();
+        PositionBatchOpPojoInfo pojoData = new PositionBatchOpPojoInfo(pojo);
+        pojoData.setSpecimen(info.specimen);
+        pojoData.setContainer(info.container);
+        pojoData.setPosition(info.specimenPosition);
+        return Pair.of(null, pojoData);
     }
 
     private void updatePostition(ActionContext           context,

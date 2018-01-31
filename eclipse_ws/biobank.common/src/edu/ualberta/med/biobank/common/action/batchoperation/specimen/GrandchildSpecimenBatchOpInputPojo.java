@@ -9,7 +9,9 @@ import java.util.Date;
  * @author Nelson Loyola
  *
  */
-public class GrandchildSpecimenBatchOpInputPojo implements IBatchOpSpecimenInputPojo {
+public class GrandchildSpecimenBatchOpInputPojo implements
+                                               IBatchOpSpecimenInputPojo,
+                                               IBatchOpSpecimenPositionPojo {
     private static final long serialVersionUID = 1L;
 
     private int lineNumber;
@@ -37,6 +39,7 @@ public class GrandchildSpecimenBatchOpInputPojo implements IBatchOpSpecimenInput
         this.lineNumber = lineNumber;
     }
 
+    @Override
     public String getInventoryId() {
         return inventoryId;
     }
@@ -103,44 +106,66 @@ public class GrandchildSpecimenBatchOpInputPojo implements IBatchOpSpecimenInput
         this.currentCenter = currentCenter;
     }
 
+    @Override
     public String getPalletProductBarcode() {
         return palletProductBarcode;
     }
 
+    @Override
     public void setPalletProductBarcode(String palletProductBarcode) {
         this.palletProductBarcode = palletProductBarcode;
     }
 
+    @Override
     public String getRootContainerType() {
         return rootContainerType;
     }
 
+    @Override
     public void setRootContainerType(String rootContainerType) {
         this.rootContainerType = rootContainerType;
     }
 
+    @Override
     public String getPalletLabel() {
         return palletLabel;
     }
 
+    @Override
     public void setPalletLabel(String palletLabel) {
         this.palletLabel = palletLabel;
     }
 
+    @Override
     public String getPalletPosition() {
         return palletPosition;
     }
 
+    @Override
     public void setPalletPosition(String palletPosition) {
         this.palletPosition = palletPosition;
     }
 
+    @Override
     public String getComment() {
         return comment;
     }
 
+    @Override
     public void setComment(String comment) {
         this.comment = comment;
+    }
+
+    @Override
+    public boolean hasLabelAndPosition() {
+        return (rootContainerType != null)
+            && (palletLabel != null)
+            && (palletPosition != null);
+    }
+
+    @Override
+    public boolean hasProductBarcodeAndPosition() {
+        return (palletProductBarcode != null) && (palletPosition != null);
     }
 
 }

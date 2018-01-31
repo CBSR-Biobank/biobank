@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.test;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
@@ -19,13 +17,13 @@ public class AllTestsSuite {
     public static final String userLogin = "testuser";
     public static final String userPwd = "test";
 
-    @BeforeClass
-    public static void setUp() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDown() throws Exception {
-    }
+//    @BeforeClass
+//    public static void setUp() throws Exception {
+//    }
+//
+//    @AfterClass
+//    public static void tearDown() throws Exception {
+//    }
 
     @Deprecated
     public static BiobankApplicationService connect(String user, String password)

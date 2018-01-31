@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.test.action.batchoperation.specimenPosition;
+package edu.ualberta.med.biobank.test.action.batchoperation.specimen.position;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpAction;
-import edu.ualberta.med.biobank.common.action.batchoperation.specimenPosition.PositionBatchOpPojo;
+import edu.ualberta.med.biobank.common.action.batchoperation.specimen.position.PositionBatchOpPojo;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;

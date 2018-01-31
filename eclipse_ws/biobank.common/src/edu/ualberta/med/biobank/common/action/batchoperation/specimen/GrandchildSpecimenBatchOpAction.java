@@ -20,19 +20,15 @@ import edu.ualberta.med.biobank.common.action.batchoperation.BatchOpActionUtil;
 import edu.ualberta.med.biobank.common.action.batchoperation.BatchOpInputErrorSet;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.exception.BatchOpErrorsException;
-import edu.ualberta.med.biobank.common.action.exception.BatchOpException;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.model.BatchOperation;
 import edu.ualberta.med.biobank.model.BatchOperationSpecimen;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.CollectionEvent;
-import edu.ualberta.med.biobank.model.Comment;
-import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
-import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.util.CompressedReference;
 
 /**
@@ -109,33 +105,30 @@ public class GrandchildSpecimenBatchOpAction
             throw new BatchOpErrorsException(errorSet.getErrors());
         }
 
-        Map<String, GrandchildSpecimenBatchOpBuilder> pojoDataMap =
-            new HashMap<String, GrandchildSpecimenBatchOpBuilder>(0);
+        Map<String, GrandchildSpecimenBatchOpDbInfo> pojoDataMap =
+            new HashMap<String, GrandchildSpecimenBatchOpDbInfo>(0);
 
         log.debug("SpecimenBatchOpAction: getting DB info");
         for (GrandchildSpecimenBatchOpInputPojo pojo : pojos) {
             String inventoryId = pojo.getInventoryId();
 
-            Pair<BatchOpException<LString>, GrandchildSpecimenBatchOpBuilder> result =
+            Pair<BatchOpInputErrorSet, GrandchildSpecimenBatchOpDbInfo> result =
                 getDbInfo(context, pojo);
 
-            BatchOpException<LString> error = result.getLeft();
-            if (error != null) {
-                errorSet.addError(error.getLineNumber(), error.getMessage());
-
+            BatchOpInputErrorSet errors = result.getLeft();
+            if (errors != null) {
+                errorSet.addAll(errors);
             }
 
-            GrandchildSpecimenBatchOpBuilder pojoData = result.getRight();
+            GrandchildSpecimenBatchOpDbInfo pojoData = result.getRight();
             if (pojoData != null) {
                 pojoDataMap.put(inventoryId, pojoData);
             }
         }
 
-        for (GrandchildSpecimenBatchOpBuilder pojoData : pojoDataMap.values()) {
-            boolean valid = pojoData.validate();
-            if (!valid) {
-                errorSet.addAll(pojoData.getErrorList());
-            }
+        for (GrandchildSpecimenBatchOpDbInfo pojoData : pojoDataMap.values()) {
+            Pair<BatchOpInputErrorSet, Boolean> valid = pojoData.validate();
+            errorSet.addAll(valid.getLeft());
         }
 
         if (!errorSet.isEmpty()) {
@@ -148,7 +141,7 @@ public class GrandchildSpecimenBatchOpAction
 
         // now add aliquoted specimens
         log.debug("SpecimenBatchOpAction: adding aliquot specimens");
-        for (GrandchildSpecimenBatchOpBuilder info : pojoDataMap.values()) {
+        for (GrandchildSpecimenBatchOpDbInfo info : pojoDataMap.values()) {
             addSpecimen(context, batchOp, info);
         }
 
@@ -203,7 +196,7 @@ public class GrandchildSpecimenBatchOpAction
     }
 
     // get referenced items that exist in the database
-    private Pair<BatchOpException<LString>, GrandchildSpecimenBatchOpBuilder>
+    private Pair<BatchOpInputErrorSet, GrandchildSpecimenBatchOpDbInfo>
     getDbInfo(ActionContext                      context,
               GrandchildSpecimenBatchOpInputPojo inputPojo) {
         Specimen spc = BatchOpActionUtil.getSpecimen(context.getSession(),
@@ -212,7 +205,7 @@ public class GrandchildSpecimenBatchOpAction
             return errorResult(inputPojo, SPC_ALREADY_EXISTS_ERROR);
         }
 
-        GrandchildSpecimenBatchOpBuilder pojoData = new GrandchildSpecimenBatchOpBuilder(inputPojo);
+        GrandchildSpecimenBatchOpDbInfo pojoData = new GrandchildSpecimenBatchOpDbInfo(inputPojo);
         String parentInventoryId = inputPojo.getParentInventoryId();
         Specimen parentSpecimen = BatchOpActionUtil.getSpecimen(context.getSession(),
                                                                 parentInventoryId);
@@ -236,7 +229,6 @@ public class GrandchildSpecimenBatchOpAction
         }
 
         pojoData.setPatient(patient);
-        pojoData.setUser(context.getUser());
         pojoData.setSpecimenType(spcType);
 
         Set<SpecimenType> siteAliquotedSpecimenTypes =
@@ -282,50 +274,19 @@ public class GrandchildSpecimenBatchOpAction
         // only get container information if defined for this row
 
         if (pojoData.hasPosition()) {
-            String position = inputPojo.getPalletPosition();
-            String label = inputPojo.getPalletLabel();
-            String barcode = inputPojo.getPalletProductBarcode();
-            boolean hasLabel = (label != null) && !label.isEmpty();
-            Container container;
+            Pair<BatchOpInputErrorSet, SpecimenPositionPojoData> validation =
+                validatePositionInfo(context.getSession(),
+                                     inputPojo,
+                                     inputPojo.getSpecimenType());
 
-            if (hasLabel) {
-                container = BatchOpActionUtil.getContainer(context.getSession(), label);
-                if (container == null) {
-                    return errorResult(inputPojo, CSV_CONTAINER_LABEL_ERROR.format(label));
-                }
-            } else {
-                container = BatchOpActionUtil.getContainerByBarcode(context.getSession(), barcode);
-                if (container == null) {
-                    return errorResult(inputPojo, CSV_CONTAINER_BARCODE_ERROR.format(barcode));
-                }
+            BatchOpInputErrorSet validationErrors = validation.getLeft();
+            if ((validationErrors != null) && !validationErrors.isEmpty()) {
+                return Pair.of(validationErrors, null);
             }
 
-            pojoData.setContainer(container);
-
-            if (!container.getContainerType().getSpecimenTypes().contains(spcType)) {
-                return errorResult(inputPojo,
-                                   CSV_CONTAINER_SPC_TYPE_ERROR.format(spcType.getName()));
-            }
-
-            try {
-                RowColPos pos = container.getPositionFromLabelingScheme(position);
-
-                // is container position empty?
-                if (!container.isPositionFree(pos)) {
-                    LString message = (hasLabel)
-                        ? CSV_LABEL_POS_OCCUPIED_ERROR.format(position, label)
-                            : CSV_CONTAINER_POS_OCCUPIED_ERROR.format(position, barcode);
-                    return errorResult(inputPojo, message);
-                }
-
-                pojoData.setSpecimenPos(pos);
-            } catch (Exception e) {
-                LString message = (hasLabel)
-                    ? CSV_LABEL_POS_OCCUPIED_ERROR.format(position, label)
-                        : CSV_CONTAINER_POS_OCCUPIED_ERROR.format(position, barcode);
-                return errorResult(inputPojo, message);
-            }
-
+            SpecimenPositionPojoData info = validation.getRight();
+            pojoData.setContainer(info.container);
+            pojoData.setSpecimenPos(info.specimenPosition);
         }
 
         return Pair.of(null, pojoData);
@@ -333,7 +294,7 @@ public class GrandchildSpecimenBatchOpAction
 
     private Specimen addSpecimen(ActionContext                    context,
                                  BatchOperation                   batchOp,
-                                 GrandchildSpecimenBatchOpBuilder pojoData) {
+                                 GrandchildSpecimenBatchOpDbInfo pojoData) {
         if (context == null) {
             throw new NullPointerException("context is null");
         }
@@ -354,13 +315,20 @@ public class GrandchildSpecimenBatchOpAction
         CollectionEvent cevent = pojoData.getCevent();
         pojoData.setPatient(cevent.getPatient());
 
-        Specimen spc = pojoData.createNewSpecimen();
-
-        // check if this specimen has a comment and if so save it to DB
-        if (!spc.getComments().isEmpty()) {
-            Comment comment = spc.getComments().iterator().next();
-            context.getSession().save(comment);
-        }
+        Specimen spc = createSpecimen(context,
+                                      pojoData.getPojo().getInventoryId(),
+                                      pojoData.getParentSpecimen(),
+                                      cevent,
+                                      null,
+                                      pojoData.getSpecimenType(),
+                                      false,
+                                      pojoData.getOriginCenter(),
+                                      pojoData.getOriginInfo(),
+                                      pojoData.getPojo().getCreatedAt(),
+                                      pojoData.getPojo().getVolume(),
+                                      pojoData.getPojo().getComment(),
+                                      pojoData.getContainer(),
+                                      pojoData.getSpecimenPos());
 
         context.getSession().save(spc.getOriginInfo());
         context.getSession().save(spc);
@@ -376,9 +344,11 @@ public class GrandchildSpecimenBatchOpAction
     //
     // Used by getDbInfo to return a result.
     //
-    private static Pair<BatchOpException<LString>, GrandchildSpecimenBatchOpBuilder>
+    private static Pair<BatchOpInputErrorSet, GrandchildSpecimenBatchOpDbInfo>
     errorResult(GrandchildSpecimenBatchOpInputPojo pojo, LString error) {
-        return Pair.of(new BatchOpException<LString>(pojo.getLineNumber(), error), null);
+        BatchOpInputErrorSet errors = new BatchOpInputErrorSet();
+        errors.addError(pojo.getLineNumber(), error);
+        return Pair.of(errors, null);
 
     }
 

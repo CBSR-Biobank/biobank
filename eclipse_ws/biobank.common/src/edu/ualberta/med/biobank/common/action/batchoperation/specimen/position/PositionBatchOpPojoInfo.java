@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.common.action.batchoperation.specimenPosition;
+package edu.ualberta.med.biobank.common.action.batchoperation.specimen.position;
 
 import edu.ualberta.med.biobank.common.action.batchoperation.IBatchOpPojoHelper;
 import edu.ualberta.med.biobank.model.Container;

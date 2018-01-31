@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.common.action.batchoperation;
 
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.hibernate.Criteria;
@@ -18,6 +17,7 @@ import edu.ualberta.med.biobank.model.BatchOperation;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.EventAttr;
 import edu.ualberta.med.biobank.model.FileData;
 import edu.ualberta.med.biobank.model.FileMetaData;
@@ -72,29 +72,6 @@ public class BatchOpActionUtil {
             .add(Restrictions.eq("inventoryId", inventoryId));
 
         return (Specimen) c.uniqueResult();
-    }
-
-    public static Set<Study> getStudiesForSpecimens(Set<Specimen> specimens) {
-        // get all collection events
-        for (Specimen specimen : specimens) {
-            specimen.getCollectionEvent();
-        }
-
-        // get all patients from specimens
-        for (Specimen specimen : specimens) {
-            specimen.getCollectionEvent().getPatient();
-        }
-
-        Set<Study> studies = new HashSet<Study>();
-        for (Specimen specimen : specimens) {
-            studies.add(specimen.getCollectionEvent().getPatient().getStudy());
-        }
-        return studies;
-    }
-
-    public static Set<Study> getStudiesForSpecimens(List<Specimen> specimens) {
-        Set<Specimen> specimensAsSet = new HashSet<Specimen>(specimens);
-        return getStudiesForSpecimens(specimensAsSet);
     }
 
     public static SpecimenType getSpecimenType(Session session, String name) {
@@ -157,14 +134,30 @@ public class BatchOpActionUtil {
         return result;
     }
 
-    public static Container getContainer(Session session, String label) {
+    public static Container getContainer(Session session,
+                                         String label,
+                                         String containerTypeNameShort) {
         if (session == null) {
             throw new NullPointerException("session is null");
         }
 
         Criteria c = session
-            .createCriteria(Container.class, "c")
-            .add(Restrictions.eq("label", label));
+            .createCriteria(Container.class, "container")
+            .createAlias("container.containerType", "ctype")
+            .add(Restrictions.eq("label", label))
+            .add(Restrictions.eq("ctype.nameShort", containerTypeNameShort));
+
+        return (Container) c.uniqueResult();
+    }
+
+    public static Container getContainerType(Session session, String nameShort) {
+        if (session == null) {
+            throw new NullPointerException("session is null");
+        }
+
+        Criteria c = session
+            .createCriteria(ContainerType.class)
+            .add(Restrictions.eq("nameShort", nameShort));
 
         return (Container) c.uniqueResult();
     }
@@ -309,4 +302,5 @@ public class BatchOpActionUtil {
         }
         return true;
     }
+
 }

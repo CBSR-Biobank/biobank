@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.common.action.batchoperation.specimenPosition;
+package edu.ualberta.med.biobank.common.action.batchoperation.specimen.position;
 
 import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.i18n.Bundle;

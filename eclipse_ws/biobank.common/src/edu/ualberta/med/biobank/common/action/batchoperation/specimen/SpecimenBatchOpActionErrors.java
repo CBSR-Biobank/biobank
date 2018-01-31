@@ -55,6 +55,9 @@ public class SpecimenBatchOpActionErrors {
     public static final Tr CSV_CONTAINER_LABEL_ERROR =
         bundle.tr("container with label \"{0}\" does not exist");
 
+    public static final Tr CSV_CONTAINER_LABEL_ROOT_CONTAINER_TYPE_ERROR =
+        bundle.tr("container with label \"{0}\" and root container type \"{1}\" does not exist");
+
     public static final Tr CSV_CONTAINER_BARCODE_ERROR =
         bundle.tr("container with product barcode \"{0}\" does not exist");
 

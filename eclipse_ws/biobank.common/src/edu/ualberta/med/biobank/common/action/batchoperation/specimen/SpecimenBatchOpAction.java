@@ -4,11 +4,13 @@ import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,18 +20,16 @@ import edu.ualberta.med.biobank.common.action.batchoperation.BatchOpActionUtil;
 import edu.ualberta.med.biobank.common.action.batchoperation.BatchOpInputErrorSet;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.exception.BatchOpErrorsException;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.BatchOperation;
 import edu.ualberta.med.biobank.model.BatchOperationSpecimen;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.CollectionEvent;
-import edu.ualberta.med.biobank.model.Comment;
-import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
-import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.util.CompressedReference;
 
 /**
@@ -106,10 +106,8 @@ public class SpecimenBatchOpAction extends CommonSpecimenBatchOpAction<SpecimenB
         // getModelObjects(context, pojos);
 
         Map<String, SpecimenBatchOpInputPojo> pojoMap = new HashMap<String, SpecimenBatchOpInputPojo>(0);
-
-        Map<String, SpecimenBatchOpBuilder> pojoDataMap = new HashMap<String, SpecimenBatchOpBuilder>(0);
-
-        Set<SpecimenBatchOpBuilder> aliquotSpcPojoData = new HashSet<SpecimenBatchOpBuilder>();
+        Map<String, SpecimenBatchOpDbInfo> pojoDataMap = new HashMap<String, SpecimenBatchOpDbInfo>(0);
+        Set<SpecimenBatchOpDbInfo> aliquotSpcPojoData = new HashSet<SpecimenBatchOpDbInfo>();
 
         log.debug("SpecimenBatchOpAction: getting DB info");
         for (SpecimenBatchOpInputPojo pojo : pojos) {
@@ -121,7 +119,7 @@ public class SpecimenBatchOpAction extends CommonSpecimenBatchOpAction<SpecimenB
         }
 
         for (SpecimenBatchOpInputPojo pojo : pojos) {
-            SpecimenBatchOpBuilder pojoData = getDbInfo(context, pojo,
+            SpecimenBatchOpDbInfo pojoData = getDbInfo(context, pojo,
                 pojoMap.get(pojo.getParentInventoryId()));
 
             if (pojoData != null) {
@@ -133,8 +131,8 @@ public class SpecimenBatchOpAction extends CommonSpecimenBatchOpAction<SpecimenB
         }
 
         // assign the parent specimen for child specimens
-        for (SpecimenBatchOpBuilder pojoData : aliquotSpcPojoData) {
-            SpecimenBatchOpBuilder parentPojoData =
+        for (SpecimenBatchOpDbInfo pojoData : aliquotSpcPojoData) {
+            SpecimenBatchOpDbInfo parentPojoData =
                 pojoDataMap.get(pojoData.getParentInventoryId());
 
             if (parentPojoData != null) {
@@ -142,11 +140,9 @@ public class SpecimenBatchOpAction extends CommonSpecimenBatchOpAction<SpecimenB
             }
         }
 
-        for (SpecimenBatchOpBuilder pojoData : pojoDataMap.values()) {
-            boolean valid = pojoData.validate();
-            if (!valid) {
-                errorSet.addAll(pojoData.getErrorList());
-            }
+        for (SpecimenBatchOpDbInfo pojoData : pojoDataMap.values()) {
+            Pair<BatchOpInputErrorSet, Boolean> valid = pojoData.validate();
+            errorSet.addAll(valid.getLeft());
 
             if (pojoData.getParentInventoryId() != null) {
                 SpecimenBatchOpInputPojo pojo = pojoData.getPojo();
@@ -171,43 +167,35 @@ public class SpecimenBatchOpAction extends CommonSpecimenBatchOpAction<SpecimenB
 
         // add all source specimens first
         log.debug("SpecimenBatchOpAction: adding source specimens");
-        for (SpecimenBatchOpBuilder info : pojoDataMap.values()) {
+        for (SpecimenBatchOpDbInfo info : pojoDataMap.values()) {
             if (!info.getPojo().getSourceSpecimen()) continue;
 
-            Specimen spc = addSpecimen(context, batchOp, info);
-            parentSpecimens.put(spc.getInventoryId(), spc);
-
-            if (info.getPevent() == null) {
-                ProcessingEvent pevent = createProcessignEventIfRequired(context, info);
-                if (pevent != null) {
-                    createdProcessingEvents.put(pevent.getWorksheet(), pevent);
-
-                    spc.setProcessingEvent(pevent);
-                    pevent.getSpecimens().add(spc);
-                }
+            ProcessingEvent pevent = info.getPevent();
+            if (pevent == null) {
+                pevent = createProcessignEventIfRequired(context, info);
             }
 
+            Specimen spc = addSpecimen(context, batchOp, info, pevent);
+            parentSpecimens.put(spc.getInventoryId(), spc);
             // TODO: set activity status to closed?
         }
 
         // now add aliquoted specimens
         log.debug("SpecimenBatchOpAction: adding aliquot specimens");
-        for (SpecimenBatchOpBuilder info : aliquotSpcPojoData) {
-            if ((info.getParentInventoryId() != null)
-                && (info.getParentSpecimen() == null)) {
-                Specimen parentSpc =
-                    parentSpecimens.get(info.getParentInventoryId());
+        for (SpecimenBatchOpDbInfo info : aliquotSpcPojoData) {
+            if ((info.getParentInventoryId() != null) && (info.getParentSpecimen() == null)) {
+                Specimen parentSpc = parentSpecimens.get(info.getParentInventoryId());
                 if (parentSpc == null) {
                     errorSet.addError(info.getPojo().getLineNumber(),
-                        SpecimenBatchOpActionErrors.CSV_PARENT_SPC_INV_ID_ERROR.format(info.getPojo().getParentInventoryId()));
+                                      SpecimenBatchOpActionErrors.CSV_PARENT_SPC_INV_ID_ERROR
+                                          .format(info.getPojo().getParentInventoryId()));
                 } else {
                     info.setParentSpecimen(parentSpc);
                 }
             }
 
             if (errorSet.isEmpty()) {
-                createProcessignEventIfRequired(context, info);
-                addSpecimen(context, batchOp, info);
+                addSpecimen(context, batchOp, info, createProcessignEventIfRequired(context, info));
             }
         }
 
@@ -263,9 +251,9 @@ public class SpecimenBatchOpAction extends CommonSpecimenBatchOpAction<SpecimenB
     }
 
     // get referenced items that exist in the database
-    private SpecimenBatchOpBuilder getDbInfo(ActionContext context,
-        SpecimenBatchOpInputPojo inputPojo,
-        SpecimenBatchOpInputPojo parentInputPojo) {
+    private SpecimenBatchOpDbInfo getDbInfo(ActionContext context,
+                                             SpecimenBatchOpInputPojo inputPojo,
+                                             SpecimenBatchOpInputPojo parentInputPojo) {
         Specimen spc = BatchOpActionUtil.getSpecimen(context.getSession(), inputPojo.getInventoryId());
         if (spc != null) {
             errorSet.addError(inputPojo.getLineNumber(),
@@ -273,9 +261,7 @@ public class SpecimenBatchOpAction extends CommonSpecimenBatchOpAction<SpecimenB
             return null;
         }
 
-        SpecimenBatchOpBuilder pojoData = new SpecimenBatchOpBuilder(inputPojo, parentInputPojo);
-        pojoData.setUser(context.getUser());
-
+        SpecimenBatchOpDbInfo pojoData = new SpecimenBatchOpDbInfo(inputPojo, parentInputPojo);
         Specimen parentSpecimen = null;
 
         Patient patient = null;
@@ -409,73 +395,28 @@ public class SpecimenBatchOpAction extends CommonSpecimenBatchOpAction<SpecimenB
         }
 
         // only get container information if defined for this row
-
         if (pojoData.hasPosition()) {
-            String position = inputPojo.getPalletPosition();
-            String label = inputPojo.getPalletLabel();
-            String barcode = inputPojo.getPalletProductBarcode();
-            boolean hasLabel = (label != null) && !label.isEmpty();
-            Container container;
+            Pair<BatchOpInputErrorSet, SpecimenPositionPojoData> validation =
+                validatePositionInfo(context.getSession(),
+                                     inputPojo,
+                                     inputPojo.getSpecimenType());
 
-            if (hasLabel) {
-                container = BatchOpActionUtil.getContainer(context.getSession(), label);
+            BatchOpInputErrorSet validationErrors = validation.getLeft();
+            errorSet.addAll(validationErrors);
+            if ((validationErrors != null) && !validationErrors.isEmpty()) return null;
 
-                if (container == null) {
-                    errorSet.addError(inputPojo.getLineNumber(),
-                        SpecimenBatchOpActionErrors.CSV_CONTAINER_LABEL_ERROR.format(label));
-                    return null;
-                }
-            } else {
-                container = BatchOpActionUtil.getContainerByBarcode(context.getSession(), barcode);
-
-                if (container == null) {
-                    errorSet.addError(inputPojo.getLineNumber(), SpecimenBatchOpActionErrors.CSV_CONTAINER_BARCODE_ERROR.format(barcode));
-                    return null;
-                }
-            }
-
-            pojoData.setContainer(container);
-
-            if (!container.getContainerType().getSpecimenTypes().contains(spcType)) {
-                errorSet.addError(inputPojo.getLineNumber(),
-                    SpecimenBatchOpActionErrors.CSV_CONTAINER_SPC_TYPE_ERROR.format(spcType.getName()));
-                return null;
-            }
-
-            try {
-                RowColPos pos = container.getPositionFromLabelingScheme(position);
-
-                // is container position empty?
-                if (!container.isPositionFree(pos)) {
-                    if (hasLabel) {
-                        errorSet.addError(inputPojo.getLineNumber(),
-                            SpecimenBatchOpActionErrors.CSV_LABEL_POS_OCCUPIED_ERROR.format(position, label));
-                    } else {
-                        errorSet.addError(inputPojo.getLineNumber(),
-                            SpecimenBatchOpActionErrors.CSV_CONTAINER_POS_OCCUPIED_ERROR.format(position, barcode));
-                    }
-                    return null;
-                }
-
-                pojoData.setSpecimenPos(pos);
-            } catch (Exception e) {
-                if (hasLabel) {
-                    errorSet.addError(inputPojo.getLineNumber(),
-                        SpecimenBatchOpActionErrors.CSV_SPECIMEN_LABEL_ERROR.format(position, label));
-                } else {
-                    errorSet.addError(inputPojo.getLineNumber(),
-                        SpecimenBatchOpActionErrors.CSV_SPECIMEN_BARCODE_ERROR.format(position, barcode));
-                }
-                return null;
-            }
-
+            SpecimenPositionPojoData info = validation.getRight();
+            pojoData.setContainer(info.container);
+            pojoData.setSpecimenPos(info.specimenPosition);
         }
 
         return pojoData;
     }
 
-    private Specimen addSpecimen(ActionContext context,
-        BatchOperation batchOp, SpecimenBatchOpBuilder pojoData) {
+    private Specimen addSpecimen(ActionContext          context,
+                                 BatchOperation         batchOp,
+                                 SpecimenBatchOpDbInfo pojoData,
+                                 ProcessingEvent        pevent) {
         if (context == null) {
             throw new NullPointerException("context is null");
         }
@@ -525,13 +466,27 @@ public class SpecimenBatchOpAction extends CommonSpecimenBatchOpAction<SpecimenB
             pojoData.setPatient(cevent.getPatient());
         }
 
-        Specimen spc = pojoData.createNewSpecimen();
-
-        // check if this specimen has a comment and if so save it to DB
-        if (!spc.getComments().isEmpty()) {
-            Comment comment = spc.getComments().iterator().next();
-            context.getSession().save(comment);
+        if ((pojoData.getPojo().getParentInventoryId() != null)
+            && (pojoData.getParentSpecimen() == null)) {
+            throw new IllegalStateException(
+                "parent specimen for specimen with " + pojoData.getPojo().getInventoryId()
+                    + " has not be created yet");
         }
+
+        Specimen spc = createSpecimen(context,
+                                      pojoData.getPojo().getInventoryId(),
+                                      pojoData.getParentSpecimen(),
+                                      cevent,
+                                      pevent,
+                                      pojoData.getSpecimenType(),
+                                      pojoData.getPojo().getSourceSpecimen(),
+                                      pojoData.getOriginCenter(),
+                                      pojoData.getOriginInfo(),
+                                      pojoData.getPojo().getCreatedAt(),
+                                      pojoData.getPojo().getVolume(),
+                                      pojoData.getPojo().getComment(),
+                                      pojoData.getContainer(),
+                                      pojoData.getSpecimenPos());
 
         context.getSession().save(spc.getOriginInfo());
         context.getSession().save(spc);
@@ -595,7 +550,7 @@ public class SpecimenBatchOpAction extends CommonSpecimenBatchOpAction<SpecimenB
     }
 
     protected ProcessingEvent createProcessignEventIfRequired(ActionContext context,
-        SpecimenBatchOpBuilder pojoData) {
+                                                              SpecimenBatchOpDbInfo pojoData) {
         ProcessingEvent pevent = null;
 
         // add the processing event for this source specimen
@@ -607,13 +562,50 @@ public class SpecimenBatchOpAction extends CommonSpecimenBatchOpAction<SpecimenB
                     pojoData.setPevent(pevent);
                     log.debug("createProcessignEventIfRequired: processing event created previously");
                 } else {
-                    pevent = pojoData.createNewProcessingEvent();
+                    Center center = pojoData.getOriginCenter();
+                    if (center == null) {
+                        // origin center not assigned to pojo, default to working center
+                        center = workingCenterOnServerSide;
+                    }
+                    OriginInfo originInfo = pojoData.createNewOriginInfo(center);
+                    originInfo.setReceiverCenter(center);
+                    pevent = createNewProcessingEvent(pojoData.getParentSpecimen(),
+                                                      pojoData.getPojo().getWorksheet(),
+                                                      pojoData.getPojo().getCreatedAt(),
+                                                      pojoData.getPojo().getWaybill(),
+                                                      pojoData.getOriginInfo());
                     context.getSession().saveOrUpdate(pevent);
                     log.debug("createProcessignEventIfRequired: created new processing event");
 
                 }
             }
         }
+        return pevent;
+    }
+
+    /**
+     * Creates a new processing event for the specimen stored into this builder.
+     *
+     * @return a new processing event.
+     */
+    ProcessingEvent createNewProcessingEvent(Specimen   parentSpecimen,
+                                             String     worksheet,
+                                             Date       createdAt,
+                                             String     waybill,
+                                             OriginInfo originInfo) {
+        if (parentSpecimen != null) {
+            throw new IllegalStateException(
+                "this specimen has a parent specimen and cannot have a processing event");
+        }
+        ProcessingEvent pevent = new ProcessingEvent();
+        pevent.setWorksheet(worksheet);
+        pevent.setCreatedAt(createdAt);
+
+        Center peventCenter = (waybill == null)
+            ? originInfo.getCenter() : originInfo.getReceiverCenter();
+        pevent.setCenter(peventCenter);
+        pevent.setActivityStatus(ActivityStatus.ACTIVE);
+        createdProcessingEvents.put(worksheet, pevent);
         return pevent;
     }
 

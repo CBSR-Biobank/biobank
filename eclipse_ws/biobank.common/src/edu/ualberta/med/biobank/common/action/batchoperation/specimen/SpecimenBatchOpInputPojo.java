@@ -15,7 +15,9 @@ import java.util.Date;
  * @author Nelson Loyola
  *
  */
-public class SpecimenBatchOpInputPojo implements IBatchOpSpecimenInputPojo {
+public class SpecimenBatchOpInputPojo implements
+                                     IBatchOpSpecimenInputPojo,
+                                     IBatchOpSpecimenPositionPojo {
     private static final long serialVersionUID = 1L;
 
     private int lineNumber;
@@ -54,6 +56,7 @@ public class SpecimenBatchOpInputPojo implements IBatchOpSpecimenInputPojo {
         this.lineNumber = lineNumber;
     }
 
+    @Override
     public String getInventoryId() {
         return inventoryId;
     }
@@ -152,42 +155,52 @@ public class SpecimenBatchOpInputPojo implements IBatchOpSpecimenInputPojo {
         this.currentCenter = currentCenter;
     }
 
+    @Override
     public String getPalletProductBarcode() {
         return palletProductBarcode;
     }
 
+    @Override
     public void setPalletProductBarcode(String palletProductBarcode) {
         this.palletProductBarcode = palletProductBarcode;
     }
 
+    @Override
     public String getRootContainerType() {
         return rootContainerType;
     }
 
+    @Override
     public void setRootContainerType(String rootContainerType) {
         this.rootContainerType = rootContainerType;
     }
 
+    @Override
     public String getPalletLabel() {
         return palletLabel;
     }
 
+    @Override
     public void setPalletLabel(String palletLabel) {
         this.palletLabel = palletLabel;
     }
 
+    @Override
     public String getPalletPosition() {
         return palletPosition;
     }
 
+    @Override
     public void setPalletPosition(String palletPosition) {
         this.palletPosition = palletPosition;
     }
 
+    @Override
     public String getComment() {
         return comment;
     }
 
+    @Override
     public void setComment(String comment) {
         this.comment = comment;
     }
@@ -252,10 +265,12 @@ public class SpecimenBatchOpInputPojo implements IBatchOpSpecimenInputPojo {
         return (patientNumber != null) && (visitNumber != null);
     }
 
+    @Override
     public boolean hasProductBarcodeAndPosition() {
         return (palletProductBarcode != null) && (palletPosition != null);
     }
 
+    @Override
     public boolean hasLabelAndPosition() {
         return (rootContainerType != null)
             && (palletLabel != null)

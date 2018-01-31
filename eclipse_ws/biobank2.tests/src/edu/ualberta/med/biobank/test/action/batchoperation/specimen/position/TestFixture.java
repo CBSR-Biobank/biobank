@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.test.action.batchoperation.specimenPosition;
+package edu.ualberta.med.biobank.test.action.batchoperation.specimen.position;
 
 import java.util.ArrayList;
 import java.util.Arrays;

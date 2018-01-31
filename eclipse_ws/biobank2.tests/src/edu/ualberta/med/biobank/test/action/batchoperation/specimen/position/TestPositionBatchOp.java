@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.test.action.batchoperation.specimenPosition;
+package edu.ualberta.med.biobank.test.action.batchoperation.specimen.position;
 
 import static edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpActionErrors.*;
 
@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -17,10 +18,10 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import edu.ualberta.med.biobank.common.action.batchoperation.specimenPosition.PositionBatchOpAction;
-import edu.ualberta.med.biobank.common.action.batchoperation.specimenPosition.PositionBatchOpPojo;
-import edu.ualberta.med.biobank.common.action.batchoperation.specimenPosition.SpecimenPositionBatchOpGetAction;
-import edu.ualberta.med.biobank.common.action.batchoperation.specimenPosition.SpecimenPositionBatchOpGetResult;
+import edu.ualberta.med.biobank.common.action.batchoperation.specimen.position.PositionBatchOpAction;
+import edu.ualberta.med.biobank.common.action.batchoperation.specimen.position.PositionBatchOpPojo;
+import edu.ualberta.med.biobank.common.action.batchoperation.specimen.position.SpecimenPositionBatchOpGetAction;
+import edu.ualberta.med.biobank.common.action.batchoperation.specimen.position.SpecimenPositionBatchOpGetResult;
 import edu.ualberta.med.biobank.common.action.exception.BatchOpErrorsException;
 import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.i18n.LString;
@@ -262,6 +263,12 @@ public class TestPositionBatchOp extends TestAction {
             SpecimenPositionBatchOpGetResult batchOpResult =
                 exec(new SpecimenPositionBatchOpGetAction(bachOpId));
             Assert.assertEquals(pojos.size(), batchOpResult.getSpecimenData().size());
+            Assert.assertEquals(getGlobalAdmin().getLogin(), batchOpResult.getExecutedBy());
+
+            Date timeNow = new Date();
+            Assert.assertTrue("Dates aren't close enough to each other!",
+                              (timeNow.getTime() - batchOpResult.getTimeExecuted().getTime()) < 10000);
+            Assert.assertEquals(CSV_NAME, batchOpResult.getInput().getName());
         } catch (BatchOpErrorsException e) {
             CsvUtil.showErrorsInLog(log, e);
             Assert.fail("errors in CVS data: " + e.getMessage());
@@ -269,7 +276,7 @@ public class TestPositionBatchOp extends TestAction {
     }
 
     private PositionBatchOpAction createAction(List<PositionBatchOpPojo> pojos)
-        throws NoSuchAlgorithmException, IOException {
+        throws NoSuchAlgorithmException, IOException, ClassNotFoundException {
         return new PositionBatchOpAction(factory.getDefaultSite(),
                                          new HashSet<PositionBatchOpPojo>(pojos),
                                          new File(CSV_NAME));
