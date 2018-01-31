@@ -71,10 +71,10 @@
   <fileset id="testcase.files" dir="${eclipse.proj.dir.tests}/src">
     <exclude name="**/wrappers/**" />
     <exclude name="**/presenters/**" />
-      <!--
-	  do not include the tests in edu.ualberta.med.biobank.test.batchoperation
-	  however, the tests in edu.ualberta.med.biobank.test.action.batchoperation are included
-      -->
+    <!--
+	 do not include the tests in edu.ualberta.med.biobank.test.batchoperation
+	 however, the tests in edu.ualberta.med.biobank.test.action.batchoperation are included
+    -->
     <exclude name="**/test/batchoperation/**" />
     <exclude name="**/test/action/security/util/**" />
     <exclude name="**/test/action/tmp/**" />
@@ -87,6 +87,7 @@
     <exclude name="**/TestReportsOnExistingData.java" />
     <exclude name="**/TestReportsProcedurallyGeneratedData.java" />
     <include name="**/Test*.java" />
+    <exclude name="**/TestFixture.java" />
   </fileset>
 
   <target name="test" depends="clean-test-results,tests-compile" description="executes test cases">
