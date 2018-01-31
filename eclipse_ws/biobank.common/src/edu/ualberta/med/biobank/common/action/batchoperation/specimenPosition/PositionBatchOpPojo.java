@@ -86,10 +86,6 @@ public class PositionBatchOpPojo implements IBatchOpInputPojo {
         this.comment = comment;
     }
 
-    public static long getSerialversionuid() {
-        return serialVersionUID;
-    }
-
     public boolean hasCurrentPosition() {
         return currentPalletLabel != null;
     }
