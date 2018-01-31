@@ -134,10 +134,12 @@
           description="executes test cases with code coverage">
     <delete file="${test.output}/coverage.emma" />
     <junit printsummary="yes" haltonfailure="no" showoutput="yes" fork="true">
-      <classpath refid="biobank.common.run.classpath" />
       <classpath refid="test.class.path" />
+      <classpath refid="biobank.common.run.classpath" />
       <classpath refid="emma.lib" />
       <classpath>
+        <pathelement location="${eclipse.proj.dir.tools}/output" />
+        <pathelement location="${eclipse.proj.dir.tools}/lib/naming-common.jar" />
         <pathelement location="${eclipse.proj.dir.tests}/lib/junit.jar" />
         <pathelement location="${eclipse.proj.dir.tests}/lib/clm.jar" />
         <pathelement location="${eclipse.proj.dir.tools}/lib/naming-common.jar" />
