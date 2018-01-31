@@ -5,7 +5,7 @@ import org.junit.runners.Suite;
 
 import edu.ualberta.med.biobank.test.action.batchoperation.patient.TestPatientBatchOp;
 import edu.ualberta.med.biobank.test.action.batchoperation.shipment.TestShipmentCsvInfo;
-import edu.ualberta.med.biobank.test.action.batchoperation.specimen.TestSpecimenBatchOp;
+import edu.ualberta.med.biobank.test.action.batchoperation.specimen.SpecimenBatchOpTestSuite;
 import edu.ualberta.med.biobank.test.action.security.SecuritySuite;
 
 @RunWith(Suite.class)
@@ -28,7 +28,7 @@ import edu.ualberta.med.biobank.test.action.security.SecuritySuite;
     TestShippingMethod.class,
     TestSite.class,
     TestSpecimen.class,
-    TestSpecimenBatchOp.class,
+    SpecimenBatchOpTestSuite.class,
     TestStudy.class })
 public class ActionSuite {
 }

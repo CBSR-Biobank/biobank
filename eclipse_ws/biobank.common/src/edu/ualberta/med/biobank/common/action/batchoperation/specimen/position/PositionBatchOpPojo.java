@@ -1,6 +1,6 @@
-package edu.ualberta.med.biobank.common.action.batchoperation.specimenPosition;
+package edu.ualberta.med.biobank.common.action.batchoperation.specimen.position;
 
-import edu.ualberta.med.biobank.common.action.batchoperation.IBatchOpInputPojo;
+import edu.ualberta.med.biobank.common.action.batchoperation.specimen.IBatchOpSpecimenPositionPojo;
 
 /**
  * POJO used by the Specimen Position Assign Batch Operation feature to import specimen information.
@@ -8,7 +8,7 @@ import edu.ualberta.med.biobank.common.action.batchoperation.IBatchOpInputPojo;
  * @author Nelson Loyola
  *
  */
-public class PositionBatchOpPojo implements IBatchOpInputPojo {
+public class PositionBatchOpPojo implements IBatchOpSpecimenPositionPojo {
     private static final long serialVersionUID = 1L;
 
     private int lineNumber;
@@ -30,6 +30,7 @@ public class PositionBatchOpPojo implements IBatchOpInputPojo {
         this.lineNumber = lineNumber;
     }
 
+    @Override
     public String getInventoryId() {
         return inventoryId;
     }
@@ -46,42 +47,52 @@ public class PositionBatchOpPojo implements IBatchOpInputPojo {
         this.currentPalletLabel = currentPalletLabel;
     }
 
+    @Override
     public String getPalletProductBarcode() {
         return palletProductBarcode;
     }
 
+    @Override
     public void setPalletProductBarcode(String palletProductBarcode) {
         this.palletProductBarcode = palletProductBarcode;
     }
 
+    @Override
     public String getRootContainerType() {
         return rootContainerType;
     }
 
+    @Override
     public void setRootContainerType(String rootContainerType) {
         this.rootContainerType = rootContainerType;
     }
 
+    @Override
     public String getPalletLabel() {
         return palletLabel;
     }
 
+    @Override
     public void setPalletLabel(String palletLabel) {
         this.palletLabel = palletLabel;
     }
 
+    @Override
     public String getPalletPosition() {
         return palletPosition;
     }
 
+    @Override
     public void setPalletPosition(String palletPosition) {
         this.palletPosition = palletPosition;
     }
 
+    @Override
     public String getComment() {
         return comment;
     }
 
+    @Override
     public void setComment(String comment) {
         this.comment = comment;
     }
@@ -90,12 +101,14 @@ public class PositionBatchOpPojo implements IBatchOpInputPojo {
         return currentPalletLabel != null;
     }
 
+    @Override
     public boolean hasLabelAndPosition() {
         return (rootContainerType != null)
             && (palletLabel != null)
             && (palletPosition != null);
     }
 
+    @Override
     public boolean hasProductBarcodeAndPosition() {
         return (palletProductBarcode != null) && (palletPosition != null);
     }

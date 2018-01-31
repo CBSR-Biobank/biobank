@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.test.action.batchoperation.specimenPosition;
+package edu.ualberta.med.biobank.test.action.batchoperation.specimen.position;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -11,7 +11,7 @@ import org.supercsv.io.CsvMapWriter;
 import org.supercsv.io.ICsvMapWriter;
 import org.supercsv.prefs.CsvPreference;
 
-import edu.ualberta.med.biobank.common.action.batchoperation.specimenPosition.PositionBatchOpPojo;
+import edu.ualberta.med.biobank.common.action.batchoperation.specimen.position.PositionBatchOpPojo;
 
 public class PositionBatchOpCsvWriter {
 

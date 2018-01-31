@@ -3,23 +3,34 @@ package edu.ualberta.med.biobank.test.action.batchoperation.specimen;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.hibernate.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import edu.ualberta.med.biobank.common.action.batchoperation.specimen.IBatchOpSpecimenPositionPojo;
 import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpInputPojo;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
+import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.SpecimenPosition;
+import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.model.type.LabelingLayout;
 import edu.ualberta.med.biobank.model.util.RowColPos;
+import edu.ualberta.med.biobank.test.Factory;
 import edu.ualberta.med.biobank.test.NameGenerator;
 import edu.ualberta.med.biobank.test.Utils;
 
@@ -30,6 +41,9 @@ import edu.ualberta.med.biobank.test.Utils;
  */
 @SuppressWarnings("nls")
 class SpecimenBatchOpPojoHelper {
+
+    private static Logger log = LoggerFactory.getLogger(SpecimenBatchOpPojoHelper.class);
+
     private final NameGenerator nameGenerator;
 
     private int lineNumber;
@@ -194,45 +208,123 @@ class SpecimenBatchOpPojoHelper {
         return specimenInfo;
     }
 
-    public void fillContainersWithSpecimenBatchOpPojos(List<SpecimenBatchOpInputPojo> specimenCsvInfos,
-                                                       Set<Container>                 containers,
-                                                       boolean                        useProductBarcode) {
-
+    public static <T extends IBatchOpSpecimenPositionPojo> void
+    assignPositionsToPojos(Set<T>         pojos,
+                           Set<Container> containers,
+                           boolean        useProductBarcode) {
         // fill as many containers as space will allow
-        int count = 0;
+        Set<T> pojosToAssign = new HashSet<T>(pojos);
+        Iterator<T> iterator = pojosToAssign.iterator();
+
         for (Container container : containers) {
             ContainerType ctype = container.getContainerType();
 
-            int maxRows =
-                container.getContainerType().getCapacity().getRowCapacity();
-            int maxCols =
-                container.getContainerType().getCapacity().getColCapacity();
+            int maxRows = container.getContainerType().getCapacity().getRowCapacity();
+            int maxCols = container.getContainerType().getCapacity().getColCapacity();
 
             for (int r = 0; r < maxRows; ++r) {
                 for (int c = 0; c < maxCols; ++c) {
-                    if (count >= specimenCsvInfos.size()) break;
+                    if (pojosToAssign.isEmpty()) break;
 
-                    SpecimenBatchOpInputPojo csvInfo =
-                        specimenCsvInfos.get(count);
+                    T csvInfo = iterator.next();
+                    iterator.remove();
                     RowColPos pos = new RowColPos(r, c);
                     csvInfo.setPalletPosition(ctype.getPositionString(pos));
 
                     if (useProductBarcode) {
-                       csvInfo.setPalletProductBarcode(container.getProductBarcode());
+                        csvInfo.setPalletProductBarcode(container.getProductBarcode());
                     } else {
-                       csvInfo.setPalletLabel(container.getLabel());
-                       csvInfo.setRootContainerType(ctype.getNameShort());
+                        csvInfo.setPalletLabel(container.getLabel());
+                        csvInfo.setRootContainerType(ctype.getNameShort());
                     }
-
-                    count++;
                 }
             }
         }
+
+        if (!pojosToAssign.isEmpty()) {
+            throw new IllegalStateException("not enough containers to hold all pojos");
+        }
     }
 
-    public void addComments(Set<SpecimenBatchOpInputPojo> specimenCsvInfos) {
-        for (SpecimenBatchOpInputPojo specimenCsvInfo : specimenCsvInfos) {
-            specimenCsvInfo.setComment(nameGenerator.next(String.class));
+    public static <T extends IBatchOpSpecimenPositionPojo>
+    void addComments(Set<T> pojos, NameGenerator nameGenerator) {
+        for (T pojo : pojos) {
+            pojo.setComment(nameGenerator.next(String.class));
         }
+    }
+
+    public static void fillContainerWithSecimens(Session session,
+                                                 Factory factory,
+                                                 Container container,
+                                                 Patient patient) {
+        session.beginTransaction();
+        factory.createSourceSpecimen();
+        factory.setDefaultPatient(patient);
+
+        ContainerType type = container.getContainerType();
+        Capacity capacity = type.getCapacity();
+        Integer rowCapacity = capacity.getRowCapacity();
+        Integer colCapacity = capacity.getColCapacity();
+        int labelingSchemeId = type.getChildLabelingScheme().getId();
+        LabelingLayout layout = type.getLabelingLayout();
+
+        for (int r = 0; r < rowCapacity; ++r) {
+            for (int c = 0; c < colCapacity; ++c) {
+                RowColPos rcp = new RowColPos(r, c);
+                String positionString = ContainerLabelingScheme.getPositionString(rcp,
+                                                                                  labelingSchemeId,
+                                                                                  rowCapacity,
+                                                                                  colCapacity,
+                                                                                  layout);
+                Specimen specimenWithPosition = factory.createParentSpecimen();
+                log.trace("placing specimen at: {}", positionString);
+
+                SpecimenPosition pos = new SpecimenPosition();
+                pos.setSpecimen(specimenWithPosition);
+                pos.setRow(r);
+                pos.setCol(c);
+                pos.setContainer(container);
+                pos.setPositionString(positionString);
+                session.save(pos);
+                session.flush();
+            }
+        }
+        session.getTransaction().commit();
+    }
+
+    // adds allowed specimen types to the leaf containers' container types
+    public static Set<Container> createContainers(Session session,
+                                                  Factory factory,
+                                                  NameGenerator nameGenerator,
+                                                  Set<SpecimenType> specimenTypes,
+                                                  int numContainers) {
+        factory.createContainerType();
+        factory.createTopContainer();
+        factory.createParentContainer();
+
+        ContainerType ctype = factory.createContainerType();
+        ctype.getChildContainerTypes().clear();
+        ctype.getSpecimenTypes().clear();
+        ctype.getSpecimenTypes().addAll(specimenTypes);
+        session.save(ctype);
+
+        Set<Container> result = new HashSet<Container>();
+        for (int i = 0; i < numContainers; ++i) {
+            Container container = factory.createContainer();
+            container.setProductBarcode(nameGenerator.next(Container.class));
+            result.add(container);
+        }
+
+        return result;
+    }
+
+    public static Set<Container> createContainers(Session session,
+                                                  Factory factory,
+                                                  NameGenerator nameGenerator,
+                                                  SpecimenType specimenType,
+                                                  int numContainers) {
+        Set<SpecimenType> specimenTypes = new HashSet<SpecimenType>(0);
+        specimenTypes.add(specimenType);
+        return createContainers(session, factory, nameGenerator, specimenTypes, numContainers);
     }
 }

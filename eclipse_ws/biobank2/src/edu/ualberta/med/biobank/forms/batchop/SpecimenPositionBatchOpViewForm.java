@@ -7,8 +7,8 @@ import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.action.batchoperation.specimenPosition.SpecimenPositionBatchOpGetAction;
-import edu.ualberta.med.biobank.common.action.batchoperation.specimenPosition.SpecimenPositionBatchOpGetResult;
+import edu.ualberta.med.biobank.common.action.batchoperation.specimen.position.SpecimenPositionBatchOpGetAction;
+import edu.ualberta.med.biobank.common.action.batchoperation.specimen.position.SpecimenPositionBatchOpGetResult;
 import edu.ualberta.med.biobank.widgets.infotables.SpecimenPositionTable;
 
 public class SpecimenPositionBatchOpViewForm extends BatchOpViewForm {

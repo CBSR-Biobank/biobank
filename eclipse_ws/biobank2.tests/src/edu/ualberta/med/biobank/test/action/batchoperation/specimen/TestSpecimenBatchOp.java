@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -30,8 +31,6 @@ import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
-import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
@@ -40,7 +39,6 @@ import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenPosition;
 import edu.ualberta.med.biobank.model.SpecimenType;
-import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.test.NameGenerator;
 import edu.ualberta.med.biobank.test.action.TestAction;
 import edu.ualberta.med.biobank.test.action.batchoperation.AssertBatchOpException;
@@ -622,7 +620,7 @@ public class TestSpecimenBatchOp extends TestAction {
 
         Set<SpecimenBatchOpInputPojo> csvInfos = specimenCsvHelper.createAliquotedSpecimens(
             factory.getDefaultStudy(), parentSpecimens);
-        specimenCsvHelper.addComments(csvInfos);
+        SpecimenBatchOpPojoHelper.addComments(csvInfos, nameGenerator);
         SpecimenBatchOpCsvWriter.write(CSV_NAME, csvInfos);
 
         try {
@@ -655,7 +653,12 @@ public class TestSpecimenBatchOp extends TestAction {
         factory.createAliquotedSpecimen();
         factory.createAliquotedSpecimen();
 
-        Set<Container> childL2Containers = createContainers(aqSpecimenType);
+        Set<Container> childL2Containers =
+            SpecimenBatchOpPojoHelper.createContainers(session,
+                                                       factory,
+                                                       nameGenerator,
+                                                       aqSpecimenType,
+                                                       5);
 
         session.getTransaction().commit();
 
@@ -667,15 +670,15 @@ public class TestSpecimenBatchOp extends TestAction {
         Assert.assertTrue("have CSV data", csvInfos.size() > 0);
 
         // only the aliquoted specimens will have a position
-        List<SpecimenBatchOpInputPojo> aliquotedSpecimensCsvInfos =
-            new ArrayList<SpecimenBatchOpInputPojo>();
+        Set<SpecimenBatchOpInputPojo> aliquotedSpecimensCsvInfos =
+            new HashSet<SpecimenBatchOpInputPojo>();
 
         for (SpecimenBatchOpInputPojo csvInfo : csvInfos) {
             if (csvInfo.getSourceSpecimen()) continue;
             aliquotedSpecimensCsvInfos.add(csvInfo);
         }
 
-        specimenCsvHelper.fillContainersWithSpecimenBatchOpPojos(
+        SpecimenBatchOpPojoHelper.assignPositionsToPojos(
             aliquotedSpecimensCsvInfos, childL2Containers, false);
 
         SpecimenBatchOpCsvWriter.write(CSV_NAME, csvInfos);
@@ -707,7 +710,12 @@ public class TestSpecimenBatchOp extends TestAction {
             }
         }
 
-        Set<Container> childL2Containers = createContainers(factory.getDefaultSourceSpecimenType());
+        Set<Container> childL2Containers =
+            SpecimenBatchOpPojoHelper.createContainers(session,
+                                                       factory,
+                                                       nameGenerator,
+                                                       factory.getDefaultSourceSpecimenType(),
+                                                       5);
 
         session.getTransaction().commit();
 
@@ -715,10 +723,9 @@ public class TestSpecimenBatchOp extends TestAction {
         Set<SpecimenBatchOpInputPojo> csvInfos = specimenCsvHelper.sourceSpecimensCreate(
             originInfos, patients, factory.getDefaultStudy().getSourceSpecimens());
 
-        specimenCsvHelper.fillContainersWithSpecimenBatchOpPojos(
-            new ArrayList<SpecimenBatchOpInputPojo>(csvInfos),
-            childL2Containers,
-            false);
+        SpecimenBatchOpPojoHelper.assignPositionsToPojos(csvInfos,
+                                                         childL2Containers,
+                                                         false);
 
         SpecimenBatchOpCsvWriter.write(CSV_NAME, csvInfos);
 
@@ -748,7 +755,12 @@ public class TestSpecimenBatchOp extends TestAction {
             }
         }
 
-        Set<Container> childL2Containers = createContainers(factory.getDefaultSourceSpecimenType());
+        Set<Container> childL2Containers =
+            SpecimenBatchOpPojoHelper.createContainers(session,
+                                                       factory,
+                                                       nameGenerator,
+                                                       factory.getDefaultSourceSpecimenType(),
+                                                       5);
 
         session.getTransaction().commit();
 
@@ -756,10 +768,7 @@ public class TestSpecimenBatchOp extends TestAction {
         Set<SpecimenBatchOpInputPojo> csvInfos = specimenCsvHelper.sourceSpecimensCreate(
             originInfos, patients, factory.getDefaultStudy().getSourceSpecimens());
 
-        specimenCsvHelper.fillContainersWithSpecimenBatchOpPojos(
-            new ArrayList<SpecimenBatchOpInputPojo>(csvInfos),
-            childL2Containers,
-            true);
+        SpecimenBatchOpPojoHelper.assignPositionsToPojos(csvInfos, childL2Containers, true);
 
         SpecimenBatchOpCsvWriter.write(CSV_NAME, csvInfos);
 
@@ -782,7 +791,12 @@ public class TestSpecimenBatchOp extends TestAction {
         patients.add(patient);
         factory.createSourceSpecimen();
 
-        Set<Container> childL2Containers = createContainers(factory.getDefaultSourceSpecimenType());
+        Set<Container> childL2Containers =
+            SpecimenBatchOpPojoHelper.createContainers(session,
+                                                       factory,
+                                                       nameGenerator,
+                                                       factory.getDefaultSourceSpecimenType(),
+                                                       5);
 
         session.getTransaction().commit();
 
@@ -790,10 +804,7 @@ public class TestSpecimenBatchOp extends TestAction {
         Set<SpecimenBatchOpInputPojo> csvInfos = specimenCsvHelper.sourceSpecimensCreate(
             originInfos, patients, factory.getDefaultStudy().getSourceSpecimens());
 
-        specimenCsvHelper.fillContainersWithSpecimenBatchOpPojos(
-            new ArrayList<SpecimenBatchOpInputPojo>(csvInfos),
-            childL2Containers,
-            true);
+        SpecimenBatchOpPojoHelper.assignPositionsToPojos(csvInfos, childL2Containers, true);
 
         for (SpecimenBatchOpInputPojo csvInfo : csvInfos) {
             csvInfo.setPalletProductBarcode("");
@@ -819,43 +830,32 @@ public class TestSpecimenBatchOp extends TestAction {
         Set<Patient> patients = new HashSet<Patient>();
         Patient patient = factory.createPatient();
         patients.add(patient);
-        factory.createSourceSpecimen();
-        Specimen specimenWithPosition = factory.createParentSpecimen();
-
-        Set<Container> childL2Containers = createContainers(factory.getDefaultSourceSpecimenType());
-        Container container = childL2Containers.iterator().next();
-
-        SpecimenPosition pos = new SpecimenPosition();
-        pos.setSpecimen(specimenWithPosition);
-        pos.setRow(0);
-        pos.setCol(0);
-        pos.setContainer(container);
-
-        ContainerType type = container.getContainerType();
-        RowColPos rcp = new RowColPos(0, 0);
-        String positionString = ContainerLabelingScheme.getPositionString(
-            rcp, type.getChildLabelingScheme().getId(), type.getCapacity().getRowCapacity(),
-            type.getCapacity().getColCapacity(), type.getLabelingLayout());
-        pos.setPositionString(positionString);
-        session.save(pos);
-        session.flush();
-
+        Set<Container> childL2Containers =
+            SpecimenBatchOpPojoHelper.createContainers(session,
+                                                       factory,
+                                                       nameGenerator,
+                                                       factory.getDefaultSourceSpecimenType(),
+                                                       1);
         session.getTransaction().commit();
 
-        // make sure you can add parent specimens without a worksheet #
-        Set<SpecimenBatchOpInputPojo> csvInfos = specimenCsvHelper.sourceSpecimensCreate(
-            originInfos, patients, factory.getDefaultStudy().getSourceSpecimens());
+        SpecimenBatchOpPojoHelper.fillContainerWithSecimens(session,
+                                                           factory,
+                                                           childL2Containers.iterator().next(),
+                                                           patient);
 
-        specimenCsvHelper.fillContainersWithSpecimenBatchOpPojos(
-            new ArrayList<SpecimenBatchOpInputPojo>(csvInfos),
-            childL2Containers,
-            false);
+        Set<SpecimenBatchOpInputPojo> csvInfos =
+            specimenCsvHelper.sourceSpecimensCreate(originInfos,
+                                                    patients,
+                                                    factory.getDefaultStudy().getSourceSpecimens());
 
+        SpecimenBatchOpPojoHelper.assignPositionsToPojos(csvInfos, childL2Containers, false);
         SpecimenBatchOpCsvWriter.write(CSV_NAME, csvInfos);
 
         try {
-            SpecimenBatchOpAction importAction = new SpecimenBatchOpAction(
-                factory.getDefaultSite(), csvInfos, new File(CSV_NAME));
+            SpecimenBatchOpAction importAction =
+                new SpecimenBatchOpAction(factory.getDefaultSite(),
+                                          csvInfos,
+                                          new File(CSV_NAME));
             exec(importAction);
             Assert.fail("should fail");
         } catch (BatchOpErrorsException e) {
@@ -872,37 +872,25 @@ public class TestSpecimenBatchOp extends TestAction {
         Patient patient = factory.createPatient();
         patients.add(patient);
         factory.createSourceSpecimen();
-        Specimen specimenWithPosition = factory.createParentSpecimen();
-
-        Set<Container> childL2Containers = createContainers(factory.getDefaultSourceSpecimenType());
-        Container container = childL2Containers.iterator().next();
-
-        SpecimenPosition pos = new SpecimenPosition();
-        pos.setSpecimen(specimenWithPosition);
-        pos.setRow(0);
-        pos.setCol(0);
-        pos.setContainer(container);
-
-        ContainerType type = container.getContainerType();
-        RowColPos rcp = new RowColPos(0, 0);
-        String positionString = ContainerLabelingScheme.getPositionString(
-            rcp, type.getChildLabelingScheme().getId(), type.getCapacity().getRowCapacity(),
-            type.getCapacity().getColCapacity(), type.getLabelingLayout());
-        pos.setPositionString(positionString);
-        session.save(pos);
-        session.flush();
-
+        Set<Container> childL2Containers =
+            SpecimenBatchOpPojoHelper.createContainers(session,
+                                                       factory,
+                                                       nameGenerator,
+                                                       factory.getDefaultSourceSpecimenType(),
+                                                       5);
         session.getTransaction().commit();
+
+        SpecimenBatchOpPojoHelper.fillContainerWithSecimens(session,
+                                                           factory,
+                                                           childL2Containers.iterator().next(),
+                                                           patient);
+
 
         // make sure you can add parent specimens without a worksheet #
         Set<SpecimenBatchOpInputPojo> csvInfos = specimenCsvHelper.sourceSpecimensCreate(
             originInfos, patients, factory.getDefaultStudy().getSourceSpecimens());
 
-        specimenCsvHelper.fillContainersWithSpecimenBatchOpPojos(
-            new ArrayList<SpecimenBatchOpInputPojo>(csvInfos),
-            childL2Containers,
-            true);
-
+        SpecimenBatchOpPojoHelper.assignPositionsToPojos(csvInfos, childL2Containers, true);
         SpecimenBatchOpCsvWriter.write(CSV_NAME, csvInfos);
 
         try {
@@ -1161,28 +1149,6 @@ public class TestSpecimenBatchOp extends TestAction {
         }
     }
 
-    // need to add allowed specimen type to the leaft containers' container
-    // types
-    private Set<Container> createContainers(SpecimenType specimenType) {
-        factory.createTopContainer();
-        factory.createParentContainer();
-
-        ContainerType ctype = factory.createContainerType();
-        ctype.getChildContainerTypes().clear();
-        ctype.getSpecimenTypes().clear();
-        ctype.getSpecimenTypes().add(specimenType);
-        session.save(ctype);
-
-        Set<Container> result = new HashSet<Container>();
-        for (int i = 0; i < 3; ++i) {
-            Container container = factory.createContainer();
-            container.setProductBarcode(nameGenerator.next(Container.class));
-            result.add(container);
-        }
-
-        return result;
-    }
-
     @Test
     public void specimenBatchOpGetAction() throws Exception {
         Set<Patient> patients = new HashSet<Patient>();
@@ -1221,6 +1187,12 @@ public class TestSpecimenBatchOp extends TestAction {
         BatchOpGetResult<Specimen> batchOpResult = exec(new SpecimenBatchOpGetAction(bachOpId));
 
         Assert.assertEquals(csvInfos.size(), batchOpResult.getModelObjects().size());
+        Assert.assertEquals(getGlobalAdmin().getLogin(), batchOpResult.getExecutedBy());
+
+        Date timeNow = new Date();
+        Assert.assertTrue("Dates aren't close enough to each other!",
+                          (timeNow.getTime() - batchOpResult.getTimeExecuted().getTime()) < 10000);
+        Assert.assertEquals(CSV_NAME, batchOpResult.getInput().getName());
     }
 
     /**

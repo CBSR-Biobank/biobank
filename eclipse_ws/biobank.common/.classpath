@@ -50,6 +50,6 @@
 	<classpathentry kind="src" path="conf"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry exported="true" kind="lib" path="lib/server/flyway-core.jar" sourcepath="lib/server/flyway-core-source.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/server/commons-lang3.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/server/commons-lang3.jar" sourcepath="lib/server/commons-lang3-source.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

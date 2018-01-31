@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.common.action.batchoperation.specimenPosition;
+package edu.ualberta.med.biobank.common.action.batchoperation.specimen.position;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +9,7 @@ import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.batchoperation.BatchOpActionUtil;
 import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpGetAction;
-import edu.ualberta.med.biobank.common.action.batchoperation.specimenPosition.SpecimenPositionBatchOpGetResult.SpecimenInfo;
+import edu.ualberta.med.biobank.common.action.batchoperation.specimen.position.SpecimenPositionBatchOpGetResult.SpecimenInfo;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.model.BatchOperation;
 import edu.ualberta.med.biobank.model.Container;
