@@ -96,3 +96,6 @@ decode.png
 BiobankCli*.zip
 import_*.csv
 testing/
+coverage/
+coverage.txt
+coverage.xml
