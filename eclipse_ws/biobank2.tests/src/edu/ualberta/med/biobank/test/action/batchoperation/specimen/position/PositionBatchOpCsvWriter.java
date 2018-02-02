@@ -3,7 +3,7 @@ package edu.ualberta.med.biobank.test.action.batchoperation.specimen.position;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Set;
 
 import org.supercsv.cellprocessor.ConvertNullTo;
 import org.supercsv.cellprocessor.ift.CellProcessor;
@@ -15,7 +15,7 @@ import edu.ualberta.med.biobank.common.action.batchoperation.specimen.position.P
 
 public class PositionBatchOpCsvWriter {
 
-    public static void write(String filename, List<PositionBatchOpPojo> pojos) throws IOException {
+    public static void write(String filename, Set<PositionBatchOpPojo> pojos) throws IOException {
         final String[] header = new String[] {
             "inventoryId",
             "currentPalletLabel",

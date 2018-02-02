@@ -78,10 +78,17 @@ public class PositionBatchOpAction extends GenericSpecimenPositionBatchOpAction<
             throw new IllegalStateException("pojo list is empty");
         }
 
+        Set<String> pojoInventoryIds = new HashSet<String>(0);
         BatchOpInputErrorSet errors = new BatchOpInputErrorSet();
         Set<PositionBatchOpPojoInfo> pojoData = new HashSet<PositionBatchOpPojoInfo>(0);
 
         for (PositionBatchOpPojo pojo : pojos) {
+            String inventoryId = pojo.getInventoryId();
+            if (pojoInventoryIds.contains(inventoryId)) {
+                throw new IllegalStateException("inventory ID found more than once: " + inventoryId);
+            }
+            pojoInventoryIds.add(inventoryId);
+
             Pair<BatchOpInputErrorSet, PositionBatchOpPojoInfo> pojoInfoMaybe =
                 getDbInfo(context, pojo);
 
@@ -143,7 +150,8 @@ public class PositionBatchOpAction extends GenericSpecimenPositionBatchOpAction<
                 String label = position.getContainer().getLabel();
                 if (!label.equals(pojo.getCurrentPalletLabel())) {
                     errors.addError(lineNumber,
-                                    CSV_SPECIMEN_PALLET_LABEL_INVALID_ERROR.format(label));
+                                    CSV_SPECIMEN_PALLET_LABEL_INVALID_ERROR
+                                        .format(pojo.getCurrentPalletLabel()));
                 }
             }
         }

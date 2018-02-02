@@ -17,14 +17,6 @@ public class AllTestsSuite {
     public static final String userLogin = "testuser";
     public static final String userPwd = "test";
 
-//    @BeforeClass
-//    public static void setUp() throws Exception {
-//    }
-//
-//    @AfterClass
-//    public static void tearDown() throws Exception {
-//    }
-
     @Deprecated
     public static BiobankApplicationService connect(String user, String password)
         throws Exception {

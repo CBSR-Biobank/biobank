@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.common.action.batchoperation.specimen;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.action.batchoperation.BatchOpInputErrorSet;
 import edu.ualberta.med.biobank.common.action.batchoperation.IBatchOpPojoHelper;
@@ -140,13 +138,12 @@ public class CommonSpecimenPojoDbInfo<T extends IBatchOpSpecimenInputPojo & IBat
      *
      * @return
      */
-    Pair<BatchOpInputErrorSet, Boolean> validate() {
+    BatchOpInputErrorSet validate() {
+        BatchOpInputErrorSet errorSet = new BatchOpInputErrorSet();
         if ((parentSpecimen != null) && (patient == null)) {
-            BatchOpInputErrorSet errorSet = new BatchOpInputErrorSet();
             errorSet.addError(pojo.getLineNumber(), CSV_NO_PATIENT_ERROR.format());
-            return Pair.of(errorSet, null);
         }
-        return Pair.of(null, true);
+        return errorSet;
     }
 
     /**

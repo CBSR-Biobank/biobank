@@ -141,18 +141,14 @@ public class SpecimenBatchOpAction extends CommonSpecimenBatchOpAction<SpecimenB
         }
 
         for (SpecimenBatchOpDbInfo pojoData : pojoDataMap.values()) {
-            Pair<BatchOpInputErrorSet, Boolean> valid = pojoData.validate();
-            errorSet.addAll(valid.getLeft());
+            errorSet.addAll(pojoData.validate());
 
             if (pojoData.getParentInventoryId() != null) {
-                SpecimenBatchOpInputPojo pojo = pojoData.getPojo();
-
                 // ensure that aliquoted specimens with parent specimens already
                 // in the database have a collection event
                 if ((pojoData.getParentSpecimen() != null)
                     && (pojoData.getParentSpecimen().getCollectionEvent() == null)) {
-                    errorSet.addError(pojo.getLineNumber(),
-                        SpecimenBatchOpActionErrors.CSV_CEVENT_ERROR.format(pojo.getPatientNumber(), pojo.getVisitNumber()));
+                    throw new IllegalStateException("specimen does not have a collection event");
                 }
             }
         }
@@ -216,38 +212,10 @@ public class SpecimenBatchOpAction extends CommonSpecimenBatchOpAction<SpecimenB
             checkForPatientAndCollectionEvent(pojo);
         } else {
             // this is an aliquoted specimen
-
             if (pojo.getParentInventoryId() == null) {
                 checkForPatientAndCollectionEvent(pojo);
             }
         }
-
-        String productBarcode = pojo.getPalletProductBarcode();
-        String label = pojo.getPalletLabel();
-        String position = pojo.getPalletPosition();
-        String rootContainerType = pojo.getRootContainerType();
-
-        boolean hasLabel = (label != null) && !label.isEmpty();
-        boolean hasProductBarcode = (productBarcode != null) && !productBarcode.isEmpty();
-        boolean hasPosition = (position != null) && !position.isEmpty();
-        boolean hasRootContainerType = (rootContainerType != null) && !rootContainerType.isEmpty();
-
-        if (hasPosition && !hasProductBarcode && !hasLabel) {
-            errorSet.addError(pojo.getLineNumber(), SpecimenBatchOpActionErrors.CSV_PALLET_POS_ERROR);
-        }
-
-        if (hasProductBarcode && !hasLabel && !hasPosition) {
-            errorSet.addError(pojo.getLineNumber(), SpecimenBatchOpActionErrors.CSV_PROD_BARCODE_NO_POS_ERROR);
-        }
-
-        if (hasLabel && !hasProductBarcode && !hasPosition) {
-            errorSet.addError(pojo.getLineNumber(), SpecimenBatchOpActionErrors.CSV_PALLET_POS_ERROR);
-        }
-
-        if (hasLabel && hasPosition && !hasRootContainerType) {
-            errorSet.addError(pojo.getLineNumber(), SpecimenBatchOpActionErrors.CSV_PALLET_LABEL_NO_CTYPE_ERROR);
-        }
-
     }
 
     // get referenced items that exist in the database
@@ -336,13 +304,12 @@ public class SpecimenBatchOpAction extends CommonSpecimenBatchOpAction<SpecimenB
         if (cevent == null) {
             // only aliquoted specimens with no parent require a collection
             // event
-            if (pojoData.isAliquotedSpecimen()) {
-                if (pojoData.getParentInventoryId() == null) {
-                    errorSet.addError(
-                        inputPojo.getLineNumber(),
-                        SpecimenBatchOpActionErrors.CSV_CEVENT_ERROR.format(inputPojo.getPatientNumber(),
-                            inputPojo.getVisitNumber()));
-                }
+            if (pojoData.isAliquotedSpecimen() &&
+                ((pojoData.getParentInventoryId() == null) || pojoData.getParentInventoryId().isEmpty())) {
+                errorSet.addError(inputPojo.getLineNumber(),
+                                  SpecimenBatchOpActionErrors.CSV_CEVENT_ERROR.
+                                      format(inputPojo.getPatientNumber(),
+                                             inputPojo.getVisitNumber()));
             }
         } else {
             pojoData.setCevent(cevent);
@@ -354,7 +321,8 @@ public class SpecimenBatchOpAction extends CommonSpecimenBatchOpAction<SpecimenB
                 BatchOpActionUtil.getOriginInfo(context.getSession(), inputPojo.getWaybill());
             if (originInfo == null) {
                 errorSet.addError(inputPojo.getLineNumber(),
-                    SpecimenBatchOpActionErrors.CSV_WAYBILL_ERROR.format(inputPojo.getWaybill()));
+                                  SpecimenBatchOpActionErrors.CSV_WAYBILL_ERROR
+                                      .format(inputPojo.getWaybill()));
             } else {
                 pojoData.setOriginInfo(originInfo);
             }
@@ -395,7 +363,7 @@ public class SpecimenBatchOpAction extends CommonSpecimenBatchOpAction<SpecimenB
         }
 
         // only get container information if defined for this row
-        if (pojoData.hasPosition()) {
+        if (inputPojo.hasPositionInfo()) {
             Pair<BatchOpInputErrorSet, SpecimenPositionPojoData> validation =
                 validatePositionInfo(context.getSession(),
                                      inputPojo,
@@ -514,15 +482,16 @@ public class SpecimenBatchOpAction extends CommonSpecimenBatchOpAction<SpecimenB
         SpecimenBatchOpInputPojo inputPojo, Specimen parentSpecimen) {
         CollectionEvent cevent = null;
 
-        if (inputPojo.getParentInventoryId() == null) {
-            if (inputPojo.getPatientNumber() == null) {
+        if ((inputPojo.getParentInventoryId() == null) || inputPojo.getParentInventoryId().isEmpty()) {
+            if ((inputPojo.getPatientNumber() == null) || inputPojo.getPatientNumber().isEmpty()) {
                 errorSet.addError(inputPojo.getLineNumber(),
-                    SpecimenBatchOpActionErrors.CSV_PATIENT_NUMBER_INVALID_ERROR.format());
+                                  SpecimenBatchOpActionErrors.CSV_PATIENT_NUMBER_INVALID_ERROR.format());
                 return null;
             }
 
             cevent = BatchOpActionUtil.getCollectionEvent(context.getSession(),
-                inputPojo.getPatientNumber(), inputPojo.getVisitNumber());
+                                                          inputPojo.getPatientNumber(),
+                                                          inputPojo.getVisitNumber());
             return cevent;
         }
 
@@ -533,8 +502,10 @@ public class SpecimenBatchOpAction extends CommonSpecimenBatchOpAction<SpecimenB
             // ensure they match with the cevent and patient
             if ((inputPojo.getPatientNumber() != null) && !inputPojo.getPatientNumber().isEmpty()
                 && !cevent.getPatient().getPnumber().equals(inputPojo.getPatientNumber())) {
-                errorSet.addError(inputPojo.getLineNumber(), SpecimenBatchOpActionErrors.CSV_PATIENT_MATCH_ERROR.format(
-                    inputPojo.getPatientNumber(), cevent.getPatient().getPnumber()));
+                errorSet.addError(inputPojo.getLineNumber(),
+                                  SpecimenBatchOpActionErrors.CSV_PATIENT_MATCH_ERROR
+                                  .format(inputPojo.getPatientNumber(),
+                                          cevent.getPatient().getPnumber()));
             }
 
             if ((inputPojo.getVisitNumber() != null)

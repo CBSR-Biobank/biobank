@@ -127,8 +127,7 @@ public class GrandchildSpecimenBatchOpAction
         }
 
         for (GrandchildSpecimenBatchOpDbInfo pojoData : pojoDataMap.values()) {
-            Pair<BatchOpInputErrorSet, Boolean> valid = pojoData.validate();
-            errorSet.addAll(valid.getLeft());
+            errorSet.addAll(pojoData.validate());
         }
 
         if (!errorSet.isEmpty()) {
@@ -154,17 +153,9 @@ public class GrandchildSpecimenBatchOpAction
 
         String parentInventoryId = pojo.getParentInventoryId();
         String patientNumber = pojo.getPatientNumber();
-        String productBarcode = pojo.getPalletProductBarcode();
-        String label = pojo.getPalletLabel();
-        String position = pojo.getPalletPosition();
-        String rootContainerType = pojo.getRootContainerType();
 
         boolean hasParentInventoryId = (parentInventoryId != null) && !parentInventoryId.isEmpty();
         boolean hasPatientNumberId = (patientNumber != null) && !patientNumber.isEmpty();
-        boolean hasLabel = (label != null) && !label.isEmpty();
-        boolean hasProductBarcode = (productBarcode != null) && !productBarcode.isEmpty();
-        boolean hasPosition = (position != null) && !position.isEmpty();
-        boolean hasRootContainerType = (rootContainerType != null) && !rootContainerType.isEmpty();
 
         if (!hasParentInventoryId) {
             // should be checked in the Pojo Reader
@@ -174,22 +165,6 @@ public class GrandchildSpecimenBatchOpAction
         if (!hasPatientNumberId) {
             // should be checked in the Pojo Reader
             errors.addError(pojo.getLineNumber(), CSV_PATIENT_NUMBER_REQUIRED_ERROR);
-        }
-
-        if (hasPosition && !hasProductBarcode && !hasLabel) {
-            errors.addError(pojo.getLineNumber(), CSV_PALLET_POS_ERROR);
-        }
-
-        if (hasProductBarcode && !hasLabel && !hasPosition) {
-            errors.addError(pojo.getLineNumber(), CSV_PROD_BARCODE_NO_POS_ERROR);
-        }
-
-        if (hasLabel && !hasProductBarcode && !hasPosition) {
-            errors.addError(pojo.getLineNumber(), CSV_PALLET_POS_ERROR);
-        }
-
-        if (hasLabel && hasPosition && !hasRootContainerType) {
-            errors.addError(pojo.getLineNumber(), CSV_PALLET_LABEL_NO_CTYPE_ERROR);
         }
 
         return errors;
@@ -273,7 +248,7 @@ public class GrandchildSpecimenBatchOpAction
 
         // only get container information if defined for this row
 
-        if (pojoData.hasPosition()) {
+        if (inputPojo.hasPositionInfo()) {
             Pair<BatchOpInputErrorSet, SpecimenPositionPojoData> validation =
                 validatePositionInfo(context.getSession(),
                                      inputPojo,

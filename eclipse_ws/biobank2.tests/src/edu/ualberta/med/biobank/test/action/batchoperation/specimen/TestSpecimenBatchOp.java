@@ -1,46 +1,48 @@
 package edu.ualberta.med.biobank.test.action.batchoperation.specimen;
 
 import static edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpActionErrors.*;
+import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
-import org.hibernate.criterion.Restrictions;
-import org.junit.Assert;
+import org.hibernate.Session;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.batchoperation.BatchOpGetResult;
 import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpAction;
 import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpGetAction;
 import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpInputPojo;
 import edu.ualberta.med.biobank.common.action.exception.BatchOpErrorsException;
 import edu.ualberta.med.biobank.common.util.DateCompare;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
-import edu.ualberta.med.biobank.model.Center;
-import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
-import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Specimen;
-import edu.ualberta.med.biobank.model.SpecimenPosition;
 import edu.ualberta.med.biobank.model.SpecimenType;
-import edu.ualberta.med.biobank.test.NameGenerator;
-import edu.ualberta.med.biobank.test.action.TestAction;
+import edu.ualberta.med.biobank.test.Factory;
 import edu.ualberta.med.biobank.test.action.batchoperation.AssertBatchOpException;
 import edu.ualberta.med.biobank.test.action.batchoperation.CsvUtil;
 
@@ -49,7 +51,7 @@ import edu.ualberta.med.biobank.test.action.batchoperation.CsvUtil;
  * @author Nelson Loyola
  *
  */
-public class TestSpecimenBatchOp extends TestAction {
+public class TestSpecimenBatchOp extends CommonSpecimenBatachOpTests<SpecimenBatchOpInputPojo> {
 
     private static Logger log = LoggerFactory.getLogger(TestSpecimenBatchOp.class);
 
@@ -59,76 +61,60 @@ public class TestSpecimenBatchOp extends TestAction {
 
     private final Set<OriginInfo> originInfos = new HashSet<OriginInfo>();
 
-    private NameGenerator nameGenerator;
-
-    private Site defaultSite;
-
-    private Clinic defaultClinic;
-
     @Override
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        nameGenerator = new NameGenerator("test_" + getMethodNameR());
         specimenCsvHelper = new SpecimenBatchOpPojoHelper(nameGenerator);
 
         // delete the CSV file if it exists
         File file = new File(CSV_NAME);
         file.delete();
 
-        session.beginTransaction();
-        defaultSite = factory.createSite();
-        defaultClinic = factory.createClinic();
-        factory.createStudy();
-
         // add 2 shipments
         //
         // source center on origin info will be the clinic created above
+        session.beginTransaction();
         factory.createShipmentInfo();
         originInfos.add(factory.createOriginInfo());
         factory.createShipmentInfo();
         originInfos.add(factory.createOriginInfo());
+        session.getTransaction().commit();
     }
 
     @Test
     public void noErrorsNoContainers() throws Exception {
+        session.beginTransaction();
         Set<Patient> patients = new HashSet<Patient>();
         patients.add(factory.createPatient());
-        patients.add(factory.createPatient());
-        patients.add(factory.createPatient());
+        factory.createCollectionEvent();
 
         Set<SourceSpecimen> sourceSpecimens = new HashSet<SourceSpecimen>();
-        sourceSpecimens.add(factory.createSourceSpecimen());
-        factory.createSpecimenType();
-        sourceSpecimens.add(factory.createSourceSpecimen());
-        factory.createSpecimenType();
         sourceSpecimens.add(factory.createSourceSpecimen());
 
         // create a new specimen type for the aliquoted specimens
         factory.createSpecimenType();
         Set<AliquotedSpecimen> aliquotedSpecimens = new HashSet<AliquotedSpecimen>();
         aliquotedSpecimens.add(factory.createAliquotedSpecimen());
-        aliquotedSpecimens.add(factory.createAliquotedSpecimen());
-        aliquotedSpecimens.add(factory.createAliquotedSpecimen());
 
         session.getTransaction().commit();
 
-        Set<SpecimenBatchOpInputPojo> csvInfos = specimenCsvHelper.createAllSpecimens(
-            factory.getDefaultStudy(), originInfos, patients);
+        Set<SpecimenBatchOpInputPojo> pojos =
+            specimenCsvHelper.createAllSpecimens(session, originInfos, patients);
 
         // write out to CSV file so we can view data
-        SpecimenBatchOpCsvWriter.write(CSV_NAME, csvInfos);
+        SpecimenBatchOpCsvWriter.write(CSV_NAME, pojos);
 
         try {
             SpecimenBatchOpAction importAction = new SpecimenBatchOpAction(
-                factory.getDefaultSite(), csvInfos, new File(CSV_NAME));
+                factory.getDefaultSite(), pojos, new File(CSV_NAME));
             exec(importAction);
         } catch (BatchOpErrorsException e) {
             CsvUtil.showErrorsInLog(log, e);
-            Assert.fail("errors in CVS data: " + e.getMessage());
+            fail("errors in CVS data: " + e.getMessage());
         }
 
-        checkCsvInfoAgainstDb(csvInfos);
+        checkAgainstDb(pojos);
     }
 
     // test with large number of patients
@@ -137,10 +123,12 @@ public class TestSpecimenBatchOp extends TestAction {
     public void manyPatients() throws Exception {
         final int numPatients = 500;
 
+        session.beginTransaction();
         Set<Patient> patients = new HashSet<Patient>();
 
         for (int i = 0; i < numPatients; i++) {
             patients.add(factory.createPatient());
+            factory.createCollectionEvent();
         }
 
         Set<SourceSpecimen> sourceSpecimens = new HashSet<SourceSpecimen>();
@@ -156,85 +144,198 @@ public class TestSpecimenBatchOp extends TestAction {
         session.getTransaction().commit();
 
         Set<OriginInfo> testOriginInfos = new HashSet<OriginInfo>();
+        Set<SpecimenBatchOpInputPojo> pojos =
+            specimenCsvHelper.createAllSpecimens(session, testOriginInfos, patients);
 
-        Set<SpecimenBatchOpInputPojo> csvInfos = specimenCsvHelper.createAllSpecimens(
-            factory.getDefaultStudy(), testOriginInfos, patients);
-
-        SpecimenBatchOpCsvWriter.write(CSV_NAME, csvInfos);
+        SpecimenBatchOpCsvWriter.write(CSV_NAME, pojos);
 
         try {
             SpecimenBatchOpAction importAction = new SpecimenBatchOpAction(
-                factory.getDefaultSite(), csvInfos, new File(CSV_NAME));
+                factory.getDefaultSite(), pojos, new File(CSV_NAME));
             exec(importAction);
         } catch (BatchOpErrorsException e) {
             CsvUtil.showErrorsInLog(log, e);
-            Assert.fail("errors in CVS data: " + e.getMessage());
+            fail("errors in CVS data: " + e.getMessage());
         }
 
-        checkCsvInfoAgainstDb(csvInfos);
+        checkAgainstDb(pojos);
     }
 
     @Test
     public void onlyParentSpecimensInCsv() throws Exception {
         Set<Patient> patients = new HashSet<Patient>();
 
-        for (int i = 0; i < 3; i++) {
-            Patient patient = factory.createPatient();
-            patients.add(patient);
-
-            // create 3 source specimens and parent specimens
-            for (int j = 0; j < 3; j++) {
-                factory.createSourceSpecimen();
-            }
-        }
-
+        session.beginTransaction();
+        Patient patient = factory.createPatient();
+        patients.add(patient);
+        factory.createCollectionEvent();
+        factory.createSourceSpecimen();
         session.getTransaction().commit();
 
         // make sure you can add parent specimens without a worksheet #
-        Set<SpecimenBatchOpInputPojo> csvInfos = specimenCsvHelper.sourceSpecimensCreate(
-            originInfos,
-            patients,
-            factory.getDefaultStudy().getSourceSpecimens());
+        Set<SpecimenBatchOpInputPojo> pojos =
+            specimenCsvHelper.sourceSpecimensCreate(session, originInfos, patients);
 
         // remove the worksheet # for the last half
-        int half = csvInfos.size() / 2;
+        int half = pojos.size() / 2;
         int count = 0;
-        for (SpecimenBatchOpInputPojo csvInfo : csvInfos) {
+        for (SpecimenBatchOpInputPojo pojo : pojos) {
             if (count > half) {
-                csvInfo.setWorksheet(null);
+                pojo.setWorksheet(null);
             }
             ++count;
         }
 
-        SpecimenBatchOpCsvWriter.write(CSV_NAME, csvInfos);
+        SpecimenBatchOpCsvWriter.write(CSV_NAME, pojos);
 
         try {
-            SpecimenBatchOpAction importAction = new SpecimenBatchOpAction(
-                factory.getDefaultSite(), csvInfos, new File(CSV_NAME));
+            SpecimenBatchOpAction importAction =
+                new SpecimenBatchOpAction(factory.getDefaultSite(), pojos, new File(CSV_NAME));
             exec(importAction);
         } catch (BatchOpErrorsException e) {
             CsvUtil.showErrorsInLog(log, e);
-            Assert.fail("errors in CVS data: " + e.getMessage());
+            fail("errors in CVS data: " + e.getMessage());
         }
 
-        checkCsvInfoAgainstDb(csvInfos);
+        checkAgainstDb(pojos);
+    }
+
+    @Test
+    public void aliquotsWithParentSpecimens() throws Exception {
+        final SimpleTestFixture fixture = new SimpleTestFixture(session, factory);
+        Set<SpecimenBatchOpInputPojo> pojos =
+            specimenCsvHelper.createAllSpecimens(session,
+                                                 originInfos,
+                                                 fixture.patients);
+        SpecimenBatchOpCsvWriter.write(CSV_NAME, pojos);
+
+        try {
+            SpecimenBatchOpAction importAction =
+                new SpecimenBatchOpAction(factory.getDefaultSite(), pojos, new File(CSV_NAME));
+            exec(importAction);
+        } catch (BatchOpErrorsException e) {
+            CsvUtil.showErrorsInLog(log, e);
+            fail("errors in CVS data: " + e.getMessage());
+        }
+
+        checkAgainstDb(pojos);
+    }
+
+    @Test
+    public void aliquotsWithParentSpecimensInDb() throws Exception {
+        Set<Patient> patients = new HashSet<Patient>();
+
+        session.beginTransaction();
+        factory.createSourceSpecimen();
+        factory.createAliquotedSpecimen();
+        for (int i = 0; i < 2; i++) {
+            Patient patient = factory.createPatient();
+            patients.add(patient);
+            factory.createCollectionEvent();
+            factory.createParentSpecimen();
+        }
+        session.getTransaction().commit();
+
+        Set<SpecimenBatchOpInputPojo> pojos = specimenCsvHelper.createAliquotedSpecimens(patients);
+        assertTrue("no pojos generated", pojos.size() > 0);
+
+        SpecimenBatchOpCsvWriter.write(CSV_NAME, pojos);
+
+        try {
+            SpecimenBatchOpAction importAction =
+                new SpecimenBatchOpAction(factory.getDefaultSite(), pojos, new File(CSV_NAME));
+            exec(importAction);
+        } catch (BatchOpErrorsException e) {
+            CsvUtil.showErrorsInLog(log, e);
+            fail("errors in CVS data: " + e.getMessage());
+        }
+
+        checkAgainstDb(pojos);
+    }
+
+    @Test
+    public void failsForSourceSpecimensWithParentInventoryId() throws Exception {
+        Set<Patient> patients = new HashSet<Patient>();
+
+        session.beginTransaction();
+        factory.createSourceSpecimen();
+        factory.createAliquotedSpecimen();
+        Patient patient = factory.createPatient();
+        patients.add(patient);
+        factory.createCollectionEvent();
+        Specimen parentSpecimen = factory.createParentSpecimen();
+        session.getTransaction().commit();
+
+        Set<SpecimenBatchOpInputPojo> pojos =
+            specimenCsvHelper.sourceSpecimensCreate(session, originInfos, patients);
+
+        SpecimenBatchOpInputPojo pojo = pojos.iterator().next();
+        pojo.setInventoryId(parentSpecimen.getInventoryId());
+
+        SpecimenBatchOpCsvWriter.write(CSV_NAME, pojos);
+
+        try {
+            SpecimenBatchOpAction importAction = new SpecimenBatchOpAction(
+                factory.getDefaultSite(), pojos, new File(CSV_NAME));
+            exec(importAction);
+            fail("should not be allowed to create aliquot specimens with no parent specimens");
+        } catch (BatchOpErrorsException e) {
+            new AssertBatchOpException()
+                .withMessage(SPC_ALREADY_EXISTS_ERROR)
+                .assertIn(e);
+        }
+    }
+
+    @Test
+    public void failsForSpecimensThatExistInDb() throws Exception {
+        Set<Patient> patients = new HashSet<Patient>();
+
+        session.beginTransaction();
+        for (int i = 0; i < 2; i++) {
+            Patient patient = factory.createPatient();
+            patients.add(patient);
+            factory.createCollectionEvent();
+        }
+        factory.createSourceSpecimen();
+        session.getTransaction().commit();
+
+        Set<SpecimenBatchOpInputPojo> pojos =
+            specimenCsvHelper.sourceSpecimensCreate(session, originInfos, patients);
+
+        for (SpecimenBatchOpInputPojo pojo : pojos) {
+            pojo.setParentInventoryId(nameGenerator.next(Specimen.class));
+        }
+
+        SpecimenBatchOpCsvWriter.write(CSV_NAME, pojos);
+
+        try {
+            SpecimenBatchOpAction importAction = new SpecimenBatchOpAction(
+                factory.getDefaultSite(), pojos, new File(CSV_NAME));
+            exec(importAction);
+            fail("should not be allowed to create aliquot specimens with no parent specimens");
+        } catch (BatchOpErrorsException e) {
+            new AssertBatchOpException()
+                .withMessage(CSV_PARENT_SPC_ERROR)
+                .assertIn(e);
+        }
     }
 
     @Test
     public void multiplePatientsSameWorksheet() throws Exception {
         Set<Patient> patients = new HashSet<Patient>();
 
+        session.beginTransaction();
         for (int i = 0; i < 2; i++) {
             Patient patient = factory.createPatient();
             patients.add(patient);
+            factory.createCollectionEvent();
         }
 
         factory.createSourceSpecimen();
         session.getTransaction().commit();
 
         Set<SpecimenBatchOpInputPojo> pojos =
-            specimenCsvHelper.sourceSpecimensCreate(originInfos, patients,
-                factory.getDefaultStudy().getSourceSpecimens());
+            specimenCsvHelper.sourceSpecimensCreate(session, originInfos, patients);
 
         // give every parent specimen the same worksheet number
         String worksheet = pojos.iterator().next().getWorksheet();
@@ -250,25 +351,70 @@ public class TestSpecimenBatchOp extends TestAction {
             exec(importAction);
         } catch (BatchOpErrorsException e) {
             CsvUtil.showErrorsInLog(log, e);
-            Assert.fail("errors in CVS data: " + e.getMessage());
+            fail("errors in CVS data: " + e.getMessage());
         }
 
-        checkCsvInfoAgainstDb(pojos);
+        checkAgainstDb(pojos);
+    }
+
+    @Test
+    public void withVolume() throws Exception {
+        Set<Patient> patients = new HashSet<Patient>();
+
+        session.beginTransaction();
+        for (int i = 0; i < 2; i++) {
+            Patient patient = factory.createPatient();
+            patients.add(patient);
+
+            // create source specimens and parent specimens
+            for (int j = 0; j < 2; j++) {
+                factory.createSourceSpecimen();
+                factory.createParentSpecimen();
+            }
+        }
+        factory.createAliquotedSpecimen();
+        session.getTransaction().commit();
+
+        Set<SpecimenBatchOpInputPojo> pojos = specimenCsvHelper.createAliquotedSpecimens(patients);
+        assertTrue("no pojos generated", pojos.size() > 0);
+
+        // set the volume
+        Random r = new Random();
+        for (SpecimenBatchOpInputPojo pojo : pojos) {
+            assertFalse(pojo.getSourceSpecimen());
+            pojo.setVolume(new BigDecimal(r.nextInt(10)));
+        }
+
+        SpecimenBatchOpCsvWriter.write(CSV_NAME, pojos);
+
+        try {
+            SpecimenBatchOpAction importAction = new SpecimenBatchOpAction(
+                factory.getDefaultSite(), pojos, new File(CSV_NAME));
+            exec(importAction);
+        } catch (BatchOpErrorsException e) {
+            CsvUtil.showErrorsInLog(log, e);
+            fail("errors in CVS data: " + e.getMessage());
+        }
+
+        checkAgainstDb(pojos);
     }
 
     @Test
     public void existingWorksheet() throws Exception {
+        session.beginTransaction();
         factory.createSourceSpecimen();
         factory.createPatient();
+        factory.createCollectionEvent();
         ProcessingEvent pevent = factory.createProcessingEvent();
         factory.createParentSpecimen();
 
         Set<Patient> patients = new HashSet<Patient>();
         patients.add(factory.createPatient());
+        factory.createCollectionEvent();
         session.getTransaction().commit();
 
-        Set<SpecimenBatchOpInputPojo> pojos = specimenCsvHelper.sourceSpecimensCreate(
-            originInfos, patients, factory.getDefaultStudy().getSourceSpecimens());
+        Set<SpecimenBatchOpInputPojo> pojos =
+            specimenCsvHelper.sourceSpecimensCreate(session, originInfos, patients);
 
         // give every parent specimen the same worksheet number
         String worksheet = pevent.getWorksheet();
@@ -284,27 +430,22 @@ public class TestSpecimenBatchOp extends TestAction {
             exec(importAction);
         } catch (BatchOpErrorsException e) {
             CsvUtil.showErrorsInLog(log, e);
-            Assert.fail("errors in CVS data: " + e.getMessage());
+            fail("errors in CVS data: " + e.getMessage());
         }
 
-        checkCsvInfoAgainstDb(pojos);
+        checkAgainstDb(pojos);
     }
 
     @Test
     public void onlyChildSpecimensNoPevents() throws Exception {
         Set<Patient> patients = new HashSet<Patient>();
-        Set<Specimen> parentSpecimens = new HashSet<Specimen>();
 
+        session.beginTransaction();
         for (int i = 0; i < 3; i++) {
             Patient patient = factory.createPatient();
             patients.add(patient);
             factory.createCollectionEvent();
-
-            // create 3 source specimens and parent specimens
-            for (int j = 0; j < 3; j++) {
-                factory.createSourceSpecimen();
-                parentSpecimens.add(factory.createParentSpecimen());
-            }
+            factory.createParentSpecimen();
         }
 
         // create a new specimen type for the aliquoted specimens
@@ -316,22 +457,20 @@ public class TestSpecimenBatchOp extends TestAction {
 
         session.getTransaction().commit();
 
-        Set<SpecimenBatchOpInputPojo> csvInfos =
-            specimenCsvHelper.createAliquotedSpecimens(
-                factory.getDefaultStudy(), parentSpecimens);
+        Set<SpecimenBatchOpInputPojo> pojos = specimenCsvHelper.createAliquotedSpecimens(patients);
 
-        SpecimenBatchOpCsvWriter.write(CSV_NAME, csvInfos);
+        SpecimenBatchOpCsvWriter.write(CSV_NAME, pojos);
 
         try {
             SpecimenBatchOpAction importAction = new SpecimenBatchOpAction(
-                factory.getDefaultSite(), csvInfos, new File(CSV_NAME));
+                factory.getDefaultSite(), pojos, new File(CSV_NAME));
             exec(importAction);
         } catch (BatchOpErrorsException e) {
             CsvUtil.showErrorsInLog(log, e);
-            Assert.fail("errors in CVS data: " + e.getMessage());
+            fail("errors in CVS data: " + e.getMessage());
         }
 
-        checkCsvInfoAgainstDb(csvInfos);
+        checkAgainstDb(pojos);
     }
 
     /*
@@ -344,6 +483,7 @@ public class TestSpecimenBatchOp extends TestAction {
         Set<Patient> patients = new HashSet<Patient>();
         Map<String, Specimen> parentSpecimens = new HashMap<String, Specimen>();
 
+        session.beginTransaction();
         for (int i = 0; i < 3; i++) {
             Patient patient = factory.createPatient();
             patients.add(patient);
@@ -367,8 +507,8 @@ public class TestSpecimenBatchOp extends TestAction {
 
         session.getTransaction().commit();
 
-        Set<SpecimenBatchOpInputPojo> pojos = specimenCsvHelper.createAliquotedSpecimens(
-            factory.getDefaultStudy(), parentSpecimens.values());
+        Set<SpecimenBatchOpInputPojo> pojos =
+            specimenCsvHelper.createAliquotedSpecimens(patients);
 
         // add the worksheet
         for (SpecimenBatchOpInputPojo pojo : pojos) {
@@ -384,10 +524,10 @@ public class TestSpecimenBatchOp extends TestAction {
             exec(importAction);
         } catch (BatchOpErrorsException e) {
             CsvUtil.showErrorsInLog(log, e);
-            Assert.fail("errors in CVS data: " + e.getMessage());
+            fail("errors in CVS data: " + e.getMessage());
         }
 
-        checkCsvInfoAgainstDb(pojos);
+        checkAgainstDb(pojos);
     }
 
     @Test
@@ -396,6 +536,7 @@ public class TestSpecimenBatchOp extends TestAction {
         Set<Patient> patients = new HashSet<Patient>();
         Set<Specimen> parentSpecimens = new HashSet<Specimen>();
 
+        session.beginTransaction();
         patients.add(factory.createPatient());
         factory.createSourceSpecimen();
         factory.createAliquotedSpecimen();
@@ -403,21 +544,21 @@ public class TestSpecimenBatchOp extends TestAction {
 
         session.getTransaction().commit();
 
-        Set<SpecimenBatchOpInputPojo> inputPojos = specimenCsvHelper.createAliquotedSpecimens(
-            factory.getDefaultStudy(), parentSpecimens);
+        Set<SpecimenBatchOpInputPojo> pojos =
+            specimenCsvHelper.createAliquotedSpecimens(patients);
 
         // change the parent's inventory id to something that does not exist
-        for (SpecimenBatchOpInputPojo inputPojo : inputPojos) {
-            inputPojo.setParentInventoryId(inputPojo.getParentInventoryId() + "_1");
+        for (SpecimenBatchOpInputPojo pojo : pojos) {
+            pojo.setParentInventoryId(pojo.getParentInventoryId() + "_1");
         }
 
-        SpecimenBatchOpCsvWriter.write(CSV_NAME, inputPojos);
+        SpecimenBatchOpCsvWriter.write(CSV_NAME, pojos);
 
         try {
             SpecimenBatchOpAction importAction = new SpecimenBatchOpAction(
-                factory.getDefaultSite(), inputPojos, new File(CSV_NAME));
+                factory.getDefaultSite(), pojos, new File(CSV_NAME));
             exec(importAction);
-            Assert.fail("should not be allowed to create aliquot specimens with no parent specimens");
+            fail("should not be allowed to create aliquot specimens with no parent specimens");
         } catch (BatchOpErrorsException e) {
             new AssertBatchOpException()
                 .withMessage(CSV_PARENT_SPC_INV_ID_ERROR.format())
@@ -427,21 +568,22 @@ public class TestSpecimenBatchOp extends TestAction {
 
     @Test
     public void onlyChildSpecimensNoCollectionEvent() throws Exception {
+        session.beginTransaction();
         factory.createSpecimenType();
         AliquotedSpecimen aliquotedSpecimen = factory.createAliquotedSpecimen();
 
         session.getTransaction().commit();
 
-        Set<SpecimenBatchOpInputPojo> csvInfos = new HashSet<SpecimenBatchOpInputPojo>();
-        csvInfos.add(specimenCsvHelper.aliquotedSpecimenCreate(
+        Set<SpecimenBatchOpInputPojo> pojos = new HashSet<SpecimenBatchOpInputPojo>();
+        pojos.add(specimenCsvHelper.genericSpecimenCreate(
             null, aliquotedSpecimen.getSpecimenType().getName()));
-        SpecimenBatchOpCsvWriter.write(CSV_NAME, csvInfos);
+        SpecimenBatchOpCsvWriter.write(CSV_NAME, pojos);
 
         try {
             SpecimenBatchOpAction importAction = new SpecimenBatchOpAction(
-                factory.getDefaultSite(), csvInfos, new File(CSV_NAME));
+                factory.getDefaultSite(), pojos, new File(CSV_NAME));
             exec(importAction);
-            Assert.fail("should not be allowed to create aliquot specimens with no collection events");
+            fail("should not be allowed to create aliquot specimens with no collection events");
         } catch (BatchOpErrorsException e) {
             new AssertBatchOpException()
                 .withMessage(CSV_ALIQ_SPC_PATIENT_CEVENT_MISSING_ERROR)
@@ -452,42 +594,127 @@ public class TestSpecimenBatchOp extends TestAction {
     @Test
     public void invalidPatientNumber() throws Exception {
         Set<Patient> patients = new HashSet<Patient>();
+        session.beginTransaction();
+        factory.createSourceSpecimen();
         Patient patient = factory.createPatient();
         patients.add(patient);
-        factory.createSourceSpecimen();
-
+        factory.createCollectionEvent();
         session.getTransaction().commit();
 
-        // make sure you can add parent specimens without a worksheet #
-        Set<SpecimenBatchOpInputPojo> csvInfos =
-            specimenCsvHelper.sourceSpecimensCreate(originInfos, patients,
-                factory.getDefaultStudy().getSourceSpecimens());
+        for (String testCase : Arrays.asList("empty", "invalid")) {
+            // make sure you can add parent specimens without a worksheet #
+            Set<SpecimenBatchOpInputPojo> pojos =
+                specimenCsvHelper.sourceSpecimensCreate(session, originInfos, patients);
 
-        // change the patient number to something invalid
-        for (SpecimenBatchOpInputPojo csvInfo : csvInfos) {
-            if (csvInfo.getPatientNumber() != null) {
-                csvInfo.setPatientNumber(csvInfo.getPatientNumber() + "_2");
+            if (testCase.equals("empty")) {
+                for (SpecimenBatchOpInputPojo pojo : pojos) {
+                    if (pojo.getPatientNumber() != null) {
+                        pojo.setPatientNumber(StringUtil.EMPTY_STRING);
+                    }
+                }
+            } else {
+                for (SpecimenBatchOpInputPojo pojo : pojos) {
+                    if (pojo.getPatientNumber() != null) {
+                        pojo.setPatientNumber(pojo.getPatientNumber() + "_2");
+                    }
+                }
             }
-        }
-        SpecimenBatchOpCsvWriter.write(CSV_NAME, csvInfos);
 
-        try {
-            SpecimenBatchOpAction importAction = new SpecimenBatchOpAction(
-                factory.getDefaultSite(), csvInfos, new File(CSV_NAME));
-            exec(importAction);
-            Assert.fail("should not be allowed to create aliquot specimens with invalid patients");
-        } catch (BatchOpErrorsException e) {
-            new AssertBatchOpException()
-                .withMessage(CSV_PATIENT_NUMBER_INVALID_ERROR.format())
-                .assertIn(e);
+            SpecimenBatchOpCsvWriter.write(CSV_NAME, pojos);
+
+            try {
+                SpecimenBatchOpAction importAction =
+                    new SpecimenBatchOpAction(factory.getDefaultSite(), pojos, new File(CSV_NAME));
+                exec(importAction);
+                fail("should not be allowed to create aliquot specimens with invalid patients");
+            } catch (BatchOpErrorsException e) {
+                new AssertBatchOpException()
+                    .withMessage(CSV_PATIENT_NUMBER_INVALID_ERROR.format())
+                    .assertIn(e);
+            }
         }
     }
 
     @Test
-    public void missingPatientNumber() throws Exception {
+    public void wrongPatientNumber() throws Exception {
         Set<Patient> patients = new HashSet<Patient>();
+        session.beginTransaction();
+        factory.createSourceSpecimen();
+        factory.createAliquotedSpecimen();
         Patient patient = factory.createPatient();
         patients.add(patient);
+        CollectionEvent event = factory.createCollectionEvent();
+        event.setVisitNumber(3);
+        factory.createParentSpecimen();
+        Patient wrongPatient = factory.createPatient();
+        CollectionEvent wrongEvent = factory.createCollectionEvent();
+        wrongEvent.setVisitNumber(10);
+        session.getTransaction().commit();
+
+        // make sure you can add parent specimens without a worksheet #
+        Set<SpecimenBatchOpInputPojo> pojos =
+            specimenCsvHelper.createAliquotedSpecimens(patients);
+
+        // change the patient on the aliquoted number to something invalid
+        for (SpecimenBatchOpInputPojo pojo : pojos) {
+            if (pojo.getParentInventoryId() != null) {
+                pojo.setPatientNumber(wrongPatient.getPnumber());
+                pojo.setVisitNumber(wrongEvent.getVisitNumber());
+            }
+        }
+        SpecimenBatchOpCsvWriter.write(CSV_NAME, pojos);
+
+        try {
+            SpecimenBatchOpAction importAction =
+                new SpecimenBatchOpAction(factory.getDefaultSite(), pojos, new File(CSV_NAME));
+            exec(importAction);
+            fail("should not be allowed to create aliquot specimens with invalid patients");
+        } catch (BatchOpErrorsException e) {
+            new AssertBatchOpException().withMessage(CSV_PATIENT_MATCH_ERROR.format()).assertIn(e);
+        }
+    }
+    @Test
+    public void invalidVisitNumber() throws Exception {
+        Set<Patient> patients = new HashSet<Patient>();
+
+        session.beginTransaction();
+        factory.createSourceSpecimen();
+        factory.createAliquotedSpecimen();
+        Patient patient = factory.createPatient();
+        patients.add(patient);
+        CollectionEvent event = factory.createCollectionEvent();
+        factory.createParentSpecimen();
+        session.getTransaction().commit();
+
+        Set<SpecimenBatchOpInputPojo> pojos =
+            specimenCsvHelper.createAliquotedSpecimens(patients);
+
+        for (SpecimenBatchOpInputPojo pojo : pojos) {
+            pojo.setParentInventoryId(StringUtil.EMPTY_STRING);
+            pojo.setPatientNumber(patient.getPnumber());
+            pojo.setVisitNumber(event.getVisitNumber());
+        }
+
+        SpecimenBatchOpCsvWriter.write(CSV_NAME, pojos);
+
+        try {
+            SpecimenBatchOpAction importAction =
+                new SpecimenBatchOpAction(factory.getDefaultSite(), pojos, new File(CSV_NAME));
+            exec(importAction);
+            fail("should not be allowed to create aliquot specimens with invalid patients");
+        } catch (BatchOpErrorsException e) {
+            new AssertBatchOpException().withMessage(CSV_CEVENT_ERROR.format()).assertIn(e);
+        }
+    }
+
+
+    @Test
+    public void missingPatientNumber() throws Exception {
+        Set<Patient> patients = new HashSet<Patient>();
+        session.beginTransaction();
+        Patient patient = factory.createPatient();
+        patients.add(patient);
+        factory.createCollectionEvent();
 
         Set<SourceSpecimen> sourceSpecimens = new HashSet<SourceSpecimen>();
         sourceSpecimens.add(factory.createSourceSpecimen());
@@ -497,19 +724,20 @@ public class TestSpecimenBatchOp extends TestAction {
 
         session.getTransaction().commit();
 
-        Set<SpecimenBatchOpInputPojo> csvInfos = specimenCsvHelper.createAllSpecimens(
-            factory.getDefaultStudy(), originInfos, patients);
+        Set<SpecimenBatchOpInputPojo> pojos =
+            specimenCsvHelper.createAllSpecimens(session, originInfos, patients);
+
         // set all patient numbers to null
-        for (SpecimenBatchOpInputPojo csvInfo : csvInfos) {
-            csvInfo.setPatientNumber("");
+        for (SpecimenBatchOpInputPojo pojo : pojos) {
+            pojo.setPatientNumber("");
         }
-        SpecimenBatchOpCsvWriter.write(CSV_NAME, csvInfos);
+        SpecimenBatchOpCsvWriter.write(CSV_NAME, pojos);
 
         try {
             SpecimenBatchOpAction importAction = new SpecimenBatchOpAction(
-                factory.getDefaultSite(), csvInfos, new File(CSV_NAME));
+                factory.getDefaultSite(), pojos, new File(CSV_NAME));
             exec(importAction);
-            Assert.fail("should not be allowed to import spcecimens when patient number is missing");
+            fail("should not be allowed to import spcecimens when patient number is missing");
         } catch (BatchOpErrorsException e) {
             CsvUtil.showErrorsInLog(log, e);
         }
@@ -518,31 +746,32 @@ public class TestSpecimenBatchOp extends TestAction {
     @Test
     public void invalidSourceSpecimenType() throws Exception {
         Set<Patient> patients = new HashSet<Patient>();
+        session.beginTransaction();
         Patient patient = factory.createPatient();
         patients.add(patient);
+        factory.createCollectionEvent();
         factory.createSourceSpecimen();
 
         session.getTransaction().commit();
 
         // make sure you can add parent specimens without a worksheet #
-        Set<SpecimenBatchOpInputPojo> csvInfos =
-            specimenCsvHelper.sourceSpecimensCreate(originInfos, patients,
-                factory.getDefaultStudy().getSourceSpecimens());
+        Set<SpecimenBatchOpInputPojo> pojos =
+            specimenCsvHelper.sourceSpecimensCreate(session, originInfos, patients);
 
         // change the specimen type to something invalid
-        for (SpecimenBatchOpInputPojo csvInfo : csvInfos) {
-            String stype = csvInfo.getSpecimenType();
+        for (SpecimenBatchOpInputPojo pojo : pojos) {
+            String stype = pojo.getSpecimenType();
             if (stype != null) {
-                csvInfo.setSpecimenType(stype + "_x");
+                pojo.setSpecimenType(stype + "_x");
             }
         }
-        SpecimenBatchOpCsvWriter.write(CSV_NAME, csvInfos);
+        SpecimenBatchOpCsvWriter.write(CSV_NAME, pojos);
 
         try {
             SpecimenBatchOpAction importAction = new SpecimenBatchOpAction(
-                factory.getDefaultSite(), csvInfos, new File(CSV_NAME));
+                factory.getDefaultSite(), pojos, new File(CSV_NAME));
             exec(importAction);
-            Assert.fail("should not be allowed to invalid specimen types");
+            fail("should not be allowed to invalid specimen types");
         } catch (BatchOpErrorsException e) {
             new AssertBatchOpException()
                 .withMessage(CSV_SPECIMEN_TYPE_ERROR.format())
@@ -553,7 +782,10 @@ public class TestSpecimenBatchOp extends TestAction {
     @Test
     public void invalidAliquotedSpecimenType() throws Exception {
         Set<Patient> patients = new HashSet<Patient>();
+        session.beginTransaction();
         Patient patient = factory.createPatient();
+        factory.createCollectionEvent();
+        factory.createParentSpecimen();
         patients.add(patient);
         factory.createSourceSpecimen();
 
@@ -566,23 +798,23 @@ public class TestSpecimenBatchOp extends TestAction {
 
         session.getTransaction().commit();
 
-        Set<SpecimenBatchOpInputPojo> csvInfos = specimenCsvHelper.createAllSpecimens(
-            factory.getDefaultStudy(), originInfos, patients);
+        Set<SpecimenBatchOpInputPojo> pojos =
+            specimenCsvHelper.createAllSpecimens(session, originInfos, patients);
 
         // change the specimen type to something invalid
-        for (SpecimenBatchOpInputPojo csvInfo : csvInfos) {
-            String stype = csvInfo.getSpecimenType();
-            if ((stype != null) && !csvInfo.getSourceSpecimen()) {
-                csvInfo.setSpecimenType(stype + "_x");
+        for (SpecimenBatchOpInputPojo pojo : pojos) {
+            String stype = pojo.getSpecimenType();
+            if ((stype != null) && !pojo.getSourceSpecimen()) {
+                pojo.setSpecimenType(stype + "_x");
             }
         }
-        SpecimenBatchOpCsvWriter.write(CSV_NAME, csvInfos);
+        SpecimenBatchOpCsvWriter.write(CSV_NAME, pojos);
 
         try {
             SpecimenBatchOpAction importAction = new SpecimenBatchOpAction(
-                factory.getDefaultSite(), csvInfos, new File(CSV_NAME));
+                factory.getDefaultSite(), pojos, new File(CSV_NAME));
             exec(importAction);
-            Assert.fail("should not be allowed to invalid specimen types");
+            fail("should not be allowed to invalid specimen types");
         } catch (BatchOpErrorsException e) {
             new AssertBatchOpException()
                 .withMessage(CSV_SPECIMEN_TYPE_ERROR.format())
@@ -592,9 +824,9 @@ public class TestSpecimenBatchOp extends TestAction {
 
     @Test
     public void withComments() throws Exception {
-        Set<Patient> patients = new HashSet<Patient>();
-        Set<Specimen> parentSpecimens = new HashSet<Specimen>();
+        final Set<Patient> patients = new HashSet<Patient>();
 
+        session.beginTransaction();
         for (int i = 0; i < 3; i++) {
             Patient patient = factory.createPatient();
             patients.add(patient);
@@ -605,110 +837,48 @@ public class TestSpecimenBatchOp extends TestAction {
                 factory.createSourceSpecimen();
                 Specimen parentSpecimen = factory.createParentSpecimen();
                 parentSpecimen.setProcessingEvent(factory.createProcessingEvent());
-                parentSpecimens.add(parentSpecimen);
             }
         }
 
         // create a new specimen type for the aliquoted specimens
         factory.createSpecimenType();
-        Set<AliquotedSpecimen> aliquotedSpecimens = new HashSet<AliquotedSpecimen>();
-        aliquotedSpecimens.add(factory.createAliquotedSpecimen());
-        aliquotedSpecimens.add(factory.createAliquotedSpecimen());
-        aliquotedSpecimens.add(factory.createAliquotedSpecimen());
-
+        factory.createAliquotedSpecimen();
+        factory.createAliquotedSpecimen();
         session.getTransaction().commit();
 
-        Set<SpecimenBatchOpInputPojo> csvInfos = specimenCsvHelper.createAliquotedSpecimens(
-            factory.getDefaultStudy(), parentSpecimens);
-        SpecimenBatchOpPojoHelper.addComments(csvInfos, nameGenerator);
-        SpecimenBatchOpCsvWriter.write(CSV_NAME, csvInfos);
-
-        try {
-            SpecimenBatchOpAction importAction = new SpecimenBatchOpAction(
-                factory.getDefaultSite(), csvInfos, new File(CSV_NAME));
-            exec(importAction);
-        } catch (BatchOpErrorsException e) {
-            CsvUtil.showErrorsInLog(log, e);
-            Assert.fail("errors in CVS data: " + e.getMessage());
-        }
-
-        checkCsvInfoAgainstDb(csvInfos);
+        withComments(new IPojosCreator<SpecimenBatchOpInputPojo>() {
+            @Override
+            public Set<SpecimenBatchOpInputPojo> create() {
+                return specimenCsvHelper.createAliquotedSpecimens(patients);
+            }
+        });
     }
 
     @Test
     public void noErrorsWithContainers() throws Exception {
-        Set<Patient> patients = new HashSet<Patient>();
-        patients.add(factory.createPatient());
-        patients.add(factory.createPatient());
-        patients.add(factory.createPatient());
-
-        factory.createSourceSpecimen();
-        factory.createSourceSpecimen();
-        factory.createSourceSpecimen();
-
-        SpecimenType aqSpecimenType = factory.createSpecimenType();
-        factory.setDefaultAliquotedSpecimenType(aqSpecimenType);
-
-        factory.createAliquotedSpecimen();
-        factory.createAliquotedSpecimen();
-        factory.createAliquotedSpecimen();
-
-        Set<Container> childL2Containers =
-            SpecimenBatchOpPojoHelper.createContainers(session,
-                                                       factory,
-                                                       nameGenerator,
-                                                       aqSpecimenType,
-                                                       5);
-
-        session.getTransaction().commit();
-
-        Set<SpecimenBatchOpInputPojo> csvInfos = new HashSet<SpecimenBatchOpInputPojo>();
-        csvInfos = specimenCsvHelper.createAllSpecimens(factory.getDefaultStudy(),
-                                                        originInfos,
-                                                        patients);
-
-        Assert.assertTrue("have CSV data", csvInfos.size() > 0);
-
-        // only the aliquoted specimens will have a position
-        Set<SpecimenBatchOpInputPojo> aliquotedSpecimensCsvInfos =
-            new HashSet<SpecimenBatchOpInputPojo>();
-
-        for (SpecimenBatchOpInputPojo csvInfo : csvInfos) {
-            if (csvInfo.getSourceSpecimen()) continue;
-            aliquotedSpecimensCsvInfos.add(csvInfo);
-        }
-
-        SpecimenBatchOpPojoHelper.assignPositionsToPojos(
-            aliquotedSpecimensCsvInfos, childL2Containers, false);
-
-        SpecimenBatchOpCsvWriter.write(CSV_NAME, csvInfos);
-
-        try {
-            SpecimenBatchOpAction importAction = new SpecimenBatchOpAction(factory.getDefaultSite(),
-                                                                           csvInfos,
-                                                                           new File(CSV_NAME));
-            exec(importAction);
-        } catch (BatchOpErrorsException e) {
-            CsvUtil.showErrorsInLog(log, e);
-            Assert.fail("errors in CVS data: " + e.getMessage());
-        }
-
-        checkCsvInfoAgainstDb(csvInfos);
+        final SimpleTestFixture fixture = new SimpleTestFixture(session, factory);
+        noErrorsWithContainers(new IPojosCreator<SpecimenBatchOpInputPojo>() {
+            @Override
+            public Set<SpecimenBatchOpInputPojo> create() {
+                return specimenCsvHelper.createAllSpecimens(session,
+                                                            originInfos,
+                                                            fixture.patients);
+            }
+        });
     }
 
     @Test
     public void onlyParentSpecimensWithLabelsAndPositions() throws Exception {
         Set<Patient> patients = new HashSet<Patient>();
 
-        for (int i = 0; i < 3; i++) {
+        session.beginTransaction();
+        for (int i = 0; i < 2; i++) {
             Patient patient = factory.createPatient();
             patients.add(patient);
-
-            // create 3 source specimens and parent specimens
-            for (int j = 0; j < 3; j++) {
-                factory.createSourceSpecimen();
-            }
+            factory.createCollectionEvent();
+            factory.createSourceSpecimen();
         }
+        session.getTransaction().commit();
 
         Set<Container> childL2Containers =
             SpecimenBatchOpPojoHelper.createContainers(session,
@@ -717,191 +887,57 @@ public class TestSpecimenBatchOp extends TestAction {
                                                        factory.getDefaultSourceSpecimenType(),
                                                        5);
 
-        session.getTransaction().commit();
-
         // make sure you can add parent specimens without a worksheet #
-        Set<SpecimenBatchOpInputPojo> csvInfos = specimenCsvHelper.sourceSpecimensCreate(
-            originInfos, patients, factory.getDefaultStudy().getSourceSpecimens());
+        Set<SpecimenBatchOpInputPojo> pojos =
+            specimenCsvHelper.sourceSpecimensCreate(session, originInfos, patients);
 
-        SpecimenBatchOpPojoHelper.assignPositionsToPojos(csvInfos,
+        SpecimenBatchOpPojoHelper.assignPositionsToPojos(pojos,
                                                          childL2Containers,
                                                          false);
 
-        SpecimenBatchOpCsvWriter.write(CSV_NAME, csvInfos);
+        SpecimenBatchOpCsvWriter.write(CSV_NAME, pojos);
 
         try {
             SpecimenBatchOpAction importAction = new SpecimenBatchOpAction(
-                factory.getDefaultSite(), csvInfos, new File(CSV_NAME));
+                factory.getDefaultSite(), pojos, new File(CSV_NAME));
             exec(importAction);
         } catch (BatchOpErrorsException e) {
             CsvUtil.showErrorsInLog(log, e);
-            Assert.fail("errors in CVS data: " + e.getMessage());
+            fail("errors in CVS data: " + e.getMessage());
         }
 
-        checkCsvInfoAgainstDb(csvInfos);
+        checkAgainstDb(pojos);
     }
 
     @Test
-    public void withProductBarcodesAndPositions() throws Exception {
+    public void withInvalidWaybill() throws Exception {
         Set<Patient> patients = new HashSet<Patient>();
 
-        for (int i = 0; i < 3; i++) {
-            Patient patient = factory.createPatient();
-            patients.add(patient);
-
-            // create 3 source specimens and parent specimens
-            for (int j = 0; j < 3; j++) {
-                factory.createSourceSpecimen();
-            }
-        }
-
-        Set<Container> childL2Containers =
-            SpecimenBatchOpPojoHelper.createContainers(session,
-                                                       factory,
-                                                       nameGenerator,
-                                                       factory.getDefaultSourceSpecimenType(),
-                                                       5);
-
-        session.getTransaction().commit();
-
-        // make sure you can add parent specimens without a worksheet #
-        Set<SpecimenBatchOpInputPojo> csvInfos = specimenCsvHelper.sourceSpecimensCreate(
-            originInfos, patients, factory.getDefaultStudy().getSourceSpecimens());
-
-        SpecimenBatchOpPojoHelper.assignPositionsToPojos(csvInfos, childL2Containers, true);
-
-        SpecimenBatchOpCsvWriter.write(CSV_NAME, csvInfos);
-
-        try {
-            SpecimenBatchOpAction importAction = new SpecimenBatchOpAction(
-                factory.getDefaultSite(), csvInfos, new File(CSV_NAME));
-            exec(importAction);
-        } catch (BatchOpErrorsException e) {
-            CsvUtil.showErrorsInLog(log, e);
-            Assert.fail("errors in CVS data: " + e.getMessage());
-        }
-
-        checkCsvInfoAgainstDb(csvInfos);
-    }
-
-    @Test
-    public void onlyPalletPositions() throws Exception {
-        Set<Patient> patients = new HashSet<Patient>();
-        Patient patient = factory.createPatient();
-        patients.add(patient);
+        session.beginTransaction();
         factory.createSourceSpecimen();
-
-        Set<Container> childL2Containers =
-            SpecimenBatchOpPojoHelper.createContainers(session,
-                                                       factory,
-                                                       nameGenerator,
-                                                       factory.getDefaultSourceSpecimenType(),
-                                                       5);
-
+        Patient patient = factory.createPatient();
+        patients.add(patient);
+        factory.createCollectionEvent();
         session.getTransaction().commit();
 
         // make sure you can add parent specimens without a worksheet #
-        Set<SpecimenBatchOpInputPojo> csvInfos = specimenCsvHelper.sourceSpecimensCreate(
-            originInfos, patients, factory.getDefaultStudy().getSourceSpecimens());
+        Set<SpecimenBatchOpInputPojo> pojos =
+            specimenCsvHelper.sourceSpecimensCreate(session, originInfos, patients);
 
-        SpecimenBatchOpPojoHelper.assignPositionsToPojos(csvInfos, childL2Containers, true);
-
-        for (SpecimenBatchOpInputPojo csvInfo : csvInfos) {
-            csvInfo.setPalletProductBarcode("");
+        for (SpecimenBatchOpInputPojo pojo : pojos) {
+            pojo.setWaybill(pojo.getWaybill() + nameGenerator.next(String.class));
         }
 
-        SpecimenBatchOpCsvWriter.write(CSV_NAME, csvInfos);
-
-        try {
-            SpecimenBatchOpAction importAction = new SpecimenBatchOpAction(
-                factory.getDefaultSite(), csvInfos, new File(CSV_NAME));
-            exec(importAction);
-            Assert.fail("should fail");
-        } catch (BatchOpErrorsException e) {
-            CsvUtil.showErrorsInLog(log, e);
-            new AssertBatchOpException()
-                .withMessage(CSV_PALLET_POS_ERROR)
-                .assertIn(e);
-        }
-    }
-
-    @Test
-    public void positionsByLabelAlreadyOccupied() throws Exception {
-        Set<Patient> patients = new HashSet<Patient>();
-        Patient patient = factory.createPatient();
-        patients.add(patient);
-        Set<Container> childL2Containers =
-            SpecimenBatchOpPojoHelper.createContainers(session,
-                                                       factory,
-                                                       nameGenerator,
-                                                       factory.getDefaultSourceSpecimenType(),
-                                                       1);
-        session.getTransaction().commit();
-
-        SpecimenBatchOpPojoHelper.fillContainerWithSecimens(session,
-                                                           factory,
-                                                           childL2Containers.iterator().next(),
-                                                           patient);
-
-        Set<SpecimenBatchOpInputPojo> csvInfos =
-            specimenCsvHelper.sourceSpecimensCreate(originInfos,
-                                                    patients,
-                                                    factory.getDefaultStudy().getSourceSpecimens());
-
-        SpecimenBatchOpPojoHelper.assignPositionsToPojos(csvInfos, childL2Containers, false);
-        SpecimenBatchOpCsvWriter.write(CSV_NAME, csvInfos);
+        SpecimenBatchOpCsvWriter.write(CSV_NAME, pojos);
 
         try {
             SpecimenBatchOpAction importAction =
-                new SpecimenBatchOpAction(factory.getDefaultSite(),
-                                          csvInfos,
-                                          new File(CSV_NAME));
+                new SpecimenBatchOpAction(factory.getDefaultSite(), pojos, new File(CSV_NAME));
             exec(importAction);
-            Assert.fail("should fail");
+            fail("should not be allowed to create aliquot specimens with no parent specimens");
         } catch (BatchOpErrorsException e) {
-            CsvUtil.showErrorsInLog(log, e);
             new AssertBatchOpException()
-                .withMessage(CSV_LABEL_POS_OCCUPIED_ERROR.format())
-                .assertIn(e);
-        }
-    }
-
-    @Test
-    public void positionsByBarcodeAlreadyOccupied() throws Exception {
-        Set<Patient> patients = new HashSet<Patient>();
-        Patient patient = factory.createPatient();
-        patients.add(patient);
-        factory.createSourceSpecimen();
-        Set<Container> childL2Containers =
-            SpecimenBatchOpPojoHelper.createContainers(session,
-                                                       factory,
-                                                       nameGenerator,
-                                                       factory.getDefaultSourceSpecimenType(),
-                                                       5);
-        session.getTransaction().commit();
-
-        SpecimenBatchOpPojoHelper.fillContainerWithSecimens(session,
-                                                           factory,
-                                                           childL2Containers.iterator().next(),
-                                                           patient);
-
-
-        // make sure you can add parent specimens without a worksheet #
-        Set<SpecimenBatchOpInputPojo> csvInfos = specimenCsvHelper.sourceSpecimensCreate(
-            originInfos, patients, factory.getDefaultStudy().getSourceSpecimens());
-
-        SpecimenBatchOpPojoHelper.assignPositionsToPojos(csvInfos, childL2Containers, true);
-        SpecimenBatchOpCsvWriter.write(CSV_NAME, csvInfos);
-
-        try {
-            SpecimenBatchOpAction importAction = new SpecimenBatchOpAction(
-                factory.getDefaultSite(), csvInfos, new File(CSV_NAME));
-            exec(importAction);
-            Assert.fail("should fail");
-        } catch (BatchOpErrorsException e) {
-            CsvUtil.showErrorsInLog(log, e);
-            new AssertBatchOpException()
-                .withMessage(CSV_CONTAINER_POS_OCCUPIED_ERROR.format())
+                .withMessage(CSV_WAYBILL_ERROR.format())
                 .assertIn(e);
         }
     }
@@ -909,16 +945,17 @@ public class TestSpecimenBatchOp extends TestAction {
     @Test
     public void withExistingPevents() throws IOException, NoSuchAlgorithmException, ClassNotFoundException {
         Set<Patient> patients = new HashSet<Patient>();
+        session.beginTransaction();
         Set<Specimen> parentSpecimens = new HashSet<Specimen>();
         Map<String, ProcessingEvent> peventMap = new HashMap<String, ProcessingEvent>();
 
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 2; i++) {
             Patient patient = factory.createPatient();
             patients.add(patient);
             factory.createCollectionEvent();
 
             // create 3 source specimens and parent specimens
-            for (int j = 0; j < 3; j++) {
+            for (int j = 0; j < 2; j++) {
                 factory.createSourceSpecimen();
                 Specimen parentSpecimen = factory.createParentSpecimen();
                 ProcessingEvent pevent = factory.createProcessingEvent();
@@ -936,36 +973,36 @@ public class TestSpecimenBatchOp extends TestAction {
         Set<AliquotedSpecimen> aliquotedSpecimens = new HashSet<AliquotedSpecimen>();
         aliquotedSpecimens.add(factory.createAliquotedSpecimen());
         aliquotedSpecimens.add(factory.createAliquotedSpecimen());
-        aliquotedSpecimens.add(factory.createAliquotedSpecimen());
 
         session.getTransaction().commit();
 
-        Set<SpecimenBatchOpInputPojo> csvInfos =
-            specimenCsvHelper.createAliquotedSpecimens(factory.getDefaultStudy(), parentSpecimens);
+        Set<SpecimenBatchOpInputPojo> pojos =
+            specimenCsvHelper.createAliquotedSpecimens(patients);
 
-        // add the worksheet number to the csvInfos
-        for (SpecimenBatchOpInputPojo csvInfo : csvInfos) {
-            csvInfo.setWorksheet(peventMap.get(csvInfo.getParentInventoryId()).getWorksheet());
+        // add the worksheet number to the pojos
+        for (SpecimenBatchOpInputPojo pojo : pojos) {
+            pojo.setWorksheet(peventMap.get(pojo.getParentInventoryId()).getWorksheet());
         }
 
-        SpecimenBatchOpCsvWriter.write(CSV_NAME, csvInfos);
+        SpecimenBatchOpCsvWriter.write(CSV_NAME, pojos);
 
         try {
             SpecimenBatchOpAction importAction = new SpecimenBatchOpAction(
-                factory.getDefaultSite(), csvInfos, new File(CSV_NAME));
+                factory.getDefaultSite(), pojos, new File(CSV_NAME));
             exec(importAction);
         } catch (BatchOpErrorsException e) {
             CsvUtil.showErrorsInLog(log, e);
-            Assert.fail("errors in CVS data: " + e.getMessage());
+            fail("errors in CVS data: " + e.getMessage());
         }
 
-        checkCsvInfoAgainstDb(csvInfos);
+        checkAgainstDb(pojos);
     }
 
     @Test
     public void aliquotsWithNoParentSpc() throws IOException, NoSuchAlgorithmException, ClassNotFoundException {
         Set<Patient> patients = new HashSet<Patient>();
 
+        session.beginTransaction();
         for (int i = 0; i < 3; i++) {
             Patient patient = factory.createPatient();
             patients.add(patient);
@@ -981,21 +1018,21 @@ public class TestSpecimenBatchOp extends TestAction {
 
         session.getTransaction().commit();
 
-        Set<SpecimenBatchOpInputPojo> csvInfos = specimenCsvHelper.aliquotedSpecimensCreate(
+        Set<SpecimenBatchOpInputPojo> pojos = specimenCsvHelper.aliquotedSpecimensCreate(
             patients, aliquotedSpecimens);
 
-        SpecimenBatchOpCsvWriter.write(CSV_NAME, csvInfos);
+        SpecimenBatchOpCsvWriter.write(CSV_NAME, pojos);
 
         try {
             SpecimenBatchOpAction importAction = new SpecimenBatchOpAction(
-                factory.getDefaultSite(), csvInfos, new File(CSV_NAME));
+                factory.getDefaultSite(), pojos, new File(CSV_NAME));
             exec(importAction);
         } catch (BatchOpErrorsException e) {
             CsvUtil.showErrorsInLog(log, e);
-            Assert.fail("errors in CVS data: " + e.getMessage());
+            fail("errors in CVS data: " + e.getMessage());
         }
 
-        checkCsvInfoAgainstDb(csvInfos);
+        checkAgainstDb(pojos);
     }
 
     // This test should fail since a single aliquot cannot have two parent specimens
@@ -1004,8 +1041,10 @@ public class TestSpecimenBatchOp extends TestAction {
         Set<Patient> patients = new HashSet<Patient>();
         Set<AliquotedSpecimen> aliquotedSpecimens = new HashSet<AliquotedSpecimen>();
 
+        session.beginTransaction();
         Patient patient = factory.createPatient();
         patients.add(patient);
+        factory.createCollectionEvent();
         factory.createSourceSpecimen();
         aliquotedSpecimens.add(factory.createAliquotedSpecimen());
         factory.createCollectionEvent();
@@ -1014,16 +1053,16 @@ public class TestSpecimenBatchOp extends TestAction {
         factory.createSpecimenType();
         session.getTransaction().commit();
 
-        Set<SpecimenBatchOpInputPojo> parentSpecimenPojos = specimenCsvHelper.sourceSpecimensCreate(
-            originInfos, patients, factory.getDefaultStudy().getSourceSpecimens());
+        Set<SpecimenBatchOpInputPojo> parentSpecimenPojos =
+            specimenCsvHelper.sourceSpecimensCreate(session, originInfos, patients);
 
-        Assert.assertTrue(parentSpecimenPojos.size() > 2);
+        assertTrue(parentSpecimenPojos.size() > 2);
 
         Set<SpecimenBatchOpInputPojo> childSpecimenPojos =
             specimenCsvHelper.aliquotedSpecimensCreate(patients, aliquotedSpecimens);
 
-        Set<SpecimenBatchOpInputPojo> csvInfos = new HashSet<SpecimenBatchOpInputPojo>();
-        csvInfos.addAll(parentSpecimenPojos);
+        Set<SpecimenBatchOpInputPojo> pojos = new HashSet<SpecimenBatchOpInputPojo>();
+        pojos.addAll(parentSpecimenPojos);
 
         // modify the aliquot to point to the first parent specimen
         List<SpecimenBatchOpInputPojo> parentSpecimenPojosList =
@@ -1031,7 +1070,7 @@ public class TestSpecimenBatchOp extends TestAction {
 
         SpecimenBatchOpInputPojo childSpecimenPojo = childSpecimenPojos.iterator().next();
         childSpecimenPojo.setParentInventoryId(parentSpecimenPojosList.get(0).getInventoryId());
-        csvInfos.addAll(childSpecimenPojos);
+        pojos.addAll(childSpecimenPojos);
 
         SpecimenBatchOpInputPojo newChildSpecimenPojo = new SpecimenBatchOpInputPojo();
         newChildSpecimenPojo.setInventoryId(childSpecimenPojo.getInventoryId());
@@ -1041,158 +1080,191 @@ public class TestSpecimenBatchOp extends TestAction {
         newChildSpecimenPojo.setPatientNumber(childSpecimenPojo.getPatientNumber());
         newChildSpecimenPojo.setVisitNumber(childSpecimenPojo.getVisitNumber());
         newChildSpecimenPojo.setSourceSpecimen(false);
-        csvInfos.add(newChildSpecimenPojo);
+        pojos.add(newChildSpecimenPojo);
 
-        SpecimenBatchOpCsvWriter.write(CSV_NAME, csvInfos);
+        SpecimenBatchOpCsvWriter.write(CSV_NAME, pojos);
 
         try {
             SpecimenBatchOpAction importAction = new SpecimenBatchOpAction(
-                factory.getDefaultSite(), csvInfos, new File(CSV_NAME));
+                factory.getDefaultSite(), pojos, new File(CSV_NAME));
             exec(importAction);
-            Assert.fail("CSV file contains duplicate inventory IDs, test should fail");
+            fail("CSV file contains duplicate inventory IDs, test should fail");
         } catch (IllegalStateException e) {
             CsvUtil.showErrorsInLog(log, e);
         }
     }
 
-    private void checkCsvInfoAgainstDb(Set<SpecimenBatchOpInputPojo> csvInfos) {
-        for (SpecimenBatchOpInputPojo csvInfo : csvInfos) {
-            log.trace("checking specimen against db: inventory id {}", csvInfo.getInventoryId());
+    @Test
+    public void withProductBarcodesAndPositions() throws Exception {
+        final Set<Patient> patients = new HashSet<Patient>();
 
-            Specimen specimen = (Specimen) session.createCriteria(Specimen.class)
-                .add(Restrictions.eq("inventoryId", csvInfo.getInventoryId())).uniqueResult();
-
-            Assert.assertNotNull(specimen);
-
-            Assert.assertEquals(csvInfo.getSpecimenType(), specimen.getSpecimenType().getName());
-            Assert.assertEquals(0, DateCompare.compare(csvInfo.getCreatedAt(), specimen.getCreatedAt()));
-
-            if (csvInfo.getPatientNumber() != null) {
-                Assert.assertEquals(csvInfo.getPatientNumber(),
-                    specimen.getCollectionEvent().getPatient().getPnumber());
-            }
-
-            Assert.assertNotNull(specimen.getCollectionEvent());
-
-            if (csvInfo.getVisitNumber() != null) {
-                Assert.assertEquals(csvInfo.getVisitNumber(),
-                    specimen.getCollectionEvent().getVisitNumber());
-            }
-
-            if (specimen.getOriginInfo().getShipmentInfo() != null) {
-                Assert.assertEquals(csvInfo.getWaybill(),
-                    specimen.getOriginInfo().getShipmentInfo().getWaybill());
-            }
-
-            if (csvInfo.getOriginCenter() != null) {
-                Assert.assertEquals(csvInfo.getOriginCenter(),
-                    specimen.getOriginInfo().getCenter().getNameShort());
-            }
-
-            if (csvInfo.getCurrentCenter() != null) {
-                Assert.assertEquals(csvInfo.getCurrentCenter(),
-                    specimen.getCurrentCenter().getNameShort());
-            }
-
-            if (csvInfo.getSourceSpecimen()) {
-                Assert.assertNotNull(specimen.getOriginalCollectionEvent());
-
-                if ((csvInfo.getWorksheet() != null) && !csvInfo.getWorksheet().isEmpty()) {
-                    Assert.assertNotNull(specimen.getProcessingEvent());
-                    Assert.assertEquals(csvInfo.getWorksheet(),
-                        specimen.getProcessingEvent().getWorksheet());
-                }
-            } else {
-                Assert.assertNull(specimen.getOriginalCollectionEvent());
-
-                if (csvInfo.getParentInventoryId() != null) {
-                    Assert.assertEquals(csvInfo.getParentInventoryId(),
-                        specimen.getParentSpecimen().getInventoryId());
-
-                    if (csvInfo.getWorksheet() != null) {
-                        Assert.assertNotNull(specimen.getParentSpecimen().getProcessingEvent());
-
-                        Assert.assertEquals(csvInfo.getWorksheet(),
-                            specimen.getParentSpecimen().getProcessingEvent().getWorksheet());
-                    }
-                } else {
-                    if (csvInfo.getWorksheet() != null) {
-                        Assert.assertEquals(csvInfo.getWorksheet(), specimen
-                            .getProcessingEvent().getWorksheet());
-                    }
-                }
-            }
-
-            if ((csvInfo.getPalletPosition() != null) && !csvInfo.getPalletPosition().isEmpty()) {
-                SpecimenPosition specimenPosition = specimen.getSpecimenPosition();
-                Assert.assertNotNull(specimenPosition);
-                Assert.assertEquals(csvInfo.getPalletPosition(), specimenPosition.getPositionString());
-
-                String label = csvInfo.getPalletLabel();
-                boolean hasLabel = (label != null) && !label.isEmpty();
-
-                if (hasLabel) {
-                    Assert.assertEquals(label, specimenPosition.getContainer().getLabel());
-                } else {
-                    String barcode = csvInfo.getPalletProductBarcode();
-                    Assert.assertEquals(barcode, specimenPosition.getContainer().getProductBarcode());
-                }
-
-            }
-
-            if ((csvInfo.getComment() != null) && !csvInfo.getComment().isEmpty()) {
-                Assert.assertEquals(1, specimen.getComments().size());
-                Assert.assertEquals(csvInfo.getComment(),
-                    specimen.getComments().iterator().next().getMessage());
-
-            }
+        session.beginTransaction();
+        for (int i = 0; i < 3; i++) {
+            patients.add(factory.createPatient());
+            factory.createCollectionEvent();
+            factory.createSourceSpecimen();
         }
+        session.getTransaction().commit();
+
+        withProductBarcodesAndPositions(new IPojosCreator<SpecimenBatchOpInputPojo>() {
+            @Override
+            public Set<SpecimenBatchOpInputPojo> create() {
+                return specimenCsvHelper.sourceSpecimensCreate(session, originInfos, patients);
+            }
+        });
+    }
+
+    @Test
+    public void withInvalidContainerInformation() throws Exception {
+        final Set<Patient> patients = new HashSet<Patient>();
+        session.beginTransaction();
+        Patient patient = factory.createPatient();
+        patients.add(patient);
+        factory.createCollectionEvent();
+        factory.createSourceSpecimen();
+        session.getTransaction().commit();
+
+        IPojosCreator<SpecimenBatchOpInputPojo> pojosCreator =
+            new IPojosCreator<SpecimenBatchOpInputPojo>() {
+                @Override
+                public Set<SpecimenBatchOpInputPojo> create() {
+                    return specimenCsvHelper.sourceSpecimensCreate(session, originInfos, patients);
+                }
+            };
+        withInvalidContainerInformation(pojosCreator, false);
+    }
+
+    @Test
+    public void withInvalidSpecimenPositions() throws Exception {
+        final Set<Patient> patients = new HashSet<Patient>();
+
+        session.beginTransaction();
+        Patient patient = factory.createPatient();
+        patients.add(patient);
+        factory.createCollectionEvent();
+        factory.createSourceSpecimen();
+        session.getTransaction().commit();
+
+        IPojosCreator<SpecimenBatchOpInputPojo> pojosCreator =
+            new IPojosCreator<SpecimenBatchOpInputPojo>() {
+            @Override
+            public Set<SpecimenBatchOpInputPojo> create() {
+                return specimenCsvHelper.sourceSpecimensCreate(session, originInfos, patients);
+            }
+        };
+        Set<SpecimenType> specimenTypes = new HashSet<SpecimenType>();
+        specimenTypes.add(factory.getDefaultSourceSpecimenType());
+        withInvalidSpecimenPositions(pojosCreator, specimenTypes);
+    }
+
+    @Test
+    public void withInvalidSpecimenTypes() throws Exception {
+        final Set<Patient> patients = new HashSet<Patient>();
+
+        session.beginTransaction();
+        Patient patient = factory.createPatient();
+        patients.add(patient);
+        factory.createCollectionEvent();
+        factory.createSourceSpecimen();
+        session.getTransaction().commit();
+
+        withInvalidSpecimenTypes(new IPojosCreator<SpecimenBatchOpInputPojo>() {
+            @Override
+            public Set<SpecimenBatchOpInputPojo> create() {
+                return specimenCsvHelper.sourceSpecimensCreate(session, originInfos, patients);
+            }
+        });
+    }
+
+    @Test
+    public void withInvalidContainerType() throws Exception {
+        final Set<Patient> patients = new HashSet<Patient>();
+
+        session.beginTransaction();
+        Patient patient = factory.createPatient();
+        patients.add(patient);
+        factory.createCollectionEvent();
+        factory.createSourceSpecimen();
+        session.getTransaction().commit();
+
+        Set<SpecimenType> specimenTypes = new HashSet<SpecimenType>();
+        specimenTypes.add(factory.getDefaultSourceSpecimenType());
+
+        IPojosCreator<SpecimenBatchOpInputPojo> pojosCreator =
+            new IPojosCreator<SpecimenBatchOpInputPojo>() {
+            @Override
+            public Set<SpecimenBatchOpInputPojo> create() {
+                return specimenCsvHelper.sourceSpecimensCreate(session, originInfos, patients);
+            }
+        };
+        withInvalidContainerType(pojosCreator, specimenTypes);
+    }
+
+    @Test
+    public void positionsAlreadyOccupied() throws Exception {
+        final Set<Patient> patients = new HashSet<Patient>();
+
+        session.beginTransaction();
+        Patient patient = factory.createPatient();
+        patients.add(patient);
+        factory.createSourceSpecimen();
+        session.getTransaction().commit();
+
+        Set<SpecimenType> specimenTypes = new HashSet<SpecimenType>();
+        specimenTypes.add(factory.getDefaultSourceSpecimenType());
+
+        IPojosCreator<SpecimenBatchOpInputPojo> pojosCreator =
+            new IPojosCreator<SpecimenBatchOpInputPojo>() {
+            @Override
+            public Set<SpecimenBatchOpInputPojo> create() {
+                return specimenCsvHelper.sourceSpecimensCreate(session, originInfos, patients);
+            }
+        };
+        withPositionsAlreadyOccupied(pojosCreator,
+                                     specimenTypes,
+                                     patients.iterator().next());
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void errorsIfInventoryIdFoundMoreThanOnce() throws Exception {
+        final SimpleTestFixture fixture = new SimpleTestFixture(session, factory);
+        IPojosCreator<SpecimenBatchOpInputPojo> pojosCreator =
+            new IPojosCreator<SpecimenBatchOpInputPojo>() {
+                @Override
+                public Set<SpecimenBatchOpInputPojo> create() {
+                    return specimenCsvHelper.sourceSpecimensCreate(session,
+                                                                   originInfos,
+                                                                   fixture.patients);
+                }
+            };
+
+        errorsIfInventoryIdFoundMoreThanOnce(pojosCreator);
     }
 
     @Test
     public void specimenBatchOpGetAction() throws Exception {
-        Set<Patient> patients = new HashSet<Patient>();
-        patients.add(factory.createPatient());
-        patients.add(factory.createPatient());
-        patients.add(factory.createPatient());
-
-        Set<SourceSpecimen> sourceSpecimens = new HashSet<SourceSpecimen>();
-        sourceSpecimens.add(factory.createSourceSpecimen());
-        factory.createSpecimenType();
-        sourceSpecimens.add(factory.createSourceSpecimen());
-        factory.createSpecimenType();
-        sourceSpecimens.add(factory.createSourceSpecimen());
-
-        // create a new specimen type for the aliquoted specimens
-        factory.createSpecimenType();
-        Set<AliquotedSpecimen> aliquotedSpecimens = new HashSet<AliquotedSpecimen>();
-        aliquotedSpecimens.add(factory.createAliquotedSpecimen());
-        aliquotedSpecimens.add(factory.createAliquotedSpecimen());
-        aliquotedSpecimens.add(factory.createAliquotedSpecimen());
-
-        session.getTransaction().commit();
-
-        Set<SpecimenBatchOpInputPojo> csvInfos = specimenCsvHelper.createAllSpecimens(
-            factory.getDefaultStudy(), originInfos, patients);
+        final SimpleTestFixture fixture = new SimpleTestFixture(session, factory);
+        Set<SpecimenBatchOpInputPojo> pojos =
+            specimenCsvHelper.createAllSpecimens(session, originInfos, fixture.patients);
 
         // write out to CSV file so we can view data
-        SpecimenBatchOpCsvWriter.write(CSV_NAME, csvInfos);
+        SpecimenBatchOpCsvWriter.write(CSV_NAME, pojos);
 
         SpecimenBatchOpAction importAction = new SpecimenBatchOpAction(
-            factory.getDefaultSite(), csvInfos, new File(CSV_NAME));
+            factory.getDefaultSite(), pojos, new File(CSV_NAME));
         Integer bachOpId = exec(importAction).getId();
 
-        checkCsvInfoAgainstDb(csvInfos);
+        checkAgainstDb(pojos);
 
         BatchOpGetResult<Specimen> batchOpResult = exec(new SpecimenBatchOpGetAction(bachOpId));
 
-        Assert.assertEquals(csvInfos.size(), batchOpResult.getModelObjects().size());
-        Assert.assertEquals(getGlobalAdmin().getLogin(), batchOpResult.getExecutedBy());
+        assertEquals(pojos.size(), batchOpResult.getModelObjects().size());
+        assertEquals(getGlobalAdmin().getLogin(), batchOpResult.getExecutedBy());
 
         Date timeNow = new Date();
-        Assert.assertTrue("Dates aren't close enough to each other!",
+        assertTrue("Dates aren't close enough to each other!",
                           (timeNow.getTime() - batchOpResult.getTimeExecuted().getTime()) < 10000);
-        Assert.assertEquals(CSV_NAME, batchOpResult.getInput().getName());
+        assertEquals(CSV_NAME, batchOpResult.getInput().getName());
     }
 
     /**
@@ -1206,29 +1278,28 @@ public class TestSpecimenBatchOp extends TestAction {
     @Test
     public void studySourceSpecimens() throws IOException, NoSuchAlgorithmException, ClassNotFoundException {
         Set<Patient> patients = new HashSet<Patient>();
+        session.beginTransaction();
         patients.add(factory.createPatient());
+        factory.createCollectionEvent();
         factory.createSourceSpecimen();
         SpecimenType specimenType = factory.createSpecimenType();
-
         session.getTransaction().commit();
 
-        Set<SpecimenBatchOpInputPojo> csvInfos = specimenCsvHelper.sourceSpecimensCreate(
-            originInfos,
-            patients,
-            factory.getDefaultStudy().getSourceSpecimens());
+        Set<SpecimenBatchOpInputPojo> pojos =
+            specimenCsvHelper.sourceSpecimensCreate(session, originInfos, patients);
 
         // change the specimen type
-        for (SpecimenBatchOpInputPojo csvInfo : csvInfos) {
-            csvInfo.setSpecimenType(specimenType.getNameShort());
+        for (SpecimenBatchOpInputPojo pojo : pojos) {
+            pojo.setSpecimenType(specimenType.getNameShort());
         }
 
-        SpecimenBatchOpCsvWriter.write(CSV_NAME, csvInfos);
+        SpecimenBatchOpCsvWriter.write(CSV_NAME, pojos);
 
         try {
             SpecimenBatchOpAction importAction = new SpecimenBatchOpAction(
-                factory.getDefaultSite(), csvInfos, new File(CSV_NAME));
+                factory.getDefaultSite(), pojos, new File(CSV_NAME));
             exec(importAction);
-            Assert.fail("should fail");
+            fail("should fail");
         } catch (BatchOpErrorsException e) {
             CsvUtil.showErrorsInLog(log, e);
             new AssertBatchOpException()
@@ -1246,32 +1317,26 @@ public class TestSpecimenBatchOp extends TestAction {
      */
     @Test
     public void studyAliquotedSpecimens() throws Exception {
-        // the parent specimens will not exist in this test
-        Set<Patient> patients = new HashSet<Patient>();
-        Set<Specimen> parentSpecimens = new HashSet<Specimen>();
+        final SimpleTestFixture fixture = new SimpleTestFixture(session, factory);
+        Set<SpecimenBatchOpInputPojo> pojos =
+            specimenCsvHelper.createAliquotedSpecimens(fixture.patients);
 
-        patients.add(factory.createPatient());
-        factory.createSourceSpecimen();
-        factory.createAliquotedSpecimen();
-        parentSpecimens.add(factory.createParentSpecimen());
+        session.beginTransaction();
         SpecimenType specimenType = factory.createSpecimenType();
         session.getTransaction().commit();
 
-        Set<SpecimenBatchOpInputPojo> inputPojos = specimenCsvHelper.createAliquotedSpecimens(
-            factory.getDefaultStudy(), parentSpecimens);
-
-        // change the specimen type to something that does not exist
-        for (SpecimenBatchOpInputPojo inputPojo : inputPojos) {
-            inputPojo.setSpecimenType(specimenType.getNameShort());
+        // change the specimen type to another that is not in the study
+        for (SpecimenBatchOpInputPojo pojo : pojos) {
+            pojo.setSpecimenType(specimenType.getNameShort());
         }
 
-        SpecimenBatchOpCsvWriter.write(CSV_NAME, inputPojos);
+        SpecimenBatchOpCsvWriter.write(CSV_NAME, pojos);
 
         try {
             SpecimenBatchOpAction importAction = new SpecimenBatchOpAction(
-                factory.getDefaultSite(), inputPojos, new File(CSV_NAME));
+                factory.getDefaultSite(), pojos, new File(CSV_NAME));
             exec(importAction);
-            Assert.fail("should fail");
+            fail("should fail");
         } catch (BatchOpErrorsException e) {
             CsvUtil.showErrorsInLog(log, e);
             new AssertBatchOpException()
@@ -1281,146 +1346,135 @@ public class TestSpecimenBatchOp extends TestAction {
     }
 
     @Test
-    public void originCenterIsInvalid() throws Exception {
-        Set<Patient> patients = new HashSet<Patient>();
-        Set<Specimen> parentSpecimens = new HashSet<Specimen>();
-
-        patients.add(factory.createPatient());
-        factory.createSourceSpecimen();
-        factory.createAliquotedSpecimen();
-        parentSpecimens.add(factory.createParentSpecimen());
-        factory.createSpecimenType();
-        factory.createAliquotedSpecimen();
-        session.getTransaction().commit();
-
-        Set<SpecimenBatchOpInputPojo> inputPojos = specimenCsvHelper.createAllSpecimens(
-            factory.getDefaultStudy(), originInfos, patients);
-
-        // change the origin center to something invalid
-        for (SpecimenBatchOpInputPojo inputPojo : inputPojos) {
-            inputPojo.setOriginCenter(nameGenerator.next(Center.class));
-        }
-
-        SpecimenBatchOpCsvWriter.write(CSV_NAME, inputPojos);
-
-        try {
-            SpecimenBatchOpAction importAction = new SpecimenBatchOpAction(
-                factory.getDefaultSite(), inputPojos, new File(CSV_NAME));
-            exec(importAction);
-            Assert.fail("should fail");
-        } catch (BatchOpErrorsException e) {
-            CsvUtil.showErrorsInLog(log, e);
-            new AssertBatchOpException()
-                .withMessage(CSV_ORIGIN_CENTER_SHORT_NAME_ERROR.format())
-                .assertIn(e);
-        }
-    }
-
-    @Test
     public void originCenterIsValid() throws Exception {
-        Set<Patient> patients = new HashSet<Patient>();
-        Set<Specimen> parentSpecimens = new HashSet<Specimen>();
-
-        patients.add(factory.createPatient());
-        factory.createSourceSpecimen();
-        factory.createAliquotedSpecimen();
-        parentSpecimens.add(factory.createParentSpecimen());
-        factory.createSpecimenType();
-        factory.createAliquotedSpecimen();
-        session.getTransaction().commit();
-
-        Set<SpecimenBatchOpInputPojo> inputPojos = specimenCsvHelper.createAllSpecimens(
-            factory.getDefaultStudy(), originInfos, patients);
-
-        // assign the origin center
-        for (SpecimenBatchOpInputPojo inputPojo : inputPojos) {
-            inputPojo.setOriginCenter(defaultClinic.getNameShort());
-        }
-
-        SpecimenBatchOpCsvWriter.write(CSV_NAME, inputPojos);
-
-        SpecimenBatchOpAction importAction = new SpecimenBatchOpAction(
-            factory.getDefaultSite(), inputPojos, new File(CSV_NAME));
-
-        try {
-            Integer bachOpId = exec(importAction).getId();
-            checkCsvInfoAgainstDb(inputPojos);
-            BatchOpGetResult<Specimen> batchOpResult = exec(new SpecimenBatchOpGetAction(bachOpId));
-            Assert.assertEquals(inputPojos.size(), batchOpResult.getModelObjects().size());
-        } catch (BatchOpErrorsException e) {
-            CsvUtil.showErrorsInLog(log, e);
-        }
-
+        final SimpleTestFixture fixture = new SimpleTestFixture(session, factory);
+        originCenterIsValid(new IPojosCreator<SpecimenBatchOpInputPojo>() {
+            @Override
+            public Set<SpecimenBatchOpInputPojo> create() {
+                return specimenCsvHelper.createAllSpecimens(session, originInfos, fixture.patients);
+            }
+        });
     }
 
     @Test
-    public void currentCenterIsInvalid() throws Exception {
-        Set<Patient> patients = new HashSet<Patient>();
-        Set<Specimen> parentSpecimens = new HashSet<Specimen>();
-
-        patients.add(factory.createPatient());
-        factory.createSourceSpecimen();
-        factory.createAliquotedSpecimen();
-        parentSpecimens.add(factory.createParentSpecimen());
-        factory.createSpecimenType();
-        factory.createAliquotedSpecimen();
-        session.getTransaction().commit();
-
-        Set<SpecimenBatchOpInputPojo> inputPojos = specimenCsvHelper.createAllSpecimens(
-            factory.getDefaultStudy(), originInfos, patients);
-
-        // change the current center to something invalid
-        for (SpecimenBatchOpInputPojo inputPojo : inputPojos) {
-            inputPojo.setCurrentCenter(nameGenerator.next(Center.class));
-        }
-
-        SpecimenBatchOpCsvWriter.write(CSV_NAME, inputPojos);
-
-        try {
-            SpecimenBatchOpAction importAction = new SpecimenBatchOpAction(
-                factory.getDefaultSite(), inputPojos, new File(CSV_NAME));
-            exec(importAction);
-            Assert.fail("should fail");
-        } catch (BatchOpErrorsException e) {
-            CsvUtil.showErrorsInLog(log, e);
-            new AssertBatchOpException()
-                .withMessage(CSV_CURRENT_CENTER_SHORT_NAME_ERROR.format())
-                .assertIn(e);
-        }
+    public void originCenterIsInvalid() throws Exception {
+        final SimpleTestFixture fixture = new SimpleTestFixture(session, factory);
+        originCenterIsInvalid(new IPojosCreator<SpecimenBatchOpInputPojo>() {
+            @Override
+            public Set<SpecimenBatchOpInputPojo> create() {
+                return specimenCsvHelper.createAllSpecimens(session, originInfos, fixture.patients);
+            }
+        });
     }
 
     @Test
     public void currentCenterIsValid() throws Exception {
-        Set<Patient> patients = new HashSet<Patient>();
-        Set<Specimen> parentSpecimens = new HashSet<Specimen>();
+        final SimpleTestFixture fixture = new SimpleTestFixture(session, factory);
+        currentCenterIsValid(new IPojosCreator<SpecimenBatchOpInputPojo>() {
+            @Override
+            public Set<SpecimenBatchOpInputPojo> create() {
+                return specimenCsvHelper.createAllSpecimens(session, originInfos, fixture.patients);
+            }
+        });
+    }
 
+    @Test
+    public void currentCenterIsInvalid() throws Exception {
+        final SimpleTestFixture fixture = new SimpleTestFixture(session, factory);
+        currentCenterIsInvalid(new IPojosCreator<SpecimenBatchOpInputPojo>() {
+            @Override
+            public Set<SpecimenBatchOpInputPojo> create() {
+                return specimenCsvHelper.createAllSpecimens(session, originInfos, fixture.patients);
+            }
+        });
+    }
+
+    @Override
+    protected void checkAgainstDb(SpecimenBatchOpInputPojo pojo, Specimen specimen) {
+        super.checkAgainstDb(pojo, specimen);
+
+        assertNotNull(specimen);
+        assertEquals(pojo.getSpecimenType(), specimen.getSpecimenType().getName());
+        assertEquals(0, DateCompare.compare(pojo.getCreatedAt(), specimen.getCreatedAt()));
+        assertNotNull(specimen.getCollectionEvent());
+
+        if (pojo.getVisitNumber() != null) {
+            assertEquals(pojo.getVisitNumber(),
+                                specimen.getCollectionEvent().getVisitNumber());
+        }
+
+        if (specimen.getOriginInfo().getShipmentInfo() != null) {
+            assertEquals(pojo.getWaybill(),
+                                specimen.getOriginInfo().getShipmentInfo().getWaybill());
+        }
+
+        if (pojo.getOriginCenter() != null) {
+            assertEquals(pojo.getOriginCenter(),
+                                specimen.getOriginInfo().getCenter().getNameShort());
+        }
+
+        if (pojo.getCurrentCenter() != null) {
+            assertEquals(pojo.getCurrentCenter(),
+                                specimen.getCurrentCenter().getNameShort());
+        }
+
+        if (pojo.getSourceSpecimen()) {
+            assertNotNull(specimen.getOriginalCollectionEvent());
+
+            if ((pojo.getWorksheet() != null) && !pojo.getWorksheet().isEmpty()) {
+                assertNotNull(specimen.getProcessingEvent());
+                assertEquals(pojo.getWorksheet(),
+                                    specimen.getProcessingEvent().getWorksheet());
+            }
+        } else {
+            assertNull(specimen.getOriginalCollectionEvent());
+
+            if (pojo.getParentInventoryId() != null) {
+                if (pojo.getWorksheet() != null) {
+                    assertNotNull(specimen.getParentSpecimen().getProcessingEvent());
+
+                    assertEquals(pojo.getWorksheet(),
+                                 specimen.getParentSpecimen().getProcessingEvent().getWorksheet());
+                }
+            } else {
+                if (pojo.getWorksheet() != null) {
+                    assertEquals(pojo.getWorksheet(),
+                                 specimen.getProcessingEvent().getWorksheet());
+                }
+            }
+
+            if (pojo.getVolume() != null) {
+                assertTrue(specimen.getQuantity().compareTo(pojo.getVolume()) == 0);
+            }
+        }
+    }
+
+    @Override
+    protected File writePojosToCsv(Set<SpecimenBatchOpInputPojo> pojos) throws IOException {
+        SpecimenBatchOpCsvWriter.write(CSV_NAME, pojos);
+        return new File(CSV_NAME);
+    }
+
+    @Override
+    protected Action<IdResult> createAction(Set<SpecimenBatchOpInputPojo> pojos, File file)
+        throws IOException, NoSuchAlgorithmException, ClassNotFoundException {
+        return new SpecimenBatchOpAction(factory.getDefaultSite(), pojos, file);
+    }
+
+}
+
+final class SimpleTestFixture {
+
+    Set<Patient> patients = new HashSet<Patient>();
+
+    SimpleTestFixture(Session session, Factory factory) {
+        session.beginTransaction();
         patients.add(factory.createPatient());
         factory.createSourceSpecimen();
         factory.createAliquotedSpecimen();
-        parentSpecimens.add(factory.createParentSpecimen());
+        factory.createParentSpecimen();
         factory.createSpecimenType();
         factory.createAliquotedSpecimen();
         session.getTransaction().commit();
-
-        Set<SpecimenBatchOpInputPojo> inputPojos = specimenCsvHelper.createAllSpecimens(
-            factory.getDefaultStudy(), originInfos, patients);
-
-        // assig the origin center
-        for (SpecimenBatchOpInputPojo inputPojo : inputPojos) {
-            inputPojo.setCurrentCenter(defaultSite.getNameShort());
-        }
-
-        SpecimenBatchOpCsvWriter.write(CSV_NAME, inputPojos);
-
-        SpecimenBatchOpAction importAction = new SpecimenBatchOpAction(
-            factory.getDefaultSite(), inputPojos, new File(CSV_NAME));
-        Integer bachOpId = exec(importAction).getId();
-
-        checkCsvInfoAgainstDb(inputPojos);
-
-        BatchOpGetResult<Specimen> batchOpResult = exec(new SpecimenBatchOpGetAction(bachOpId));
-
-        Assert.assertEquals(inputPojos.size(), batchOpResult.getModelObjects().size());
     }
-
 }

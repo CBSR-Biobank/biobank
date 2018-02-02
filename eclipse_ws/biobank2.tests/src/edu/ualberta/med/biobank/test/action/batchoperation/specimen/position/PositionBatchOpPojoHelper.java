@@ -1,9 +1,7 @@
 package edu.ualberta.med.biobank.test.action.batchoperation.specimen.position;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -13,21 +11,17 @@ import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBa
 import edu.ualberta.med.biobank.common.action.batchoperation.specimen.position.PositionBatchOpPojo;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenPosition;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.model.util.RowColPos;
+import edu.ualberta.med.biobank.test.action.batchoperation.specimen.SpecimenBatchOpPojoHelper;
 
 public class PositionBatchOpPojoHelper {
 
     private static Logger log = LoggerFactory.getLogger(SpecimenBatchOpAction.class);
 
-    static List<PositionBatchOpPojo> createPositionPojos(Study          study,
-                                                        Set<Patient>   patients,
-                                                        Set<Container> containers,
-                                                        boolean        useProductBarcode) {
+    static Set<PositionBatchOpPojo> createPojos(Study study, Set<Patient> patients) {
         if (study.getSourceSpecimens().size() == 0) {
             throw new IllegalStateException("study does not have any source specimens");
         }
@@ -36,29 +30,37 @@ public class PositionBatchOpPojoHelper {
             throw new IllegalStateException("study does not have any source specimens");
         }
 
-        List<PositionBatchOpPojo> pojos = new ArrayList<PositionBatchOpPojo>();
+        Set<PositionBatchOpPojo> pojos = new LinkedHashSet<PositionBatchOpPojo>();
 
         for (Patient patient : patients) {
             for (CollectionEvent ce : patient.getCollectionEvents()) {
                 pojos.addAll(createPojosForSpecimens(ce.getAllSpecimens()));
             }
         }
-
-        fillPojoContainerInfo(pojos, containers, useProductBarcode);
         return pojos;
     }
 
-    static List<PositionBatchOpPojo> createPositionPojosWithLabels(Study          study,
+    static Set<PositionBatchOpPojo> createPojosWithPositions(Study          study,
+                                                             Set<Patient>   patients,
+                                                             Set<Container> containers,
+                                                             boolean        useProductBarcode) {
+
+        Set<PositionBatchOpPojo> pojos = createPojos(study, patients);
+        SpecimenBatchOpPojoHelper.assignPositionsToPojos(pojos, containers, useProductBarcode);
+        return pojos;
+    }
+
+    static Set<PositionBatchOpPojo> createPositionPojosWithLabels(Study          study,
                                                                   Set<Patient>   patients,
                                                                   Set<Container> containers) {
-        return createPositionPojos(study, patients, containers, false);
+        return createPojosWithPositions(study, patients, containers, false);
 
     }
 
-    static List<PositionBatchOpPojo> createPositionPojosWithBarcodes(Study          study,
+    static Set<PositionBatchOpPojo> createPositionPojosWithBarcodes(Study          study,
                                                                    Set<Patient>   patients,
                                                                    Set<Container> containers) {
-        return createPositionPojos(study, patients, containers, true);
+        return createPojosWithPositions(study, patients, containers, true);
 
     }
 
@@ -80,39 +82,5 @@ public class PositionBatchOpPojoHelper {
         }
 
         return pojos;
-    }
-
-    private static void fillPojoContainerInfo(List<PositionBatchOpPojo> pojos,
-                                              Set<Container>            containers,
-                                              boolean                   useProductBarcode) {
-
-        // fill as many containers as space will allow
-        List<PositionBatchOpPojo> pojosToAdd = new ArrayList<PositionBatchOpPojo>(pojos);
-        Iterator<PositionBatchOpPojo> iterator = pojosToAdd.iterator();
-
-        for (Container container : containers) {
-            ContainerType ctype = container.getContainerType();
-
-            int maxRows = container.getContainerType().getCapacity().getRowCapacity();
-            int maxCols = container.getContainerType().getCapacity().getColCapacity();
-
-            for (int r = 0; r < maxRows; ++r) {
-                for (int c = 0; c < maxCols; ++c) {
-                    if (pojosToAdd.isEmpty()) break;
-
-                    PositionBatchOpPojo pojo = iterator.next();
-                    iterator.remove();
-                    RowColPos pos = new RowColPos(r, c);
-                    pojo.setPalletPosition(ctype.getPositionString(pos));
-
-                    if (useProductBarcode) {
-                        pojo.setPalletProductBarcode(container.getProductBarcode());
-                    } else {
-                        pojo.setPalletLabel(container.getLabel());
-                        pojo.setRootContainerType(ctype.getNameShort());
-                    }
-                }
-            }
-        }
     }
 }
