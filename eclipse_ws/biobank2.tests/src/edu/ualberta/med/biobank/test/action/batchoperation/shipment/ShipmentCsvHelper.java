@@ -17,11 +17,13 @@ class ShipmentCsvHelper {
     }
 
     Set<ShipmentBatchOpInputRow> createShipments(Center sendingCenter,
-        Center receivingCenter, Set<ShippingMethod> shippingMethods,
-        int maxShipments, boolean hasComments) {
+                                                 Center receivingCenter,
+                                                 Set<ShippingMethod> shippingMethods,
+                                                 int maxShipmentsPerShipingMethod,
+                                                 boolean hasComments) {
         Set<ShipmentBatchOpInputRow> csvInfos = new HashSet<ShipmentBatchOpInputRow>();
-        for (int i = 0; i < maxShipments; ++i) {
-            for (ShippingMethod shippingMethod : shippingMethods) {
+        for (ShippingMethod shippingMethod : shippingMethods) {
+            for (int i = 0; i < maxShipmentsPerShipingMethod; ++i) {
                 ShipmentBatchOpInputRow csvInfo = new ShipmentBatchOpInputRow();
                 csvInfo.setDateReceived(new Date());
                 csvInfo.setSendingCenter(sendingCenter.getNameShort());
@@ -36,9 +38,14 @@ class ShipmentCsvHelper {
     }
 
     Set<ShipmentBatchOpInputRow> createShipments(Center sendingCenter,
-        Center receivingCenter, Set<ShippingMethod> shippingMethods,
-        int maxShipments) {
-        return createShipments(sendingCenter, receivingCenter, shippingMethods, maxShipments, false);
+                                                 Center receivingCenter,
+                                                 Set<ShippingMethod> shippingMethods,
+                                                 int maxShipmentsPerShipingMethod) {
+        return createShipments(sendingCenter,
+                               receivingCenter,
+                               shippingMethods,
+                               maxShipmentsPerShipingMethod,
+                               false);
     }
 
     ShippingMethod getNewShippingMethod() {
