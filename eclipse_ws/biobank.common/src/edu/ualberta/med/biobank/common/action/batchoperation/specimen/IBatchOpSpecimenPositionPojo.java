@@ -6,6 +6,8 @@ public interface IBatchOpSpecimenPositionPojo extends IBatchOpInputPojo {
 
     String getInventoryId();
 
+    void setInventoryId(String id);
+
     String getPalletProductBarcode();
 
     void setPalletProductBarcode(String barcode);
@@ -29,5 +31,9 @@ public interface IBatchOpSpecimenPositionPojo extends IBatchOpInputPojo {
     boolean hasLabelAndPosition();
 
     boolean hasProductBarcodeAndPosition();
+
+    boolean hasPalletPosition();
+
+    boolean hasPositionInfo();
 
 }

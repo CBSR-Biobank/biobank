@@ -61,6 +61,7 @@ public class SpecimenBatchOpInputPojo implements
         return inventoryId;
     }
 
+    @Override
     public void setInventoryId(String inventoryId) {
         this.inventoryId = inventoryId;
     }
@@ -143,6 +144,7 @@ public class SpecimenBatchOpInputPojo implements
         return originCenter;
     }
 
+    @Override
     public void setOriginCenter(String originCenter) {
         this.originCenter = originCenter;
     }
@@ -151,6 +153,7 @@ public class SpecimenBatchOpInputPojo implements
         return currentCenter;
     }
 
+    @Override
     public void setCurrentCenter(String currentCenter) {
         this.currentCenter = currentCenter;
     }
@@ -266,19 +269,34 @@ public class SpecimenBatchOpInputPojo implements
     }
 
     @Override
+    public boolean hasPalletPosition() {
+        return (palletPosition != null) && !palletPosition.isEmpty();
+    }
+
+    @Override
     public boolean hasProductBarcodeAndPosition() {
-        return (palletProductBarcode != null) && (palletPosition != null);
+        return (palletProductBarcode != null) && !palletProductBarcode.isEmpty()
+            && (palletPosition != null) && !palletPosition.isEmpty();
     }
 
     @Override
     public boolean hasLabelAndPosition() {
-        return (rootContainerType != null)
-            && (palletLabel != null)
-            && (palletPosition != null);
+        return (rootContainerType != null) && !rootContainerType.isEmpty()
+            && (palletLabel != null) && !palletLabel.isEmpty()
+            && (palletPosition != null) && !palletPosition.isEmpty();
     }
 
     public boolean hasProductBarcodeAndLabel() {
-        return (palletProductBarcode != null) && (palletLabel != null);
+        return (palletProductBarcode != null)  && !palletProductBarcode.isEmpty()
+            && (palletLabel != null) && !palletLabel.isEmpty();
+    }
+
+    @Override
+    public boolean hasPositionInfo() {
+        return (rootContainerType != null) && !rootContainerType.isEmpty()
+            || (palletLabel != null) && !palletLabel.isEmpty()
+            || (palletProductBarcode != null) && !palletProductBarcode.isEmpty()
+            || (palletPosition != null) && !palletPosition.isEmpty();
     }
 
 }

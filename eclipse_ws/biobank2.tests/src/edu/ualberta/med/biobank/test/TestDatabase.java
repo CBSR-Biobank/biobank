@@ -57,7 +57,6 @@ public class TestDatabase {
         r = new Random();
         appService = AllTestsSuite.appService;
         if (appService == null) {
-            AllTestsSuite.setUp();
             appService = AllTestsSuite.appService;
             Assert.assertNotNull("setUp: appService is null", appService);
         }

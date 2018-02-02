@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.test.action;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
+import edu.ualberta.med.biobank.test.action.batchoperation.ceventattr.TestCeventAttrBatchOp;
 import edu.ualberta.med.biobank.test.action.batchoperation.patient.TestPatientBatchOp;
 import edu.ualberta.med.biobank.test.action.batchoperation.shipment.TestShipmentCsvInfo;
 import edu.ualberta.med.biobank.test.action.batchoperation.specimen.SpecimenBatchOpTestSuite;
@@ -12,6 +13,7 @@ import edu.ualberta.med.biobank.test.action.security.SecuritySuite;
 @Suite.SuiteClasses({
     SecuritySuite.class,
     TestClinic.class,
+    TestCeventAttrBatchOp.class,
     TestCollectionEvent.class,
     TestContainer.class,
     TestContainerLabelingScheme.class,

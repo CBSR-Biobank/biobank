@@ -44,6 +44,7 @@ public class GrandchildSpecimenBatchOpInputPojo implements
         return inventoryId;
     }
 
+    @Override
     public void setInventoryId(String inventoryId) {
         this.inventoryId = inventoryId;
     }
@@ -94,6 +95,7 @@ public class GrandchildSpecimenBatchOpInputPojo implements
         return originCenter;
     }
 
+    @Override
     public void setOriginCenter(String originCenter) {
         this.originCenter = originCenter;
     }
@@ -102,6 +104,7 @@ public class GrandchildSpecimenBatchOpInputPojo implements
         return currentCenter;
     }
 
+    @Override
     public void setCurrentCenter(String currentCenter) {
         this.currentCenter = currentCenter;
     }
@@ -157,15 +160,29 @@ public class GrandchildSpecimenBatchOpInputPojo implements
     }
 
     @Override
-    public boolean hasLabelAndPosition() {
-        return (rootContainerType != null)
-            && (palletLabel != null)
-            && (palletPosition != null);
+    public boolean hasPalletPosition() {
+        return (palletPosition != null) && !palletPosition.isEmpty();
     }
 
     @Override
     public boolean hasProductBarcodeAndPosition() {
-        return (palletProductBarcode != null) && (palletPosition != null);
+        return (palletProductBarcode != null) && !palletProductBarcode.isEmpty()
+            && (palletPosition != null) && !palletPosition.isEmpty();
+    }
+
+    @Override
+    public boolean hasLabelAndPosition() {
+        return (rootContainerType != null) && !rootContainerType.isEmpty()
+            && (palletLabel != null) && !palletLabel.isEmpty()
+            && (palletPosition != null) && !palletPosition.isEmpty();
+    }
+
+    @Override
+    public boolean hasPositionInfo() {
+        return (rootContainerType != null) && !rootContainerType.isEmpty()
+            || (palletLabel != null) && !palletLabel.isEmpty()
+            || (palletProductBarcode != null) && !palletProductBarcode.isEmpty()
+            || (palletPosition != null) && !palletPosition.isEmpty();
     }
 
 }

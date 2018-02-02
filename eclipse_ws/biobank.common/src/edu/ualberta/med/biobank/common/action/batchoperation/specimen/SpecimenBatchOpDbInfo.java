@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.common.action.batchoperation.specimen;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,15 +57,14 @@ public class SpecimenBatchOpDbInfo extends CommonSpecimenPojoDbInfo<SpecimenBatc
     }
 
     @Override
-    Pair<BatchOpInputErrorSet, Boolean> validate() {
+    BatchOpInputErrorSet validate() {
+        BatchOpInputErrorSet errorSet = new BatchOpInputErrorSet();
         // ensure that aliquoted specimens with parent specimens already
         // in the database have a patient
         if ((getParentSpecimen() != null) && (getPatient() == null) && (parentPojo == null)) {
-            BatchOpInputErrorSet errorSet = new BatchOpInputErrorSet();
             errorSet.addError(getCsvLineNumber(), CSV_NO_PATIENT_ERROR.format());
-            return Pair.of(errorSet, null);
         }
-        return Pair.of(null, true);
+        return errorSet;
     }
 
     /**

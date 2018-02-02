@@ -7,4 +7,8 @@ public interface IBatchOpSpecimenInputPojo extends IBatchOpSpecimenPositionPojo 
 
     String getPatientNumber();
 
+    void setOriginCenter(String nameShort);
+
+    void setCurrentCenter(String nameShort);
+
 }

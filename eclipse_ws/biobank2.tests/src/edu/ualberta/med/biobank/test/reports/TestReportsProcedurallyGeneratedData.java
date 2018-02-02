@@ -94,11 +94,6 @@ public final class TestReportsProcedurallyGeneratedData implements
         new ArrayList<PatientWrapper>();
 
     private TestReportsProcedurallyGeneratedData() {
-        try {
-            AllTestsSuite.setUp();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         appService = AllTestsSuite.appService;
         Assert.assertNotNull("setUp: appService is null", appService);
     }
@@ -260,7 +255,7 @@ public final class TestReportsProcedurallyGeneratedData implements
      * Generate various possibilities of good ContainerType-s, since the
      * generation of Container-s can then depend solely on these
      * ContainerType-s.
-     * 
+     *
      * @param site which Site to add the ContainerType-s to
      * @param parentContainerType which ContainerType to add children
      *            ContainerType-s to
@@ -350,7 +345,7 @@ public final class TestReportsProcedurallyGeneratedData implements
     }
 
     /**
-     * 
+     *
      * @param site which Site to add the ContainerType-s to
      * @param parentContainer the parent Container. If null, will create "some"
      *            of each top-level ContainerType

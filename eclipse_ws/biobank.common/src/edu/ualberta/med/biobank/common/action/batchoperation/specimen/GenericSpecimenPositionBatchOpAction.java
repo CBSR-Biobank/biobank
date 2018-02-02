@@ -1,8 +1,6 @@
 package edu.ualberta.med.biobank.common.action.batchoperation.specimen;
 
 import static edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpActionErrors.*;
-import static edu.ualberta.med.biobank.common.action.batchoperation.specimen.position.PositionBatchOpActionErrors.CSV_BARCODE_AND_LABEEL_INFO_INVALID_ERROR;
-import static edu.ualberta.med.biobank.common.action.batchoperation.specimen.position.PositionBatchOpActionErrors.CSV_LABEL_AND_POSITION_INVALID_ERROR;
 
 import java.io.File;
 import java.io.IOException;
@@ -140,14 +138,6 @@ public abstract class GenericSpecimenPositionBatchOpAction<T extends IBatchOpSpe
         boolean hasLabel = (label != null) && !label.isEmpty();
         boolean hasRootContainerType = (rootContainerType != null) && !rootContainerType.isEmpty();
 
-        if (!pojo.hasLabelAndPosition() && !pojo.hasProductBarcodeAndPosition()) {
-            if (!pojo.hasLabelAndPosition()) {
-                errors.addError(lineNumber, CSV_LABEL_AND_POSITION_INVALID_ERROR);
-            } else {
-                errors.addError(lineNumber, CSV_BARCODE_AND_LABEEL_INFO_INVALID_ERROR);
-            }
-        }
-
         if (!hasPosition && !hasProductBarcode && !hasLabel) {
             errors.addError(pojo.getLineNumber(), CSV_PALLET_POS_INFO_INALID_ERROR);
         }
@@ -221,11 +211,7 @@ public abstract class GenericSpecimenPositionBatchOpAction<T extends IBatchOpSpe
             errors.addError(lineNumber, CSV_SPECIMEN_LABEL_ERROR.format(palletPosition,
                                                                         container.getLabel()));
         } catch (Exception e) {
-            LString message = (hasLabel)
-                                        ? CSV_LABEL_POS_OCCUPIED_ERROR.format(palletPosition, label)
-                                        : CSV_CONTAINER_POS_OCCUPIED_ERROR.format(palletPosition,
-                                                                                  barcode);
-            errors.addError(lineNumber, message);
+            throw new IllegalStateException("failed to assign position");
         }
         return Pair.of(errors, null);
     }

@@ -71,8 +71,7 @@ public class SpecimenBatchOpActionErrors {
         bundle.tr("patient number is invalid");
 
     public static final Tr CSV_PATIENT_MATCH_ERROR =
-        bundle.tr("patient number \"{0}\" does not match "
-            + "the patient on the source specimen \"{1}\"");
+        bundle.tr("patient number \"{0}\" does not match the patient on the source specimen \"{1}\"");
 
     public static final Tr CSV_CEVENT_MATCH_ERROR =
         bundle.tr("collection event with visit number \"{0}\" "
