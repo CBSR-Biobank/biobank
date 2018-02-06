@@ -194,13 +194,6 @@ public abstract class BatchOpViewForm extends BiobankViewForm {
         return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
     }
 
-    protected static void openForm(Integer batchOpId, String formId, boolean focusOnEditor)
-        throws PartInitException {
-        SpecimenBatchOpViewFormInput input = new SpecimenBatchOpViewFormInput(batchOpId);
-        PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
-            .openEditor(input, formId, focusOnEditor);
-    }
-
     public Integer getBatchId() {
         return batchId;
     }
@@ -233,15 +226,22 @@ public abstract class BatchOpViewForm extends BiobankViewForm {
         this.fileMetaData = fileMetaData;
     }
 
-    public static class SpecimenBatchOpViewFormInput extends FormInput {
+    protected static void openForm(Integer batchOpId, String formId, boolean focusOnEditor)
+        throws PartInitException {
+        BatchOpViewFormInput input = new BatchOpViewFormInput(batchOpId);
+        PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
+            .openEditor(input, formId, focusOnEditor);
+    }
+
+    public static class BatchOpViewFormInput extends FormInput {
+
+        private final Integer batchOpId;
 
         @SuppressWarnings("nls")
-        public SpecimenBatchOpViewFormInput(Integer batchOpId) {
+        public BatchOpViewFormInput(Integer batchOpId) {
             super(batchOpId, i18n.tr("Specimen Import"));
             this.batchOpId = batchOpId;
         }
-
-        private final Integer batchOpId;
 
         public Integer getBatchOpId() {
             return batchOpId;
@@ -260,7 +260,7 @@ public abstract class BatchOpViewForm extends BiobankViewForm {
             if (this == obj) return true;
             if (obj == null) return false;
             if (getClass() != obj.getClass()) return false;
-            SpecimenBatchOpViewFormInput other = (SpecimenBatchOpViewFormInput) obj;
+            BatchOpViewFormInput other = (BatchOpViewFormInput) obj;
             if (batchOpId == null) {
                 if (other.batchOpId != null) return false;
             } else if (!batchOpId.equals(other.batchOpId)) return false;
