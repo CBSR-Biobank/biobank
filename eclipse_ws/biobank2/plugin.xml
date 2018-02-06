@@ -1927,17 +1927,22 @@
         id="edu.ualberta.med.biobank.forms.SpecimenPositionBatchOpViewForm"
         name="%SpecimenPositionImport.editor">
 </editor>
+<editor class="edu.ualberta.med.biobank.forms.batchop.SpecimenMultipleBatchOpViewForm"
+        default="false"
+        id="edu.ualberta.med.biobank.forms.MultipleBatchOpViewForm"
+        name="%MultipleImportView.editor">
+</editor>
 <editor class="edu.ualberta.med.biobank.forms.linkassign.SpecimenAssignEntryForm"
         default="false"
         id="edu.ualberta.med.biobank.forms.SpecimenAssignEntryForm"
         name="%SpecimenAssign.editor">
 </editor>
 <editor
-      class="edu.ualberta.med.biobank.forms.ResearchGroupEntryForm"
-      default="false"
-      icon="icons/research_group.png"
-      id="edu.ualberta.med.biobank.forms.ResearchGroupEntryForm"
-      name="%ResearchGroupEntry.editor">
+  class="edu.ualberta.med.biobank.forms.ResearchGroupEntryForm"
+  default="false"
+  icon="icons/research_group.png"
+  id="edu.ualberta.med.biobank.forms.ResearchGroupEntryForm"
+  name="%ResearchGroupEntry.editor">
 </editor>
 <editor
       class="edu.ualberta.med.biobank.forms.ResearchGroupViewForm"

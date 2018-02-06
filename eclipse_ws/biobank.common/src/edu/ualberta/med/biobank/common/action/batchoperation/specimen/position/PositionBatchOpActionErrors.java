@@ -18,8 +18,8 @@ public class PositionBatchOpActionErrors {
 
     public static final Bundle bundle = new CommonBundle();
 
-    public static final LString CSV_SPECIMEN_INVENTORY_INVALID_ERROR =
-        bundle.tr("specimen inventory ID is invalid").format();
+    public static final Tr CSV_SPECIMEN_INVENTORY_INVALID_ERROR =
+        bundle.tr("specimen inventory ID is invalid: {0}");
 
     public static final LString CSV_SPECIMEN_HAS_NO_POSITION_ERROR =
         bundle.tr("specimen does not currently have a position, but current pallet label is specified")

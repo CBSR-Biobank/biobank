@@ -139,7 +139,9 @@ public class PositionBatchOpAction extends GenericSpecimenPositionBatchOpAction<
         Specimen specimen = BatchOpActionUtil.getSpecimen(session, pojo.getInventoryId());
 
         if (specimen == null) {
-            errors.addError(lineNumber, CSV_SPECIMEN_INVENTORY_INVALID_ERROR);
+            errors.addError(lineNumber,
+                            CSV_SPECIMEN_INVENTORY_INVALID_ERROR.format(pojo.getInventoryId()));
+            return Pair.of(errors, null);
         }
 
         if (pojo.hasCurrentPosition()) {

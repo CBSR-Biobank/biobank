@@ -3,8 +3,6 @@ package edu.ualberta.med.biobank.common.action.batchoperation.specimen;
 import java.util.List;
 
 import org.hibernate.Session;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
@@ -30,6 +28,13 @@ public class SpecimenBatchOpGetAction
 
     private final Integer id;
 
+    @SuppressWarnings("nls")
+    private static final String SPECIMEN_QRY = "SELECT bos.specimen "
+        + " FROM " + BatchOperationSpecimen.class.getName() + " bos"
+        + " WHERE bos.batch.id = ?"
+        + " ORDER BY bos.specimen.inventoryId";
+
+
     public SpecimenBatchOpGetAction(Integer batchOperationId) {
         this.id = batchOperationId;
     }
@@ -40,25 +45,24 @@ public class SpecimenBatchOpGetAction
     }
 
     @Override
-    public BatchOpGetResult<Specimen> run(ActionContext context)
-        throws ActionException {
+    public BatchOpGetResult<Specimen> run(ActionContext context) throws ActionException {
         Session session = context.getSession();
         BatchOperation batch = context.load(BatchOperation.class, id);
-        List<Specimen> specimens = getSpecimens(id, session);
-        BatchOpGetResult<Specimen> result = new BatchOpGetResult<Specimen>(
-            batch, BatchOpActionUtil.getFileMetaData(session, id), specimens);
+        BatchOpGetResult<Specimen> result =
+            new BatchOpGetResult<Specimen>(batch,
+                                           BatchOpActionUtil.getFileMetaData(session, id),
+                                           getSpecimens(id, session));
 
         return result;
     }
 
-    @SuppressWarnings("nls")
     public static List<Specimen> getSpecimens(Integer batchOperationId, Session session) {
         @SuppressWarnings("unchecked")
         List<Specimen> specimens = session
-            .createCriteria(BatchOperationSpecimen.class, "batchOpSpecimen")
-            .setProjection(Projections.property("specimen"))
-            .add(Restrictions.eq("batchOpSpecimen.batch.id", batchOperationId))
+            .createQuery(SPECIMEN_QRY)
+            .setParameter(0, batchOperationId)
             .list();
         return specimens;
     }
 }
+
