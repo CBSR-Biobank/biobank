@@ -35,7 +35,7 @@ public class GrandchildSpecimenBatchOpViewForm extends BatchOpViewForm {
 
     @Override
     protected void init() throws Exception {
-        setBatchId(((SpecimenBatchOpViewFormInput) getEditorInput()).getBatchOpId());
+        setBatchId(((BatchOpViewFormInput) getEditorInput()).getBatchOpId());
         result = SessionManager.getAppService().
             doAction(new SpecimenBatchOpGetAction(getBatchId()));
 

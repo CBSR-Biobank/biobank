@@ -35,7 +35,7 @@ public class CeventAttrBatchOpViewForm extends BatchOpViewForm {
 
     @Override
     protected void init() throws Exception {
-        setBatchId(((SpecimenBatchOpViewFormInput) getEditorInput()).getBatchOpId());
+        setBatchId(((BatchOpViewFormInput) getEditorInput()).getBatchOpId());
         result = SessionManager.getAppService().doAction(
             new CeventAttrBatchOpGetAction(getBatchId()));
 
