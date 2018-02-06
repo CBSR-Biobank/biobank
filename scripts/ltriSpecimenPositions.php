@@ -47,7 +47,12 @@ function convertAndGenerate($csvname, $outdir) {
     $outfilecount = 1;
     $outhandle = getNewOutputfile($outdir, $outfilecount);
     while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
-      fputcsv($outhandle, [ $data[3], "", $data[6], "", "", $data[0], "" ]);
+      if ($rowCount === 0) {
+        fputcsv($outhandle, $header);
+        $rowCount++;
+        continue;
+      }
+      fputcsv($outhandle, [ $data[3], "", $data[6], "", "", $data[0], "" ], ",", "\"");
       $rowCount++;
       if (($rowCount % 1000) === 0) {
         $outfilecount++;

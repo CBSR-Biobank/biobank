@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.common.action.specimen;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Stack;
 
 import edu.ualberta.med.biobank.common.action.ActionResult;
@@ -12,16 +14,17 @@ public class SpecimenBriefInfo implements ActionResult {
 
     private Specimen specimen;
     private Stack<Container> parents = new Stack<Container>();
-    private BatchOperation batch;
+    private Set<BatchOperation> batchOperations = new HashSet<BatchOperation>();
 
     public SpecimenBriefInfo() {
     }
 
-    public SpecimenBriefInfo(Specimen specimen, Stack<Container> parents,
-        BatchOperation batch) {
+    public SpecimenBriefInfo(Specimen specimen,
+                             Stack<Container> parents,
+                             Set<BatchOperation> batchOperations) {
         this.specimen = specimen;
         this.parents = parents;
-        this.batch = batch;
+        this.batchOperations = batchOperations;
     }
 
     public Specimen getSpecimen() {
@@ -32,7 +35,7 @@ public class SpecimenBriefInfo implements ActionResult {
         return parents;
     }
 
-    public BatchOperation getBatch() {
-        return batch;
+    public Set<BatchOperation> getBatchOperations() {
+        return batchOperations;
     }
 }

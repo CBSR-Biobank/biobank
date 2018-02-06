@@ -1,11 +1,11 @@
 package edu.ualberta.med.biobank.tools.cli.command;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 public class CommandRegistry {
 
-    private final Map<String, Command> commands = new HashMap<String, Command>();
+    private final Map<String, Command> commands = new TreeMap<String, Command>();
 
     public static CommandRegistry getInstance() {
         return CommandRegistryHolder.INSTANCE;

@@ -40,7 +40,7 @@ public class SpecimenPositionBatchOpPojoReader implements IBatchOpPojoReader<Pos
 
     private static final I18n i18n = I18nFactory.getI18n(GrandchildSpecimenBatchOpPojoReader.class);
 
-    private static final String CSV_FIRST_HEADER = "Inventory ID";
+    private static final String CSV_FIRST_HEADER = "inventoryId";
 
     private static final String[] NAME_MAPPINGS =
         new String[] {

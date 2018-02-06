@@ -25,7 +25,7 @@ import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
-import edu.ualberta.med.biobank.forms.batchop.SpecimenBatchOpViewForm;
+import edu.ualberta.med.biobank.forms.batchop.SpecimenMultipleBatchOpViewForm;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
@@ -283,20 +283,17 @@ public class SpecimenViewForm extends BiobankViewForm {
         batchOpLabel.setBackground(BgcWidgetCreator.READ_ONLY_TEXT_BGR);
 
         openBatchOpButton = new Button(c, SWT.NONE);
-        openBatchOpButton.setText(i18n.tr("View Import"));
+        openBatchOpButton.setText(i18n.tr("View Import(s)"));
 
         toolkit.adapt(c);
 
         openBatchOpButton.addListener(SWT.MouseUp, new Listener() {
             @Override
             public void handleEvent(Event event) {
-                if (specimenBriefInfo.getBatch() != null) {
-                    Integer batchOpId = specimenBriefInfo.getBatch().getId();
-                    try {
-                        SpecimenBatchOpViewForm.openForm(batchOpId, true);
-                    } catch (PartInitException e) {
-                        throw new RuntimeException(e);
-                    }
+                try {
+                    SpecimenMultipleBatchOpViewForm.openForm(specimenBriefInfo, true);
+                } catch (PartInitException e) {
+                    throw new RuntimeException(e);
                 }
             }
         });
@@ -402,10 +399,9 @@ public class SpecimenViewForm extends BiobankViewForm {
                 .getDna().getAliquotYield());
         }
 
-        setTextValue(batchOpLabel, specimenBriefInfo.getBatch() != null
-            ? i18n.tr("Yes")
-            : i18n.tr("No"));
-        openBatchOpButton.setEnabled(specimenBriefInfo.getBatch() != null);
+        boolean hasBatchOperations = !specimenBriefInfo.getBatchOperations().isEmpty();
+        setTextValue(batchOpLabel, hasBatchOperations ? i18n.tr("Yes") : i18n.tr("No"));
+        openBatchOpButton.setEnabled(hasBatchOperations);
 
         boolean isSourceSpc =
             (specimenWrapper.getOriginalCollectionEvent() != null);

@@ -14,7 +14,7 @@ import edu.ualberta.med.biobank.widgets.infotables.SpecimenTableSimple;
 
 public class SpecimenBatchOpViewForm extends BatchOpViewForm {
 
-    private static final I18n i18n = I18nFactory.getI18n(BatchOpViewForm.class);
+    private static final I18n i18n = I18nFactory.getI18n(SpecimenBatchOpViewForm.class);
 
     @SuppressWarnings("nls")
     public static final String ID = "edu.ualberta.med.biobank.forms.SpecimenBatchOpViewForm";

@@ -22,6 +22,7 @@ import edu.ualberta.med.biobank.tools.cli.command.ProcessingEventUpdate;
 import edu.ualberta.med.biobank.tools.cli.command.SpecimenUpdateActivityStatus;
 import edu.ualberta.med.biobank.tools.cli.command.batchoperation.PatientImportCommand;
 import edu.ualberta.med.biobank.tools.cli.command.batchoperation.SpecimenImportCommand;
+import edu.ualberta.med.biobank.tools.cli.command.batchoperation.SpecimenPositionImportCommand;
 import edu.ualberta.med.biobank.tools.utils.HostUrl;
 
 /**
@@ -156,6 +157,7 @@ public class BiobankCli extends Application implements CliProvider {
         cr.addCommand(new CreateContainerCommand(this));
         cr.addCommand(new SpecimenUpdateActivityStatus(this));
         cr.addCommand(new ProcessingEventUpdate(this));
+        cr.addCommand(new SpecimenPositionImportCommand(this));
 
         // DO NOT ADD these commands since they need to be converted to actions
         // cr.addCommand(new StudyCountsCommand(this));

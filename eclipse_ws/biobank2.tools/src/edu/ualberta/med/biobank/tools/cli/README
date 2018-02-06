@@ -1,4 +1,1 @@
-This class can be exported as a runnable JAR using Eclipse.
-
-The bash script named "biobank_cli.sh" will execute the runnable JAR and
-provide the JAR with valid input.
+To build the CLI application use the "biobank-cli-dist" target with the ANT to build file.

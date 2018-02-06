@@ -1,6 +1,8 @@
 package edu.ualberta.med.biobank.common.action.specimen;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 
@@ -12,6 +14,7 @@ import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
+import edu.ualberta.med.biobank.model.BatchOperation;
 import edu.ualberta.med.biobank.model.BatchOperationSpecimen;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Container;
@@ -143,10 +146,9 @@ public class SpecimenActionHelper {
      * @return The specimen informaiton along with many of its associations.
      */
     @SuppressWarnings("nls")
-    public static SpecimenBriefInfo getSpecimenBriefInfo(
-        ActionContext context,
-        Integer specimenId,
-        String inventoryId) {
+    public static SpecimenBriefInfo getSpecimenBriefInfo(ActionContext context,
+                                                         Integer specimenId,
+                                                         String inventoryId) {
         Criteria criteria = context.getSession().createCriteria(Specimen.class);
 
         if ((specimenId == null) && (inventoryId == null)) {
@@ -235,15 +237,24 @@ public class SpecimenActionHelper {
             }
         }
 
-        BatchOperationSpecimen batchSpecimen = (BatchOperationSpecimen) context.getSession()
+        @SuppressWarnings("unchecked")
+        List<BatchOperationSpecimen> batchSpecimens = context.getSession()
             .createCriteria(BatchOperationSpecimen.class)
-            .add(Restrictions.eq("specimen.id", specimen.getId())).uniqueResult();
+            .add(Restrictions.eq("specimen.id", specimen.getId())).list();
 
-        if (batchSpecimen != null) {
-            return new SpecimenBriefInfo(specimen, parents, batchSpecimen.getBatch());
+        if (batchSpecimens.isEmpty()) {
+            return new SpecimenBriefInfo(specimen, parents, null);
         }
 
-        return new SpecimenBriefInfo(specimen, parents, null);
+        Set<BatchOperation> batchOperations = new HashSet<BatchOperation>(0);
+        for (BatchOperationSpecimen batchSpecimen : batchSpecimens) {
+            // load data required by client
+            batchSpecimen.getBatch().getInput().getMetaData().getName();
+            batchSpecimen.getBatch().getExecutedBy().getFullName();
+            batchOperations.add(batchSpecimen.getBatch());
+        }
+
+        return new SpecimenBriefInfo(specimen, parents, batchOperations);
     }
 
     /**

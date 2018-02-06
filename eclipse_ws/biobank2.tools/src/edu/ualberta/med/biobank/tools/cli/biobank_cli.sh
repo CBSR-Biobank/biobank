@@ -33,7 +33,7 @@ if [[ ! -f "$JAR" ]]; then
    exit 1
 fi
 
-OPTS=`getopt -o hH:p:u:w:j: --long help,hostname,port,user,password,jrepath -n 'parse-options' -- "$@"`
+OPTS=`getopt -o hH:p:u:w:j: --long help,hostname:,port:,user:,password:,jrepath: -n $SCRIPT -- "$@"`
 
 if [ $? != 0 ] ; then echo "Failed to parse options." >&2 ; exit 1 ; fi
 
