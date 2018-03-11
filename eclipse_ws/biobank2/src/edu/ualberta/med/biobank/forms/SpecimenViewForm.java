@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.Set;
 import java.util.Stack;
 
 import org.eclipse.core.runtime.Assert;
@@ -34,6 +35,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcWidgetCreator;
 import edu.ualberta.med.biobank.model.AbstractPosition;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
+import edu.ualberta.med.biobank.model.BatchOperation;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Container;
@@ -399,9 +401,15 @@ public class SpecimenViewForm extends BiobankViewForm {
                 .getDna().getAliquotYield());
         }
 
-        boolean hasBatchOperations = !specimenBriefInfo.getBatchOperations().isEmpty();
-        setTextValue(batchOpLabel, hasBatchOperations ? i18n.tr("Yes") : i18n.tr("No"));
-        openBatchOpButton.setEnabled(hasBatchOperations);
+        Set<BatchOperation> batchOperations = specimenBriefInfo.getBatchOperations();
+        if (batchOperations != null) {
+            boolean hasBatchOperations = !specimenBriefInfo.getBatchOperations().isEmpty();
+            setTextValue(batchOpLabel, hasBatchOperations ? i18n.tr("Yes") : i18n.tr("No"));
+            openBatchOpButton.setEnabled(hasBatchOperations);
+        } else {
+            setTextValue(batchOpLabel, i18n.tr("No"));
+            openBatchOpButton.setEnabled(false);
+        }
 
         boolean isSourceSpc =
             (specimenWrapper.getOriginalCollectionEvent() != null);
