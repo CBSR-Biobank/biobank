@@ -7,6 +7,12 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableContext;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -15,30 +21,42 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.Section;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.dispatch.DispatchChangeStateAction;
+import edu.ualberta.med.biobank.common.action.dispatch.DispatchDeleteAction;
+import edu.ualberta.med.biobank.common.action.dispatch.DispatchSaveAction;
 import edu.ualberta.med.biobank.common.action.info.DispatchSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.DispatchSpecimenInfo;
 import edu.ualberta.med.biobank.common.action.info.RequestReadInfo;
+import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
 import edu.ualberta.med.biobank.common.action.request.RequestDispatchAction;
 import edu.ualberta.med.biobank.common.action.request.RequestGetInfoAction;
 import edu.ualberta.med.biobank.common.action.request.RequestStateChangeAction;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.util.StringUtil;
+import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
+import edu.ualberta.med.biobank.dialogs.dispatch.AddDispatchCommentDialog;
 import edu.ualberta.med.biobank.dialogs.dispatch.RequestReceiveScanDialog;
+import edu.ualberta.med.biobank.dialogs.dispatch.SendDispatchDialog;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDoubleClickItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
@@ -63,6 +81,8 @@ public class RequestEntryForm extends BiobankViewForm {
     private static final I18n i18n = I18nFactory
         .getI18n(RequestEntryForm.class);
 
+    private static Logger LOG = LoggerFactory.getLogger(RequestEntryForm.class);
+
     @SuppressWarnings("nls")
     public static final String ID =
         "edu.ualberta.med.biobank.forms.RequestEntryFormBase";
@@ -72,7 +92,9 @@ public class RequestEntryForm extends BiobankViewForm {
     private RequestDispatchInfoTable dispatchTable;
     private BgcBaseText newSpecimenText;
     private Button addButton;
+    private Button removeButton;
     private Button openScanButton;
+    private Section s2 = null;
 
     @SuppressWarnings("nls")
     @Override
@@ -153,24 +175,30 @@ public class RequestEntryForm extends BiobankViewForm {
             }
         });
 
-        Section s2 =
-            createSection(Dispatch.NAME.plural().toString());
+        s2 = createSection(Dispatch.NAME.plural().toString());
         Composite dispatchCreation = toolkit.createComposite(s2);
         s2.setClient(dispatchCreation);
+
         addSectionToolbar(s2, i18n.tr("New dispatch"),
-            new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    try {
-                        buildNewDispatch();
-                    } catch (Exception e1) {
-                        BgcPlugin.openAsyncError(
-                            i18n.tr("Error adding dispatch"),
-                            e1);
-                    }
-                }
-            });
-        dispatchCreation.setLayout(new GridLayout(5, false));
+	            new SelectionAdapter() {
+	                @Override
+	                public void widgetSelected(SelectionEvent e) {
+	                    try {
+	                        buildNewDispatch();
+	                    } catch (Exception e1) {
+	                        BgcPlugin.openAsyncError(
+	                            i18n.tr("Error adding dispatch"),
+	                            e1);
+	                    }
+	                }
+	            });
+        //Show "Add New" Dispatch tool bar only if no dispatches exist
+        if(request.getDispatchCollection(false) != null && request.getDispatchCollection(false).isEmpty()) {
+		s2.getTextClient().setVisible(true);
+        } else
+		s2.getTextClient().setVisible(false);
+
+        dispatchCreation.setLayout(new GridLayout(6, false));
         toolkit.createLabel(dispatchCreation,
             i18n.tr("Enter/Scan inventory ID to add:"));
         newSpecimenText = new BgcBaseText(dispatchCreation, SWT.NONE, toolkit);
@@ -193,6 +221,7 @@ public class RequestEntryForm extends BiobankViewForm {
                     if (specimen != null) {
                         addToDispatch(getDispatchSelection(),
                             Arrays.asList(specimen));
+                        specimen.setState(RequestSpecimenState.DISPATCHED_STATE);
                         specimensTree.dispatch(specNode);
                     }
                 } catch (Exception e1) {
@@ -200,6 +229,34 @@ public class RequestEntryForm extends BiobankViewForm {
                         e1.getMessage());
                 }
                 newSpecimenText.setText(StringUtil.EMPTY_STRING);
+                specimensTree.refresh();
+            }
+        });
+
+        //Add a Remove message
+        removeButton = toolkit.createButton(dispatchCreation, StringUtil.EMPTY_STRING,SWT.PUSH);
+        removeButton.setImage(BiobankPlugin.getDefault().getImage(BgcPlugin.Image.REMOVE));
+        removeButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                RequestSpecimenWrapper specimen;
+                TreeItemAdapter specNode;
+                try {
+                    specNode = (TreeItemAdapter) specimensTree.search(newSpecimenText.getText());
+                    if (specNode == null)
+                        throw new Exception(i18n.tr("Specimen not found"));
+                    specimen = (RequestSpecimenWrapper) specNode.getSpecimen();
+                    if (specimen != null && specimen.getState().equals(RequestSpecimenState.DISPATCHED_STATE) && specimen.getClaimedBy() != null && !specimen.getClaimedBy().isEmpty()) {
+                        removeFromDispatch(getDispatchSelection(), specimen);
+			specimen.setState(RequestSpecimenState.PULLED_STATE);
+			specimensTree.pull(specNode);
+                    }
+                } catch (Exception e1) {
+			LOG.error("Error when removing specimen from dispatch in Request");
+                    BgcPlugin.openAsyncError(e1.getMessage());
+                }
+                newSpecimenText.setText(StringUtil.EMPTY_STRING);
+                specimensTree.refresh();
             }
         });
 
@@ -220,11 +277,8 @@ public class RequestEntryForm extends BiobankViewForm {
             }
         });
 
-        dispatchTable = new RequestDispatchInfoTable(dispatchCreation,
-            request.getDispatchCollection(false));
-        dispatchTable
-            .addClickListener(new IInfoTableDoubleClickItemListener<DispatchWrapper>() {
-
+        dispatchTable = new RequestDispatchInfoTable(dispatchCreation, request.getDispatchCollection(false));
+        dispatchTable.addClickListener(new IInfoTableDoubleClickItemListener<DispatchWrapper>() {
                 @Override
                 public void doubleClick(InfoTableEvent<DispatchWrapper> event) {
                     DispatchWrapper d =
@@ -234,19 +288,64 @@ public class RequestEntryForm extends BiobankViewForm {
                 }
 
             });
-        dispatchTable
-            .addEditItemListener(new IInfoTableEditItemListener<DispatchWrapper>() {
-
+        dispatchTable.addDeleteItemListener(new IInfoTableDeleteItemListener<DispatchWrapper>() {
+			@SuppressWarnings("nls")
                 @Override
-                public void editItem(InfoTableEvent<DispatchWrapper> event) {
-                    DispatchWrapper d =
-                        ((DispatchWrapper) ((InfoTableSelection) event
-                            .getSelection()).getObject());
-                    new DispatchAdapter(null, d).openEntryForm();
+                public void deleteItem(InfoTableEvent<DispatchWrapper> event) {
+                    DispatchWrapper d = ((DispatchWrapper) ((InfoTableSelection) event.getSelection()).getObject());
+                    //d.getId()
+                    if (d != null) {
+                        if (!MessageDialog.openConfirm(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
+                                // dialog title.
+                                i18n.tr("Delete Dispatch"),
+                                // dialog message.
+                                i18n.tr("Are you sure you want to delete this dispatch ?" ))) {
+                            return;
+                        }
+                        deleteDispatch(d);
+                    }
                 }
             });
-        dispatchTable.addSelectionListener(new SelectionListener() {
+        dispatchTable.addCommentListener(new IInfoTableEditItemListener<DispatchWrapper>() {
+			@Override
+			public void editItem(InfoTableEvent<DispatchWrapper> event) {
+				DispatchWrapper d = ((DispatchWrapper) ((InfoTableSelection) event.getSelection()).getObject());
+				AddDispatchCommentDialog dialog = new AddDispatchCommentDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), d);
+				int res = dialog.open();
+		        if (res == Dialog.OK) {
+		            String comment = dialog.getComment();
+		            if(comment != null && comment.trim().length() > 0)
+				addCommentToDispatch(d, comment);
+		        }
+			}
+        });
 
+        if ( (request.getDispatchCollection(false) == null && request.getDispatchCollection(false).size() < 1) ||
+             (request.getDispatchCollection(false) != null && request.getDispatchCollection(false).size() < 1) ||
+		 (request.getDispatchCollection(false) != null && request.getDispatchCollection(false).size() > 0 && request.getDispatchCollection(false).get(0).getState().equals(DispatchState.CREATION)) )
+        {
+	        dispatchTable.sendDispatchListener(new IInfoTableEditItemListener<DispatchWrapper>() {
+			@Override
+			public void editItem(InfoTableEvent<DispatchWrapper> event) {
+				DispatchWrapper d = ((DispatchWrapper) ((InfoTableSelection) event.getSelection()).getObject());
+				if(d.getDispatchSpecimenCollection(false).size() != request.getRequestSpecimenCollection(false).size()) {
+					MessageDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), i18n.tr("Incomplete Dispatch"), i18n.tr("Dispatch should contain all the requested specimens before sending." ));
+				}
+				else if(d.getState().equals(DispatchState.IN_TRANSIT)) {
+					MessageDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), i18n.tr("Dispatch Completed"), i18n.tr("Dispatch has already been sent." ));
+				}
+				else {
+					SendDispatchDialog dialog = new SendDispatchDialog(Display.getDefault().getActiveShell(), d);
+					int res = dialog.open();
+					if (res == Dialog.OK) {
+						sendDispatch(d);
+						SpecimenTransitView.getCurrent().reload();
+					}
+				}
+			}
+	        });
+        }
+        dispatchTable.addSelectionListener(new SelectionListener() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 setEnabledActions();
@@ -255,19 +354,18 @@ public class RequestEntryForm extends BiobankViewForm {
             @Override
             public void widgetDefaultSelected(SelectionEvent e) {
                 // TODO Auto-generated method stub
-
             }
         });
         GridData gd = new GridData();
         gd.grabExcessHorizontalSpace = true;
         gd.horizontalAlignment = SWT.FILL;
-        gd.horizontalSpan = 5;
+        gd.horizontalSpan = 6;
         dispatchTable.setLayoutData(gd);
 
         openScanButton.setEnabled(false);
         addButton.setEnabled(false);
+        removeButton.setEnabled(false);
         newSpecimenText.setEnabled(false);
-
     }
 
     protected void setEnabledActions() {
@@ -275,6 +373,7 @@ public class RequestEntryForm extends BiobankViewForm {
             && getDispatchSelection().isInCreationState();
         openScanButton.setEnabled(b);
         addButton.setEnabled(b);
+        removeButton.setEnabled(b);
         newSpecimenText.setEnabled(b);
     }
 
@@ -368,8 +467,9 @@ public class RequestEntryForm extends BiobankViewForm {
             .getCurrentWorkingCenter());
         d.setReceiverCenter(request.getResearchGroup());
         d.setState(DispatchState.CREATION);
-        addToDispatch(d, null);
+        addToDispatch(d, null);	//OHSDEV - No purpose of doing this !!!
         reload();
+        s2.getTextClient().setVisible(false);	//OHSDEV - Remove the "Add Dispatch" button as we want to allow adding 1 dispatch only.
         SpecimenTransitView.reloadCurrent();
     }
 
@@ -386,7 +486,7 @@ public class RequestEntryForm extends BiobankViewForm {
                         .getId(), DispatchSpecimenState.NONE));
                 } else
                     throw new Exception(
-                        i18n.tr("Error Adding: Specimen has not been pulled."));
+                        i18n.tr("Error Adding: Specimen not in the right state for this action."));
         }
         DispatchSaveInfo dInfo =
             new DispatchSaveInfo(dispatch.getId(), request.getResearchGroup().getWrappedObject(),
@@ -405,6 +505,106 @@ public class RequestEntryForm extends BiobankViewForm {
         SessionManager.getAppService().doAction(update);
         reload();
     }
+
+    @SuppressWarnings("nls")
+    protected void removeFromDispatch(DispatchWrapper dispatch, RequestSpecimenWrapper specs) throws Exception
+    {
+        Set<DispatchSpecimenInfo> dsInfos = new HashSet<DispatchSpecimenInfo>();
+
+        for(DispatchSpecimenWrapper dsw : dispatch.getDispatchSpecimenCollection(false))
+        {
+		if(!dsw.getSpecimen().getId().equals(specs.getSpecimen().getId()))
+		{
+			dsInfos.add(new DispatchSpecimenInfo(dsw.getId(), dsw.getSpecimen().getId(), dsw.getState()));
+		}
+        }
+
+        DispatchSaveInfo dInfo = new DispatchSaveInfo(
+													dispatch.getId(),
+													request.getResearchGroup().getWrappedObject(),
+													SessionManager.getUser().getCurrentWorkingCenter().getWrappedObject(),
+													DispatchState.CREATION,
+													StringUtil.EMPTY_STRING);
+
+        ShipmentInfoSaveInfo ship = null;	//No need to process ShipmentInfo as there will be no shipment when we are adding or removing from the request at this time.
+
+	SessionManager.getAppService().doAction(new RequestStateChangeAction(Arrays.asList(specs.getId()), RequestSpecimenState.PULLED_STATE));
+	SessionManager.getAppService().doAction(new DispatchSaveAction(dInfo, dsInfos, ship));
+	reload();
+    }
+
+    private void deleteDispatch(DispatchWrapper dispatchWrapper)
+    {
+	RequestSpecimenWrapper specimen;
+
+	try {
+		for(DispatchSpecimenWrapper dsw : dispatchWrapper.getDispatchSpecimenCollection(false))
+		{
+			TreeItemAdapter specNode = (TreeItemAdapter) specimensTree.search(dsw.getSpecimen().getInventoryId());
+
+			if (specNode != null)
+			{
+				specimen = (RequestSpecimenWrapper) specNode.getSpecimen();
+				SessionManager.getAppService().doAction(new RequestStateChangeAction(Arrays.asList(specimen.getId()), RequestSpecimenState.PULLED_STATE));
+				specimen.setState(RequestSpecimenState.PULLED_STATE);
+				specimensTree.pull(specNode);
+			}
+		}
+		DispatchDeleteAction delete = new DispatchDeleteAction(dispatchWrapper.getWrappedObject());
+		SessionManager.getAppService().doAction(delete);
+	} catch(Exception e) {
+		LOG.error("Error when deleting dispatch from Request");
+		e.printStackTrace();
+	}
+	reload();
+	SpecimenTransitView.reloadCurrent();
+	s2.getTextClient().setVisible(true);
+    }
+
+    public void addCommentToDispatch(DispatchWrapper dispatch, String comment)
+    {
+	try {
+		Set<DispatchSpecimenInfo> dsInfos = new HashSet<DispatchSpecimenInfo>();
+
+		for(DispatchSpecimenWrapper dsw : dispatch.getDispatchSpecimenCollection(false))
+		{
+			dsInfos.add(new DispatchSpecimenInfo(dsw.getId(), dsw.getSpecimen().getId(), dsw.getState()));
+		}
+
+		DispatchSaveInfo dInfo = new DispatchSaveInfo(
+				dispatch.getId(),
+				request.getResearchGroup().getWrappedObject(),
+				SessionManager.getUser().getCurrentWorkingCenter().getWrappedObject(),
+				DispatchState.CREATION, comment
+				);
+
+		ShipmentInfoSaveInfo ship = null;
+		if (!dispatch.isNew() && dispatch.getShipmentInfo() != null) {
+			ship = DispatchSaveAction.prepareShipInfo(dispatch.getShipmentInfo());
+		}
+
+		SessionManager.getAppService().doAction(new DispatchSaveAction(dInfo, dsInfos, ship));
+	} catch(Exception e) {
+		LOG.error("Error when adding comment to dispatch in Request");
+		e.printStackTrace();
+	}
+    }
+
+    @SuppressWarnings("nls")
+    protected void sendDispatch(DispatchWrapper dispatch)
+    {
+	try {
+		dispatch.setState(DispatchState.IN_TRANSIT);
+		DispatchChangeStateAction action = new DispatchChangeStateAction(dispatch.getId(), dispatch.getDispatchState(), DispatchSaveAction.prepareShipInfo(dispatch.getShipmentInfo()));
+		SessionManager.getAppService().doAction(action);
+
+		reload();
+
+	} catch(Exception e) {
+		LOG.error("Error when seding dispatch from Request");
+		e.printStackTrace();
+	}
+	}
 
     @Override
     public void setValues() throws Exception {

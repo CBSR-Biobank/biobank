@@ -5,6 +5,7 @@
 package edu.ualberta.med.biobank.common.wrappers.base;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
@@ -16,6 +17,15 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.ResearchGroup;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
+/**
+ *
+ * Code Changes -
+ * 		1> Changes related to having multiple Studies associated with a particular Research Group
+ * 		2> Added methods to add and remove Studies similar to how it happens in SiteBaseWrapper
+ *
+ * @author OHSDEV
+ *
+ */
 public abstract class ResearchGroupBaseWrapper extends CenterWrapper<ResearchGroup> {
 
     public ResearchGroupBaseWrapper(WritableApplicationService appService) {
@@ -46,25 +56,59 @@ public abstract class ResearchGroupBaseWrapper extends CenterWrapper<ResearchGro
         return all;
     }
 
-    public StudyWrapper getStudy() {
-        boolean notCached = !isPropertyCached(ResearchGroupPeer.STUDY);
-        StudyWrapper study = getWrappedProperty(ResearchGroupPeer.STUDY, StudyWrapper.class);
-        if (study != null && notCached) ((StudyBaseWrapper) study).setResearchGroupInternal(this);
-        return study;
-    }
-
-    public void setStudy(StudyBaseWrapper study) {
-        if (isInitialized(ResearchGroupPeer.STUDY)) {
-            StudyBaseWrapper oldStudy = getStudy();
-            if (oldStudy != null) oldStudy.setResearchGroupInternal(null);
+    // OHSDEV -->
+    public void addToStudyCollection(List<? extends StudyBaseWrapper> studyCollection) {
+        addToWrapperCollection(ResearchGroupPeer.STUDIES, studyCollection);
+        for (StudyBaseWrapper e : studyCollection) {
+            e.addToResearchGroupCollectionInternal(Arrays.asList(this));
         }
-        if (study != null) study.setResearchGroupInternal(this);
-        setWrappedProperty(ResearchGroupPeer.STUDY, study);
     }
 
-    void setStudyInternal(StudyBaseWrapper study) {
-        setWrappedProperty(ResearchGroupPeer.STUDY, study);
+    void addToStudyCollectionInternal(List<? extends StudyBaseWrapper> studyCollection) {
+        if (isInitialized(ResearchGroupPeer.STUDIES)) {
+            addToWrapperCollection(ResearchGroupPeer.STUDIES, studyCollection);
+        } else {
+            getElementQueue().add(ResearchGroupPeer.STUDIES, studyCollection);
+        }
     }
+
+    public void removeFromStudyCollection(List<? extends StudyBaseWrapper> studyCollection) {
+        removeFromWrapperCollection(ResearchGroupPeer.STUDIES, studyCollection);
+        for (StudyBaseWrapper e : studyCollection) {
+            e.removeFromResearchGroupCollectionInternal(Arrays.asList(this));
+        }
+    }
+
+    void removeFromStudyCollectionInternal(List<? extends StudyBaseWrapper> studyCollection) {
+        if (isPropertyCached(ResearchGroupPeer.STUDIES)) {
+            removeFromWrapperCollection(ResearchGroupPeer.STUDIES, studyCollection);
+        } else {
+            getElementQueue().remove(ResearchGroupPeer.STUDIES, studyCollection);
+        }
+    }
+
+    public void removeFromStudyCollectionWithCheck(List<? extends StudyBaseWrapper> studyCollection) throws BiobankCheckException {
+        removeFromWrapperCollectionWithCheck(ResearchGroupPeer.STUDIES, studyCollection);
+        for (StudyBaseWrapper e : studyCollection) {
+            e.removeFromResearchGroupCollectionInternal(Arrays.asList(this));
+        }
+    }
+
+    void removeFromStudyCollectionWithCheckInternal(List<? extends StudyBaseWrapper> studyCollection) throws BiobankCheckException {
+        removeFromWrapperCollectionWithCheck(ResearchGroupPeer.STUDIES, studyCollection);
+    }
+
+    public List<StudyWrapper> getStudyCollection(boolean sort) {
+        boolean notCached = !isPropertyCached(ResearchGroupPeer.STUDIES);
+        List<StudyWrapper> studyCollection = getWrapperCollection(ResearchGroupPeer.STUDIES, StudyWrapper.class, sort);
+        if (notCached) {
+            for (StudyBaseWrapper e : studyCollection) {
+                e.addToResearchGroupCollectionInternal(Arrays.asList(this));
+            }
+        }
+        return studyCollection;
+    }
+    // <-- OHSDEV
 
     public List<RequestWrapper> getRequestCollection(boolean sort) {
         boolean notCached = !isPropertyCached(ResearchGroupPeer.REQUESTS);

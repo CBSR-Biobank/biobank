@@ -15,9 +15,22 @@ import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.Trnc;
 import edu.ualberta.med.biobank.model.type.RequestSpecimenState;
+import edu.ualberta.med.biobank.validator.constraint.Unique;
+import edu.ualberta.med.biobank.validator.group.PrePersist;
 
+/**
+ *
+ * Code Changes -
+ * 		1> Add attributes - Request and Specimen should be unique and exist before RequestSpecimen
+ *
+ * @author OHSDEV
+ *
+ */
 @Entity
 @Table(name = "REQUEST_SPECIMEN")
+@Unique.List({
+	@Unique(properties = { "request", "specimen" }, groups = PrePersist.class)
+})
 public class RequestSpecimen extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();

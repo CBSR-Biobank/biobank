@@ -10,9 +10,18 @@ import edu.ualberta.med.biobank.common.permission.researchGroup.ResearchGroupRea
 import edu.ualberta.med.biobank.model.ResearchGroup;
 
 /**
- * Retrieve a patient information using a patient id
  * 
- * @author aaron
+ * Action object that reads a specific Research Group along with
+ * it's associated studies from the database
+ *
+ * Code Changes -
+ * 		1> Change the query to be similar to a Site(SiteGetInfoAction)
+ * 		2> Add the joins for getting the studies & address of the Research Group
+ * 		3> Remove DISTINCT as we can have multiple rows with same Research Group Info and different Study
+ * 		4> Add a call to new class ResearchGroupGetStudyInfoAction to get the short name for the studies
+ *
+ * @author aaron (Original code that has been updated)
+ * @author OHSDEV
  * 
  */
 public class ResearchGroupGetInfoAction implements
@@ -21,16 +30,22 @@ public class ResearchGroupGetInfoAction implements
 
     @SuppressWarnings("nls")
     private static final String RESEARCH_INFO_HQL =
-        "SELECT DISTINCT rg FROM "
+        "SELECT rg FROM "
             + ResearchGroup.class.getName() + " rg"
-            + " LEFT JOIN FETCH rg.comments"
-            + " INNER JOIN FETCH rg.study inner"
-            + " join fetch rg.address where rg.id=?";
+            + " INNER JOIN FETCH rg.address address"		//OHSDEV
+            + " LEFT JOIN FETCH rg.studies studies"			//OHSDEV
+            + " LEFT JOIN FETCH rg.comments comments"
+            + " LEFT JOIN FETCH comments.user"
+            + " where rg.id=?";
 
     private final Integer rgId;
 
     public ResearchGroupGetInfoAction(Integer rgId) {
         this.rgId = rgId;
+    }
+
+    public ResearchGroupGetInfoAction(ResearchGroup rg) {
+        this(rg.getId());
     }
 
     @Override
@@ -46,8 +61,10 @@ public class ResearchGroupGetInfoAction implements
         Query query = context.getSession().createQuery(RESEARCH_INFO_HQL);
         query.setParameter(0, rgId);
 
-        sInfo.researchGroup =
-            ActionContext.singleResult(query, ResearchGroup.class, rgId);
+        ResearchGroup researchGroup = (ResearchGroup) query.uniqueResult();
+
+        sInfo.setResearchGroup(researchGroup);
+        sInfo.setStudies(new ResearchGroupGetStudyInfoAction(rgId).run(context).getList());			//OHSDEV
 
         return sInfo;
     }

@@ -67,6 +67,10 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
     @SuppressWarnings("nls")
     private static final String DELETE_MENU_ITEM_TEXT = i18n.tr("Delete");
     @SuppressWarnings("nls")
+    private static final String COMMENT_MENU_ITEM_TEXT = i18n.tr("Add Comment");
+    @SuppressWarnings("nls")
+    private static final String DISPATCH_MENU_ITEM_TEXT = i18n.tr("Send Dispatch");
+    @SuppressWarnings("nls")
     public static final String LOADING = i18n.tr("loading...");
 
     public static class RowItem {
@@ -100,6 +104,8 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
     protected ListenerList editItemListeners = new ListenerList();
     protected ListenerList deleteItemListeners = new ListenerList();
     protected ListenerList doubleClickListeners = new ListenerList();
+    protected ListenerList addCommentListeners = new ListenerList();
+    protected ListenerList sendDispatchListeners = new ListenerList();
 
     List<MenuItem> items = new ArrayList<MenuItem>();
 
@@ -193,6 +199,30 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
                             }
                         });
                         items.add(item);
+                    }
+                    if (addCommentListeners.getListeners().length > 0
+				&& canEdit(getSelection())) {
+                            MenuItem item = new MenuItem(menu, SWT.PUSH);
+                            item.setText(COMMENT_MENU_ITEM_TEXT);
+                            item.addSelectionListener(new SelectionAdapter() {
+                                @Override
+                                public void widgetSelected(SelectionEvent event) {
+					addCommentItem();
+                                }
+                            });
+                            items.add(item);
+                    }
+                    if (sendDispatchListeners.getListeners().length > 0
+				&& canEdit(getSelection())) {
+                            MenuItem item = new MenuItem(menu, SWT.PUSH);
+                            item.setText(DISPATCH_MENU_ITEM_TEXT);
+                            item.addSelectionListener(new SelectionAdapter() {
+                                @Override
+                                public void widgetSelected(SelectionEvent event) {
+					sendDispatchItem();
+                                }
+                            });
+                            items.add(item);
                     }
                 } catch (Exception e) {
                     BgcPlugin.openAsyncError(
@@ -380,6 +410,14 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
         editItemListeners.add(listener);
     }
 
+    public void addCommentListener(IInfoTableEditItemListener<T> listener) {
+	addCommentListeners.add(listener);
+    }
+
+    public void sendDispatchListener(IInfoTableEditItemListener<T> listener) {
+	sendDispatchListeners.add(listener);
+    }
+
     public void addDeleteItemListener(IInfoTableDeleteItemListener<T> listener) {
         deleteItemListeners.add(listener);
     }
@@ -448,6 +486,50 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
         InfoTableSelection selection = new InfoTableSelection(objSelected);
         final InfoTableEvent<T> event = new InfoTableEvent<T>(this, selection);
         Object[] listeners = editItemListeners.getListeners();
+        for (int i = 0; i < listeners.length; ++i) {
+            @SuppressWarnings("unchecked")
+            final IInfoTableEditItemListener<T> l =
+                (IInfoTableEditItemListener<T>) listeners[i];
+            SafeRunnable.run(new SafeRunnable() {
+                @Override
+                public void run() {
+                    l.editItem(event);
+                }
+            });
+        }
+    }
+
+    public void addCommentItem() {
+        Object objSelected = getSelection();
+
+        if (objSelected == null)
+            return;
+
+        InfoTableSelection selection = new InfoTableSelection(objSelected);
+        final InfoTableEvent<T> event = new InfoTableEvent<T>(this, selection);
+        Object[] listeners = addCommentListeners.getListeners();
+        for (int i = 0; i < listeners.length; ++i) {
+            @SuppressWarnings("unchecked")
+            final IInfoTableEditItemListener<T> l =
+                (IInfoTableEditItemListener<T>) listeners[i];
+            SafeRunnable.run(new SafeRunnable() {
+                @Override
+                public void run() {
+                    l.editItem(event);
+                }
+            });
+        }
+    }
+
+    public void sendDispatchItem() {
+        Object objSelected = getSelection();
+
+        if (objSelected == null)
+            return;
+
+        InfoTableSelection selection = new InfoTableSelection(objSelected);
+        final InfoTableEvent<T> event = new InfoTableEvent<T>(this, selection);
+        Object[] listeners = sendDispatchListeners.getListeners();
         for (int i = 0; i < listeners.length; ++i) {
             @SuppressWarnings("unchecked")
             final IInfoTableEditItemListener<T> l =

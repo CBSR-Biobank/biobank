@@ -140,7 +140,8 @@ public class ReportAdapter extends AdapterBase {
 
             report.setName(reportCopyName);
             report.setUser(SessionManager.getUser());
-            ReportAdapter reportAdapter = new ReportAdapter(getParent(), report);
+            // OHSDEV
+            ReportAdapter reportAdapter = new ReportAdapter((AdapterBase)getParent(), report);
             reportAdapter.openEntryForm();
         } catch (final RemoteConnectFailureException exp) {
             BgcPlugin.openRemoteConnectErrorMessage(exp);

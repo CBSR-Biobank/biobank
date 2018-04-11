@@ -1,0 +1,29 @@
+csmupt {
+gov.nih.nci.security.authentication.loginmodules.RDBMSLoginModule sufficient
+driver="@database.driver@"
+url="@database.url@"
+user="@database.username@"
+passwd="@database.password@"
+query="SELECT * from csm_user WHERE login_name=? and password=?"
+encryption-enabled="YES";
+};
+
+biobank {
+gov.nih.nci.security.authentication.loginmodules.RDBMSLoginModule sufficient
+driver="@database.driver@"
+url="@database.url@"
+user="@database.username@"
+passwd="@database.password@"
+query="SELECT * from csm_user WHERE login_name=? and password=?"
+encryption-enabled="YES";
+};
+
+CLM {
+gov.nih.nci.security.authentication.loginmodules.RDBMSLoginModule sufficient
+driver="@database.driver@"
+url="@database.url@"
+user="@database.username@"
+passwd="@database.password@"
+query="SELECT * from csm_user WHERE login_name=? and password=?"
+encryption-enabled="YES";
+};

@@ -3,7 +3,7 @@
 <hibernate-configuration>
 	<session-factory>
 		<!-- Properties for the session factory -->
-		<property name="connection.datasource">java:/biobank</property>
+		<property name="connection.datasource">java:/comp/env/jdbc/biobank</property>
 		<property name="show_sql">false</property>
 		<property name="dialect">org.hibernate.dialect.MySQL5InnoDBDialect</property>
 		<property name="max_fetch_depth">1</property>

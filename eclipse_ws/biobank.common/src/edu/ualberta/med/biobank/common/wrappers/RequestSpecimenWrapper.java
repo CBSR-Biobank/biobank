@@ -5,6 +5,17 @@ import edu.ualberta.med.biobank.model.RequestSpecimen;
 import edu.ualberta.med.biobank.model.type.RequestSpecimenState;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
+
+/**
+ *
+ * Code Changes -
+ * 		1> Remove the setState method for 2 reasons -
+ * 				a> Results in an infinite loop and an error not thrown back to client but results in incomplete functional behavior
+ * 				b> The parent class provides the implementation
+ *
+ * @author OHSDEV
+ *
+ */
 public class RequestSpecimenWrapper extends RequestSpecimenBaseWrapper
     implements ItemWrapper {
 
@@ -34,11 +45,6 @@ public class RequestSpecimenWrapper extends RequestSpecimenBaseWrapper
     @Override
     public RequestSpecimenState getSpecimenState() {
         return getState();
-    }
-
-    @Override
-    public void setState(RequestSpecimenState state) {
-        setState(state);
     }
 
     @Override

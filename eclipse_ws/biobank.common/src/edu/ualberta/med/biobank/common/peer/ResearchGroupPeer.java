@@ -11,22 +11,16 @@ import edu.ualberta.med.biobank.model.Request;
 import edu.ualberta.med.biobank.model.ResearchGroup;
 import edu.ualberta.med.biobank.model.Study;
 
+/**
+ *
+ * Code Changes -
+ * 		1> Add a new property to hold a collection of Studies for a Research Group
+ * 		2> Remove old property STUDY
+ *
+ * @author OHSDEV
+ *
+ */
 public class ResearchGroupPeer  extends CenterPeer {
-	public static final Property<Study, ResearchGroup> STUDY = Property.create(
-		"study" //$NON-NLS-1$
-		, ResearchGroup.class
-		, new TypeReference<Study>() {}
-		, new Property.Accessor<Study, ResearchGroup>() { private static final long serialVersionUID = 1L;
-			@Override
-			public Study get(ResearchGroup model) {
-				return model.getStudy();
-			}
-			@Override
-			public void set(ResearchGroup model, Study value) {
-				model.setStudy(value);
-			}
-		});
-
 	public static final Property<Collection<Request>, ResearchGroup> REQUESTS = Property.create(
 		"requests" //$NON-NLS-1$
 		, ResearchGroup.class
@@ -43,10 +37,29 @@ public class ResearchGroupPeer  extends CenterPeer {
 			}
 		});
 
+	//OHSDEV
+	public static final Property<Collection<Study>, ResearchGroup> STUDIES = Property.create(
+			"studies" //$NON-NLS-1$
+			, ResearchGroup.class
+			, new TypeReference<Collection<Study>>() {}
+			, new Property.Accessor<Collection<Study>, ResearchGroup>() { private static final long serialVersionUID = 1L;
+				@Override
+				public Collection<Study> get(ResearchGroup model) {
+					return model.getStudies();
+				}
+				@Override
+				public void set(ResearchGroup model, Collection<Study> value) {
+					model.getStudies().clear();
+					model.getStudies().addAll(value);
+				}
+			});
+
+
+
    public static final List<Property<?, ? super ResearchGroup>> PROPERTIES;
    static {
       List<Property<?, ? super ResearchGroup>> aList = new ArrayList<Property<?, ? super ResearchGroup>>();
-      aList.add(STUDY);
+      aList.add(STUDIES);	//OHSDEV
       aList.add(REQUESTS);
       PROPERTIES = Collections.unmodifiableList(aList);
    };

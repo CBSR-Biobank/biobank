@@ -14,6 +14,16 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
+
+/**
+ *
+ * Code Changes -
+ * 		1> Remove query for loading the available Studies not used in other research groups
+ * 		   as all Studies will be available to all Research Groups to be associated
+ *
+ * @author OHSDEV
+ *
+ */
 @SuppressWarnings("unused")
 public class ResearchGroupWrapper extends ResearchGroupBaseWrapper {
 
@@ -49,20 +59,10 @@ public class ResearchGroupWrapper extends ResearchGroupBaseWrapper {
         return getCountResult(appService, new HQLCriteria(RG_COUNT_QRY));
     }
 
-    private static String AVAIL_STUDIES = "select s from " //$NON-NLS-1$
-        + Study.class.getName() + " s where s not in (select r." //$NON-NLS-1$
-        + ResearchGroupPeer.STUDY.getName() + " from " //$NON-NLS-1$
-        + ResearchGroup.class.getName() + " r)"; //$NON-NLS-1$
-
-    public static List<StudyWrapper> getAvailStudies(
-        WritableApplicationService appService) throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria(AVAIL_STUDIES);
-        List<Study> studies = appService.query(criteria);
-        List<StudyWrapper> wrappers = new ArrayList<StudyWrapper>();
-        for (Study s : studies) {
-            wrappers.add(new StudyWrapper(appService, s));
-        }
-        return wrappers;
+    //OHSDEV
+    @Override
+    public List<StudyWrapper> getStudyCollection() {
+        return getStudyCollection(true);
     }
 
     public long getCollectionEventCountForStudy(StudyWrapper study) {

@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.treeview.patient;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
@@ -11,18 +13,23 @@ import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventDeleteAction;
+import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetSourceSpecimenListInfoAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetSimpleCollectionEventInfosAction.SimpleCEventInfo;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventDeletePermission;
 import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventReadPermission;
 import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventUpdatePermission;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.forms.CollectionEventEntryForm;
 import edu.ualberta.med.biobank.forms.CollectionEventViewForm;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.SourceSpecimen;
+import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AbstractNewAdapterBase;
-import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.treeview.SpecimenTreeViewAdapter;
 
 public class CollectionEventAdapter extends AbstractNewAdapterBase {
     private static final I18n i18n = I18nFactory
@@ -104,19 +111,39 @@ public class CollectionEventAdapter extends AbstractNewAdapterBase {
             .tr("Are you sure you want to delete this collection event?");
     }
 
+    //OHSDEV
+    // Specimen tree view implementation
     @Override
-    protected AdapterBase createChildNode() {
-        return null;
+    protected SpecimenTreeViewAdapter createChildNode() {
+        return new SpecimenTreeViewAdapter(this, null);
     }
-
     @Override
-    protected AdapterBase createChildNode(Object child) {
-        return null;
+    protected SpecimenTreeViewAdapter createChildNode(Object child) {
+    Specimen spec = ((SpecimenInfo)child).specimen;
+    return new SpecimenTreeViewAdapter(this,new SpecimenWrapper(SessionManager.getAppService(),spec));
+	// return null;
     }
-
+    //OHSDEV
+    // Specimen tree view implementation
     @Override
     protected Map<Integer, ?> getChildrenObjects() throws Exception {
-        return null;
+
+	// in order to match return type need to create MAP structure providing key as speciemn id
+
+	@SuppressWarnings("unchecked")
+		List<SpecimenInfo> infos = SessionManager.getAppService().doAction(
+                new CollectionEventGetSourceSpecimenListInfoAction(ceventInfo.cevent.getId())).getList();
+
+	 HashMap<Integer, SpecimenInfo> specimenInfos =new HashMap<Integer, SpecimenInfo>();
+
+	 for (SpecimenInfo info : infos) {
+		 specimenInfos.put(info.specimen.getId(), info);
+         }
+
+	return specimenInfos;
+
+
+	// Initially was  - return null;
     }
 
     @Override
@@ -171,5 +198,12 @@ public class CollectionEventAdapter extends AbstractNewAdapterBase {
         this.ceventInfo = (SimpleCEventInfo) val;
         setId(ceventInfo.cevent.getId());
         if (ceventInfo.cevent.getId() != null) init();
+    }
+
+    @Override
+    public List<AbstractAdapterBase> search(Class<?> searchedClass,
+        Integer objectId) {
+        return findChildFromClass(searchedClass, objectId,
+			SourceSpecimen.class);
     }
 }

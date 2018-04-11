@@ -19,13 +19,16 @@ import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.BooleanResult;
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchGetInfoAction;
+import edu.ualberta.med.biobank.common.action.dispatch.DispatchGetRequestAction;
 import edu.ualberta.med.biobank.common.action.info.DispatchReadInfo;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchChangeStatePermission;
 import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDoubleClickItemListener;
@@ -42,6 +45,7 @@ import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.DispatchSpecimenListInfoTable;
 import edu.ualberta.med.biobank.widgets.trees.DispatchSpecimensTreeTable;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class DispatchViewForm extends BiobankViewForm {
     private static final I18n i18n = I18nFactory
@@ -133,7 +137,9 @@ public class DispatchViewForm extends BiobankViewForm {
         if (SessionManager.getAppService().isAllowed(perm)) {
             if (dispatch.isInCreationState()
                 && SessionManager.getUser().getCurrentWorkingCenter().equals(
-                    dispatch.getSenderCenter())) {
+                    dispatch.getSenderCenter())
+                    // OHSDEV  Suppress Sending Dispatch in Creation mode that attached to Request
+                    && !checkRequest(dispatch.getId())) {
                 createSendButton();
             } else if (dispatch.isInTransitState()
                 && SessionManager.getUser().getCurrentWorkingCenter().equals(
@@ -361,4 +367,19 @@ public class DispatchViewForm extends BiobankViewForm {
     public void dispatchSend() {
         DispatchSendingEntryForm.sendDispatch(this, dispatch, dispatchAdapter);
     }
+
+    private boolean checkRequest(Integer id) {
+
+	BooleanResult ret = null;
+		try {
+			ret = SessionManager.getAppService().doAction(
+			        new DispatchGetRequestAction(id));
+		} catch (ApplicationException e) {
+			BgcPlugin.openAsyncError(
+			// dialog title.
+			i18n.tr("Error while checking request id in Dispatch"), e);
+		}
+	return ret.isTrue();
+    }
+
 }

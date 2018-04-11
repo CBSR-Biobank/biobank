@@ -26,6 +26,7 @@ import edu.ualberta.med.biobank.forms.PatientEntryForm;
 import edu.ualberta.med.biobank.forms.PatientViewForm;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AbstractNewAdapterBase;
@@ -77,6 +78,8 @@ public class PatientAdapter extends AbstractNewAdapterBase {
     @Override
     public void executeDoubleClick() {
         performExpand();
+        //OHSDEV - Search for specimen tree view
+        this.search(Specimen.class, patient.getId());
         openViewForm();
     }
 

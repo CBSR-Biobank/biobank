@@ -12,6 +12,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.forms.widgets.Section;
 import org.supercsv.cellprocessor.ParseDate;
 import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.exception.SuperCSVException;
@@ -23,13 +24,19 @@ import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.info.ResearchGroupReadInfo;
+import edu.ualberta.med.biobank.common.action.info.StudyCountInfo;
 import edu.ualberta.med.biobank.common.action.researchGroup.RequestSubmitAction;
 import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupGetInfoAction;
 import edu.ualberta.med.biobank.common.wrappers.ResearchGroupWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcFileBrowser;
 import edu.ualberta.med.biobank.gui.common.widgets.IBgcFileBrowserListener;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDoubleClickItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
+import edu.ualberta.med.biobank.gui.common.widgets.InfoTableSelection;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.HasName;
@@ -37,8 +44,10 @@ import edu.ualberta.med.biobank.model.HasNameShort;
 import edu.ualberta.med.biobank.model.ResearchGroup;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.admin.ResearchGroupAdapter;
+import edu.ualberta.med.biobank.treeview.admin.StudyAdapter;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
 import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.ResearchGroupStudyInfoTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ResearchGroupViewForm extends AddressViewFormCommon implements
@@ -60,13 +69,16 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
 
     private BgcBaseText activityStatusLabel;
 
-    private BgcBaseText studyLabel;
-
     private BgcFileBrowser csvSelector;
 
     private Button uploadButton;
 
     private CommentsInfoTable commentTable;
+
+    //OHSDEV - Data object for the Research Group
+    private ResearchGroupReadInfo rgInfo;
+    //OHSDEV - List of Studies associated with the Research Group
+    private ResearchGroupStudyInfoTable studiesTable;
 
     @SuppressWarnings("nls")
     @Override
@@ -86,10 +98,10 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
             researchGroup.setWrappedObject(rg);
             researchGroup.setActivityStatus(ActivityStatus.ACTIVE);
         } else {
-            ResearchGroupReadInfo read =
-                SessionManager.getAppService().doAction(
-                    new ResearchGroupGetInfoAction(id));
-            researchGroup.setWrappedObject(read.researchGroup);
+		//OHSDEV - Set the Research Group data object for use in the class
+		rgInfo = SessionManager.getAppService().doAction(new ResearchGroupGetInfoAction(id));
+            researchGroup.setWrappedObject(rgInfo.getResearchGroup());
+            Assert.isNotNull(rgInfo.getStudies());
         }
     }
 
@@ -104,7 +116,31 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         createResearchGroupSection();
         createAddressSection(researchGroup);
+        createStudySection();		//OHSDEV - Create the Study table section
         createUploadSection();
+    }
+
+	//OHSDEV - Modify the view and remove the row for Study as it will have it's own section in the form
+    private void createResearchGroupSection() {
+        Composite client = toolkit.createComposite(page);
+        client.setLayout(new GridLayout(2, false));
+        client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        toolkit.paintBordersFor(client);
+
+        nameLabel = createReadOnlyLabelledField(client, SWT.NONE, HasName.PropertyName.NAME.toString());
+        nameShortLabel = createReadOnlyLabelledField(client, SWT.NONE, HasNameShort.PropertyName.NAME_SHORT.toString());
+        activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE, ActivityStatus.NAME.singular().toString());
+
+        createCommentsSection();
+        setResearchGroupValues();
+    }
+
+    private void createCommentsSection() {
+        Composite client = createSectionWithClient(Comment.NAME.plural().toString());
+        commentTable = new CommentsInfoTable(client,
+        researchGroup.getCommentCollection(false));
+        commentTable.adaptToToolkit(toolkit, true);
+        toolkit.paintBordersFor(commentTable);
     }
 
     @SuppressWarnings("nls")
@@ -132,11 +168,35 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
                 } catch (Exception e1) {
                     BgcPlugin.openAsyncError(
                         i18n.tr("Error Uploading"),
-                        i18n.tr("There was an error creating the request."));
+                        //OHSDEV - provide message from server side
+                        i18n.tr("There was an error creating the request.\n"+e1.getLocalizedMessage()));
                 }
             }
         });
         uploadButton.setEnabled(false);
+    }
+
+	//OHSDEV - Create the Study view in the form
+    private void createStudySection() {
+        Section section = createSection(Study.NAME.plural().toString());
+        studiesTable = new ResearchGroupStudyInfoTable(section, rgInfo.getStudies());
+        studiesTable.adaptToToolkit(toolkit, true);
+        studiesTable.addClickListener(new IInfoTableDoubleClickItemListener<StudyCountInfo>() {
+            @Override
+            public void doubleClick(InfoTableEvent<StudyCountInfo> event) {
+                Study s = ((StudyCountInfo) ((InfoTableSelection)event.getSelection()).getObject()).getStudy();
+                new StudyAdapter(null, new StudyWrapper(SessionManager.getAppService(), s)).openViewForm();
+            }
+        });
+        studiesTable.addEditItemListener(new IInfoTableEditItemListener<StudyCountInfo>() {
+            @Override
+            public void editItem(InfoTableEvent<StudyCountInfo> event) {
+                Study s = ((StudyCountInfo) ((InfoTableSelection)event.getSelection()).getObject()).getStudy();
+                new StudyAdapter(null, new StudyWrapper(SessionManager.getAppService(), s)).openEntryForm();
+            }
+        });
+
+        section.setClient(studiesTable);
     }
 
     @Override
@@ -146,15 +206,15 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
 
     @SuppressWarnings({ "nls" })
     public void saveRequest() throws Exception {
-        // RequestWrapper request =
-        // new RequestWrapper(SessionManager.getAppService());
-
         FileReader f = new FileReader(csvSelector.getFilePath());
-        int newLines = 0;
-        while (f.ready() && newLines < 4) {
-            char c = (char) f.read();
-            if (c == '\n') newLines++;
-        }
+
+        //OHSDEV - Commenting out code that serves no purpose
+        //OHSDEV - Causes the EOF to be reached so not further processing happens
+        //int newLines = 0;
+        //while (f.ready() && newLines < 4) {
+        //    char c = (char) f.read();
+        //    if (c == '\n') newLines++;
+        //}
 
         ICsvBeanReader reader =
             new CsvBeanReader(f, CsvPreference.STANDARD_PREFERENCE);
@@ -183,14 +243,19 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
         } finally {
             reader.close();
         }
-        List<String> specs = new ArrayList<String>();
 
+        List<String> specs = new ArrayList<String>();
         for (RequestInput ob : requests) {
             specs.add(ob.getInventoryID());
         }
 
+        List<String> studies = new ArrayList<String>();
+        for (StudyCountInfo study : rgInfo.getStudies()) {
+            studies.add(study.getStudy().getId().toString());
+        }
+
         RequestSubmitAction action =
-            new RequestSubmitAction(researchGroup.getId(), specs);
+            new RequestSubmitAction(researchGroup.getId(), specs, studies, SessionManager.getUser().getCurrentWorkingCenter().getId());
         SessionManager.getAppService().doAction(action);
 
         BgcPlugin.openMessage(
@@ -200,43 +265,9 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
         SpecimenTransitView.reloadCurrent();
     }
 
-    private void createResearchGroupSection() {
-        Composite client = toolkit.createComposite(page);
-        client.setLayout(new GridLayout(2, false));
-        client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        toolkit.paintBordersFor(client);
-
-        nameLabel =
-            createReadOnlyLabelledField(client, SWT.NONE,
-                HasName.PropertyName.NAME.toString());
-        nameShortLabel =
-            createReadOnlyLabelledField(client, SWT.NONE,
-                HasNameShort.PropertyName.NAME_SHORT.toString());
-        studyLabel =
-            createReadOnlyLabelledField(client, SWT.NONE, Study.NAME.singular()
-                .toString());
-        activityStatusLabel =
-            createReadOnlyLabelledField(client, SWT.NONE,
-                ActivityStatus.NAME.singular().toString());
-
-        createCommentsSection();
-        setResearchGroupValues();
-    }
-
-    private void createCommentsSection() {
-        Composite client =
-            createSectionWithClient(Comment.NAME.plural().toString());
-        commentTable =
-            new CommentsInfoTable(client,
-                researchGroup.getCommentCollection(false));
-        commentTable.adaptToToolkit(toolkit, true);
-        toolkit.paintBordersFor(commentTable);
-    }
-
     private void setResearchGroupValues() {
         setTextValue(nameLabel, researchGroup.getName());
         setTextValue(nameShortLabel, researchGroup.getNameShort());
-        setTextValue(studyLabel, researchGroup.getStudy());
         setTextValue(activityStatusLabel, researchGroup.getActivityStatus());
     }
 
@@ -249,6 +280,7 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
             researchGroup.getName()));
         setResearchGroupValues();
         setAddressValues(researchGroup);
+        studiesTable.setList(rgInfo.getStudies());		//Set the value of the Studies table to the list read from the database
         commentTable.setList(researchGroup.getCommentCollection(false));
     }
 

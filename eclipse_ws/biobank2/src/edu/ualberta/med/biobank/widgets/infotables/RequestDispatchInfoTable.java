@@ -11,7 +11,6 @@ import org.xnap.commons.i18n.I18nFactory;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchDeletePermission;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchReadPermission;
-import edu.ualberta.med.biobank.common.permission.dispatch.DispatchUpdatePermission;
 import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.AbstractInfoTableWidget;
@@ -104,15 +103,15 @@ public class RequestDispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
     @Override
     protected Boolean canEdit(DispatchWrapper target)
         throws ApplicationException {
-        return SessionManager.getAppService().isAllowed(
-            new DispatchUpdatePermission(target.getId()));
+        //return SessionManager.getAppService().isAllowed(new DispatchUpdatePermission(target.getId()));
+	//return false;
+	return true;
     }
 
     @Override
     protected Boolean canDelete(DispatchWrapper target)
         throws ApplicationException {
-        return SessionManager.getAppService().isAllowed(
-            new DispatchDeletePermission(target.getId()));
+        return SessionManager.getAppService().isAllowed(new DispatchDeletePermission(target.getId()));
     }
 
     @Override

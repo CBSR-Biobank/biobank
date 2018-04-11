@@ -17,6 +17,17 @@ import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.i18n.Tr;
 import edu.ualberta.med.biobank.model.Request;
 
+/**
+ *
+ * Action object that queries the database for the Request and it's relevant associations
+ *
+ * Code Changes -
+ * 		1> Add the join for getting the Request Specimens so that the data exists in the RequestWrapper
+ * 		2> Add the join for getting the Specimen info from the Request Specimens
+ *
+ * @author OHSDEV
+ *
+ */
 public class RequestGetInfoAction implements Action<RequestReadInfo> {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
@@ -32,9 +43,14 @@ public class RequestGetInfoAction implements Action<RequestReadInfo> {
     + Request.class.getName() 
     + " request join fetch request." + RequestPeer.RESEARCH_GROUP.getName()
     + " rg left join fetch request.dispatches " 
-    + " dispatches left join fetch dispatches.dispatchSpecimens ds" 
-    + " left join fetch dispatches.senderCenter left join fetch dispatches.receiverCenter" 
+    + " dispatches left join fetch dispatches.dispatchSpecimens ds"
+    + " left join fetch request.requestSpecimens "								//OHSDEV
+    + " requestSpecimens left join fetch requestSpecimens.specimen sp"			//OHSDEV
+    + " left join fetch dispatches.senderCenter "
+    + " left join fetch dispatches.receiverCenter "
     + " left join fetch dispatches.shipmentInfo "
+    + " LEFT JOIN fetch dispatches.comments comments"
+    + " LEFT JOIN fetch comments.user"
     + " join fetch request." + RequestPeer.ADDRESS.getName()
     + " where request." + DispatchPeer.ID.getName()
     +"=?";

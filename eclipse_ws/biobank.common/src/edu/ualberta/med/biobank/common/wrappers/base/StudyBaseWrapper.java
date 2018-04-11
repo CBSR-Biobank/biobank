@@ -23,6 +23,15 @@ import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
+/**
+ *
+ * Code Changes -
+ * 		1> Changes related to having multiple Research Groups associated with a particular Study
+ * 		2> Added methods to add and remove Research Groups similar to Sites in this class
+ *
+ * @author OHSDEV
+ *
+ */
 public class StudyBaseWrapper extends ModelWrapper<Study> {
 
     public StudyBaseWrapper(WritableApplicationService appService) {
@@ -67,29 +76,60 @@ public class StudyBaseWrapper extends ModelWrapper<Study> {
         setProperty(StudyPeer.NAME_SHORT, trimmed);
     }
 
-    public ResearchGroupWrapper getResearchGroup() {
-        boolean notCached = !isPropertyCached(StudyPeer.RESEARCH_GROUP);
-        ResearchGroupWrapper researchGroup =
-            getWrappedProperty(StudyPeer.RESEARCH_GROUP,
-                ResearchGroupWrapper.class);
-        if (researchGroup != null && notCached)
-            ((ResearchGroupBaseWrapper) researchGroup).setStudyInternal(this);
-        return researchGroup;
-    }
-
-    public void setResearchGroup(ResearchGroupBaseWrapper researchGroup) {
-        if (isInitialized(StudyPeer.RESEARCH_GROUP)) {
-            ResearchGroupBaseWrapper oldResearchGroup = getResearchGroup();
-            if (oldResearchGroup != null)
-                oldResearchGroup.setStudyInternal(null);
+    //OHSDEV -->
+    public List<ResearchGroupWrapper> getResearchGroupCollection(boolean sort) {
+        boolean notCached = !isPropertyCached(StudyPeer.RESEARCH_GROUPS);
+        List<ResearchGroupWrapper> rgCollection =
+            getWrapperCollection(StudyPeer.RESEARCH_GROUPS, ResearchGroupWrapper.class, sort);
+        if (notCached) {
+            for (ResearchGroupBaseWrapper e : rgCollection) {
+                e.addToStudyCollectionInternal(Arrays.asList(this));
+            }
         }
-        if (researchGroup != null) researchGroup.setStudyInternal(this);
-        setWrappedProperty(StudyPeer.RESEARCH_GROUP, researchGroup);
+        return rgCollection;
     }
 
-    void setResearchGroupInternal(ResearchGroupBaseWrapper researchGroup) {
-        setWrappedProperty(StudyPeer.RESEARCH_GROUP, researchGroup);
+    public void addToResearchGroupCollection(List<? extends ResearchGroupBaseWrapper> rgCollection) {
+        addToWrapperCollection(StudyPeer.RESEARCH_GROUPS, rgCollection);
+        for (ResearchGroupBaseWrapper e : rgCollection) {
+            e.addToStudyCollectionInternal(Arrays.asList(this));
+        }
     }
+
+    void addToResearchGroupCollectionInternal(List<? extends ResearchGroupBaseWrapper> rgCollection) {
+        if (isInitialized(StudyPeer.RESEARCH_GROUPS)) {
+            addToWrapperCollection(StudyPeer.RESEARCH_GROUPS, rgCollection);
+        } else {
+            getElementQueue().add(StudyPeer.RESEARCH_GROUPS, rgCollection);
+        }
+    }
+
+    public void removeFromResearchGroupCollection(List<? extends ResearchGroupBaseWrapper> rgCollection) {
+        removeFromWrapperCollection(StudyPeer.RESEARCH_GROUPS, rgCollection);
+        for (ResearchGroupBaseWrapper e : rgCollection) {
+            e.removeFromStudyCollectionInternal(Arrays.asList(this));
+        }
+    }
+
+    void removeFromResearchGroupCollectionInternal(List<? extends ResearchGroupBaseWrapper> rgCollection) {
+        if (isPropertyCached(StudyPeer.RESEARCH_GROUPS)) {
+            removeFromWrapperCollection(StudyPeer.RESEARCH_GROUPS, rgCollection);
+        } else {
+            getElementQueue().remove(StudyPeer.RESEARCH_GROUPS, rgCollection);
+        }
+    }
+
+    public void removeFromResearchGroupCollectionWithCheck(List<? extends ResearchGroupBaseWrapper> rgCollection) throws BiobankCheckException {
+        removeFromWrapperCollectionWithCheck(StudyPeer.RESEARCH_GROUPS, rgCollection);
+        for (ResearchGroupBaseWrapper e : rgCollection) {
+            e.removeFromStudyCollectionInternal(Arrays.asList(this));
+        }
+    }
+
+    void removeFromResearchGroupCollectionWithCheckInternal(List<? extends ResearchGroupBaseWrapper> rgCollection) throws BiobankCheckException {
+        removeFromWrapperCollectionWithCheck(StudyPeer.RESEARCH_GROUPS, rgCollection);
+    }
+    // <-- OHSDEV
 
     public List<ContactWrapper> getContactCollection(boolean sort) {
         boolean notCached = !isPropertyCached(StudyPeer.CONTACTS);

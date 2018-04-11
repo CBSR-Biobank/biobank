@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
@@ -34,21 +33,12 @@ public class RequestReceiveScanDialog extends ReceiveScanDialog<RequestWrapper> 
         dispatchSpecimens = new ArrayList<SpecimenWrapper>();
     }
 
+
+    //OHSDEV - We do not need to add extra cells when scanning during request processing. We only process what
+    //gets scanned or we re-scan as many times as we need to get the final set of specimens requested.
     @Override
     protected void addExtraCells() {
-        if (extras != null && extras.size() > 0) {
-            Display.getDefault().asyncExec(new Runnable() {
-                @SuppressWarnings("nls")
-                @Override
-                public void run() {
-                    BgcPlugin.openInformation(
-                        // information dialog title
-                        i18n.tr("Extra specimens"),
-                        // information dialog message
-                        i18n.tr("Some of the specimens in this pallet were not supposed to be in this shipment."));
-                }
-            });
-        }
+	;
     }
 
     @SuppressWarnings("nls")

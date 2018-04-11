@@ -15,16 +15,34 @@ import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.ResearchGroup;
 import edu.ualberta.med.biobank.model.Study;
 
+/**
+ *
+ * Action object that saves a Research Group along with it's associated studies to the database
+ *
+ * Code Changes -
+ * 		1> Add a setter method to accept a list of Study IDs
+ * 		2> Change the run method and make it similar to SiteSaveAction
+ *
+ * @author OHSDEV
+ *
+ */
 public class ResearchGroupSaveAction implements Action<IdResult> {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = 1L;
     private ResearchGroupSaveInfo rgInfo;
+    private Set<Integer> studyIds = new HashSet<Integer>(0);
 
     public ResearchGroupSaveAction(ResearchGroupSaveInfo rgInfo) {
         this.rgInfo = rgInfo;
+    }
+
+    //OHSDEV
+    public void setStudyIds(Set<Integer> studyIds) {
+        if (studyIds == null) {
+            throw new IllegalArgumentException();
+        }
+
+        this.studyIds = studyIds;
     }
 
     @Override
@@ -40,9 +58,12 @@ public class ResearchGroupSaveAction implements Action<IdResult> {
 
         rg.setName(rgInfo.name);
         rg.setNameShort(rgInfo.nameShort);
-
-        rg.setStudy(context.get(Study.class, rgInfo.studyId));
         rg.setActivityStatus(rgInfo.activityStatus);
+
+        //OHSDEV
+        Set<Study> studies = context.load(Study.class, studyIds);
+        rg.getStudies().clear();
+        rg.getStudies().addAll(studies);
 
         Address address = new Address();
         address.setId(rgInfo.address.id);

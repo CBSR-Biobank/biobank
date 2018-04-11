@@ -53,8 +53,19 @@ public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
         Patient.NAME.plural().toString(),
         CollectionEvent.NAME.plural().toString() };
 
+    //OHSDEV - Research Group headings
+    private static final String[] RG_HEADINGS = new String[] {
+        HasName.PropertyName.NAME.toString(),
+        HasNameShort.PropertyName.NAME_SHORT.toString(),
+        ActivityStatus.NAME.singular().toString()};
+
     public StudyInfoTable(Composite parent, List<StudyWrapper> collection) {
         super(parent, collection, HEADINGS, 10, StudyWrapper.class);
+    }
+
+    //OHSDEV - Initialize the table with Research Group headings for form view
+    public StudyInfoTable(Composite parent, List<StudyWrapper> collection, boolean isRG) {
+        super(parent, collection, RG_HEADINGS, 10, StudyWrapper.class);
     }
 
     @Override

@@ -18,6 +18,15 @@ import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
 
+/**
+ *
+ * Code Changes -
+ * 		1> Add a new property to hold a collection of Research Groups associated with a Study
+ * 		2> Remove old property RESEARCH_GROUP
+ *
+ * @author OHSDEV
+ *
+ */
 public class StudyPeer {
     public static final Property<Integer, Study> ID = Property.create("id" //$NON-NLS-1$
         , Study.class
@@ -74,22 +83,24 @@ public class StudyPeer {
             }
         });
 
-    public static final Property<ResearchGroup, Study> RESEARCH_GROUP =
-        Property.create("researchGroup" //$NON-NLS-1$
+    //OHSDEV
+    public static final Property<Collection<ResearchGroup>, Study> RESEARCH_GROUPS =
+	Property.create("researchGroups" //$NON-NLS-1$
             , Study.class
-            , new TypeReference<ResearchGroup>() {
+		, new TypeReference<Collection<ResearchGroup>>() {
             }
-            , new Property.Accessor<ResearchGroup, Study>() {
+		, new Property.Accessor<Collection<ResearchGroup>, Study>() {
                 private static final long serialVersionUID = 1L;
 
                 @Override
-                public ResearchGroup get(Study model) {
-                    return model.getResearchGroup();
+			public Collection<ResearchGroup> get(Study model) {
+                        return model.getResearchGroups();
                 }
 
                 @Override
-                public void set(Study model, ResearchGroup value) {
-                    model.setResearchGroup(value);
+                public void set(Study model, Collection<ResearchGroup> value) {
+                        model.getResearchGroups().clear();
+                        model.getResearchGroups().addAll(value);
                 }
             });
 
@@ -259,7 +270,7 @@ public class StudyPeer {
         aList.add(ID);
         aList.add(NAME);
         aList.add(NAME_SHORT);
-        aList.add(RESEARCH_GROUP);
+        aList.add(RESEARCH_GROUPS);		//OHSDEV
         aList.add(CONTACTS);
         aList.add(PATIENTS);
         aList.add(COMMENTS);

@@ -18,12 +18,15 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
+import org.eclipse.ui.IEditorPart;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.BooleanResult;
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchChangeStateAction;
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchDeleteAction;
+import edu.ualberta.med.biobank.common.action.dispatch.DispatchGetRequestAction;
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchSaveAction;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchDeletePermission;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchReadPermission;
@@ -58,7 +61,9 @@ public class DispatchAdapter extends AdapterBase {
 
     @Override
     public void init() {
-        this.isDeletable = isAllowed(new DispatchDeletePermission(getModelObject().getId()));
+        this.isDeletable = isAllowed(new DispatchDeletePermission(getModelObject().getId()))
+		 // OHSDEV  Suppress deleting Dispatch in Creation mode that attached to Request
+			&& !checkRequest(getDispatchWrapper().getId());
         this.isReadable = isAllowed(new DispatchReadPermission(getModelObject().getId()));
         this.isEditable = isAllowed(new DispatchUpdatePermission(getModelObject().getId()));
     }
@@ -78,7 +83,9 @@ public class DispatchAdapter extends AdapterBase {
                     SessionManager.getUser().getCurrentWorkingCenter())
                 && (getDispatchWrapper().isInReceivedState()
                     || getDispatchWrapper().isInLostState()
-                    || getDispatchWrapper().isInClosedState())));
+                    || getDispatchWrapper().isInClosedState())))
+                    // OHSDEV  Suppress editing Dispatch in Creation mode that attached to Request
+                    && !checkRequest(getDispatchWrapper().getId());
         }
         return editable;
     }
@@ -116,7 +123,9 @@ public class DispatchAdapter extends AdapterBase {
 
         if (siteParent.equals(getDispatchWrapper().getSenderCenter())
             && isEditable
-            && getDispatchWrapper().isInCreationState()) {
+            && getDispatchWrapper().isInCreationState()
+            // OHSDEV  Suppress Sending Dispatch in Creation mode that attached to Request
+            && !checkRequest(getDispatchWrapper().getId())) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
             mi.setText(
                 // menu item label.
@@ -194,7 +203,7 @@ public class DispatchAdapter extends AdapterBase {
         }
 
         if (isDeletable()) {
-            addDeleteMenu(menu, Dispatch.NAME.singular().toString());
+		addDeleteMenu(menu, Dispatch.NAME.singular().toString());
         }
     }
 
@@ -245,7 +254,7 @@ public class DispatchAdapter extends AdapterBase {
     @SuppressWarnings("nls")
     @Override
     protected String getConfirmDeleteMessage() {
-        return i18n.tr("Are you sure you want to delete this dispatch?");
+		return i18n.tr("Are you sure you want to delete this dispatch?");
     }
 
     public void doReceive() {
@@ -382,4 +391,19 @@ public class DispatchAdapter extends AdapterBase {
             list.add(this);
         return list;
     }
+
+    private boolean checkRequest(Integer id) {
+
+	BooleanResult ret = null;
+		try {
+			ret = SessionManager.getAppService().doAction(
+			        new DispatchGetRequestAction(id));
+		} catch (ApplicationException e) {
+			BgcPlugin.openAsyncError(
+			// dialog title.
+			i18n.tr("Error while checking request id in Dispatch"), e);
+		}
+	return ret.isTrue();
+    }
+
 }

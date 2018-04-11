@@ -1,10 +1,10 @@
 #
 # Database Properties
 #
-database.host=localhost
-database.name=biobank
-database.username=XXXXX
-database.password=ZZZZZ
+database.host=@database.host@
+database.name=@database.name@
+database.username=@database.username@
+database.password=@database.password@
 database.driver=com.mysql.jdbc.Driver
 database.url=jdbc:mysql://${database.host}:3306/${database.name}
 jdbc.driver.jar=mysql-connector-java-5.1.15-bin.jar

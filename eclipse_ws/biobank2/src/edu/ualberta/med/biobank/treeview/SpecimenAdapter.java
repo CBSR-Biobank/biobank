@@ -1,11 +1,14 @@
 package edu.ualberta.med.biobank.treeview;
 
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.permission.specimen.SpecimenDeletePermission;
 import edu.ualberta.med.biobank.common.permission.specimen.SpecimenReadPermission;
@@ -15,12 +18,24 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.forms.SpecimenEntryForm;
 import edu.ualberta.med.biobank.forms.SpecimenViewForm;
 import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.views.CollectionView;
 
 public class SpecimenAdapter extends AdapterBase {
+	 //OHSDEV
+    // Specimen tree view implementation
+    // In order to attach SpecimenTreeViewAdapter to CollectionEventAddapter those objects
+    // must be brought to the same parent class.
+    public SpecimenAdapter(AbstractAdapterBase parent, SpecimenWrapper sample) {
+        super(parent, sample);
+    }
 
     public SpecimenAdapter(AdapterBase parent, SpecimenWrapper sample) {
         super(parent, sample);
     }
+
+    private static final I18n i18n = I18nFactory
+            .getI18n(CollectionView.class);
+
 
     @Override
     public void init() {
@@ -31,8 +46,10 @@ public class SpecimenAdapter extends AdapterBase {
         this.isEditable = isAllowed(new SpecimenUpdatePermission(id));
     }
 
+
     @SuppressWarnings("nls")
     @Override
+
     public void addChild(AbstractAdapterBase child) {
         Assert.isTrue(false, "Cannot add children to this adapter");
     }
@@ -59,17 +76,18 @@ public class SpecimenAdapter extends AdapterBase {
         return null;
     }
 
+
     @Override
     protected AdapterBase createChildNode(Object child) {
         return null;
     }
+
 
     @Override
     protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
         return null;
     }
-
     @Override
     public String getEntryFormId() {
         return SpecimenEntryForm.ID;
@@ -86,4 +104,11 @@ public class SpecimenAdapter extends AdapterBase {
             return internalCompareTo(o);
         return 0;
     }
-}
+    //OHSDEV
+    // Specimen tree view implementation
+    @Override
+    protected Map<Integer, ?> getChildrenObjects() throws Exception {
+	return null;
+    }
+
+  }

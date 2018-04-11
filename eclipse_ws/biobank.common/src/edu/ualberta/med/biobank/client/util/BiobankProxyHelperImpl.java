@@ -41,8 +41,35 @@ public class BiobankProxyHelperImpl extends ProxyHelperImpl {
         } else if (obj instanceof BigDecimal) {
             return obj;
         }
+        //OHSDEV
+        return enhanceProxyObject(as, obj);
+        //return super.convertToProxy(as, obj);
+    }
 
-        return super.convertToProxy(as, obj);
+    //OHSDEV
+    //Retrieve the items in the inner listChunk object and add it back to the ListProxy object.
+    //This is done so that in Java 1.7+, we end up having the correct elementData at the ArrayList level
+    //And that data is the CGLIB enhanced ListChunk object rather than a raw ListChunk object.
+    @SuppressWarnings({ "rawtypes", "nls" })
+    private Object enhanceProxyObject(ApplicationService as, Object obj)
+    {
+		Object enhancedObject = super.convertToProxy(as, obj);
+		if(enhancedObject instanceof ListProxy)
+		{
+			ListProxy objectProxy = (ListProxy) enhancedObject;
+			if(enhancedObject != null)
+			{
+				int size = objectProxy.getListChunk().size();
+				objectProxy.ensureCapacity(size);
+				List chunk = objectProxy.getListChunk();
+
+				for(int i=0; i<size; i++) {
+					objectProxy.set(i, chunk.get(i));
+				}
+			}
+			return objectProxy;
+		}
+		return enhancedObject;
     }
 
     @SuppressWarnings({ "rawtypes", "nls" })

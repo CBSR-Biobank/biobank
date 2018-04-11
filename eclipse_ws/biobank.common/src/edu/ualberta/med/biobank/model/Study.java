@@ -11,7 +11,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
@@ -34,6 +33,12 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
  * caTissue Term - Collection Protocol: A set of written procedures that
  * describe how a biospecimen is collected.
  * 
+ * Code Changes -
+ * 		1> Convert OneToOne relation to ManyToMany for getting & setting Research Groups
+ * 		2> Change the class variable to accept a set of Research Groups associated to a Study
+ *
+ * @author OHSDEV
+ *
  */
 @Entity
 @Table(name = "STUDY")
@@ -64,7 +69,7 @@ public class Study extends AbstractBiobankModel
     private Set<StudyEventAttr> studyEventAttrs =
         new HashSet<StudyEventAttr>(0);
     private Set<Contact> contacts = new HashSet<Contact>(0);
-    private ResearchGroup researchGroup;
+    private Set<ResearchGroup> researchGroups = new HashSet<ResearchGroup>(0);		//OHSDEV
     private Set<SourceSpecimen> sourceSpecimens =
         new HashSet<SourceSpecimen>(0);
 
@@ -170,14 +175,16 @@ public class Study extends AbstractBiobankModel
         this.contacts = contacts;
     }
 
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "study")
-    public ResearchGroup getResearchGroup() {
-        return this.researchGroup;
+    //OHSDEV -->
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "studies")
+    public Set<ResearchGroup> getResearchGroups() {
+        return this.researchGroups;
     }
 
-    public void setResearchGroup(ResearchGroup researchGroup) {
-        this.researchGroup = researchGroup;
+    public void setResearchGroups(Set<ResearchGroup> researchGroups) {
+        this.researchGroups = researchGroups;
     }
+    // <-- OHSDEV
 
     @OneToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY, mappedBy = "study")
     @Cascade({ org.hibernate.annotations.CascadeType.SAVE_UPDATE })

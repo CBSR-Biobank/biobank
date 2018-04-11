@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<project name="biobank" basedir="." default="deploy"
+<project name="biobank" basedir="."
 	 xmlns:ivy="antlib:org.apache.ivy.ant"
 	 xmlns:flyway="antlib:com.googlecode.flyway.ant">
   <!--
@@ -65,7 +65,7 @@
     <include name="spiffy-all.jar" />
     <include name="supercsv.jar" />
     <include name="commons-lang.jar" />
-    <include name="commons-lang3.jar" />
+	<include name="commons-lang3.jar" />
   </fileset>
 
   <fileset id="biobank.common.client.build.classpath" dir="${eclipse.proj.dir.common}/lib/client">
@@ -142,7 +142,7 @@
 	value="edu.ualberta.med.biobank.migration,db/migrations"/-->
     <property name="flyway.locations" value="edu.ualberta.med.biobank.migration,db/migrations"/>
 
-    <copy file="${secu-log.dir}/jboss/flyway-application-config.xml.template"
+    <copy file="${secu-log.dir}/tomcat/flyway-application-config.xml.template"
 	  tofile="${lib.dir}/flyway/flyway-application-config.xml"/>
     <replace file="${lib.dir}/flyway/flyway-application-config.xml">
       <replacefilter token="@database.url@" value="${database.url}"/>
@@ -219,7 +219,7 @@
   </target>
 
   <target name="resolve" depends="init-ivy,check-dependencies-uptodate" unless="dependencies.uptodate"
-	  description="retrieve dependencies with ivy">
+	  description="--> retrieve dependencies with ivy">
 
     <ivy:retrieve pattern="lib/build/[artifact].[ext]" conf="biobank.build"  type="jar" />
     <ivy:retrieve pattern="lib/[conf]/[artifact].[ext]"
@@ -244,19 +244,19 @@
     <touch file="${lib.dir}/.dependencies.resolved" />
   </target>
 
-  <target name="report" depends="resolve" description="generates a report of dependencies">
+  <target name="report" depends="resolve" description="--> generates a report of dependencies">
     <ivy:report todir="${output.dir}"
 		conf="biobank.common.client,biobank.common.server,biobank.gui.common,biobank.mvp,biobank2,biobank2.tools,biobank2.tests" />
   </target>
 
   <target name="clean-ivy" depends="init-ivy"
-	  description="cleans ivy temporary files">
+	  description="--> cleans ivy temporary files">
     <delete>
       <fileset dir="${lib.dir}" includes=".dependencies.resolved"/>
     </delete>
   </target>
 
-  <target name="clean-cache" depends="init-ivy" description="cleans the ivy cache">
+  <target name="clean-cache" depends="init-ivy" description="--> cleans the ivy cache">
     <ivy:cleancache />
   </target>
 
@@ -264,19 +264,56 @@
     <available file="${lib.dir}/messages.jar" property="messages-jar-exists" />
   </target>
 
+
   <target name="create-messages-jar" depends="check-messages-jar-exists"
 	  unless="messages-jar-exists">
-    <antcall target="messages-jar"/>
+    <antcall target="messages-jar "/>
   </target>
 
 
   <target name="versions-update"
-          depends="server-manifest,biobank-version-modify"
-	  description="update version strings on server and client">
+      depends="server-manifest,biobank-version-modify"
+	  description="--> update version strings on server and client">
   </target>
 
-  <target name="deploy-eclipse" depends="resolve,client-branding,create-messages-jar,biobank-version-modify"
-	  description="retrieve dependencies for eclipse projects">
+  <target name="init" depends="db-properties-copy,dot-options-copy,keystore-status"
+          description="Run this fist to check the status of the project build directory." />
+
+
+  <condition property="biobank.conf.dir.exists" else="false"><available file="${tomcat.server.location}/conf/Catalina/localhost" type="dir" /></condition>
+  <target name = "create-biobank-conf-tomcat-dir" unless="${biobank.conf.dir.exists}">
+	   <mkdir dir="${tomcat.server.location}/conf/Catalina/localhost" />
+  </target>
+
+  <target name="deploy_tomcat" depends ="package-webapp">
+
+	  <antcall target="create-biobank-conf-tomcat-dir"/>
+	  <antcall target="keystore-copy"/>
+
+	  <move file="${secu-log.dir}/tomcat/biobank.xml"
+			tofile="${tomcat.server.location}/conf/Catalina/localhost/biobank.xml"
+			overwrite="true" />
+
+	  <move file="${secu-log.dir}/tomcat/login.config"
+			tofile="${tomcat.server.location}/conf/login.config"
+			overwrite="true" />
+
+	  <copy file="${secu-log.dir}/tomcat/catalina.properties"
+			tofile="${tomcat.server.location}/conf/catalina.properties"
+			overwrite="true" />
+
+      <delete dir="${tomcat.server.location}/webapps/${app.name}"/>
+	  <delete file="${tomcat.server.location}/webapps/${app.name}.war"/>
+
+	  <copy todir="${tomcat.server.location}/webapps">
+			<fileset file="${war.file}" />
+	  </copy>
+
+  </target>
+
+  <target name="deploy-eclipse"
+	  depends="resolve,client-branding,create-messages-jar,biobank-version-modify"
+	  description="--> retrieve dependencies for eclipse projects">
     <copy file="${lib.dir}/messages.jar" todir="${eclipse.proj.dir}/lib"/>
     <copy file="${lib.dir}/messages.jar" todir="${eclipse.proj.dir.common}/lib/client"/>
 
@@ -303,17 +340,17 @@
           depends="get-db-executor">
   </target>
 
-  <!-- JBoss -->
-  <target name="check-jboss-uptodate">
+  <!-- Tomcat -->
+  <target name="check-tomcat-uptodate">
     <!-- remove the upt.war because it requires db name/url/username/pw variables
          inside the war -->
     <delete includeemptydirs="true">
-      <fileset dir="${env.JBOSS_HOME}/server/default/deploy">
+      <fileset dir="${tomcat.server.location}/webapps">
         <include name="upt*.war"/>
       </fileset>
     </delete>
-    <uptodate property="jboss.uptodate"
-              targetfile="${env.JBOSS_HOME}/server/default/deploy/biobank.war">
+    <uptodate property="tomcat.uptodate"
+              targetfile="${tomcat.server.location}/webapps/biobank.war">
       <srcfiles file="${war.file}" />
       <srcfiles file="db.properties" />
     </uptodate>
@@ -356,23 +393,23 @@
       <arg line="-keystore biobank.keystore -storepasswd -storepass importkey -new biobank2" />
     </exec>
     <copy file="scripts/ssl/biobank.keystore"
-          tofile="${secu-log.dir}/jboss/biobank.keystore"  overwrite="true" />
+          tofile="${secu-log.dir}/tomcat/biobank.keystore"  overwrite="true" />
   </target>
 
   <target name="keystore-check">
-    <available file="${secu-log.dir}/jboss/biobank.keystore" property="keystore.available" />
+    <available file="${secu-log.dir}/tomcat/biobank.keystore" property="keystore.available" />
   </target>
 
   <target name="keystore-copy" depends="keystore-check">
     <fail unless="keystore.available"
-          message="${secu-log.dir}/jboss/biobank.keystore not found. Use target 'keystore-gen' to generate a temporary key or create your own manually." />
-    <copy file="${secu-log.dir}/jboss/biobank.keystore"
-          tofile="${env.JBOSS_HOME}/server/default/conf/biobank.keystore"
+          message="${secu-log.dir}/tomcat/biobank.keystore not found. Use target 'keystore-gen' to generate a temporary key or create your own manually." />
+    <copy file="${secu-log.dir}/tomcat/biobank.keystore"
+          tofile="${tomcat.server.location}/conf/biobank.keystore"
           overwrite="true" />
   </target>
 
   <target name="keystore-status" depends="keystore-check" unless="keystore.available">
-    <echo message="${secu-log.dir}/jboss/biobank.keystore not found. Use target 'keystore-gen' to generate a temporary key or create your own manually." />
+    <echo message="${secu-log.dir}/tomcat/biobank.keystore not found. Use target 'keystore-gen' to generate a temporary key or create your own manually." />
   </target>
 
   <!-- version number on server side -->
@@ -394,9 +431,9 @@
   <target name="update-db-config"
           description="copies db configuration information from db.properties to various config files">
 
-    <copy todir="${secu-log.dir}/jboss" overwrite="true">
-      <fileset dir="${secu-log.dir}/jboss">
-	<exclude name="**/console/**" />
+    <copy todir="${secu-log.dir}/tomcat" overwrite="true">
+      <fileset dir="${secu-log.dir}/tomcat">
+		<exclude name="**/console/**" />
       </fileset>
       <globmapper from="*.template" to="*"/>
       <filterset>
@@ -406,13 +443,13 @@
         <filter token="database.password" value="${database.password}"/>
       </filterset>
     </copy>
-    <move file="${secu-log.dir}/jboss/application-config.xml"
+    <move file="${secu-log.dir}/tomcat/application-config.xml"
           tofile="webapp/WEB-INF/classes/application-config.xml"
 	  overwrite="true" />
-    <move file="${secu-log.dir}/jboss/biobank.csm.new.hibernate.cfg.xml"
+    <move file="${secu-log.dir}/tomcat/biobank.csm.new.hibernate.cfg.xml"
           tofile="webapp/WEB-INF/classes/biobank.csm.new.hibernate.cfg.xml"
 	  overwrite="true" />
-    <move file="${secu-log.dir}/jboss/log4j.xml"
+    <move file="${secu-log.dir}/tomcat/log4j.xml"
           tofile="webapp/WEB-INF/classes/log4j.xml"
 	  overwrite="true" />
   </target>
@@ -439,58 +476,11 @@
     <echo message="Copied 'eclipse_ws/biobank2/.options.example' to '.options'. Please modify accordingly." />
   </target>
 
-  <target name="init" depends="db-properties-copy,dot-options-copy,keystore-status"
-          description="Run this fist to check the status of the project build directory." />
-
-  <target name="jboss.home.env">
-    <fail unless="env.JBOSS_HOME"
-          message="JBOSS_HOME environment variable not defined" />
-  </target>
-
-  <target name="deploy-jboss"
-          depends="jboss.home.env,update-db-config,package-webapp,check-jboss-uptodate,keystore-copy"
-          description="deploys the caCORE SDK webapp to JBoss"
-          unless="jboss.uptodate">
-    <copy file="${secu-log.dir}/jboss/login-config.xml"
-          tofile="${env.JBOSS_HOME}/server/default/conf/login-config.xml"
-          overwrite="true" verbose="true" />
-    <copy file="${secu-log.dir}/jboss/server${debugFileExtension}.xml"
-          tofile="${env.JBOSS_HOME}/server/default/deploy/jbossweb-tomcat55.sar/server.xml"
-          overwrite="true" verbose="true" />
-    <!-- for compatibility: this file has been split -->
-    <delete file="${env.JBOSS_HOME}/server/default/deploy/mysql-ds.xml" />
-    <copy file="${lib.dir}/build/mysql-connector-java.jar"
-          tofile="${env.JBOSS_HOME}/server/default/lib/mysql-connector-java.jar"
-          overwrite="true" verbose="true" />
-    <copy file="${secu-log.dir}/jboss/upt-ds.xml"
-          tofile="${env.JBOSS_HOME}/server/default/deploy/upt-ds.xml"
-          overwrite="true" verbose="true" />
-    <copy file="${secu-log.dir}/jboss/biobank-ds.xml"
-          tofile="${env.JBOSS_HOME}/server/default/deploy/biobank-ds.xml"
-          overwrite="true" verbose="true" />
-    <!-- ignore this war for now
-    <copy file="${secu-log.dir}/jboss/upt.war"
-          tofile="${env.JBOSS_HOME}/server/default/deploy/upt.war"
-         overwrite="true" verbose="true" />
-    -->
-    <delete includeemptydirs="true">
-      <fileset dir="${env.JBOSS_HOME}/server/default/deploy">
-        <include name="upt*.war"/>
-      </fileset>
-    </delete>
-    <copy file="${war.file}"
-          tofile="${env.JBOSS_HOME}/server/default/deploy/biobank.war"
-          overwrite="true" verbose="true"/>
-  </target>
-
   <target name="build-eclipse-projects"
 	  description="builds the Biobank client Eipse projects">
     <antcall target="eclipse-projects" />
   </target>
 
-  <target name="deploy" description="deploys to JBoss and Eclipse project"
-	  depends="deploy-eclipse,deploy-jboss">
-  </target>
 
   <target name="build-common-project"
           depends="resolve,create-messages-jar,server-manifest">
@@ -506,15 +496,16 @@
            debuglevel="source,lines,vars"
            srcdir="${eclipse.proj.dir.common}/src"
            destdir="${eclipse.proj.dir.common}/output"
-           source="1.6"
-           target="1.6"
+           source="1.7"
+           target="1.7"
            includeantruntime="false">
       <classpath refid="biobank.common.build.classpath" />
     </javac>
   </target>
 
-  <target name="package-webapp" depends="build-common-project">
-    <mkdir dir="${output.dir}" />
+  <target name="package-webapp" depends="build-common-project,update-db-config">
+     <echo>database.host : ${database.host}</echo>
+	<mkdir dir="${output.dir}" />
     <delete dir="webapp/db"/>
     <copy includeemptydirs="false" todir="webapp">
       <fileset dir=".">
@@ -543,7 +534,7 @@
       </classes>
       <webinf dir="webapp/WEB-INF">
         <include name="**/*" />
-	<exclude name="**/web.xml" />
+		<exclude name="**/web.xml" />
       </webinf>
     </war>
   </target>
@@ -560,7 +551,7 @@
   </target>
 
   <target name="clean"
-          depends="clean-tests,clean-tools,clean-jars,clean-product,clean-doxygen,clean-package-biobank-server"
+          depends="clean-tests,clean-tools,clean-jars,clean-product,clean-doxygen"
           description="cleans project output, tests, and jars">
     <delete dir="${eclipse.proj.dir.common}/output" />
     <delete dir="${eclipse.proj.dir.tools}/output" />
@@ -612,7 +603,7 @@
   </target>
 
   <target name="product"
-	  depends="clean-product,versions-update,deploy,client-branding"
+	  depends="clean-product,versions-update,deploy-eclipse,client-branding"
 	  description="build the product">
     <!-- buildDirectory is the folder where the plugins and products are found and build -->
     <!-- plugins and features are copied into the buildDirectory -->
@@ -750,110 +741,7 @@
     <delete dir="docs/doxygen/xml" />
   </target>
 
-  <target name="clean-package-biobank-server">
-    <delete dir="${package.jboss.target.dir}" />
-    <delete dir="${package.jboss.root.dir}/templates" />
-    <delete dir="${package.jboss.root.dir}/tools" />
-    <delete file="biobank-server-*.deb"/>
-  </target>
-
-  <target name="package-biobank-server"
-	  depends="deploy-jboss"
-	  description="Generates an Ubuntu package file for the Biobank server.">
-
-    <!-- Use command line unzip to keep file permissions -->
-    <exec executable="unzip">
-      <arg line="-q -o ${env.JBOSS_HOME}/../jboss-4.0.5.GA.zip -d ${package.jboss.root.dir}" />
-    </exec>
-
-    <copy file="${secu-log.dir}/jboss/overwrite/run.conf"
-	  tofile="${package.jboss.target.dir}/bin/run.conf"
-	  overwrite="true" verbose="true"/>
-
-    <copy file="${secu-log.dir}/jboss/overwrite/server/default/conf/jboss-service.xml"
-	  tofile="${package.jboss.target.dir}/server/default/conf/jboss-service.xml"
-	  overwrite="true" verbose="true"/>
-
-    <copy file="${secu-log.dir}/jboss/server.xml"
-	  tofile="${package.jboss.target.dir}/server/default/deploy/jbossweb-tomcat55.sar/server.xml"
-	  overwrite="true" />
-    <copy file="${secu-log.dir}/jboss/overwrite/server/default/deploy/jmx-console.war/WEB-INF/jboss-web.xml"
-	  tofile="${package.jboss.target.dir}/server/default/deploy/jmx-console.war/WEB-INF/jboss-web.xml"
-	  overwrite="true" />
-    <copy file="${secu-log.dir}/jboss/overwrite/server/default/deploy/jmx-console.war/WEB-INF/web.xml"
-	  tofile="${package.jboss.target.dir}/server/default/deploy/jmx-console.war/WEB-INF/web.xml"
-	  overwrite="true" />
-    <copy file="${secu-log.dir}/jboss/overwrite/server/default/deploy/management/console-mgr.sar/web-console.war/WEB-INF/jboss-web.xml"
-	  tofile="${package.jboss.target.dir}/server/default/deploy/management/console-mgr.sar/web-console.war/WEB-INF/jboss-web.xml"
-	  overwrite="true" />
-    <copy file="${secu-log.dir}/jboss/overwrite/server/default/deploy/management/console-mgr.sar/web-console.war/WEB-INF/web.xml"
-	  tofile="${package.jboss.target.dir}/server/default/deploy/management/console-mgr.sar/web-console.war/WEB-INF/web.xml"
-	  overwrite="true" />
-
-    <mkdir dir="${package.jboss.root.dir}/tools"/>
-
-    <copy file="${scripts.proj.dir}/ssl/ImportKey.class"
-	  tofile="${package.jboss.root.dir}/tools/ImportKey.class"
-	  overwrite="true" />
-
-    <mkdir dir="${package.jboss.root.dir}/templates"/>
-
-    <copy file="${secu-log.dir}/jboss/application-config.xml.template"
-	  tofile="${package.jboss.root.dir}/templates/application-config.xml.template"
-	  overwrite="true" />
-    <copy file="${secu-log.dir}/jboss/biobank-ds.xml.template"
-	  tofile="${package.jboss.root.dir}/templates/biobank-ds.xml.template"
-	  overwrite="true" />
-    <copy file="${secu-log.dir}/jboss/login-config.xml.template"
-	  tofile="${package.jboss.root.dir}/templates/login-config.xml.template"
-	  overwrite="true" />
-    <copy file="${secu-log.dir}/jboss/log4j.xml.template"
-	  tofile="${package.jboss.root.dir}/templates/log4j.xml.template"
-	  overwrite="true" />
-    <copy file="${secu-log.dir}/jboss/biobank.csm.new.hibernate.cfg.xml.template"
-	  tofile="${package.jboss.root.dir}/templates/biobank.csm.new.hibernate.cfg.xml.template"
-	  overwrite="true" />
-    <copy file="${secu-log.dir}/jboss/upt-ds.xml.template"
-	  tofile="${package.jboss.root.dir}/templates/upt-ds.xml.template"
-	  overwrite="true" />
-
-    <copy file="db/empty_db.sql.template"
-	  tofile="${package.jboss.root.dir}/templates/empty_db.sql.template"
-	  overwrite="true" />
-
-    <copy file="${scripts.proj.dir}/ssl/cert.cnf.template"
-	  tofile="${package.jboss.root.dir}/templates/cert.cnf.template"
-	  overwrite="true" />
 
 
-    <copy file="${secu-log.dir}/jboss/console/jmx-console-users.properties.template"
-	  tofile="${package.jboss.root.dir}/templates/jmx-console-users.properties.template"
-	  overwrite="true" />
-
-    <copy file="${secu-log.dir}/jboss/console/web-console-users.properties.template"
- 	  tofile="${package.jboss.root.dir}/templates/web-console-users.properties.template"
-	  overwrite="true" />
-
-    <copy file="${war.file}"
-	  tofile="${package.jboss.target.dir}/server/default/deploy/biobank.war"
-	  overwrite="true" />
-
-    <copy file="${war.file}"
-	  tofile="${package.jboss.target.dir}/server/default/deploy/biobank.war"
-	  overwrite="true" />
-
-    <copy file="${lib.dir}/build/mysql-connector-java.jar"
-          tofile="${package.jboss.target.dir}/server/default/lib/mysql-connector-java.jar"
-          overwrite="true" verbose="true" />
-
-    <exec executable="dpkg" dir="package-jboss">
-      <arg line="--build debian" />
-    </exec>
-
-    <move file="package-jboss/debian.deb"
-	  tofile="biobank-server-${server.version.num}.deb"
-	  overwrite="true" />
-
-  </target>
 
 </project>
