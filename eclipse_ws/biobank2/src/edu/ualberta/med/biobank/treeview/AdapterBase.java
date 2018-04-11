@@ -41,8 +41,13 @@ public abstract class AdapterBase extends AbstractAdapterBase {
     protected static final String BGR_LOADING_LABEL = i18n.tr("loading...");
 
     private Object modelObject;
-
-    public AdapterBase(AdapterBase parent, ModelWrapper<?> object) {
+    
+    //OHSDEV
+    // Specimen tree view implementation
+    // In order to attach SpecimenTreeViewAdapter to CollectionEventAddapter those object 
+    // must be brought to the same parent class. 
+    
+    public AdapterBase(AbstractAdapterBase parent, ModelWrapper<?> object) {
         super(parent, object == null ? null : object.getId(), null, null, false);
         setModelObject(object);
     }
@@ -97,10 +102,13 @@ public abstract class AdapterBase extends AbstractAdapterBase {
      * @return the name of the node. The name is the label displayed in the treeview.
      */
     protected abstract String getLabelInternal();
-
+    //OHSDEV
+    // Specimen tree view implementation
+    // In order to attach SpecimenTreeViewAdapter to CollectionEventAddapter those objects 
+    // must be brought to the same parent class. 
     @Override
-    public AdapterBase getParent() {
-        return (AdapterBase) parent;
+    public AbstractAdapterBase getParent() {
+        return (AbstractAdapterBase) parent;
     }
 
     /*

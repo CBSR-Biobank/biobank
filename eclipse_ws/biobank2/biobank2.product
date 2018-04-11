@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><?pde version="3.5"?><product name="BioBank" id="biobank.product" application="biobank.biobank" version="3.11.1" useFeatures="true" includeLaunchers="true">
+<?xml version="1.0" encoding="UTF-8"?><?pde version="3.5"?><product name="BioBank" id="biobank.product" application="biobank.biobank" version="3.12.0.rc1" useFeatures="true" includeLaunchers="true">
 
    <aboutInfo>
       <image path="/biobank2/icons/about.png"/>
@@ -33,7 +33,6 @@ AICML: http://aicml.cs.ualberta.ca
          <bmp winSmallHigh="/biobank.gui.common/icons/biobank_launcher_16.bmp" winMediumHigh="/biobank.gui.common/icons/biobank_launcher_32.bmp"/>
       </win>
    </launcher>
-
 
    <vm>
       <linux include="true">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/OSGi%Minimum-1.0</linux>

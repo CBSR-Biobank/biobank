@@ -13,7 +13,7 @@ Require-Bundle: org.eclipse.ui,
  biobank.common;bundle-version="3.0.0",
  org.eclipse.ui.console;bundle-version="3.5.0"
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ClassPath: .,
  lib/commons-beanutils.jar,
  lib/commons-digester.jar,

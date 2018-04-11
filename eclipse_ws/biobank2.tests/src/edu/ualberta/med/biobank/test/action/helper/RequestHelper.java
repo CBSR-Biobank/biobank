@@ -33,8 +33,7 @@ public class RequestHelper extends Helper {
         ResearchGroupReadInfo rg = actionExecutor.exec(reader);
 
         // create specs
-        Integer p = PatientHelper.createPatient(actionExecutor, name + "_patient",
-                rg.researchGroup.getStudy().getId());
+        Integer p = PatientHelper.createPatient(actionExecutor, name + "_patient", rg.getResearchGroup().getStudies().iterator().next().getId());
         Integer ceId = CollectionEventHelper.createCEventWithSourceSpecimens(
                 actionExecutor, p, researchGroup);
 

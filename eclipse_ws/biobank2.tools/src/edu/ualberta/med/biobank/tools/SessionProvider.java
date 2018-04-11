@@ -76,7 +76,7 @@ public class SessionProvider {
             // system properties override db.properties file
             dbHost = System.getProperty("database.host", StringUtil.EMPTY_STRING);
             dbName = System.getProperty("database.name", StringUtil.EMPTY_STRING);
-            dbUser = System.getProperty("database.user", StringUtil.EMPTY_STRING);
+            dbUser = System.getProperty("database.username", StringUtil.EMPTY_STRING);
             dbPassword = System.getProperty("database.password", StringUtil.EMPTY_STRING);
 
             // attempt to read db.properties file
@@ -94,7 +94,7 @@ public class SessionProvider {
                     dbName = dbProperties.getProperty("database.name", "biobank");
                 }
                 if (dbUser.isEmpty()) {
-                    dbUser = dbProperties.getProperty("database.user", "dummy");
+                    dbUser = dbProperties.getProperty("database.username", "dummy");
                 }
                 if (dbPassword.isEmpty()) {
                     dbPassword = dbProperties.getProperty("database.password", "ozzy498");

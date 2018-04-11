@@ -53,10 +53,10 @@ public class TestResearchGroup extends TestAction {
         ResearchGroupGetInfoAction reader = new ResearchGroupGetInfoAction(rgId);
         ResearchGroupReadInfo rg = exec(reader);
 
-        Assert.assertEquals(rgName, rg.researchGroup.getName());
-        Assert.assertEquals(rgName, rg.researchGroup.getNameShort());
-        Assert.assertEquals(study.getId(), rg.researchGroup.getStudy().getId());
-        Assert.assertEquals(ActivityStatus.ACTIVE, rg.researchGroup.getActivityStatus());
+        Assert.assertEquals(rgName, rg.getResearchGroup().getName());
+        Assert.assertEquals(rgName, rg.getResearchGroup().getNameShort());
+        Assert.assertEquals(study.getId(), rg.getResearchGroup().getStudies().iterator().next());
+        Assert.assertEquals(ActivityStatus.ACTIVE, rg.getResearchGroup().getActivityStatus());
     }
 
     @Test
@@ -69,12 +69,8 @@ public class TestResearchGroup extends TestAction {
         ResearchGroupReadInfo rg = exec(reader);
 
         // create specs
-        Integer p =
-            PatientHelper.createPatient(getExecutor(), testName + "_patient",
-                rg.researchGroup.getStudy().getId());
-        Integer ceId =
-            CollectionEventHelper.createCEventWithSourceSpecimens(
-                getExecutor(), p, rg.researchGroup);
+        Integer p = PatientHelper.createPatient(getExecutor(), testName + "_patient", rg.getResearchGroup().getStudies().iterator().next().getId());
+        Integer ceId = CollectionEventHelper.createCEventWithSourceSpecimens(getExecutor(), p, rg.getResearchGroup());
 
         CollectionEventGetInfoAction ceReader =
             new CollectionEventGetInfoAction(ceId);
@@ -117,7 +113,7 @@ public class TestResearchGroup extends TestAction {
         ResearchGroupReadInfo rg =
             exec(new ResearchGroupGetInfoAction(rgId));
         ResearchGroupDeleteAction delete =
-            new ResearchGroupDeleteAction(rg.researchGroup);
+            new ResearchGroupDeleteAction(rg.getResearchGroup());
         try {
             exec(delete);
             Assert.fail();
@@ -148,9 +144,7 @@ public class TestResearchGroup extends TestAction {
             new AddressSaveInfo(null, "test", "test", "test", "test", "test",
                 "test", "test", "test", "test");
         ResearchGroupSaveInfo save =
-            new ResearchGroupSaveInfo(null, getMethodNameR(), getMethodNameR(),
-                study.getId(), "comment", addressSaveInfo,
-                ActivityStatus.ACTIVE);
+            new ResearchGroupSaveInfo(null, getMethodNameR(), getMethodNameR(), "comment", addressSaveInfo, ActivityStatus.ACTIVE);
         ResearchGroupSaveAction rgSave = new ResearchGroupSaveAction(save);
 
         Integer rgId = exec(rgSave).getId();
@@ -160,12 +154,12 @@ public class TestResearchGroup extends TestAction {
 
         save.id = rgId;
 
-        Assert.assertEquals(1, rg.researchGroup.getComments().size());
+        Assert.assertEquals(1, rg.getResearchGroup().getComments().size());
         exec(rgSave);
         rg = exec(reader);
-        Assert.assertEquals(2, rg.researchGroup.getComments().size());
+        Assert.assertEquals(2, rg.getResearchGroup().getComments().size());
         exec(rgSave);
         rg = exec(reader);
-        Assert.assertEquals(3, rg.researchGroup.getComments().size());
+        Assert.assertEquals(3, rg.getResearchGroup().getComments().size());
     }
 }

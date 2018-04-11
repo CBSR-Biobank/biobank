@@ -51,10 +51,8 @@ public class TestRequest extends TestAction {
         ResearchGroupReadInfo rg = exec(rgInfo);
 
         // create specs
-        Integer p = PatientHelper.createPatient(getExecutor(), testName + "_patient",
-                rg.researchGroup.getStudy().getId());
-        Integer ceId = CollectionEventHelper.createCEventWithSourceSpecimens(
-                getExecutor(), p, researchGroup);
+        Integer p = PatientHelper.createPatient(getExecutor(), testName + "_patient", rg.getResearchGroup().getStudies().iterator().next().getId());
+        Integer ceId = CollectionEventHelper.createCEventWithSourceSpecimens(getExecutor(), p, researchGroup);
 
         CollectionEventGetInfoAction ceReader =
             new CollectionEventGetInfoAction(ceId);
