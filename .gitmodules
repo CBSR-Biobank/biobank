@@ -1,6 +1,9 @@
 [submodule "eclipse_ws/scannerConfig"]
 	path = eclipse_ws/scannerConfig
-	url = git://github.com/cbsrbiobank/scannerConfig.git
+	url = https://github.com/cbsrbiobank/scannerConfig.git
 [submodule "eclipse_ws/labelPrinter"]
 	path = eclipse_ws/labelPrinter
-	url = git://github.com/cbsrbiobank/labelPrinter.git
+	url = https://github.com/cbsrbiobank/labelPrinter.git
+[submodule "labelPrinter"]
+	path = labelPrinter
+	url = https://github.com/cbsrbiobank/labelPrinter.git
