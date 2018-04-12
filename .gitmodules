@@ -4,12 +4,3 @@
 [submodule "eclipse_ws/labelPrinter"]
 	path = eclipse_ws/labelPrinter
 	url = https://github.com/cbsrbiobank/labelPrinter.git
-[submodule "labelPrinter"]
-	path = labelPrinter
-	url = https://github.com/cbsrbiobank/labelPrinter.git
-[submodule "eclipse_ws/--"]
-	path = eclipse_ws/--
-	url = https://github.com/cbsrbiobank/labelPrinter.git
-[submodule "eclipse_ws/--force"]
-	path = eclipse_ws/--force
-	url = https://github.com/cbsrbiobank/labelPrinter.git
