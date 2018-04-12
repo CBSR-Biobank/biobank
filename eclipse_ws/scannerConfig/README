@@ -1,0 +1,13 @@
+Scanner configuration plugin used in Biobank2 and BioSampleScan.
+
+JNI
+
+The JNI class used to interface to the dmscanlib is ScanLibImpl. To generate 
+the C header file use the following commands:
+
+   - cd to <scannerConfig_proj>/bin
+   - javah -jni edu.ualberta.med.scannerconfig.dmscanlib.ScanLib
+   - mv edu_ualberta_med_scannerconfig_dmscanlib_ScanLib.h
+     <dmscanlib_proj/src.
+
+

@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="menu:org.eclipse.ui.main.menu?after=edu.ualberta.med.biobank.menu.additions">
+         <menu
+               id="edu.ualberta.med.scannerconfig.menu.configuration"
+               label="Configuration">
+            <command
+                  commandId="org.eclipse.ui.window.preferences"
+                  id="edu.ualberta.med.scannerconfig.menu.preferences"
+                  icon="icons/table_lightning.png"
+                  label="Preferences..."
+                  style="push">
+            </command>
+         </menu>
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            defaultHandler="edu.ualberta.med.scannerconfig.handler.SelectSource"
+            id="edu.ualberta.med.scannerconfig.commands.selectsource"
+            name="Select Scanner">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="edu.ualberta.med.scannerconfig.preferences.PreferenceInitializer">
+      </initializer>
+   </extension>
+   <extension point="org.eclipse.ui.preferencePages">
+    <page id="Scanner"
+        name="Scanning and Decoding"
+            class="edu.ualberta.med.scannerconfig.preferences.scanner.Scanner">
+    </page>   
+    <page 
+       category="Scanner"
+       id="Decoding"
+        name="Decoding Parameters"
+            class="edu.ualberta.med.scannerconfig.preferences.scanner.Decoding">
+    </page> 
+    <page
+          category="Scanner"
+          class="edu.ualberta.med.scannerconfig.preferences.scanner.plateposition.Plate1Settings"
+          id="scannerConfig.page1"
+          name="Plate 1 Position">
+    </page> 
+    <page
+          category="Scanner"
+          class="edu.ualberta.med.scannerconfig.preferences.scanner.plateposition.Plate2Settings"
+          id="scannerConfig.page2"
+          name="Plate 2 Position">
+    </page> 
+    <page
+          category="Scanner"
+          class="edu.ualberta.med.scannerconfig.preferences.scanner.plateposition.Plate3Settings"
+          id="scannerConfig.page3"
+          name="Plate 3 Position">
+    </page> 
+    <page
+          category="Scanner"
+          class="edu.ualberta.med.scannerconfig.preferences.scanner.plateposition.Plate4Settings"
+          id="scannerConfig.page4"
+          name="Plate 4 Position">
+    </page> 
+    <page
+          category="Scanner"
+          class="edu.ualberta.med.scannerconfig.preferences.scanner.plateposition.Plate5Settings"
+          id="scannerConfig.page5"
+          name="Plate 5 Position">
+    </page>
+   </extension>
+   <extension
+         point="org.eclipse.ui.services">
+      <sourceProvider
+            provider="edu.ualberta.med.scannerconfig.sourceproviders.PlateEnabledState">
+         <variable
+               name="edu.ualberta.med.scannerconfig.sourceprovider.plate1Enabled"
+               priorityLevel="workbench">
+         </variable>
+         <variable
+               name="edu.ualberta.med.scannerconfig.sourceprovider.plate2Enabled"
+               priorityLevel="workbench">
+         </variable>
+         <variable
+               name="edu.ualberta.med.scannerconfig.sourceprovider.plate3Enabled"
+               priorityLevel="workbench">
+         </variable>
+         <variable
+               name="edu.ualberta.med.scannerconfig.sourceprovider.plate4Enabled"
+               priorityLevel="workbench">
+         </variable>
+         <variable
+               name="edu.ualberta.med.scannerconfig.sourceprovider.plate5Enabled"
+               priorityLevel="workbench">
+         </variable>
+      </sourceProvider>
+   </extension>
+   <extension
+         point="org.eclipse.core.expressions.definitions">
+      <definition id="scannerConfigPlugin.platesEnabled">
+         <with variable="edu.ualberta.med.scannerconfig.sourceprovider.platesEnabled">
+            <equals value="true" />
+         </with>
+      </definition>
+   </extension>
+</plugin>
