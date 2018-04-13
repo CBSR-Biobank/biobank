@@ -9,10 +9,11 @@ public class V1_7__Biobank_v3120 implements SpringJdbcMigration {
 
     @Override
     public void migrate(JdbcTemplate jdbcTemplate) throws Exception {
+        // CBSR's database already has this table in the schema, but it needs to be modified
+        jdbcTemplate.execute("DROP TABLE IF EXISTS `researchgroup_study`;");
 
         // to make many to many relation between researchgroup and study
-
-	jdbcTemplate.execute(" CREATE TABLE `researchgroup_study` ("
+	jdbcTemplate.execute("CREATE TABLE `researchgroup_study` ("
 		  +" `STUDY_ID` int(11) NOT NULL,"
 		  +" `SITE_ID` int(11) NOT NULL, "
 		  +" PRIMARY KEY (`SITE_ID`,`STUDY_ID`),"
