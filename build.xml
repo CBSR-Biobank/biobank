@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<project name="biobank" basedir="."
+<project name="biobank" basedir="." default="deploy-eclipse"
 	 xmlns:ivy="antlib:org.apache.ivy.ant"
 	 xmlns:flyway="antlib:com.googlecode.flyway.ant">
   <!--
@@ -280,9 +280,12 @@
           description="Run this fist to check the status of the project build directory." />
 
 
-  <condition property="biobank.conf.dir.exists" else="false"><available file="${tomcat.server.location}/conf/Catalina/localhost" type="dir" /></condition>
+  <condition property="biobank.conf.dir.exists" else="false">
+    <available file="${tomcat.server.location}/conf/Catalina/localhost"
+               type="dir" />
+  </condition>
   <target name = "create-biobank-conf-tomcat-dir" unless="${biobank.conf.dir.exists}">
-	   <mkdir dir="${tomcat.server.location}/conf/Catalina/localhost" />
+    <mkdir dir="${tomcat.server.location}/conf/Catalina/localhost" />
   </target>
 
   <target name="deploy_tomcat" depends ="package-webapp">
@@ -317,7 +320,7 @@
     <copy file="${lib.dir}/messages.jar" todir="${eclipse.proj.dir}/lib"/>
     <copy file="${lib.dir}/messages.jar" todir="${eclipse.proj.dir.common}/lib/client"/>
 
-      <!-- File needed in the test project to call csm api methods -->
+    <!-- File needed in the test project to call csm api methods -->
     <copy file="sdk_conf/biobank.csm.new.hibernate.cfg.xml" todir="${eclipse.proj.dir.tests}/src" />
   </target>
 

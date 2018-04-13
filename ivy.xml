@@ -98,7 +98,7 @@
     <dependency org="mysql" name="mysql-connector-java" rev="5.1.15" conf="biobank.webapp->default" />
     <dependency org="cacore" name="ognl" rev="2.6.7" conf="biobank.webapp->default" />
     <dependency org="cacore" name="saaj" rev="1.2" conf="biobank.webapp->default" />
-    <dependency org="cacore" name="sdk-client-framework" rev="4.1.1" conf="biobank.webapp->default" />
+    <dependency org="cacore" name="sdk-client-framework" rev="5.0.0" conf="biobank.webapp->default" />
     <dependency org="cacore" name="sdk-security" rev="4.1.1" conf="biobank.webapp->default" />
     <dependency org="cacore" name="sdk-writable-client-framework" rev="4.1.1" conf="biobank.webapp->default" />
     <dependency org="cacore" name="wsdl4j" rev="1.5.1" conf="biobank.webapp->default" />
@@ -148,7 +148,7 @@
     <dependency org="cacore" name="jaxrpc" rev="1.1" conf="biobank.common.client->default" />
     <dependency org="cacore" name="log4j" rev="1.2.14" conf="biobank.common.client->default" />
     <dependency org="cacore" name="ognl" rev="2.6.7" conf="biobank.common.client->default" />
-    <dependency org="cacore" name="sdk-client-framework" rev="4.1.1" conf="biobank.common.client->default" />
+    <dependency org="cacore" name="sdk-client-framework" rev="5.0.0" conf="biobank.common.client->default" />
     <dependency org="cacore" name="sdk-grid-remoting" rev="4.1.1" conf="biobank.common.client->default" />
     <dependency org="cacore" name="sdk-security" rev="4.1.1" conf="biobank.common.client->default" />
     <dependency org="cacore" name="sdk-writable-client-framework" rev="4.1.1" conf="biobank.common.client->default" />
