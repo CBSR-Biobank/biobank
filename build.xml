@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<project name="biobank" basedir="." 
+<project name="biobank" basedir="." default="deploy-eclipse"
 	 xmlns:ivy="antlib:org.apache.ivy.ant"
 	 xmlns:flyway="antlib:com.googlecode.flyway.ant">
   <!--
@@ -319,6 +319,9 @@
 
       <!-- File needed in the test project to call csm api methods -->
     <copy file="sdk_conf/biobank.csm.new.hibernate.cfg.xml" todir="${eclipse.proj.dir.tests}/src" />
+		<!-- Updated jar file to support Java 7  -->
+	<copy file="lib/sdk-client-framework.jar" todir="eclipse_ws/biobank.common/lib/client/"  overwrite="true" />
+	<copy file="lib/sdk-client-framework.jar" todir="lib/biobank.webapp/"  overwrite="true" />
   </target>
 
   <target name="get-db-executor" unless="databse.exec.haveUserAndPassword">
