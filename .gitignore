@@ -3,10 +3,7 @@ lib
 db.properties
 biobank-service
 biobank-webapp
-security-logs/jboss/biobank.keystore
-security-logs/jboss/biobank-ds.xml
-security-logs/jboss/login-config.xml
-security-logs/jboss/upt-ds.xml
+security-logs/tomcat/biobank.keystore
 scripts/ssl/biobank.keystore
 po/output
 /scripts/ssl
