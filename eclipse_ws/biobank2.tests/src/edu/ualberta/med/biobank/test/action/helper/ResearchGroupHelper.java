@@ -9,7 +9,7 @@ import edu.ualberta.med.biobank.test.action.IActionExecutor;
 public class ResearchGroupHelper extends Helper {
 
     public static Integer createResearchGroup(IActionExecutor actionExecutor,
-        String name, String nameShort, Integer studyId) throws Exception {
+        String name, String nameShort) throws Exception {
         AddressSaveInfo addressSaveInfo =
             new AddressSaveInfo(null, "test", "test", "test", "test", "test",
                 "test", "test", "test", "test");

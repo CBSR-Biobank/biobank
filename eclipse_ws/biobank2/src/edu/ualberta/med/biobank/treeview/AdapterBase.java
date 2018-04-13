@@ -85,7 +85,7 @@ public abstract class AdapterBase extends AbstractAdapterBase {
     /**
      * Derived classes should not override this method. Instead they should implement
      * getNameInternal().
-     * 
+     *
      * @return the name for the node.
      */
     @Override
@@ -98,7 +98,7 @@ public abstract class AdapterBase extends AbstractAdapterBase {
 
     /**
      * Derived classses should implement this method instead of overriding getName().
-     * 
+     *
      * @return the name of the node. The name is the label displayed in the treeview.
      */
     protected abstract String getLabelInternal();
@@ -106,6 +106,7 @@ public abstract class AdapterBase extends AbstractAdapterBase {
     // Specimen tree view implementation
     // In order to attach SpecimenTreeViewAdapter to CollectionEventAddapter those objects
     // must be brought to the same parent class.
+    @SuppressWarnings("cast")
     @Override
     public AbstractAdapterBase getParent() {
         return (AbstractAdapterBase) parent;
@@ -170,7 +171,7 @@ public abstract class AdapterBase extends AbstractAdapterBase {
 
     /**
      * Called to load it's children;
-     * 
+     *
      * @param updateNode If not null, the node in the treeview to update.
      */
     @Override
@@ -210,7 +211,7 @@ public abstract class AdapterBase extends AbstractAdapterBase {
 
     /**
      * get the list of this model object children that this node should have as children nodes.
-     * 
+     *
      * @throws Exception
      */
     protected abstract List<? extends ModelWrapper<?>> getWrapperChildren()

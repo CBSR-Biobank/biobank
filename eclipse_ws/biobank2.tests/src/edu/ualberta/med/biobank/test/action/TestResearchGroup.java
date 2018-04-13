@@ -45,10 +45,9 @@ public class TestResearchGroup extends TestAction {
     }
 
     @Test
-    public void saveResearchGroup() throws Exception { 
+    public void saveResearchGroup() throws Exception {
         String rgName = getMethodNameR();
-        Integer rgId = ResearchGroupHelper.createResearchGroup(getExecutor(), rgName,
-            rgName, study.getId());
+        Integer rgId = ResearchGroupHelper.createResearchGroup(getExecutor(), rgName, rgName);
 
         ResearchGroupGetInfoAction reader = new ResearchGroupGetInfoAction(rgId);
         ResearchGroupReadInfo rg = exec(reader);
@@ -61,9 +60,9 @@ public class TestResearchGroup extends TestAction {
 
     @Test
     public void testUpload() throws Exception {
-        Integer rgId =
-            ResearchGroupHelper.createResearchGroup(getExecutor(), getMethodNameR(),
-                getMethodNameR(), study.getId());
+        Integer rgId = ResearchGroupHelper.createResearchGroup(getExecutor(),
+                                                               getMethodNameR(),
+                                                               getMethodNameR());
         ResearchGroupGetInfoAction reader =
             new ResearchGroupGetInfoAction(rgId);
         ResearchGroupReadInfo rg = exec(reader);
@@ -103,13 +102,13 @@ public class TestResearchGroup extends TestAction {
     @Test
     public void testDelete() throws Exception {
         // only one failure case specific to rg, rest are in center
+        Integer rgId = ResearchGroupHelper.createResearchGroup(getExecutor(),
+                                                               getMethodNameR(),
+                                                               getMethodNameR());
 
-        Integer rgId = ResearchGroupHelper.createResearchGroup(getExecutor(), 
-            getMethodNameR(), getMethodNameR(), study.getId());
-        
-        Integer rId = RequestHelper.createRequest(session, getExecutor(), 
+        Integer rId = RequestHelper.createRequest(session, getExecutor(),
             (ResearchGroup) session.load(ResearchGroup.class, rgId));
-        
+
         ResearchGroupReadInfo rg =
             exec(new ResearchGroupGetInfoAction(rgId));
         ResearchGroupDeleteAction delete =

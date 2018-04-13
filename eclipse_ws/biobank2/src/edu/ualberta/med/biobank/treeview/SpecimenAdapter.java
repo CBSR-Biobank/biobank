@@ -7,8 +7,6 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
-import org.xnap.commons.i18n.I18n;
-import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.permission.specimen.SpecimenDeletePermission;
 import edu.ualberta.med.biobank.common.permission.specimen.SpecimenReadPermission;
@@ -18,7 +16,6 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.forms.SpecimenEntryForm;
 import edu.ualberta.med.biobank.forms.SpecimenViewForm;
 import edu.ualberta.med.biobank.model.Specimen;
-import edu.ualberta.med.biobank.views.CollectionView;
 
 public class SpecimenAdapter extends AdapterBase {
 	 //OHSDEV
@@ -32,10 +29,6 @@ public class SpecimenAdapter extends AdapterBase {
     public SpecimenAdapter(AdapterBase parent, SpecimenWrapper sample) {
         super(parent, sample);
     }
-
-    private static final I18n i18n = I18nFactory
-            .getI18n(CollectionView.class);
-
 
     @Override
     public void init() {

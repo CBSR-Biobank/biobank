@@ -64,7 +64,9 @@ public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
     }
 
     //OHSDEV - Initialize the table with Research Group headings for form view
-    public StudyInfoTable(Composite parent, List<StudyWrapper> collection, boolean isRG) {
+    public StudyInfoTable(Composite parent,
+                          List<StudyWrapper> collection,
+                          @SuppressWarnings("unused") boolean isRG) {
         super(parent, collection, RG_HEADINGS, 10, StudyWrapper.class);
     }
 
