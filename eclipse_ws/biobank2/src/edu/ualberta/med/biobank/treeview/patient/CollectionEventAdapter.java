@@ -117,14 +117,16 @@ public class CollectionEventAdapter extends AbstractNewAdapterBase {
     protected SpecimenTreeViewAdapter createChildNode() {
         return new SpecimenTreeViewAdapter(this, null);
     }
+
     @Override
     protected SpecimenTreeViewAdapter createChildNode(Object child) {
-    Specimen spec = ((SpecimenInfo)child).specimen;
-    return new SpecimenTreeViewAdapter(this,new SpecimenWrapper(SessionManager.getAppService(),spec));
+        Specimen spec = ((SpecimenInfo)child).specimen;
+        return new SpecimenTreeViewAdapter(this,new SpecimenWrapper(SessionManager.getAppService(),spec));
 	// return null;
     }
     //OHSDEV
     // Specimen tree view implementation
+
     @Override
     protected Map<Integer, ?> getChildrenObjects() throws Exception {
 
