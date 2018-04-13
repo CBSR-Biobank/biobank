@@ -21,15 +21,11 @@ public class AddDispatchCommentDialog extends BgcBaseDialog
     @SuppressWarnings("nls")
     private static final String TITLE_COMMENT_ONLY = i18n.tr("Add a comment for the dispatch");
 
-    private String currentTitle;
+    private final String currentTitle;
     private String message;
 
     private static class CommentValue {
         private String value;
-
-        public void setValue(String value) {
-            this.value = value;
-        }
 
         public String getValue() {
             return value;
@@ -38,7 +34,7 @@ public class AddDispatchCommentDialog extends BgcBaseDialog
 
     private final CommentValue commentValue = new CommentValue();
 
-    @SuppressWarnings("nls")
+    @SuppressWarnings("unused")
     public AddDispatchCommentDialog(Shell parentShell, DispatchWrapper dispatchWrapper)
     {
         super(parentShell);

@@ -132,7 +132,6 @@ public class CollectionEventAdapter extends AbstractNewAdapterBase {
 
 	// in order to match return type need to create MAP structure providing key as speciemn id
 
-	@SuppressWarnings("unchecked")
 		List<SpecimenInfo> infos = SessionManager.getAppService().doAction(
                 new CollectionEventGetSourceSpecimenListInfoAction(ceventInfo.cevent.getId())).getList();
 

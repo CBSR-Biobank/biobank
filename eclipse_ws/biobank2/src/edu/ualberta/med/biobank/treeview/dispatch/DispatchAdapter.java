@@ -18,7 +18,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
-import org.eclipse.ui.IEditorPart;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
@@ -392,6 +391,7 @@ public class DispatchAdapter extends AdapterBase {
         return list;
     }
 
+    @SuppressWarnings("nls")
     private boolean checkRequest(Integer id) {
 
 	BooleanResult ret = null;

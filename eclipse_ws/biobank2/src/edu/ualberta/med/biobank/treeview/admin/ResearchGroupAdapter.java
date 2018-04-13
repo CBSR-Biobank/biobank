@@ -48,6 +48,7 @@ public class ResearchGroupAdapter extends AdapterBase {
         this.isEditable = isAllowed(new ResearchGroupUpdatePermission(getModelObject().getId()));
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getLabelInternal() {
 

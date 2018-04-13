@@ -7,12 +7,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.dialogs.ProgressMonitorDialog;
-import org.eclipse.jface.operation.IRunnableContext;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -33,7 +29,6 @@ import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchChangeStateAction;
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchDeleteAction;
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchSaveAction;
@@ -289,7 +284,6 @@ public class RequestEntryForm extends BiobankViewForm {
 
             });
         dispatchTable.addDeleteItemListener(new IInfoTableDeleteItemListener<DispatchWrapper>() {
-			@SuppressWarnings("nls")
                 @Override
                 public void deleteItem(InfoTableEvent<DispatchWrapper> event) {
                     DispatchWrapper d = ((DispatchWrapper) ((InfoTableSelection) event.getSelection()).getObject());
@@ -506,7 +500,6 @@ public class RequestEntryForm extends BiobankViewForm {
         reload();
     }
 
-    @SuppressWarnings("nls")
     protected void removeFromDispatch(DispatchWrapper dispatch, RequestSpecimenWrapper specs) throws Exception
     {
         Set<DispatchSpecimenInfo> dsInfos = new HashSet<DispatchSpecimenInfo>();
@@ -533,6 +526,7 @@ public class RequestEntryForm extends BiobankViewForm {
 	reload();
     }
 
+    @SuppressWarnings("nls")
     private void deleteDispatch(DispatchWrapper dispatchWrapper)
     {
 	RequestSpecimenWrapper specimen;
@@ -561,6 +555,7 @@ public class RequestEntryForm extends BiobankViewForm {
 	s2.getTextClient().setVisible(true);
     }
 
+    @SuppressWarnings("nls")
     public void addCommentToDispatch(DispatchWrapper dispatch, String comment)
     {
 	try {

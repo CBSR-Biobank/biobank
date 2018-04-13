@@ -50,7 +50,7 @@ public class BiobankProxyHelperImpl extends ProxyHelperImpl {
     //Retrieve the items in the inner listChunk object and add it back to the ListProxy object.
     //This is done so that in Java 1.7+, we end up having the correct elementData at the ArrayList level
     //And that data is the CGLIB enhanced ListChunk object rather than a raw ListChunk object.
-    @SuppressWarnings({ "rawtypes", "nls" })
+    @SuppressWarnings({ "rawtypes", "null" })
     private Object enhanceProxyObject(ApplicationService as, Object obj)
     {
 		Object enhancedObject = super.convertToProxy(as, obj);

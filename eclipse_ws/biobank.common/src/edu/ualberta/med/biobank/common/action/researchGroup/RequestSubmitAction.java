@@ -13,6 +13,7 @@ import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.researchGroup.SubmitRequestPermission;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.LocalizedException;
@@ -35,6 +36,7 @@ public class RequestSubmitAction implements Action<IdResult>
     private final List<String> studies;
     private final Integer workingCenterId;
 
+    @SuppressWarnings("nls")
     private final String SPECIMEN_INFO_HQL = "SELECT specimen "
             + " FROM " + Specimen.class.getName() + " specimen"
             + " INNER JOIN FETCH specimen.collectionEvent collectionEvent"
@@ -102,12 +104,13 @@ public class RequestSubmitAction implements Action<IdResult>
     }
 
     //OHSDEV
+    @SuppressWarnings("nls")
     private void checkSpecimens(ActionContext context,List<String> specs) throws ActionException
     {
-	StringBuffer procesedSpecimens = new StringBuffer("");
-	StringBuffer blankSpecimens = new StringBuffer("");
-	StringBuffer wrongSpecimens = new StringBuffer("");
-	StringBuffer duplicateSpecimens = new StringBuffer("");
+	StringBuffer procesedSpecimens = new StringBuffer(StringUtil.EMPTY_STRING);
+	StringBuffer blankSpecimens = new StringBuffer(StringUtil.EMPTY_STRING);
+	StringBuffer wrongSpecimens = new StringBuffer(StringUtil.EMPTY_STRING);
+	StringBuffer duplicateSpecimens = new StringBuffer(StringUtil.EMPTY_STRING);
 	int numErrors = 0;
 	List<String> procesedIds = new ArrayList<String>();
 

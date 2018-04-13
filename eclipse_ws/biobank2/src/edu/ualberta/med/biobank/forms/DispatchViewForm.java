@@ -368,6 +368,7 @@ public class DispatchViewForm extends BiobankViewForm {
         DispatchSendingEntryForm.sendDispatch(this, dispatch, dispatchAdapter);
     }
 
+    @SuppressWarnings("nls")
     private boolean checkRequest(Integer id) {
 
 	BooleanResult ret = null;

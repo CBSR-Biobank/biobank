@@ -57,6 +57,7 @@ public class SpecimenTreeViewAdapter extends SpecimenAdapter {
     }
 
 
+    @SuppressWarnings("nls")
     @Override
     protected List<? extends ModelWrapper<?>> getWrapperChildren()
             throws Exception {
@@ -92,9 +93,7 @@ public class SpecimenTreeViewAdapter extends SpecimenAdapter {
 
     }
 
-    @SuppressWarnings("nls")
     @Override
-
     public void addChild(AbstractAdapterBase child) {
 	hasChildren = true;
         AbstractAdapterBase existingNode = contains(child);
