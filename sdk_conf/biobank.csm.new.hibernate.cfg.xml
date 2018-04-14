@@ -3,7 +3,7 @@
 
 <hibernate-configuration>
     <session-factory>
-        <property name="connection.datasource">java:/biobank</property>
+        <property name="connection.datasource">java:/comp/env/jdbc/biobank</property>
         <property name="dialect">org.hibernate.dialect.MySQL5InnoDBDialect</property>
 
         <mapping resource="gov/nih/nci/security/authorization/domainobjects/Privilege.hbm.xml"/>
@@ -12,7 +12,7 @@
         <mapping resource="gov/nih/nci/security/authorization/domainobjects/Role.hbm.xml"/>
         <mapping resource="gov/nih/nci/security/dao/hibernate/RolePrivilege.hbm.xml"/>
         <mapping resource="gov/nih/nci/security/dao/hibernate/UserGroup.hbm.xml"/>
-        <mapping resource="gov/nih/nci/security/dao/hibernate/ProtectionGroupProtectionElement.hbm.xml"/>     
+        <mapping resource="gov/nih/nci/security/dao/hibernate/ProtectionGroupProtectionElement.hbm.xml"/>
         <mapping resource="gov/nih/nci/security/authorization/domainobjects/Group.hbm.xml"/>
         <mapping resource="gov/nih/nci/security/authorization/domainobjects/User.hbm.xml"/>
         <mapping resource="gov/nih/nci/security/authorization/domainobjects/ProtectionGroup.hbm.xml"/>

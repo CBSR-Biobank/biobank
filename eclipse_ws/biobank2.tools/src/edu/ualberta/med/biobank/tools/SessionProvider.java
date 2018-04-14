@@ -70,6 +70,9 @@ public class SessionProvider {
             InitialContext ic = new InitialContext();
 
             ic.createSubcontext("java:");
+            ic.createSubcontext("java:/comp");
+            ic.createSubcontext("java:/comp/env");
+            ic.createSubcontext("java:/comp/env/jdbc");
 
             String dbHost, dbName, dbUser, dbPassword;
 
@@ -110,7 +113,7 @@ public class SessionProvider {
             ds.setUser(dbUser);
             ds.setPassword(dbPassword);
 
-            ic.bind("java:/biobank", ds);
+            ic.bind("java:/comp/env/jdbc/biobank", ds);
         } catch (NamingException ex) {
             ex.printStackTrace();
         } catch (FileNotFoundException e) {
