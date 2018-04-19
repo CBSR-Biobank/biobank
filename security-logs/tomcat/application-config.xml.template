@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans default-lazy-init="false" default-dependency-check="none" default-autowire="no">
+
+  <bean name="ApplicationServiceImpl" class="edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationServiceImpl" singleton="true">
+    <constructor-arg ref="ClassCache" index="0"></constructor-arg>
+  </bean>
+
+  <!-- Bean Definitions -->
+  <bean name="ClassCache" class="edu.ualberta.med.biobank.server.system.util.BiobankClassCache" singleton="true">
+    <property name="daoList">
+      <list>
+	<!--  Add any DAO's here -->
+	<ref bean="ORMDAO" />
+      </list>
+    </property>
+  </bean>
+
+
+  <bean name="WebSystemProperties" class="java.util.Properties">
+    <constructor-arg>
+      <props>
+	<prop key="resultOutputFormatter">resultOutputFormatter.xsl</prop>
+	<prop key="rowCounter">200</prop>
+	<prop key="securityEnabled">true</prop>
+      </props>
+    </constructor-arg>
+  </bean>
+
+  <bean name="ORMDAO" class="edu.ualberta.med.biobank.server.orm.BiobankORMDAOImpl">
+    <property name="caseSensitive" value="false" />
+    <property name="resultCountPerQuery" value="1000" />
+    <property name="securityHelper">
+      <ref bean="SecurityInitializationHelper" />
+    </property>
+    <property name="sessionFactory" ref="SessionFactory" />
+    <property name="config">
+      <bean factory-bean="HibernateConfigHolder" factory-method="getConfiguration" />
+    </property>
+  </bean>
+
+  <bean name="HibernateConfigHolder"
+	class="gov.nih.nci.system.dao.orm.HibernateConfigurationHolder" />
+
+  <bean id="dataSource"
+	class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+    <property name="driverClassName" value="@database.driver@"/>
+    <property name="url" value="@database.url@"/>
+    <property name="username" value="@database.username@"/>
+    <property name="password" value="@database.password@"/>
+  </bean>
+
+  <bean id="flyway" class="com.googlecode.flyway.core.Flyway" init-method="migrate">
+    <property name="dataSource" ref="dataSource"/>
+    <property name="locations" value="edu.ualberta.med.biobank.migration,db/migrations"/>
+  </bean>
+
+  <bean name="SessionFactory" class="gov.nih.nci.system.dao.orm.SessionFactoryBean" depends-on="flyway">
+  <!--bean name="SessionFactory" class="gov.nih.nci.system.dao.orm.SessionFactoryBean"-->
+    <property name="configLocation" value="classpath:hibernate.cfg.xml" />
+    <property name="configHolder" ref="HibernateConfigHolder" />
+    <property name="securityHelper" ref="SecurityInitializationHelper"/>
+    <property name="entityInterceptor">
+      <bean class="gov.nih.nci.security.authorization.attributeLevel.GenericSecurityInterceptor">
+	<constructor-arg>
+	  <list>
+	    <bean class="org.hibernate.EmptyInterceptor"/>
+	    <!--
+		<bean class="gov.nih.nci.security.authorization.attributeLevel.AttributeSecuritySessionInterceptor">
+		<constructor-arg value="false"/>
+		</bean>
+	    -->
+	    <!-- old interceptor to add centers into protection elements-->
+	    <bean class="edu.ualberta.med.biobank.server.interceptor.SessionInterceptor"/>
+
+	  </list>
+	</constructor-arg>
+      </bean>
+    </property>
+    <property name="eventListeners">
+      <map>
+	<!--
+	     removed because this class does not exist anymore in hibernate 3.6.9-Final
+	     <entry key="pre-insert">
+	     <bean class="org.hibernate.validator.event.ValidateEventListener" />
+	     </entry>
+	     <entry key="pre-update">
+	     <bean class="org.hibernate.validator.event.ValidateEventListener" />
+	     </entry>
+	-->
+
+      </map>
+    </property>
+  </bean>
+
+  <bean name="SecurityInitializationHelper" class="gov.nih.nci.system.security.helper.SecurityInitializationHelper">
+    <property name="securityEnabled" value="true"/>
+    <property name="instanceLevelSecurityEnabled" value="true"/>
+    <property name="attributeLevelSecurityEnabled" value="false"/>
+
+    <property name="authorizationManager">
+      <bean factory-bean="userDetailsService" factory-method="authorizationManagerInstance" />
+    </property>
+
+  </bean>
+
+  <bean id="HibernateTransactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+    <property name="sessionFactory" ref="SessionFactory" />
+  </bean>
+
+  <bean id="TxInterceptor" class="org.springframework.transaction.interceptor.TransactionInterceptor">
+    <property name="transactionManager">
+      <ref bean="HibernateTransactionManager" />
+    </property>
+    <property name="transactionAttributes">
+      <props>
+	<prop key="execute*">
+	  PROPAGATION_REQUIRED,-gov.nih.nci.system.applicationservice.ApplicationException,-gov.nih.nci.system.dao.DAOException,-edu.ualberta.med.biobank.common.exception.BiobankException
+	</prop>
+        <prop key="doAction">
+          PROPAGATION_REQUIRED,-gov.nih.nci.system.applicationservice.ApplicationException,-gov.nih.nci.system.dao.DAOException,-edu.ualberta.med.biobank.common.exception.BiobankException
+        </prop>
+	<prop key="*">PROPAGATION_REQUIRED,readOnly</prop>
+      </props>
+    </property>
+  </bean>
+
+  <bean id="ApplicationService" class="org.springframework.aop.framework.ProxyFactoryBean" singleton="true">
+    <property name="target" ref="ApplicationServiceImpl" />
+    <property name="interfaces" value="edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService" />
+    <property name="interceptorNames">
+      <list>
+	<idref local="ExceptionInterceptor" />
+	<idref local="TxInterceptor" />
+	<idref local="LogInterceptor" />
+      </list>
+    </property>
+  </bean>
+
+  <bean id="LogInterceptor" class="edu.ualberta.med.biobank.server.logging.user.BiobankLogProxy"/>
+
+  <!-- Intercept exception to provide better exceptions and messages on client side -->
+  <bean id="ExceptionInterceptor" class="edu.ualberta.med.biobank.server.interceptor.ExceptionInterceptor"/>
+</beans>

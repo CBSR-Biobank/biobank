@@ -12,18 +12,18 @@ public class V1_6__Biobank_v3100 implements SpringJdbcMigration {
         // add another column to specimen advanced reports
         jdbcTemplate.execute(
             "INSERT INTO entity_property (id,property,property_type_id,entity_id,version)"
-                + "VALUES (33,'topSpecimen.comments.message',1,1,0)");
+                + "VALUES ((SELECT MAX(ID)+1 from entity_property as ent),'topSpecimen.comments.message',1,1,0)");
         jdbcTemplate.execute(
             "INSERT INTO entity_column (id,name,entity_property_id,version)"
-                + "VALUES (32,'Source Specimen Comment',33,0)");
+                + "VALUES ((SELECT MAX(ID)+1 from entity_column as col),'Source Specimen Comment',33,0)");
 
         // add another column to specimen advanced reports
         jdbcTemplate.execute(
             "INSERT INTO entity_property (id,property,property_type_id,entity_id,version)"
-                + "VALUES (34,'topSpecimen.specimenType.nameShort',1,1,0)");
+                + "VALUES ((SELECT MAX(ID)+1 from entity_property as ent),'topSpecimen.specimenType.nameShort',1,1,0)");
         jdbcTemplate.execute(
             "INSERT INTO entity_column (id,name,entity_property_id,version)"
-                + "VALUES (33,'Source Specimen Type',34,0)");
+                + "VALUES ((SELECT MAX(ID)+1 from entity_column as col),'Source Specimen Type',34,0)");
     }
 
 }

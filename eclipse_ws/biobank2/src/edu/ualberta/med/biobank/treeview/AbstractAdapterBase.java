@@ -77,7 +77,9 @@ public abstract class AbstractAdapterBase implements
 
     // used when add or remove children. Initialised to a listener that does
     // nothing. See NodeContentProvider for an implementation
-    private IDeltaListener deltaListener = NullDeltaListener.getSoleInstance();
+    //OHSDEV
+    // Specimen tree view implementation - Make accessible from SpecimenTreeViewAdapter to create child
+    protected IDeltaListener deltaListener = NullDeltaListener.getSoleInstance();
 
     // FIXME can we merge this list of listeners with the DeltaListener ?
     private final List<AdapterChangedListener> listeners;
@@ -527,7 +529,8 @@ public abstract class AbstractAdapterBase implements
         List<AbstractAdapterBase> result = new ArrayList<AbstractAdapterBase>();
         for (AbstractAdapterBase child : getChildren()) {
             List<AbstractAdapterBase> tmpRes = child.search(searchedClass, objectId);
-            if (!tmpRes.isEmpty()) {
+            //OHSDEV checking for null first
+            if (tmpRes!=null && !tmpRes.isEmpty()) {
                 result.addAll(tmpRes);
             }
         }

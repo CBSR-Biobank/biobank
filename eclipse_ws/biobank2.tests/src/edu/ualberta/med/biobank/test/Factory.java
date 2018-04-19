@@ -4,8 +4,10 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
@@ -50,6 +52,7 @@ import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
 import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.model.type.LabelingLayout;
+import edu.ualberta.med.biobank.test.action.batchoperation.specimen.SpecimenBatchOpPojoHelper;
 
 /**
  * Tries to make setting up test data easier by requiring the absolute minimum amount of data and
@@ -618,8 +621,10 @@ public class Factory {
         researchGroup.getAddress().setCity("testville");
         researchGroup.setName(name);
         researchGroup.setNameShort(name);
-        researchGroup.setStudy(getDefaultStudy());
-
+        //researchGroup.setStudy(getDefaultStudy());
+        Set<Study> studies = new HashSet<Study>(0);
+        studies.add(getDefaultStudy());
+        researchGroup.setStudies(studies);
         setDefaultCenter(researchGroup);
         setDefaultResearchGroup(researchGroup);
         session.save(researchGroup);

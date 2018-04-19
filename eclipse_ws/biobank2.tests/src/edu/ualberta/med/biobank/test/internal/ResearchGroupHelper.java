@@ -37,7 +37,10 @@ public class ResearchGroupHelper extends CenterHelper {
         StudyWrapper study, boolean addToCreatedList) throws Exception {
         ResearchGroupWrapper researchGroup = newResearchGroup(name,
             addToCreatedList);
-        researchGroup.setStudy(study);
+        //researchGroup.setStudy(study);
+        List<StudyWrapper> studies = new ArrayList<StudyWrapper>();
+        studies.add(study);
+        researchGroup.addToStudyCollection(studies);
         researchGroup.persist();
         return researchGroup;
     }
@@ -46,7 +49,10 @@ public class ResearchGroupHelper extends CenterHelper {
         boolean addToCreatedList) throws Exception {
         ResearchGroupWrapper researchGroup = newResearchGroup(name,
             addToCreatedList);
-        researchGroup.setStudy(StudyHelper.addStudy(name + "Study", true));
+        //researchGroup.setStudy(StudyHelper.addStudy(name + "Study", true));
+        List<StudyWrapper> studies = new ArrayList<StudyWrapper>();
+        studies.add(StudyHelper.addStudy(name + "Study", true));
+        researchGroup.addToStudyCollection(studies);
         researchGroup.persist();
         return researchGroup;
     }

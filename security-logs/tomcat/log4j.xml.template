@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+
+<log4j:configuration xmlns:log4j='http://jakarta.apache.org/log4j/'>
+
+  <appender name="BIOBANK_APPENDER"
+    class="edu.ualberta.med.biobank.server.logging.BiobankJDBCAppender">
+    <param name="application" value="biobank" />
+    <param name="dbDriverClass" value="@database.driver@" />
+    <param name="dbUrl" value="@database.url@" />
+    <param name="dbUser" value="@database.username@" />
+    <param name="dbPwd" value="@database.password@" />
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern"
+        value=":: [%d{ISO8601}] %-5p %c{1}.%M() %x - %m%n" />
+    </layout>
+  </appender>
+
+  <appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
+    <param name="Target" value="System.out" />
+    <param name="Threshold" value="debug" />
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern"
+        value="%d{ABSOLUTE} %-5p [%c{1}] %m%n" />
+    </layout>
+  </appender>
+
+  <category name="Biobank.Activity">
+    <level value="INFO" />
+    <appender-ref ref="BIOBANK_APPENDER" />
+  </category>
+
+  <category name="edu.ualberta.med.biobank.common.action">
+    <level value="info" />
+    <appender-ref ref="CONSOLE" />
+  </category>
+
+  <category name="com.googlecode.flyway.core">
+    <level value="info" />
+    <appender-ref ref="CONSOLE" />
+  </category>
+
+  <category name="org.apache.dbcp">
+    <level value="error" />
+    <appender-ref ref="CONSOLE" />
+  </category>
+
+  <category name="com.mchange.v2.c3p0">
+    <level value="error" />
+    <appender-ref ref="CONSOLE" />
+  </category>
+
+  <logger name="org.hibernate">
+    <level value="error" />
+  </logger>
+
+  <logger name="org.apache">
+    <level value="error" />
+  </logger>
+
+  <logger name="org.hibernate.SQL">
+    <level value="error" />
+  </logger>
+
+  <logger name="org.hibernate.type">
+    <level value="error" />
+  </logger>
+
+  <logger name="org.hibernate.tool.hbm2ddl">
+    <level value="error" />
+  </logger>
+
+  <logger name="org.hibernate.cache">
+    <level value="error" />
+  </logger>
+
+  <logger name="org.hibernate.jdbc">
+    <level value="error" />
+  </logger>
+
+  <logger name="org.hibernate.connection.DriverManagerConnectionProvider">
+    <level value="error" />
+  </logger>
+
+  <logger name="gov.nih.nci">
+    <level value="error" />
+  </logger>
+
+  <category name="org.springframework">
+    <priority value="error" />
+  </category>
+
+  <root>
+    <priority value="error" />
+    <appender-ref ref="CONSOLE" />
+  </root>
+</log4j:configuration>
