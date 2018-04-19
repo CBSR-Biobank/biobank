@@ -47,12 +47,10 @@ import edu.ualberta.med.biobank.widgets.infotables.NewSpecimenInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.NewSpecimenInfoTable.ColumnsShown;
 
 public class CollectionEventViewForm extends BiobankViewForm {
-    private static final I18n i18n = I18nFactory
-        .getI18n(CollectionEventViewForm.class);
+    private static final I18n i18n = I18nFactory.getI18n(CollectionEventViewForm.class);
 
     @SuppressWarnings("nls")
-    public static final String ID =
-        "edu.ualberta.med.biobank.forms.CollectionEventViewForm";
+    public static final String ID = "edu.ualberta.med.biobank.forms.CollectionEventViewForm";
 
     private BgcBaseText studyLabel;
 
@@ -80,8 +78,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
     @Override
     public void init() throws Exception {
         Assert.isTrue((adapter instanceof CollectionEventAdapter),
-            "Invalid editor input: object of type "
-                + adapter.getClass().getName());
+                      "Invalid editor input: object of type " + adapter.getClass().getName());
 
         updateCEventInfo();
 
@@ -91,9 +88,8 @@ public class CollectionEventViewForm extends BiobankViewForm {
     }
 
     private void updateCEventInfo() throws Exception {
-        ceventInfo =
-            SessionManager.getAppService().doAction(
-                new CollectionEventGetInfoAction(adapter.getId()));
+        ceventInfo = SessionManager.getAppService()
+            .doAction(new CollectionEventGetInfoAction(adapter.getId()));
         SessionManager.logLookup(ceventInfo.cevent);
     }
 
@@ -102,8 +98,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
     protected void createFormContent() throws Exception {
         form.setText(
             // form title
-            i18n.tr("Collection Event for visit {0}",
-                ceventInfo.cevent.getVisitNumber()));
+            i18n.tr("Collection Event for visit {0}", ceventInfo.cevent.getVisitNumber()));
         page.setLayout(new GridLayout(1, false));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         createMainSection();
@@ -119,18 +114,14 @@ public class CollectionEventViewForm extends BiobankViewForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        studyLabel =
-            createReadOnlyLabelledField(client, SWT.NONE,
-                Study.NAME.format(1).toString());
-        patientLabel =
-            createReadOnlyLabelledField(client, SWT.NONE,
-                Patient.NAME.format(1).toString());
-        visitNumberLabel =
-            createReadOnlyLabelledField(client, SWT.NONE,
-                CollectionEvent.PropertyName.VISIT_NUMBER.toString());
-        activityStatusLabel =
-            createReadOnlyLabelledField(client, SWT.NONE,
-                ActivityStatus.NAME.singular().toString());
+        studyLabel = createReadOnlyLabelledField(client, SWT.NONE,
+                                                 Study.NAME.format(1).toString());
+        patientLabel = createReadOnlyLabelledField(client, SWT.NONE,
+                                                   Patient.NAME.format(1).toString());
+        visitNumberLabel = createReadOnlyLabelledField(client, SWT.NONE,
+                                                       CollectionEvent.PropertyName.VISIT_NUMBER.toString());
+        activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
+                                                          ActivityStatus.NAME.singular().toString());
 
         createPvDataSection(client);
         createCommentsSection();
@@ -139,31 +130,26 @@ public class CollectionEventViewForm extends BiobankViewForm {
     }
 
     private void createCommentsSection() {
-        Composite client =
-            createSectionWithClient(Comment.NAME.format(2).toString());
-        commentTable =
-            new CommentsInfoTable(client,
-                ModelWrapper.wrapModelCollection(
-                    SessionManager.getAppService(),
-                    ceventInfo.cevent.getComments(),
-                    CommentWrapper.class));
+        Composite client = createSectionWithClient(Comment.NAME.format(2).toString());
+        List<CommentWrapper> wrapper =
+            ModelWrapper.wrapModelCollection(SessionManager.getAppService(),
+                                             ceventInfo.cevent.getComments(),
+                                             CommentWrapper.class);
+        commentTable = new CommentsInfoTable(client, wrapper);
         commentTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(commentTable);
     }
 
     private void createPvDataSection(Composite client) throws Exception {
-        Map<Integer, StudyEventAttrInfo> studyAttrInfos =
-            SessionManager.getAppService().doAction(
-                new StudyGetEventAttrInfoAction(ceventInfo.cevent.getPatient()
-                    .getStudy().getId())).getMap();
+        Integer studyId = ceventInfo.cevent.getPatient().getStudy().getId();
+        Map<Integer, StudyEventAttrInfo> studyAttrInfos = SessionManager.getAppService().doAction(
+                new StudyGetEventAttrInfoAction(studyId)).getMap();
 
         pvCustomInfoList = new ArrayList<FormPvCustomInfo>();
 
-        for (Entry<Integer, StudyEventAttrInfo> entry : studyAttrInfos
-            .entrySet()) {
+        for (Entry<Integer, StudyEventAttrInfo> entry : studyAttrInfos.entrySet()) {
             FormPvCustomInfo combinedPvInfo = new FormPvCustomInfo();
-            combinedPvInfo.setLabel(entry.getValue().attr.getGlobalEventAttr()
-                .getLabel());
+            combinedPvInfo.setLabel(entry.getValue().attr.getGlobalEventAttr().getLabel());
             combinedPvInfo.setType(entry.getValue().type);
 
             int style = SWT.NONE;
@@ -173,17 +159,16 @@ public class CollectionEventViewForm extends BiobankViewForm {
 
             EventAttrInfo eventAttr = ceventInfo.eventAttrs.get(entry.getKey());
             String value = eventAttr == null ? null : eventAttr.attr.getValue();
-            if (combinedPvInfo.getType() == EventAttrTypeEnum.SELECT_MULTIPLE
-                && (value != null)) {
+            if (combinedPvInfo.getType() == EventAttrTypeEnum.SELECT_MULTIPLE && (value != null)) {
                 combinedPvInfo.setValue(value.replace(';', '\n'));
             } else {
                 combinedPvInfo.setValue(value);
             }
 
-            combinedPvInfo.widget =
-                createReadOnlyLabelledField(client, style,
-                    entry.getValue().attr.getGlobalEventAttr().getLabel(),
-                    combinedPvInfo.getValue());
+            combinedPvInfo.widget = createReadOnlyLabelledField(client,
+                                                                style,
+                                                                entry.getValue().attr.getGlobalEventAttr().getLabel(),
+                                                                combinedPvInfo.getValue());
             GridData gd = new GridData(GridData.FILL_HORIZONTAL);
             combinedPvInfo.widget.setLayoutData(gd);
 
@@ -192,12 +177,10 @@ public class CollectionEventViewForm extends BiobankViewForm {
     }
 
     private void setCollectionEventValues() {
-        setTextValue(studyLabel, ceventInfo.cevent.getPatient().getStudy()
-            .getName());
+        setTextValue(studyLabel, ceventInfo.cevent.getPatient().getStudy().getName());
         setTextValue(patientLabel, ceventInfo.cevent.getPatient().getPnumber());
         setTextValue(visitNumberLabel, ceventInfo.cevent.getVisitNumber());
-        setTextValue(activityStatusLabel, ceventInfo.cevent.getActivityStatus()
-            .getName());
+        setTextValue(activityStatusLabel, ceventInfo.cevent.getActivityStatus().getName());
         // assign PvInfo
         for (FormPvCustomInfo combinedPvInfo : pvCustomInfoList) {
             setTextValue(combinedPvInfo.widget, combinedPvInfo.getValue());
@@ -205,101 +188,76 @@ public class CollectionEventViewForm extends BiobankViewForm {
     }
 
     private void createSourceSpecimensSection() {
-        Composite client =
-            createSectionWithClient(SourceSpecimen.NAME.format(2).toString());
-        sourceSpecimenTable =
-            new NewSpecimenInfoTable(client, ceventInfo.sourceSpecimenInfos,
-                ColumnsShown.CEVENT_SOURCE_SPECIMENS, 10);
+        Composite client = createSectionWithClient(SourceSpecimen.NAME.format(2).toString());
+        sourceSpecimenTable = new NewSpecimenInfoTable(client,
+                                                       ceventInfo.sourceSpecimenInfos,
+                                                       ColumnsShown.CEVENT_SOURCE_SPECIMENS, 10);
         sourceSpecimenTable.adaptToToolkit(toolkit, true);
-        sourceSpecimenTable
-            .addClickListener(new IInfoTableDoubleClickItemListener<SpecimenInfo>() {
-                @Override
-                public void doubleClick(InfoTableEvent<SpecimenInfo> event) {
-                    Specimen s =
-                        ((SpecimenInfo) ((InfoTableSelection) event
-                            .getSelection()).getObject()).specimen;
-                    AdapterBase.openForm(
-                        new FormInput(
-                            new SpecimenAdapter(null,
-                                new SpecimenWrapper(SessionManager
-                                    .getAppService(), s))),
-                        SpecimenViewForm.ID);
-                }
-            });
-        sourceSpecimenTable
-            .addEditItemListener(new IInfoTableEditItemListener<SpecimenInfo>() {
-                @Override
-                public void editItem(InfoTableEvent<SpecimenInfo> event) {
-                    Specimen s =
-                        ((SpecimenInfo) ((InfoTableSelection) event
-                            .getSelection()).getObject()).specimen;
-                    AdapterBase.openForm(
-                        new FormInput(
-                            new SpecimenAdapter(null,
-                                new SpecimenWrapper(SessionManager
-                                    .getAppService(), s))),
-                        SpecimenEntryForm.ID);
-                }
-            });
+        sourceSpecimenTable.addClickListener(new IInfoTableDoubleClickItemListener<SpecimenInfo>() {
+            @Override
+            public void doubleClick(InfoTableEvent<SpecimenInfo> event) {
+                Specimen s = ((SpecimenInfo) ((InfoTableSelection)
+                    event.getSelection()).getObject()).specimen;
+                SpecimenWrapper wrapper = new SpecimenWrapper(SessionManager.getAppService(), s);
+                AdapterBase.openForm(new FormInput(new SpecimenAdapter(null, wrapper)),
+                                     SpecimenViewForm.ID);
+            }
+        });
+        sourceSpecimenTable.addEditItemListener(new IInfoTableEditItemListener<SpecimenInfo>() {
+            @Override
+            public void editItem(InfoTableEvent<SpecimenInfo> event) {
+                Specimen s = ((SpecimenInfo) ((InfoTableSelection)
+                    event.getSelection()).getObject()).specimen;
+                SpecimenWrapper wrapper = new SpecimenWrapper(SessionManager.getAppService(), s);
+                AdapterBase.openForm(new FormInput(new SpecimenAdapter(null, wrapper)),
+                                     SpecimenEntryForm.ID);
+            }
+        });
     }
 
     private void createAliquotedSpecimensSection() {
         // FIXME should we show that to clinics ?
-        Composite client =
-            createSectionWithClient(AliquotedSpecimen.NAME.format(2).toString());
-        aliquotedSpcTable =
-            new NewSpecimenInfoTable(client, ceventInfo.aliquotedSpecimenInfos,
-                ColumnsShown.CEVENT_ALIQUOTED_SPECIMENS, 10);
+        Composite client = createSectionWithClient(AliquotedSpecimen.NAME.format(2).toString());
+        aliquotedSpcTable = new NewSpecimenInfoTable(client,
+                                                     ceventInfo.aliquotedSpecimenInfos,
+                                                     ColumnsShown.CEVENT_ALIQUOTED_SPECIMENS,
+                                                     10);
         aliquotedSpcTable.adaptToToolkit(toolkit, true);
-        aliquotedSpcTable
-            .addClickListener(new IInfoTableDoubleClickItemListener<SpecimenInfo>() {
+        aliquotedSpcTable.addClickListener(new IInfoTableDoubleClickItemListener<SpecimenInfo>() {
                 @Override
                 public void doubleClick(InfoTableEvent<SpecimenInfo> event) {
-                    Specimen s =
-                        ((SpecimenInfo) ((InfoTableSelection) event
-                            .getSelection()).getObject()).specimen;
-                    AdapterBase.openForm(
-                        new FormInput(
-                            new SpecimenAdapter(null,
-                                new SpecimenWrapper(SessionManager
-                                    .getAppService(), s))),
-                        SpecimenViewForm.ID);
+                    Specimen s = ((SpecimenInfo) ((InfoTableSelection)
+                        event.getSelection()).getObject()).specimen;
+                    SpecimenWrapper wrapper = new SpecimenWrapper(SessionManager.getAppService(), s);
+                    AdapterBase.openForm(new FormInput(new SpecimenAdapter(null, wrapper)),
+                                         SpecimenViewForm.ID);
                 }
             });
-        aliquotedSpcTable
-            .addEditItemListener(new IInfoTableEditItemListener<SpecimenInfo>() {
-                @Override
-                public void editItem(InfoTableEvent<SpecimenInfo> event) {
-                    Specimen s =
-                        ((SpecimenInfo) ((InfoTableSelection) event
-                            .getSelection()).getObject()).specimen;
-                    AdapterBase.openForm(
-                        new FormInput(
-                            new SpecimenAdapter(null,
-                                new SpecimenWrapper(SessionManager
-                                    .getAppService(), s))),
-                        SpecimenEntryForm.ID);
-                }
-            });
+        aliquotedSpcTable.addEditItemListener(new IInfoTableEditItemListener<SpecimenInfo>() {
+            @Override
+            public void editItem(InfoTableEvent<SpecimenInfo> event) {
+                Specimen s = ((SpecimenInfo) ((InfoTableSelection)
+                    event.getSelection()).getObject()).specimen;
+                SpecimenWrapper wrapper = new SpecimenWrapper(SessionManager.getAppService(), s);
+                AdapterBase.openForm(new FormInput(new SpecimenAdapter(null, wrapper)),
+                                     SpecimenEntryForm.ID);
+            }
+        });
     }
 
     @SuppressWarnings("nls")
     @Override
     public void setValues() throws Exception {
-        setPartName(
-        // tab name, {0} is visit number
-        i18n.tr("CE {0}", ceventInfo.cevent.getVisitNumber()));
-        form.setText(
-            // form title
-            i18n.tr("Collection Event for visit {0}",
-                ceventInfo.cevent.getVisitNumber()));
+        setPartName(// tab name, {0} is visit number
+                    i18n.tr("CE {0}", ceventInfo.cevent.getVisitNumber()));
+        form.setText(// form title
+                     i18n.tr("Collection Event for visit {0}", ceventInfo.cevent.getVisitNumber()));
         setCollectionEventValues();
         sourceSpecimenTable.setList(ceventInfo.sourceSpecimenInfos);
         aliquotedSpcTable.setList(ceventInfo.aliquotedSpecimenInfos);
-        commentTable.setList(ModelWrapper.wrapModelCollection(
-            SessionManager.getAppService(),
-            ceventInfo.cevent.getComments(),
-            CommentWrapper.class));
+        commentTable.setList(ModelWrapper.wrapModelCollection(SessionManager.getAppService(),
+                                                              ceventInfo.cevent.getComments(),
+                                                              CommentWrapper.class));
     }
 
 }
