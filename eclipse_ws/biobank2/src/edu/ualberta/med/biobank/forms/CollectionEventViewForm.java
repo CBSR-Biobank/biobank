@@ -18,33 +18,21 @@ import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGet
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.EventAttrInfo;
 import edu.ualberta.med.biobank.common.action.eventattr.EventAttrTypeEnum;
-import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyEventAttrInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyGetEventAttrInfoAction;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
-import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
-import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDoubleClickItemListener;
-import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
-import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
-import edu.ualberta.med.biobank.gui.common.widgets.InfoTableSelection;
 import edu.ualberta.med.biobank.model.ActivityStatus;
-import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.EventAttrCustom;
 import edu.ualberta.med.biobank.model.Patient;
-import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.treeview.SpecimenAdapter;
 import edu.ualberta.med.biobank.treeview.patient.CollectionEventAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
-import edu.ualberta.med.biobank.widgets.infotables.NewSpecimenInfoTable;
-import edu.ualberta.med.biobank.widgets.infotables.NewSpecimenInfoTable.ColumnsShown;
+import edu.ualberta.med.biobank.widgets.trees.SpecimensTreeTable;
 
 public class CollectionEventViewForm extends BiobankViewForm {
     private static final I18n i18n = I18nFactory.getI18n(CollectionEventViewForm.class);
@@ -60,11 +48,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
 
     private BgcBaseText visitNumberLabel;
 
-    private NewSpecimenInfoTable sourceSpecimenTable;
-
     private BgcBaseText activityStatusLabel;
-
-    private NewSpecimenInfoTable aliquotedSpcTable;
 
     private CEventInfo ceventInfo;
 
@@ -102,8 +86,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
         page.setLayout(new GridLayout(1, false));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         createMainSection();
-        createSourceSpecimensSection();
-        createAliquotedSpecimensSection();
+        createSpecimensSection();
     }
 
     private void createMainSection() throws Exception {
@@ -187,62 +170,11 @@ public class CollectionEventViewForm extends BiobankViewForm {
         }
     }
 
-    private void createSourceSpecimensSection() {
-        Composite client = createSectionWithClient(SourceSpecimen.NAME.format(2).toString());
-        sourceSpecimenTable = new NewSpecimenInfoTable(client,
-                                                       ceventInfo.sourceSpecimenInfos,
-                                                       ColumnsShown.CEVENT_SOURCE_SPECIMENS, 10);
-        sourceSpecimenTable.adaptToToolkit(toolkit, true);
-        sourceSpecimenTable.addClickListener(new IInfoTableDoubleClickItemListener<SpecimenInfo>() {
-            @Override
-            public void doubleClick(InfoTableEvent<SpecimenInfo> event) {
-                Specimen s = ((SpecimenInfo) ((InfoTableSelection)
-                    event.getSelection()).getObject()).specimen;
-                SpecimenWrapper wrapper = new SpecimenWrapper(SessionManager.getAppService(), s);
-                AdapterBase.openForm(new FormInput(new SpecimenAdapter(null, wrapper)),
-                                     SpecimenViewForm.ID);
-            }
-        });
-        sourceSpecimenTable.addEditItemListener(new IInfoTableEditItemListener<SpecimenInfo>() {
-            @Override
-            public void editItem(InfoTableEvent<SpecimenInfo> event) {
-                Specimen s = ((SpecimenInfo) ((InfoTableSelection)
-                    event.getSelection()).getObject()).specimen;
-                SpecimenWrapper wrapper = new SpecimenWrapper(SessionManager.getAppService(), s);
-                AdapterBase.openForm(new FormInput(new SpecimenAdapter(null, wrapper)),
-                                     SpecimenEntryForm.ID);
-            }
-        });
-    }
-
-    private void createAliquotedSpecimensSection() {
-        // FIXME should we show that to clinics ?
-        Composite client = createSectionWithClient(AliquotedSpecimen.NAME.format(2).toString());
-        aliquotedSpcTable = new NewSpecimenInfoTable(client,
-                                                     ceventInfo.aliquotedSpecimenInfos,
-                                                     ColumnsShown.CEVENT_ALIQUOTED_SPECIMENS,
-                                                     10);
-        aliquotedSpcTable.adaptToToolkit(toolkit, true);
-        aliquotedSpcTable.addClickListener(new IInfoTableDoubleClickItemListener<SpecimenInfo>() {
-                @Override
-                public void doubleClick(InfoTableEvent<SpecimenInfo> event) {
-                    Specimen s = ((SpecimenInfo) ((InfoTableSelection)
-                        event.getSelection()).getObject()).specimen;
-                    SpecimenWrapper wrapper = new SpecimenWrapper(SessionManager.getAppService(), s);
-                    AdapterBase.openForm(new FormInput(new SpecimenAdapter(null, wrapper)),
-                                         SpecimenViewForm.ID);
-                }
-            });
-        aliquotedSpcTable.addEditItemListener(new IInfoTableEditItemListener<SpecimenInfo>() {
-            @Override
-            public void editItem(InfoTableEvent<SpecimenInfo> event) {
-                Specimen s = ((SpecimenInfo) ((InfoTableSelection)
-                    event.getSelection()).getObject()).specimen;
-                SpecimenWrapper wrapper = new SpecimenWrapper(SessionManager.getAppService(), s);
-                AdapterBase.openForm(new FormInput(new SpecimenAdapter(null, wrapper)),
-                                     SpecimenEntryForm.ID);
-            }
-        });
+    private void createSpecimensSection() {
+        Composite client = createSectionWithClient(Specimen.NAME.format(2).toString());
+        new SpecimensTreeTable(client,
+                               ceventInfo.sourceSpecimenInfos,
+                               ceventInfo.aliquotedSpecimenInfos);
     }
 
     @SuppressWarnings("nls")
@@ -253,8 +185,6 @@ public class CollectionEventViewForm extends BiobankViewForm {
         form.setText(// form title
                      i18n.tr("Collection Event for visit {0}", ceventInfo.cevent.getVisitNumber()));
         setCollectionEventValues();
-        sourceSpecimenTable.setList(ceventInfo.sourceSpecimenInfos);
-        aliquotedSpcTable.setList(ceventInfo.aliquotedSpecimenInfos);
         commentTable.setList(ModelWrapper.wrapModelCollection(SessionManager.getAppService(),
                                                               ceventInfo.cevent.getComments(),
                                                               CommentWrapper.class));
