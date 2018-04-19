@@ -6,10 +6,7 @@
          BioBank Client
 Version {0}
 
-Developed for the Canadian BioSample Repository by AICML .
-
 Canadian BioSample Repository: http://www.biosample.ca
-AICML: http://aicml.cs.ualberta.ca
       </text>
    </aboutInfo>
 
@@ -18,7 +15,8 @@ AICML: http://aicml.cs.ualberta.ca
 
    <launcherArgs>
       <programArgs>-data @user.home/biobank2</programArgs>
-      <vmArgs>-Dosgi.requiredJavaVersion=1.6 -XX:MaxPermSize=256m -Xms40m -Xmx512m</vmArgs>
+      <programArgsLin>--launcher.GTK_version 2</programArgsLin>
+      <vmArgs>-Dosgi.requiredJavaVersion=1.6 -XX:MaxPermSize=256m -Xms512m -Xmx1024m</vmArgs>
       <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts</vmArgsMac>
    </launcherArgs>
 
@@ -43,7 +41,7 @@ AICML: http://aicml.cs.ualberta.ca
 
    <license>
         <text>
-   Copyright 2014 Canadian BioSample Repository. All rights reserved.
+   Copyright 2018 Canadian BioSample Repository. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
