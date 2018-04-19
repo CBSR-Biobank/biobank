@@ -1927,6 +1927,11 @@
         id="edu.ualberta.med.biobank.forms.SpecimenPositionBatchOpViewForm"
         name="%SpecimenPositionImport.editor">
 </editor>
+<editor class="edu.ualberta.med.biobank.forms.batchop.GrandchildSpecimenBatchOpViewForm"
+        default="false"
+        id="edu.ualberta.med.biobank.forms.GrandchildSpecimenBatchOpViewForm"
+        name="%SpecimenPositionImport.editor">
+</editor>
 <editor class="edu.ualberta.med.biobank.forms.batchop.SpecimenMultipleBatchOpViewForm"
         default="false"
         id="edu.ualberta.med.biobank.forms.MultipleBatchOpViewForm"
