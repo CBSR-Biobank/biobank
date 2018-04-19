@@ -31,7 +31,6 @@ public class GrandchildSpecimenTypeTestConfig extends AliquotsTestConfig {
         session.beginTransaction();
         grandchildSpecimenType = createSpecimenTypes();
         addToStudies();
-        addAliquots();
         session.getTransaction().commit();
     }
 
