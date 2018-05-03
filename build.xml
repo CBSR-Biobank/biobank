@@ -182,7 +182,7 @@
     <flyway:validate/>
   </target>
 
-  <property name="ivy.install.version" value="2.2.0" />
+  <property name="ivy.install.version" value="2.4.0" />
   <condition property="ivy.home" value="${env.IVY_HOME}">
     <isset property="env.IVY_HOME" />
   </condition>
