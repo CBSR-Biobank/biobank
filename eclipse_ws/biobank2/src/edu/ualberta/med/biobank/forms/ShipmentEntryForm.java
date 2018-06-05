@@ -194,7 +194,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         createSpecimensSection();
     }
 
-    @SuppressWarnings({ "nls", "unchecked" })
+    @SuppressWarnings("nls")
     private void createMainSection() throws Exception, ApplicationException {
         Composite client = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
