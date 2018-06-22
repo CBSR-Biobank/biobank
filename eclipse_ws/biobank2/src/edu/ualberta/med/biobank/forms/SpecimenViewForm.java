@@ -417,36 +417,26 @@ public class SpecimenViewForm extends BiobankViewForm {
         setCheckBoxValue(isSourceSpcButton, isSourceSpc);
 
         if (!isSourceSpc) {
-            setTextValue(sourceInvIdLabel, specimenWrapper.getTopSpecimen()
-                .getInventoryId());
+            setTextValue(sourceInvIdLabel, specimenWrapper.getTopSpecimen().getInventoryId());
 
-            setTextValue(parentInvIdLabel, specimenWrapper.getParentSpecimen()
-                .getInventoryId());
+            SpecimenWrapper parentSpecimen = specimenWrapper.getParentSpecimen();
+            if (parentSpecimen != null) {
+                setTextValue(parentInvIdLabel, parentSpecimen.getInventoryId());
 
-            ProcessingEventWrapper pevent = specimenWrapper.getParentSpecimen()
-                .getProcessingEvent();
-
-            if (pevent != null) {
-                setTextValue(sourcePeventLabel,
-                    new StringBuilder(pevent.getFormattedCreatedAt())
-                        .append(" (").append(i18n.tr("worksheet: {0}",
-                            pevent.getWorksheet())).append(")").toString());
+                ProcessingEventWrapper pevent = parentSpecimen.getProcessingEvent();
+                if (pevent != null) {
+                    setTextValue(sourcePeventLabel, getPeventLabel(pevent));
+                }
             }
         }
 
         ProcessingEventWrapper pevent = specimenWrapper.getProcessingEvent();
         if (pevent != null) {
-            setTextValue(
-                peventLabel,
-                new StringBuilder(pevent.getFormattedCreatedAt()).append(" (")
-                    .append(
-                        i18n.tr("worksheet: {0}",
-                            pevent.getWorksheet())).append(")").toString());
+            setTextValue(peventLabel, getPeventLabel(pevent));
         }
 
         setTextValue(childrenLabel,
-            specimenWrapper.getChildSpecimenCollection(false)
-                .size());
+            specimenWrapper.getChildSpecimenCollection(false).size());
         setTextValue(activityStatusLabel, specimenWrapper.getActivityStatus());
         setTextValue(commentLabel, specimenWrapper.getCommentCollection(false));
 
@@ -460,4 +450,12 @@ public class SpecimenViewForm extends BiobankViewForm {
         // prevented with this method left empty
     }
 
+    @SuppressWarnings("nls")
+    private String getPeventLabel(ProcessingEventWrapper pevent) {
+        StringBuilder label = new StringBuilder(pevent.getFormattedCreatedAt());
+        label.append(" (");
+        label.append(i18n.tr("worksheet: {0}", pevent.getWorksheet()));
+        label.append(")");
+        return label.toString();
+    }
 }
