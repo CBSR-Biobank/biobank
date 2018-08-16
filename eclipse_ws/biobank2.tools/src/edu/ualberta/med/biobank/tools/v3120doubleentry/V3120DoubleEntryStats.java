@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.tools.v3100doubleentry;
+package edu.ualberta.med.biobank.tools.v3120doubleentry;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -14,22 +14,24 @@ import org.apache.log4j.PropertyConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import edu.ualberta.med.biobank.tools.v3100doubleentry.V3100DoubleEntryStats;
+
 /**
- * The databases "biobank_v390_de" and "biobank_v3100_de" must first be populated on the host
+ * The databases "biobank_v3100_de" and "biobank_v3120_de" must first be populated on the host
  * machine prior to running this code. A database dump of the production database goes into
  * "biobank_v3100_de", and a database dump of the test environment database goes into
- * "biobank_v390_de".
+ * "biobank_v3120_de".
  *
  * @author Nelson Loyola
  *
  */
-public class V3100DoubleEntryStats {
+public class V3120DoubleEntryStats {
 
     private static Logger log = LoggerFactory.getLogger(V3100DoubleEntryStats.class);
 
-    public static final String DB_NAME_PRODUCTION = "biobank_v321_de";
+    public static final String DB_NAME_PRODUCTION = "biobank_v3100_de";
 
-    public static final String DB_NAME_TEST = "biobank_v3100_de";
+    public static final String DB_NAME_TEST = "biobank_v3120_de";
 
     public static final String BASE_QRY = " FROM specimen spc"
         + " LEFT JOIN specimen pspc on pspc.id=spc.parent_specimen_id"
@@ -53,9 +55,9 @@ public class V3100DoubleEntryStats {
 
     public static final String ORDER_BY_CLAUSE = " ORDER BY s.name_short,p.pnumber,spc.inventory_id,spc.created_at";
 
-    public static final String DATE_START = "2015-06-28 00:00";
+    public static final String DATE_START = "2018-08-10 16:00";
 
-    public static final String DATE_END = "2015-06-29 23:59";
+    public static final String DATE_END = "2018-08-15 23:00";
 
     private static class DoubleEntryData {
         int studyCount;
@@ -70,13 +72,13 @@ public class V3100DoubleEntryStats {
 
     public static void main(String[] argv) {
         try {
-            new V3100DoubleEntryStats();
+            new V3120DoubleEntryStats();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private V3100DoubleEntryStats() throws SQLException {
+    private V3120DoubleEntryStats() throws SQLException {
         PropertyConfigurator.configure("conf/log4j.properties");
         DoubleEntryData prodData = getDbStats(DB_NAME_PRODUCTION);
         DoubleEntryData testData = getDbStats(DB_NAME_TEST);
