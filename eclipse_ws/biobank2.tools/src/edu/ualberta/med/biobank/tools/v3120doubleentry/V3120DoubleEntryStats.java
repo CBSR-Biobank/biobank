@@ -55,9 +55,9 @@ public class V3120DoubleEntryStats {
 
     public static final String ORDER_BY_CLAUSE = " ORDER BY s.name_short,p.pnumber,spc.inventory_id,spc.created_at";
 
-    public static final String DATE_START = "2018-08-10 16:00";
+    public static final String DATE_START = "2018-08-10 09:00";
 
-    public static final String DATE_END = "2018-08-15 23:00";
+    public static final String DATE_END = "2018-08-15 09:00";
 
     private static class DoubleEntryData {
         int studyCount;
