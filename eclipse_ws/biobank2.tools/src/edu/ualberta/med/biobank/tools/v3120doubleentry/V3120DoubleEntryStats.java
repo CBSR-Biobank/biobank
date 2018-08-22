@@ -68,6 +68,7 @@ public class V3120DoubleEntryStats {
         Set<String> patients;
         Set<String> cevents;
         Map<String, Object[]> specimens;
+        Map<String, Object[]> importedSpecimens;
     }
 
     public static void main(String[] argv) {
@@ -103,11 +104,15 @@ public class V3120DoubleEntryStats {
         System.out.println("scan assigned specimens,"
             + prodData.specimensScanAssigned + ","
             + testData.specimensScanAssigned);
+        System.out.println("imported specimens,"
+            + prodData.importedSpecimens.size() + ","
+            + testData.importedSpecimens.size());
         System.out.println();
 
         printPatientDelta(prodData, testData);
         printCeventDelta(prodData, testData);
         printSpecimenDelta(prodData, testData);
+        printImportedSpecimenDelta(prodData, testData);
     }
 
     private void printPatientDelta(DoubleEntryData prodData,
@@ -227,6 +232,41 @@ public class V3120DoubleEntryStats {
         }
     }
 
+    private void printImportedSpecimenDelta(DoubleEntryData prodData, DoubleEntryData testData) {
+        Map<String, Object[]> notInTestDb = new LinkedHashMap<String, Object[]>();
+        Map<String, Object[]> notInProdDb = new LinkedHashMap<String, Object[]>();
+
+        // check for specimens in production db and not in test db
+        for (String inventoryId : prodData.importedSpecimens.keySet()) {
+            if (!testData.importedSpecimens.containsKey(inventoryId)) {
+                notInTestDb.put(inventoryId, prodData.specimens.get(inventoryId));
+            }
+        }
+
+        // check for specimens in production db and not in test db
+        for (String inventoryId : testData.importedSpecimens.keySet()) {
+            if (!prodData.importedSpecimens.containsKey(inventoryId)) {
+                notInProdDb.put(inventoryId, testData.specimens.get(inventoryId));
+            }
+        }
+
+        if (notInTestDb.size() > 0) {
+            System.out.println("Imported specimens not in Test DB: (" + notInTestDb.size() + ")");
+            for (String inventoryId : notInTestDb.keySet()) {
+                System.out.println(inventoryId);
+            }
+            System.out.println();
+        }
+
+        if (notInProdDb.size() > 0) {
+            System.out.println("Imported Specimens not in Production DB: (" + notInProdDb.size() + ")");
+            for (String inventoryId : notInProdDb.keySet()) {
+                System.out.println(inventoryId);
+            }
+            System.out.println();
+        }
+    }
+
     private DoubleEntryData getDbStats(String dbName) throws SQLException {
         Connection dbCon = DriverManager.getConnection(
             "jdbc:mysql://localhost:3306/" + dbName, "dummy", "ozzy498");
@@ -239,17 +279,16 @@ public class V3120DoubleEntryStats {
         deData.cevents = getCevents(BASE_QRY, dbCon);
         deData.peventCount = getPeventCount(BASE_QRY, dbCon);
         deData.specimensCreated = getSpecimensCreatedCount(BASE_QRY, dbCon);
-        deData.specimensScanAssigned = getSpecimensScanAssignedCount(BASE_QRY,
-            dbCon);
+        deData.specimensScanAssigned = getSpecimensScanAssignedCount(BASE_QRY, dbCon);
         deData.specimens = getSpecimens(BASE_QRY, dbCon);
+        deData.importedSpecimens = getImportedSpecimens(dbCon);
 
         return deData;
     }
 
     private int getStudiesCount(String baseQry, Connection dbCon)
         throws SQLException {
-        PreparedStatement ps = dbCon.prepareCall("SELECT COUNT(DISTINCT s.id) "
-            + baseQry);
+        PreparedStatement ps = dbCon.prepareCall("SELECT COUNT(DISTINCT s.id) " + baseQry);
         ResultSet rs = doQuery(ps);
         rs.next();
         return rs.getInt(1);
@@ -257,8 +296,7 @@ public class V3120DoubleEntryStats {
 
     private int getOriginCentersCount(String baseQry, Connection dbCon)
         throws SQLException {
-        PreparedStatement ps = dbCon
-            .prepareCall("SELECT COUNT(DISTINCT ocenter.id) " + baseQry);
+        PreparedStatement ps = dbCon.prepareCall("SELECT COUNT(DISTINCT ocenter.id) " + baseQry);
         ResultSet rs = doQuery(ps);
         rs.next();
         return rs.getInt(1);
@@ -266,8 +304,7 @@ public class V3120DoubleEntryStats {
 
     private Set<String> getPatients(String baseQry, Connection dbCon)
         throws SQLException {
-        PreparedStatement ps = dbCon.prepareCall("SELECT DISTINCT p.pnumber "
-            + baseQry);
+        PreparedStatement ps = dbCon.prepareCall("SELECT DISTINCT p.pnumber " + baseQry);
         ResultSet rs = doQuery(ps);
 
         Set<String> results = new LinkedHashSet<String>();
@@ -279,9 +316,8 @@ public class V3120DoubleEntryStats {
 
     private Set<String> getCevents(String baseQry, Connection dbCon)
         throws SQLException {
-        PreparedStatement ps = dbCon
-            .prepareCall("SELECT DISTINCT ce.visit_number, p.pnumber "
-                + baseQry);
+        PreparedStatement ps =
+            dbCon.prepareCall("SELECT DISTINCT ce.visit_number, p.pnumber " + baseQry);
         ResultSet rs = doQuery(ps);
 
         Set<String> results = new LinkedHashSet<String>();
@@ -302,8 +338,7 @@ public class V3120DoubleEntryStats {
 
     private int getSpecimensCreatedCount(String baseQry, Connection dbCon)
         throws SQLException {
-        PreparedStatement ps = dbCon
-            .prepareCall("SELECT COUNT(DISTINCT spc.id) " + baseQry);
+        PreparedStatement ps = dbCon.prepareCall("SELECT COUNT(DISTINCT spc.id) " + baseQry);
         ResultSet rs = doQuery(ps);
         rs.next();
         return rs.getInt(1);
@@ -321,14 +356,40 @@ public class V3120DoubleEntryStats {
 
     private Map<String, Object[]> getSpecimens(String baseQry, Connection dbCon)
         throws SQLException {
-        PreparedStatement ps = dbCon.prepareCall(SELECT_DETAILS_CLAUSE
-            + baseQry + ORDER_BY_CLAUSE);
+        PreparedStatement ps = dbCon.prepareCall(SELECT_DETAILS_CLAUSE + baseQry + ORDER_BY_CLAUSE);
         ResultSet rs = doQuery(ps);
 
         Map<String, Object[]> results = new LinkedHashMap<String, Object[]>();
         while (rs.next()) {
             results.put(
                 rs.getString(7),
+                new Object[] { rs.getString(1), rs.getString(2),
+                    rs.getString(3), rs.getString(4), rs.getString(5),
+                    rs.getString(6), rs.getString(7), rs.getString(8),
+                    rs.getString(9), rs.getString(10),
+                    rs.getString(11), rs.getString(12),
+                    rs.getString(13), });
+        }
+        return results;
+    }
+
+
+
+    private Map<String, Object[]> getImportedSpecimens(Connection dbCon)
+        throws SQLException {
+        final String qry = "SELECT spc.*, op.time_executed "
+            + "FROM batch_operation op "
+            + "LEFT JOIN batch_operation_specimen opspc on opspc.batch_operation_id=op.id "
+            + "LEFT JOIN specimen spc on spc.id=opspc.specimen_id "
+            + "WHERE op.time_executed >= convert_tz(?,'Canada/Mountain','GMT') "
+            + "AND op.time_executed <= convert_tz(?,'Canada/Mountain','GMT');";
+        PreparedStatement ps = dbCon.prepareCall(qry);
+        ResultSet rs = doQuery(ps);
+
+        Map<String, Object[]> results = new LinkedHashMap<String, Object[]>();
+        while (rs.next()) {
+            results.put(
+                rs.getString(2),
                 new Object[] { rs.getString(1), rs.getString(2),
                     rs.getString(3), rs.getString(4), rs.getString(5),
                     rs.getString(6), rs.getString(7), rs.getString(8),
