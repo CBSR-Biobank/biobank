@@ -53,6 +53,13 @@ public class V3120DoubleEntryStats {
         + "pspc.inventory_id parent_spc_inv_id,stype.name,date(spc.created_at),"
         + "row,col,label";
 
+    public static final String SPECIMENS_ASSIGNED_FROM_LOG = "SELECT * "
+        + "FROM log "
+        + "WHERE created_at >= convert_tz(?,'Canada/Mountain','GMT') "
+        + "AND created_at <= convert_tz(?,'Canada/Mountain','GMT') "
+        + "AND location_label<>'' "
+        + "ORDER BY inventory_id";
+
     public static final String ORDER_BY_CLAUSE = " ORDER BY s.name_short,p.pnumber,spc.inventory_id,spc.created_at";
 
     public static final String DATE_START = "2018-08-10 09:00";
@@ -69,6 +76,7 @@ public class V3120DoubleEntryStats {
         Set<String> cevents;
         Map<String, Object[]> specimens;
         Map<String, Object[]> importedSpecimens;
+        Map<String, Object[]> assignedSpecimensFromLog;
     }
 
     public static void main(String[] argv) {
@@ -107,12 +115,16 @@ public class V3120DoubleEntryStats {
         System.out.println("imported specimens,"
             + prodData.importedSpecimens.size() + ","
             + testData.importedSpecimens.size());
+        System.out.println("scan assigned specimens from log,"
+            + prodData.assignedSpecimensFromLog.size() + ","
+            + testData.assignedSpecimensFromLog.size());
         System.out.println();
 
         printPatientDelta(prodData, testData);
         printCeventDelta(prodData, testData);
         printSpecimenDelta(prodData, testData);
         printImportedSpecimenDelta(prodData, testData);
+        printAssignedSpecimenFromLogDelta(prodData, testData);
     }
 
     private void printPatientDelta(DoubleEntryData prodData,
@@ -239,14 +251,14 @@ public class V3120DoubleEntryStats {
         // check for specimens in production db and not in test db
         for (String inventoryId : prodData.importedSpecimens.keySet()) {
             if (!testData.importedSpecimens.containsKey(inventoryId)) {
-                notInTestDb.put(inventoryId, prodData.specimens.get(inventoryId));
+                notInTestDb.put(inventoryId, prodData.importedSpecimens.get(inventoryId));
             }
         }
 
         // check for specimens in production db and not in test db
         for (String inventoryId : testData.importedSpecimens.keySet()) {
             if (!prodData.importedSpecimens.containsKey(inventoryId)) {
-                notInProdDb.put(inventoryId, testData.specimens.get(inventoryId));
+                notInProdDb.put(inventoryId, testData.importedSpecimens.get(inventoryId));
             }
         }
 
@@ -267,9 +279,48 @@ public class V3120DoubleEntryStats {
         }
     }
 
+    private void printAssignedSpecimenFromLogDelta(DoubleEntryData prodData, DoubleEntryData testData) {
+        Map<String, Object[]> notInTestDb = new LinkedHashMap<String, Object[]>();
+        Map<String, Object[]> notInProdDb = new LinkedHashMap<String, Object[]>();
+
+        // check for specimens in production db and not in test db
+        for (String inventoryId : prodData.assignedSpecimensFromLog.keySet()) {
+            if (!testData.assignedSpecimensFromLog.containsKey(inventoryId)) {
+                notInTestDb.put(inventoryId, prodData.specimens.get(inventoryId));
+            }
+        }
+
+        // check for specimens in production db and not in test db
+        for (String inventoryId : testData.assignedSpecimensFromLog.keySet()) {
+            if (!prodData.assignedSpecimensFromLog.containsKey(inventoryId)) {
+                notInProdDb.put(inventoryId, testData.assignedSpecimensFromLog.get(inventoryId));
+            }
+        }
+
+        if (notInTestDb.size() > 0) {
+            System.out.println("Assigned specimens (in log) not in Test DB: ("
+                + notInTestDb.size() + ")");
+            for (String inventoryId : notInTestDb.keySet()) {
+                System.out.println(inventoryId);
+            }
+            System.out.println();
+        }
+
+        if (notInProdDb.size() > 0) {
+            System.out.println("Assigned Specimens (in log) not in Production DB: ("
+                + notInProdDb.size() + ")");
+            for (String inventoryId : notInProdDb.keySet()) {
+                System.out.println(inventoryId);
+            }
+            System.out.println();
+        }
+    }
+
     private DoubleEntryData getDbStats(String dbName) throws SQLException {
         Connection dbCon = DriverManager.getConnection(
             "jdbc:mysql://localhost:3306/" + dbName, "dummy", "ozzy498");
+
+        log.info("dbname: {}", dbName);
 
         DoubleEntryData deData = new DoubleEntryData();
 
@@ -282,6 +333,7 @@ public class V3120DoubleEntryStats {
         deData.specimensScanAssigned = getSpecimensScanAssignedCount(BASE_QRY, dbCon);
         deData.specimens = getSpecimens(BASE_QRY, dbCon);
         deData.importedSpecimens = getImportedSpecimens(dbCon);
+        deData.assignedSpecimensFromLog = getSpecimensAssignedFromLog(dbCon);
 
         return deData;
     }
@@ -396,6 +448,23 @@ public class V3120DoubleEntryStats {
                     rs.getString(9), rs.getString(10),
                     rs.getString(11), rs.getString(12),
                     rs.getString(13), });
+        }
+        return results;
+    }
+
+    private Map<String, Object[]> getSpecimensAssignedFromLog(Connection dbCon)
+        throws SQLException {
+        PreparedStatement ps = dbCon.prepareCall(SPECIMENS_ASSIGNED_FROM_LOG);
+        ResultSet rs = doQuery(ps);
+
+        Map<String, Object[]> results = new LinkedHashMap<>();
+        while (rs.next()) {
+            results.put(
+                rs.getString(7),
+                new Object[] { rs.getString(1), rs.getString(2),
+                    rs.getString(3), rs.getString(4), rs.getString(5),
+                    rs.getString(6), rs.getString(7), rs.getString(8),
+                    rs.getString(9), rs.getString(10) });
         }
         return results;
     }
