@@ -176,7 +176,7 @@ public class TestGrandchildSpecimenBatchOp
     }
 
     @Test
-    public void parentSpecimenDoesInvalid() throws Exception {
+    public void parentSpecimenInvalid() throws Exception {
         LString expectedError;
 
         for (String testCase : Arrays.asList("empty", "invalid")) {

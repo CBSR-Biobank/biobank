@@ -97,6 +97,7 @@ public abstract class CommonSpecimenBatachOpTests<T extends IBatchOpSpecimenInpu
         Assert.assertTrue("empty CSV data", pojos.size() > 0);
 
         for (T pojo : pojos) {
+            pojo.setOriginCenter(defaultClinic.getNameShort());
             pojo.setCurrentCenter(defaultSite.getNameShort());
         }
 
@@ -116,16 +117,19 @@ public abstract class CommonSpecimenBatachOpTests<T extends IBatchOpSpecimenInpu
     protected void currentCenterIsInvalid(IPojosCreator<T> pojosCreator) throws Exception {
         for (String testCase : Arrays.asList("empty", "invalid")) {
             Set<T> pojos = pojosCreator.create();
+            String centerName;
+
             Assert.assertTrue("empty CSV data", pojos.size() > 0);
 
             if (testCase.equals("empty")) {
-                for (T pojo : pojos) {
-                    pojo.setCurrentCenter(StringUtil.EMPTY_STRING);
-                }
+                centerName = StringUtil.EMPTY_STRING;
             } else {
-                for (T pojo : pojos) {
-                    pojo.setCurrentCenter(nameGenerator.next(Center.class));
-                }
+                centerName = nameGenerator.next(Center.class);
+            }
+
+            for (T pojo : pojos) {
+                pojo.setOriginCenter(defaultClinic.getNameShort());
+                pojo.setCurrentCenter(centerName);
             }
 
             File file = writePojosToCsv(pojos);

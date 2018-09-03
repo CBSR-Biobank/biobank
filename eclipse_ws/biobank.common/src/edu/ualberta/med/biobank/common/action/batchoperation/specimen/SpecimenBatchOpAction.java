@@ -448,7 +448,7 @@ public class SpecimenBatchOpAction extends CommonSpecimenBatchOpAction<SpecimenB
                                       pevent,
                                       pojoData.getSpecimenType(),
                                       pojoData.getPojo().getSourceSpecimen(),
-                                      pojoData.getOriginCenter(),
+                                      pojoData.getCurrentCenter(),
                                       pojoData.getOriginInfo(),
                                       pojoData.getPojo().getCreatedAt(),
                                       pojoData.getPojo().getVolume(),
