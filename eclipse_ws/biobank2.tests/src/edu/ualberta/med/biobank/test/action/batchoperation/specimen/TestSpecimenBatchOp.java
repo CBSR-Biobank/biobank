@@ -690,9 +690,9 @@ public class TestSpecimenBatchOp extends CommonSpecimenBatachOpTests<SpecimenBat
             specimenCsvHelper.createAliquotedSpecimens(patients);
 
         for (SpecimenBatchOpInputPojo pojo : pojos) {
-            pojo.setParentInventoryId(StringUtil.EMPTY_STRING);
+            pojo.setParentInventoryId(null);
             pojo.setPatientNumber(patient.getPnumber());
-            pojo.setVisitNumber(event.getVisitNumber());
+            pojo.setVisitNumber(event.getVisitNumber() + 10);
         }
 
         SpecimenBatchOpCsvWriter.write(CSV_NAME, pojos);
@@ -701,7 +701,7 @@ public class TestSpecimenBatchOp extends CommonSpecimenBatachOpTests<SpecimenBat
             SpecimenBatchOpAction importAction =
                 new SpecimenBatchOpAction(factory.getDefaultSite(), pojos, new File(CSV_NAME));
             exec(importAction);
-            fail("should not be allowed to create aliquot specimens with invalid patients");
+            fail("should not be allowed to create aliquot specimens with an invalid visit number");
         } catch (BatchOpErrorsException e) {
             new AssertBatchOpException().withMessage(CSV_CEVENT_ERROR.format()).assertIn(e);
         }
