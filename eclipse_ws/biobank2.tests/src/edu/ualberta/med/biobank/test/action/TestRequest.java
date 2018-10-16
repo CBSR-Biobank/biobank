@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.test.action;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -9,30 +10,37 @@ import javax.validation.ConstraintViolationException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
-import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
 import edu.ualberta.med.biobank.common.action.info.RequestReadInfo;
-import edu.ualberta.med.biobank.common.action.info.ResearchGroupReadInfo;
 import edu.ualberta.med.biobank.common.action.request.RequestClaimAction;
 import edu.ualberta.med.biobank.common.action.request.RequestDeleteAction;
 import edu.ualberta.med.biobank.common.action.request.RequestGetInfoAction;
 import edu.ualberta.med.biobank.common.action.request.RequestGetSpecimenInfosAction;
 import edu.ualberta.med.biobank.common.action.request.RequestStateChangeAction;
 import edu.ualberta.med.biobank.common.action.researchGroup.RequestSubmitAction;
-import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupGetInfoAction;
-import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
+import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.Request;
 import edu.ualberta.med.biobank.model.RequestSpecimen;
 import edu.ualberta.med.biobank.model.ResearchGroup;
+import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.type.RequestSpecimenState;
-import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
-import edu.ualberta.med.biobank.test.action.helper.PatientHelper;
+import edu.ualberta.med.biobank.test.action.helper.ContainerHelper;
 import edu.ualberta.med.biobank.test.action.helper.RequestHelper;
 
 public class TestRequest extends TestAction {
 
+    private static final Logger log = LoggerFactory.getLogger(TestRequest.class);
+
     private ResearchGroup researchGroup;
+
+    private enum SubmitActionType {
+        NO_STUDY_NO_SITE,
+        STUDY_AND_SITE
+    }
 
     @Override
     @Before
@@ -45,40 +53,49 @@ public class TestRequest extends TestAction {
 
     @Test
     public void testUpload() throws Exception {
+        for (SubmitActionType actionType: SubmitActionType.values()) {
+            List<String> specimenIds = new ArrayList<>();
+            session.beginTransaction();
+            Container container = factory.createContainer();
+            factory.createCollectionEvent();
+            for (int i = 0; i < 5; i++) {
+                Specimen specimen = factory.createParentSpecimen();
+                specimenIds.add(specimen.getInventoryId());
+                ContainerHelper.placeSpecimenInContainer(session, specimen, container);
+                session.update(specimen);
+                log.info("actionType" + actionType + ", specimen added: " + specimen.getInventoryId());
+            }
+            session.getTransaction().commit();
 
-        ResearchGroupGetInfoAction rgInfo =
-            new ResearchGroupGetInfoAction(researchGroup.getId());
-        ResearchGroupReadInfo rg = exec(rgInfo);
+            Integer reqId = null;
 
-        // create specs
-        Integer p = PatientHelper.createPatient(getExecutor(), testName + "_patient", rg.getResearchGroup().getStudies().iterator().next().getId());
-        Integer ceId = CollectionEventHelper.createCEventWithSourceSpecimens(getExecutor(), p, researchGroup);
+            // request specimens
+            switch (actionType) {
 
-        CollectionEventGetInfoAction ceReader =
-            new CollectionEventGetInfoAction(ceId);
-        CEventInfo ceInfo = exec(ceReader);
-        List<String> specs = new ArrayList<String>();
-        for (SpecimenInfo specInfo : ceInfo.sourceSpecimenInfos)
-            specs.add(specInfo.specimen.getInventoryId());
+            case STUDY_AND_SITE: {
+                Study study = factory.getDefaultStudy();
+                Site site = factory.getDefaultSite();
+                reqId = exec(new RequestSubmitAction(researchGroup.getId(),
+                                                     specimenIds,
+                                                     Arrays.asList(study.getId().toString()),
+                                                     site.getId())).getId();
+                break;
+            }
 
-        Assert.assertTrue(ceInfo.sourceSpecimenInfos.size() >= 2);
-        specs.remove(Math.abs(getR().nextInt()) % specs.size());
-        specs.remove(Math.abs(getR().nextInt()) % specs.size());
+            case NO_STUDY_NO_SITE: {
+                reqId = exec(new RequestSubmitAction(researchGroup.getId(), specimenIds)).getId();
+                break;
+            }
 
-        // request specs
-        RequestSubmitAction action =
-            new RequestSubmitAction(researchGroup.getId(), specs);
-        Integer rId = exec(action).getId();
+            }
 
-        // make sure you got what was requested
-        RequestGetSpecimenInfosAction specAction =
-            new RequestGetSpecimenInfosAction(rId);
-        List<Object[]> specInfo = exec(specAction).getList();
+            // make sure you got what was requested
+            List<Object[]> specData = exec(new RequestGetSpecimenInfosAction(reqId)).getList();
 
-        for (int i = 0; i < specInfo.size(); i++) {
-            RequestSpecimen spec = (RequestSpecimen) specInfo.get(i)[0];
-            Assert.assertTrue(specs.contains(spec.getSpecimen()
-                .getInventoryId()));
+            for (Object[] specInfo : specData) {
+                RequestSpecimen spec = (RequestSpecimen) specInfo[0];
+                Assert.assertTrue(specimenIds.contains(spec.getSpecimen().getInventoryId()));
+            }
         }
     }
 

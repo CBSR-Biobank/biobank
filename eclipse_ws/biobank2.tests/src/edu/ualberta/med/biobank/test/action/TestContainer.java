@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.test.action;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import junit.framework.Assert;
 
@@ -22,9 +21,9 @@ import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Specimen;
-import edu.ualberta.med.biobank.model.SpecimenPosition;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.util.RowColPos;
+import edu.ualberta.med.biobank.test.action.helper.ContainerHelper;
 
 public class TestContainer extends TestAction {
 
@@ -116,52 +115,6 @@ public class TestContainer extends TestAction {
         Assert.assertEquals(uniqueString, container.getComments().iterator().next().getMessage());
     }
 
-    // Returns the first empty position
-    private RowColPos getEmptyPosition(Container container) {
-        ContainerType ctype = container.getContainerType();
-        Integer rowCap = ctype.getCapacity().getRowCapacity();
-        Integer colCap = ctype.getCapacity().getColCapacity();
-        for (int row = 0; row < rowCap; ++row) {
-            for (int col = 0; col < colCap; ++col) {
-                RowColPos pos = new RowColPos(row, col);
-                if (container.isPositionFree(pos)) {
-                    return pos;
-                }
-            }
-        }
-        return null;
-    }
-
-    private SpecimenPosition placeSpecimenInContainer(Specimen specimen, Container container) {
-        ContainerType ctype = container.getContainerType();
-
-        SpecimenType specimenType = specimen.getSpecimenType();
-        Set<SpecimenType> specimenTypes = ctype.getSpecimenTypes();
-        if (!specimenTypes.contains(specimenType)) {
-            ctype.getSpecimenTypes().add(specimenType);
-            session.update(ctype);
-            session.flush();
-        }
-
-        RowColPos emptyPosition = getEmptyPosition(container);
-        SpecimenPosition specimenPosition = new SpecimenPosition();
-        specimenPosition.setRow(emptyPosition.getRow());
-        specimenPosition.setCol(emptyPosition.getCol());
-        specimenPosition.setSpecimen(specimen);
-        specimenPosition.setContainer(container);
-        specimen.setSpecimenPosition(specimenPosition);
-        container.getSpecimenPositions().add(specimenPosition);
-
-        String positionString = ContainerLabelingScheme.getPositionString(
-            emptyPosition,
-            ctype.getChildLabelingScheme().getId(),
-            ctype.getCapacity().getRowCapacity(),
-            ctype.getCapacity().getColCapacity(),
-            ctype.getLabelingLayout());
-        specimenPosition.setPositionString(positionString);
-        return specimenPosition;
-    }
-
     @Test
     public void checkGetAction() throws Exception {
         session.beginTransaction();
@@ -169,11 +122,11 @@ public class TestContainer extends TestAction {
 
         // create a parent specimen and place it in this container
         Specimen parentSpecimen = factory.createParentSpecimen();
-        placeSpecimenInContainer(parentSpecimen, container);
+        ContainerHelper.placeSpecimenInContainer(session, parentSpecimen, container);
 
         // create a child specimen and place it in this container
         Specimen childSpecimen = factory.createChildSpecimen();
-        placeSpecimenInContainer(childSpecimen, container);
+        ContainerHelper.placeSpecimenInContainer(session, childSpecimen, container);
 
         session.getTransaction().commit();
 
@@ -372,7 +325,7 @@ public class TestContainer extends TestAction {
     }
 
     /**
-     * 
+     *
      */
     @Test
     public void getContainerByProductBarcode() {
