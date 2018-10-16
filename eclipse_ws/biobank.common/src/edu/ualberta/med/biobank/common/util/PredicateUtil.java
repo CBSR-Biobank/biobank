@@ -32,7 +32,7 @@ public class PredicateUtil {
     }
 
     public static <T> Predicate<T> andPredicate(final Predicate<T> p1,
-        final Predicate<T> p2, final Predicate<T>... pN) {
+        final Predicate<T> p2, @SuppressWarnings("unchecked") final Predicate<T>... pN) {
         return new Predicate<T>() {
             @Override
             public boolean evaluate(T type) {
@@ -52,7 +52,7 @@ public class PredicateUtil {
     }
 
     public static <T> Predicate<T> orPredicate(final Predicate<T> p1,
-        final Predicate<T> p2, final Predicate<T>... pN) {
+        final Predicate<T> p2, @SuppressWarnings("unchecked") final Predicate<T>... pN) {
         return new Predicate<T>() {
             @Override
             public boolean evaluate(T type) {
