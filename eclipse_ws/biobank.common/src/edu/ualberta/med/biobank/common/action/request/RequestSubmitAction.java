@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.common.action.researchGroup;
+package edu.ualberta.med.biobank.common.action.request;
 
 import java.util.ArrayList;
 import java.util.Date;

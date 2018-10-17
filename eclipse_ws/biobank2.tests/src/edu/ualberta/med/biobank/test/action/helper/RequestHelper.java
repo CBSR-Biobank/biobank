@@ -1,79 +1,94 @@
 package edu.ualberta.med.biobank.test.action.helper;
 
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-import org.hibernate.Query;
 import org.hibernate.Session;
 
-import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
-import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
-import edu.ualberta.med.biobank.common.action.info.ResearchGroupReadInfo;
-import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupGetInfoAction;
-import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
+import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.Dispatch;
+import edu.ualberta.med.biobank.model.DispatchSpecimen;
 import edu.ualberta.med.biobank.model.Request;
 import edu.ualberta.med.biobank.model.RequestSpecimen;
 import edu.ualberta.med.biobank.model.ResearchGroup;
+import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.type.RequestSpecimenState;
-import edu.ualberta.med.biobank.test.Utils;
-import edu.ualberta.med.biobank.test.action.IActionExecutor;
+import edu.ualberta.med.biobank.test.Factory;
 
 public class RequestHelper extends Helper {
 
-    public static Integer createRequest(Session session,
-                                        IActionExecutor actionExecutor,
+    /*
+     * Creates a request with specimens, and the specimens are stored in a container.
+     */
+    public static Request createRequest(Session session,
+                                        Factory factory,
                                         ResearchGroup researchGroup) throws Exception {
+
+        List<String> specimenIds = new ArrayList<>();
+
         session.beginTransaction();
-        String name = Utils.getRandomString(5);
-
-        ResearchGroupGetInfoAction reader =
-            new ResearchGroupGetInfoAction(researchGroup.getId());
-        ResearchGroupReadInfo rg = actionExecutor.exec(reader);
-
-        // create specs
-        Integer p = PatientHelper.createPatient(actionExecutor, name + "_patient", rg.getResearchGroup().getStudies().iterator().next().getId());
-        Integer ceId = CollectionEventHelper.createCEventWithSourceSpecimens(
-                actionExecutor, p, researchGroup);
-
-        CollectionEventGetInfoAction ceReader =
-            new CollectionEventGetInfoAction(ceId);
-        CEventInfo ceInfo = actionExecutor.exec(ceReader);
-        List<String> specs = new ArrayList<String>();
-        for (SpecimenInfo specInfo : ceInfo.sourceSpecimenInfos)
-            specs.add(specInfo.specimen.getInventoryId());
-
-        // request specs
-        Request request = new Request();
+        Request request = factory.createRequest();
         request.setResearchGroup(researchGroup);
-        request.setCreatedAt(new Date());
-        request.setAddress(researchGroup.getAddress());
 
+        Set<RequestSpecimen> requestSpecimens = new HashSet<>(0);
+
+        Container container = factory.createContainer();
+        factory.createCollectionEvent();
+        for (int i = 0; i < 5; i++) {
+            Specimen specimen = factory.createParentSpecimen();
+            specimenIds.add(specimen.getInventoryId());
+            ContainerHelper.placeSpecimenInContainer(session, specimen, container);
+            session.update(specimen);
+
+            RequestSpecimen rs = new RequestSpecimen();
+            rs.setRequest(request);
+            rs.setState(RequestSpecimenState.AVAILABLE_STATE);
+            rs.setSpecimen(specimen);
+            session.saveOrUpdate(rs);
+
+            requestSpecimens.add(rs);
+        }
+
+        request.getRequestSpecimens().addAll(requestSpecimens);
         session.saveOrUpdate(request);
 
-        for (String id : specs) {
-            if (id == null || id.equals(""))
-                throw new Exception(
-                    "Blank specimen id, please check your your file for correct input.");
-
-            Query q = session.createQuery("from "
-                + Specimen.class.getName() + " where inventoryId=?");
-            q.setParameter(0, id);
-
-            Specimen spec = (Specimen) q.list().get(0);
-            if (spec == null)
-                continue;
-            RequestSpecimen r =
-                new RequestSpecimen();
-            r.setRequest(request);
-            r.setState(RequestSpecimenState.AVAILABLE_STATE);
-            r.setSpecimen(spec);
-            session.saveOrUpdate(r);
-        }
         session.getTransaction().commit();
         session.flush();
-        return request.getId();
+        return request;
+    }
 
+    public static Dispatch requestAddDispatch(Session session,
+                                              Factory factory,
+                                              Request request) {
+        session.beginTransaction();
+        Site sendingSite = factory.getDefaultSite();
+        Site receivingSite = factory.createSite();
+        Dispatch dispatch = factory.createDispatch(sendingSite, receivingSite);
+
+        Set<DispatchSpecimen> dispatchSpecimens = new HashSet<>(0);
+        for (RequestSpecimen rs : request.getRequestSpecimens()) {
+            DispatchSpecimen dispatchSpecimen = new DispatchSpecimen();
+            dispatchSpecimen.setDispatch(dispatch);
+            dispatchSpecimen.setSpecimen(rs.getSpecimen());
+            session.save(dispatchSpecimen);
+            session.flush();
+
+            dispatchSpecimens.add(dispatchSpecimen);
+        }
+
+        dispatch.getDispatchSpecimens().addAll(dispatchSpecimens);
+        session.saveOrUpdate(dispatch);
+
+        request.setDispatches(new HashSet<>(Arrays.asList(dispatch)));
+        session.saveOrUpdate(request);
+
+        session.getTransaction().commit();
+        session.flush();
+
+        return dispatch;
     }
 }

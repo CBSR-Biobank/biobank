@@ -12,15 +12,13 @@ import edu.ualberta.med.biobank.model.type.RequestSpecimenState;
 
 public class RequestStateChangeAction implements Action<EmptyResult> {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = 3825968229912773240L;
-    private List<Integer> rSpecIds;
-    private RequestSpecimenState state;
 
-    public RequestStateChangeAction(List<Integer> rSpecIds,
-        RequestSpecimenState state) {
+    private final List<Integer> rSpecIds;
+
+    private final RequestSpecimenState state;
+
+    public RequestStateChangeAction(List<Integer> rSpecIds, RequestSpecimenState state) {
         this.rSpecIds = rSpecIds;
         this.state = state;
     }

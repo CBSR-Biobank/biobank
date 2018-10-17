@@ -18,9 +18,12 @@ import edu.ualberta.med.biobank.common.action.request.RequestClaimAction;
 import edu.ualberta.med.biobank.common.action.request.RequestDeleteAction;
 import edu.ualberta.med.biobank.common.action.request.RequestGetInfoAction;
 import edu.ualberta.med.biobank.common.action.request.RequestGetSpecimenInfosAction;
+import edu.ualberta.med.biobank.common.action.request.RequestRetrievalAction;
 import edu.ualberta.med.biobank.common.action.request.RequestStateChangeAction;
-import edu.ualberta.med.biobank.common.action.researchGroup.RequestSubmitAction;
+import edu.ualberta.med.biobank.common.action.request.RequestSubmitAction;
 import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.Dispatch;
+import edu.ualberta.med.biobank.model.DispatchSpecimen;
 import edu.ualberta.med.biobank.model.Request;
 import edu.ualberta.med.biobank.model.RequestSpecimen;
 import edu.ualberta.med.biobank.model.ResearchGroup;
@@ -52,7 +55,82 @@ public class TestRequest extends TestAction {
     }
 
     @Test
-    public void testUpload() throws Exception {
+    public void requestClaim() throws Exception {
+        Request request = RequestHelper.createRequest(session, factory, researchGroup);
+        exec(new RequestClaimAction(getRequestSpecimenIds(request)));
+
+        session.clear();
+        request = (Request) session.get(Request.class, request.getId());
+        for (RequestSpecimen rs : request.getRequestSpecimens()) {
+            Assert.assertNotNull(rs.getClaimedBy());
+            Assert.assertFalse(rs.getClaimedBy().isEmpty());
+        }
+
+    }
+
+    @Test
+    public void requestDelete() throws Exception {
+        Request request = RequestHelper.createRequest(session, factory, researchGroup);
+        exec(new RequestDeleteAction(request));
+
+        session.clear();
+        Request dbCheck = (Request) session.get(Request.class, request.getId());
+        Assert.assertNull(dbCheck);
+    }
+
+    @Test
+    public void requestDeleteNotAllowed() throws Exception {
+        Request request = RequestHelper.createRequest(session, factory, researchGroup);
+
+        session.beginTransaction();
+        request.setSubmitted(new Date());
+        session.saveOrUpdate(request);
+        session.getTransaction().commit();
+
+        try {
+            exec(new RequestDeleteAction(request));
+            Assert.fail("should not be allowed to delete the request");
+        } catch (ConstraintViolationException e) {
+            // intentionally empty
+        }
+    }
+
+    @Test
+    public void requestGetInfo() throws Exception {
+        Request request = RequestHelper.createRequest(session, factory, researchGroup);
+        Dispatch dispatch = RequestHelper.requestAddDispatch(session, factory, request);
+
+        List<Integer> specimenIds = new ArrayList<>(0);
+        for (RequestSpecimen rs : request.getRequestSpecimens()) {
+            specimenIds.add(rs.getSpecimen().getId());
+        }
+
+        RequestReadInfo info = exec(new RequestGetInfoAction(request.getId()));
+
+        Assert.assertEquals(request.getId(), info.request.getId());
+        Assert.assertEquals(request.getRequestSpecimens().size(),
+                            info.request.getRequestSpecimens().size());
+
+        Assert.assertEquals(request.getAddress().getCity(), info.request.getAddress().getCity());
+
+        for (RequestSpecimen rs : info.request.getRequestSpecimens()) {
+            Assert.assertTrue(specimenIds.contains(rs.getSpecimen().getId()));
+        }
+
+        Assert.assertEquals(request.getDispatches().size(), info.request.getDispatches().size());
+
+        for (Dispatch d : info.request.getDispatches()) {
+            Assert.assertEquals(dispatch.getId(), d.getId());
+            Assert.assertEquals(dispatch.getSenderCenter().getId(), d.getSenderCenter().getId());
+            Assert.assertEquals(dispatch.getReceiverCenter().getId(), d.getReceiverCenter().getId());
+            for (DispatchSpecimen ds : d.getDispatchSpecimens()) {
+                Assert.assertTrue(specimenIds.contains(ds.getSpecimen().getId()));
+            }
+        }
+    }
+
+    @Test
+    public void requestSubmit() throws Exception {
         for (SubmitActionType actionType: SubmitActionType.values()) {
             List<String> specimenIds = new ArrayList<>();
             session.beginTransaction();
@@ -90,92 +168,73 @@ public class TestRequest extends TestAction {
             }
 
             // make sure you got what was requested
-            List<Object[]> specData = exec(new RequestGetSpecimenInfosAction(reqId)).getList();
+            Request requestInDb = (Request) session.get(Request.class, reqId);
 
-            for (Object[] specInfo : specData) {
-                RequestSpecimen spec = (RequestSpecimen) specInfo[0];
-                Assert.assertTrue(specimenIds.contains(spec.getSpecimen().getInventoryId()));
+            for (RequestSpecimen rs : requestInDb.getRequestSpecimens()) {
+                Assert.assertTrue(specimenIds.contains(rs.getSpecimen().getInventoryId()));
             }
         }
     }
 
     @Test
-    public void testClaim() throws Exception {
-        Integer rId = RequestHelper.createRequest(session, getExecutor(), researchGroup);
+    public void requestStateChange() throws Exception {
+        Request request = RequestHelper.createRequest(session, factory, researchGroup);
+        exec(new RequestStateChangeAction(getRequestSpecimenIds(request),
+                                          RequestSpecimenState.DISPATCHED_STATE));
 
-        RequestGetSpecimenInfosAction specAction =
-            new RequestGetSpecimenInfosAction(rId);
-        List<Object[]> specInfo = exec(specAction).getList();
-        List<Integer> ids = new ArrayList<Integer>();
-
-        for (int i = 0; i < specInfo.size(); i++) {
-            RequestSpecimen spec = (RequestSpecimen) specInfo.get(i)[0];
-            ids.add(spec.getId());
-        }
-
-        RequestClaimAction claimAction =
-            new RequestClaimAction(ids);
-        exec(claimAction);
-
-        specInfo = exec(specAction).getList();
-        for (int i = 0; i < specInfo.size(); i++) {
-            RequestSpecimen spec = (RequestSpecimen) specInfo.get(i)[0];
-            Assert.assertTrue(spec.getClaimedBy() != null
-                && !spec.getClaimedBy().equals(""));
-        }
-
-    }
-
-    @Test
-    public void testStateChanges() throws Exception {
-        Integer rId = RequestHelper.createRequest(session, getExecutor(), researchGroup);
-
-        RequestGetSpecimenInfosAction specAction =
-            new RequestGetSpecimenInfosAction(rId);
-        List<Object[]> specInfo = exec(specAction).getList();
-        List<Integer> ids = new ArrayList<Integer>();
-
-        for (int i = 0; i < specInfo.size(); i++) {
-            RequestSpecimen spec = (RequestSpecimen) specInfo.get(i)[0];
-            ids.add(spec.getId());
-        }
-
-        RequestStateChangeAction dispatchAction =
-            new RequestStateChangeAction(ids,
-                RequestSpecimenState.DISPATCHED_STATE);
-        exec(dispatchAction);
-
-        specInfo = exec(specAction).getList();
-        for (int i = 0; i < specInfo.size(); i++) {
-            RequestSpecimen spec = (RequestSpecimen) specInfo.get(i)[0];
-            Assert.assertTrue(RequestSpecimenState.DISPATCHED_STATE == spec
-                .getState());
+        session.clear();
+        request = (Request) session.get(Request.class, request.getId());
+        for (RequestSpecimen rs : request.getRequestSpecimens()) {
+            Assert.assertEquals(RequestSpecimenState.DISPATCHED_STATE, rs.getState());
         }
     }
 
     @Test
-    public void testDelete() throws Exception {
-        Integer rId = RequestHelper.createRequest(session, getExecutor(), researchGroup);
+    public void requestGetSpecimenInfo() throws Exception {
+        Request request = RequestHelper.createRequest(session, factory, researchGroup);
+        List<Integer> specimenIds = getSpecimenIds(request);
 
-        RequestReadInfo reqInfo = exec(new RequestGetInfoAction(rId));
-        RequestDeleteAction delete = new RequestDeleteAction(reqInfo.request);
-        exec(delete);
+        List<Object[]> specData = exec(new RequestGetSpecimenInfosAction(request.getId())).getList();
+        for (Object[] specInfo : specData) {
+            RequestSpecimen spec = (RequestSpecimen) specInfo[0];
+            Assert.assertTrue(specimenIds.contains(spec.getSpecimen().getId()));
+            Assert.assertNotNull(spec.getSpecimen().getCollectionEvent());
+            Assert.assertNotNull(spec.getSpecimen().getSpecimenType());
+            Assert.assertNotNull(spec.getSpecimen().getSpecimenPosition());
+            Assert.assertNotNull(spec.getSpecimen().getSpecimenPosition().getContainer());
+        }
+    }
 
-        rId = RequestHelper.createRequest(session, getExecutor(), researchGroup);
+    @Test
+    public void requestRetrieval() throws Exception {
         session.beginTransaction();
-        Request r = (Request) session.get(Request.class, rId);
-        r.setSubmitted(new Date());
-        session.saveOrUpdate(r);
+        Site site = factory.createSite();
         session.getTransaction().commit();
-        reqInfo = exec(new RequestGetInfoAction(rId));
-        delete = new RequestDeleteAction(reqInfo.request);
 
-        try {
-            exec(delete);
-            Assert.fail("should not be allowed to delete the request");
-        } catch (ConstraintViolationException e) {
-            // good
+        Request request = RequestHelper.createRequest(session, factory, researchGroup);
+
+        ArrayList<Request> response = exec(new RequestRetrievalAction(site)).getList();
+        Assert.assertEquals(1, response.size());
+        for (Request responseRequest : response) {
+            Assert.assertEquals(request.getId(), responseRequest.getId());
         }
+    }
+
+    private List<Integer> getSpecimenIds(Request request) {
+        List<Integer> ids = new ArrayList<Integer>(0);
+        for (RequestSpecimen rs : request.getRequestSpecimens()) {
+            ids.add(rs.getSpecimen().getId());
+        }
+        return ids;
+    }
+
+
+    private List<Integer> getRequestSpecimenIds(Request request) {
+        List<Integer> ids = new ArrayList<Integer>(0);
+        for (RequestSpecimen rs : request.getRequestSpecimens()) {
+            ids.add(rs.getId());
+        }
+        return ids;
     }
 
 }

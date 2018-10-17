@@ -17,14 +17,14 @@ public class RequestRetrievalAction implements Action<ListResult<Request>> {
 
     @SuppressWarnings("nls")
     private static final String REQUEST_HQL =
-        "SELECT r FROM " + Request.class.getName() + " r"
+        "SELECT DISTINCT r FROM " + Request.class.getName() + " r"
             + " INNER JOIN FETCH r.requestSpecimens rs"
             + " INNER JOIN FETCH r.researchGroup rg"
             + " WHERE rs.specimen.currentCenter.id=?";
 
     private static final long serialVersionUID = 5306372891238576571L;
 
-    private Integer centerId;
+    private final Integer centerId;
 
     public RequestRetrievalAction(Center center) {
         this.centerId = center.getId();
@@ -33,7 +33,7 @@ public class RequestRetrievalAction implements Action<ListResult<Request>> {
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
         return PermissionEnum.REQUEST_READ.isAllowed(context.getUser(),
-            context.load(Center.class, centerId));
+                                                     context.load(Center.class, centerId));
     }
 
     @Override

@@ -16,31 +16,27 @@ import edu.ualberta.med.biobank.common.peer.SpecimenPositionPeer;
 import edu.ualberta.med.biobank.common.permission.request.RequestReadPermission;
 import edu.ualberta.med.biobank.model.RequestSpecimen;
 
-public class RequestGetSpecimenInfosAction implements
-    Action<ListResult<Object[]>> {
+public class RequestGetSpecimenInfosAction implements Action<ListResult<Object[]>> {
 
+    // @formatter:off
     @SuppressWarnings("nls")
     public static final String TREE_QUERY =
-        "select ra, concat(c.path, concat('/', c.id)), c.id, a.id, st.id, sp.id from " //$NON-NLS-1$
-            + RequestSpecimen.class.getName()
-            + " ra inner join fetch ra." //$NON-NLS-1$
-            + RequestSpecimenPeer.SPECIMEN.getName()
-            + " a inner join fetch a.collectionEvent" //$NON-NLS-1$
-            + " ce inner join fetch ce.patient inner join fetch a."
-            + SpecimenPeer.SPECIMEN_TYPE.getName()
-            + " st inner join fetch a." //$NON-NLS-1$
-            + SpecimenPeer.SPECIMEN_POSITION.getName()
-            + " sp inner join fetch sp." //$NON-NLS-1$
-            + SpecimenPositionPeer.CONTAINER.getName()
-            + " c inner join fetch c."
-            + ContainerPeer.POSITION.getName()
-            + " cp inner join fetch c.topContainer "
-            + "top inner join fetch top.containerType ct where ra." //$NON-NLS-1$
-            + RequestSpecimenPeer.REQUEST.getName() + ".id=? order by ra." //$NON-NLS-1$
-            + RequestSpecimenPeer.STATE.getName();
+        "SELECT ra, CONCAT(c.path, CONCAT('/', c.id)), c.id, a.id, st.id, sp.id "
+            + "FROM " + RequestSpecimen.class.getName() + " ra "
+            + "INNER JOIN FETCH ra." + RequestSpecimenPeer.SPECIMEN.getName() + " a "
+            + "INNER JOIN FETCH a.collectionEvent ce "
+            + "INNER JOIN FETCH ce.patient inner join fetch a." + SpecimenPeer.SPECIMEN_TYPE.getName() + " st "
+            + "INNER JOIN FETCH a." + SpecimenPeer.SPECIMEN_POSITION.getName() + " sp "
+            + "LEFT JOIN FETCH sp." + SpecimenPositionPeer.CONTAINER.getName() + " c "
+            + "LEFT JOIN FETCH c." + ContainerPeer.POSITION.getName() + " cp "
+            + "LEFT JOIN FETCH c.topContainer top "
+            + "LEFT JOIN FETCH top.containerType ct "
+            + "WHERE ra." + RequestSpecimenPeer.REQUEST.getName() + ".id=? "
+            + "ORDER BY ra." + RequestSpecimenPeer.STATE.getName();
+    // @formatter:on
 
     private static final long serialVersionUID = 1L;
-    private Integer requestId;
+    private final Integer requestId;
 
     public RequestGetSpecimenInfosAction(Integer requestId) {
         this.requestId = requestId;
@@ -54,11 +50,9 @@ public class RequestGetSpecimenInfosAction implements
     @Override
     public ListResult<Object[]> run(ActionContext context)
         throws ActionException {
-        ArrayList<Object[]> specInfos =
-            new ArrayList<Object[]>();
+        ArrayList<Object[]> specInfos = new ArrayList<Object[]>();
 
-        Query query =
-            context.getSession().createQuery(TREE_QUERY);
+        Query query = context.getSession().createQuery(TREE_QUERY);
         query.setParameter(0, requestId);
 
         @SuppressWarnings("unchecked")

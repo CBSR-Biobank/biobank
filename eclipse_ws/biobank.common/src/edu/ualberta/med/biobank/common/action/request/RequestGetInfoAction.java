@@ -9,7 +9,6 @@ import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.RequestReadInfo;
-import edu.ualberta.med.biobank.common.peer.DispatchPeer;
 import edu.ualberta.med.biobank.common.peer.RequestPeer;
 import edu.ualberta.med.biobank.common.permission.request.RequestReadPermission;
 import edu.ualberta.med.biobank.i18n.Bundle;
@@ -37,23 +36,24 @@ public class RequestGetInfoAction implements Action<RequestReadInfo> {
         bundle.tr("No request found with id \"{0}\".");
 
     private final Integer id;
+
     // @formatter:off
     @SuppressWarnings("nls")
-    private static final String REQUEST_HQL = "select distinct request from "
-    + Request.class.getName() 
-    + " request join fetch request." + RequestPeer.RESEARCH_GROUP.getName()
-    + " rg left join fetch request.dispatches " 
-    + " dispatches left join fetch dispatches.dispatchSpecimens ds"
-    + " left join fetch request.requestSpecimens "								//OHSDEV
-    + " requestSpecimens left join fetch requestSpecimens.specimen sp"			//OHSDEV
-    + " left join fetch dispatches.senderCenter "
-    + " left join fetch dispatches.receiverCenter "
-    + " left join fetch dispatches.shipmentInfo "
-    + " LEFT JOIN fetch dispatches.comments comments"
-    + " LEFT JOIN fetch comments.user"
-    + " join fetch request." + RequestPeer.ADDRESS.getName()
-    + " where request." + DispatchPeer.ID.getName()
-    +"=?";
+    private static final String REQUEST_HQL =
+        "SELECT DISTINCT request "
+        + " FROM "+ Request.class.getName() + " request"
+        + " JOIN FETCH request." + RequestPeer.RESEARCH_GROUP.getName() + " rg "
+        + " LEFT JOIN FETCH request.dispatches dispatches"
+        + " LEFT JOIN FETCH dispatches.dispatchSpecimens ds"
+        + " LEFT JOIN FETCH request.requestSpecimens requestSpecimens"   //OHSDEV
+        + " LEFT JOIN FETCH requestSpecimens.specimen sp"                //OHSDEV
+        + " LEFT JOIN FETCH dispatches.senderCenter "
+        + " LEFT JOIN FETCH dispatches.receiverCenter "
+        + " LEFT JOIN FETCH dispatches.shipmentInfo "
+        + " LEFT JOIN FETCH dispatches.comments comments"
+        + " LEFT JOIN FETCH comments.user"
+        + " JOIN FETCH request." + RequestPeer.ADDRESS.getName()
+        + " WHERE request." + RequestPeer.ID.getName() +"=?";
     // @formatter:on
 
     public RequestGetInfoAction(Integer id) {
@@ -77,9 +77,7 @@ public class RequestGetInfoAction implements Action<RequestReadInfo> {
         List<Object> rows = query.list();
         if (rows.size() == 1) {
             Object row = rows.get(0);
-
             sInfo.request = (Request) row;
-
         } else {
             throw new LocalizedException(REQUEST_NOT_FOUND.format(id));
         }
