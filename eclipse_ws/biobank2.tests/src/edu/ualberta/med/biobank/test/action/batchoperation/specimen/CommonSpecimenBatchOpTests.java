@@ -22,10 +22,10 @@ import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.test.action.batchoperation.AssertBatchOpException;
 import edu.ualberta.med.biobank.test.action.batchoperation.CsvUtil;
 
-public abstract class CommonSpecimenBatachOpTests<T extends IBatchOpSpecimenInputPojo>
+public abstract class CommonSpecimenBatchOpTests<T extends IBatchOpSpecimenInputPojo>
     extends CommonSpecimenPositionBatchOpTests<T> {
 
-    private static Logger log = LoggerFactory.getLogger(CommonSpecimenBatachOpTests.class);
+    private static Logger log = LoggerFactory.getLogger(CommonSpecimenBatchOpTests.class);
 
     private Clinic defaultClinic;
 

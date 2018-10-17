@@ -50,7 +50,7 @@ import edu.ualberta.med.biobank.test.action.batchoperation.CsvUtil;
  *
  */
 public class TestGrandchildSpecimenBatchOp
-    extends CommonSpecimenBatachOpTests<GrandchildSpecimenBatchOpInputPojo> {
+    extends CommonSpecimenBatchOpTests<GrandchildSpecimenBatchOpInputPojo> {
 
     private static Logger log = LoggerFactory.getLogger(TestGrandchildSpecimenBatchOp.class);
 

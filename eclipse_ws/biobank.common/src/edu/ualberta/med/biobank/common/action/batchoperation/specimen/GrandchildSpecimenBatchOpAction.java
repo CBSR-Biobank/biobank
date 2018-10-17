@@ -297,7 +297,7 @@ public class GrandchildSpecimenBatchOpAction
                                       null,
                                       pojoData.getSpecimenType(),
                                       false,
-                                      pojoData.getOriginCenter(),
+                                      pojoData.getCurrentCenter(),
                                       pojoData.getOriginInfo(),
                                       pojoData.getPojo().getCreatedAt(),
                                       pojoData.getPojo().getVolume(),

@@ -51,7 +51,7 @@ import edu.ualberta.med.biobank.test.action.batchoperation.CsvUtil;
  * @author Nelson Loyola
  *
  */
-public class TestSpecimenBatchOp extends CommonSpecimenBatachOpTests<SpecimenBatchOpInputPojo> {
+public class TestSpecimenBatchOp extends CommonSpecimenBatchOpTests<SpecimenBatchOpInputPojo> {
 
     private static Logger log = LoggerFactory.getLogger(TestSpecimenBatchOp.class);
 
