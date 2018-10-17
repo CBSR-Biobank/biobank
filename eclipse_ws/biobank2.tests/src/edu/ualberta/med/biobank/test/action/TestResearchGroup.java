@@ -1,164 +1,195 @@
 package edu.ualberta.med.biobank.test.action;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.validation.ConstraintViolationException;
 
+import org.hibernate.criterion.Restrictions;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
-import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
-import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
 import edu.ualberta.med.biobank.common.action.info.AddressSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.ResearchGroupReadInfo;
 import edu.ualberta.med.biobank.common.action.info.ResearchGroupSaveInfo;
-import edu.ualberta.med.biobank.common.action.request.RequestGetSpecimenInfosAction;
-import edu.ualberta.med.biobank.common.action.researchGroup.RequestSubmitAction;
+import edu.ualberta.med.biobank.common.action.info.StudyCountInfo;
 import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupDeleteAction;
+import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupGetAllAction;
 import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupGetInfoAction;
+import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupGetStudyInfoAction;
 import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupSaveAction;
-import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.Address;
+import edu.ualberta.med.biobank.model.Center;
+import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Request;
 import edu.ualberta.med.biobank.model.RequestSpecimen;
 import edu.ualberta.med.biobank.model.ResearchGroup;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
-import edu.ualberta.med.biobank.test.action.helper.PatientHelper;
-import edu.ualberta.med.biobank.test.action.helper.RequestHelper;
-import edu.ualberta.med.biobank.test.action.helper.ResearchGroupHelper;
 
 public class TestResearchGroup extends TestAction {
 
-    private Study study;
-
-    @Override
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
+    @Test
+    public void researchGroupGetInfo() throws Exception {
         session.beginTransaction();
-        study = factory.createStudy();
+        ResearchGroup researchGroup = factory.createResearchGroup();
         session.getTransaction().commit();
-    }
 
-    @Test
-    public void saveResearchGroup() throws Exception {
-        String rgName = getMethodNameR();
-        Integer rgId = ResearchGroupHelper.createResearchGroup(getExecutor(), rgName, rgName);
+        ResearchGroupReadInfo rg = exec(new ResearchGroupGetInfoAction(researchGroup.getId()));
 
-        ResearchGroupGetInfoAction reader = new ResearchGroupGetInfoAction(rgId);
-        ResearchGroupReadInfo rg = exec(reader);
-
-        Assert.assertEquals(rgName, rg.getResearchGroup().getName());
-        Assert.assertEquals(rgName, rg.getResearchGroup().getNameShort());
-        Assert.assertEquals(study.getId(), rg.getResearchGroup().getStudies().iterator().next());
+        Assert.assertEquals(researchGroup.getName(), rg.getResearchGroup().getName());
+        Assert.assertEquals(researchGroup.getNameShort(), rg.getResearchGroup().getNameShort());
         Assert.assertEquals(ActivityStatus.ACTIVE, rg.getResearchGroup().getActivityStatus());
-    }
 
-    @Test
-    public void testUpload() throws Exception {
-        Integer rgId = ResearchGroupHelper.createResearchGroup(getExecutor(),
-                                                               getMethodNameR(),
-                                                               getMethodNameR());
-        ResearchGroupGetInfoAction reader =
-            new ResearchGroupGetInfoAction(rgId);
-        ResearchGroupReadInfo rg = exec(reader);
+        List<Integer> studyIds = new ArrayList<>();
+        for (Study study : researchGroup.getStudies()) {
+            studyIds.add(study.getId());
+        }
 
-        // create specs
-        Integer p = PatientHelper.createPatient(getExecutor(), testName + "_patient", rg.getResearchGroup().getStudies().iterator().next().getId());
-        Integer ceId = CollectionEventHelper.createCEventWithSourceSpecimens(getExecutor(), p, rg.getResearchGroup());
-
-        CollectionEventGetInfoAction ceReader =
-            new CollectionEventGetInfoAction(ceId);
-        CEventInfo ceInfo = exec(ceReader);
-        List<String> specs = new ArrayList<String>();
-        for (SpecimenInfo specInfo : ceInfo.sourceSpecimenInfos)
-            specs.add(specInfo.specimen.getInventoryId());
-
-        Assert.assertTrue(ceInfo.sourceSpecimenInfos.size() >= 2);
-        specs.remove(Math.abs(getR().nextInt()) % specs.size());
-        specs.remove(Math.abs(getR().nextInt()) % specs.size());
-
-        // request specs
-        RequestSubmitAction action =
-            new RequestSubmitAction(rgId, specs);
-        Integer rId = exec(action).getId();
-
-        // make sure you got what was requested
-        RequestGetSpecimenInfosAction specAction =
-            new RequestGetSpecimenInfosAction(rId);
-        List<Object[]> specInfo = exec(specAction).getList();
-
-        for (int i = 0; i < specInfo.size(); i++) {
-            RequestSpecimen spec = (RequestSpecimen) specInfo.get(i)[0];
-            Assert.assertTrue(specs.contains(spec.getSpecimen()
-                .getInventoryId()));
+        for (Study study : rg.getResearchGroup().getStudies()) {
+            Assert.assertTrue(studyIds.contains(study.getId()));
         }
     }
 
     @Test
-    public void testDelete() throws Exception {
-        // only one failure case specific to rg, rest are in center
-        Integer rgId = ResearchGroupHelper.createResearchGroup(getExecutor(),
-                                                               getMethodNameR(),
-                                                               getMethodNameR());
+    public void researchGroupGetAll() throws Exception {
+        session.beginTransaction();
+        Set<ResearchGroup> researchGroupsInDb =
+            new HashSet<ResearchGroup>(Arrays.asList(factory.createResearchGroup(),
+                                                     factory.createResearchGroup(),
+                                                     factory.createResearchGroup()));
+        session.getTransaction().commit();
 
-        Integer rId = RequestHelper.createRequest(session, getExecutor(),
-            (ResearchGroup) session.load(ResearchGroup.class, rgId));
+        ArrayList<ResearchGroup> response = exec(new ResearchGroupGetAllAction()).getList();
+        List<Integer> researchGroupIds = new ArrayList<>(0);
+        for (ResearchGroup rg: response) {
+            researchGroupIds.add(rg.getId());
+        }
 
-        ResearchGroupReadInfo rg =
-            exec(new ResearchGroupGetInfoAction(rgId));
-        ResearchGroupDeleteAction delete =
-            new ResearchGroupDeleteAction(rg.getResearchGroup());
+        for (ResearchGroup rgInDb : researchGroupsInDb) {
+            Assert.assertTrue(researchGroupIds.contains(rgInDb.getId()));
+        }
+    }
+
+    @Test
+    public void researchGroupGetStudyInfo() throws Exception {
+        session.beginTransaction();
+        Set<Study> studies = new HashSet<Study>(Arrays.asList(factory.createStudy(),
+                                                              factory.createStudy(),
+                                                              factory.createStudy()));
+        List<Integer> studyIds = new ArrayList<>(0);
+        for (Study study : studies) {
+            studyIds.add(study.getId());
+        }
+        ResearchGroup researchGroup = factory.createResearchGroup();
+        researchGroup.setStudies(studies);
+        session.getTransaction().commit();
+
+        ArrayList<StudyCountInfo> response =
+            exec(new ResearchGroupGetStudyInfoAction(researchGroup.getId())).getList();
+
+        Assert.assertEquals(studies.size(), response.size());
+        for (StudyCountInfo info : response) {
+            Assert.assertTrue(studyIds.contains(info.getStudy().getId()));
+        }
+    }
+
+    @Test
+    public void researchGroupSave() throws Exception {
+        session.beginTransaction();
+        Study study = factory.createStudy();
+        session.getTransaction().commit();
+
+        ResearchGroup rg = new ResearchGroup();
+        rg.getAddress().setCity("testville");
+        rg.setName(factory.getNameGenerator().next(Center.class));
+        rg.setNameShort(factory.getNameGenerator().next(Center.class));
+        rg.setStudies(new HashSet<Study>(0));
+
+        Address address = rg.getAddress();
+
+        Set<Integer> studyIds = new HashSet<>(Arrays.asList(study.getId()));
+        AddressSaveInfo addressInfo =
+            new AddressSaveInfo(address.getId(),
+                                address.getStreet1(),
+                                address.getStreet2(),
+                                address.getCity(),
+                                address.getProvince(),
+                                address.getPostalCode(),
+                                address.getEmailAddress(),
+                                address.getPhoneNumber(),
+                                address.getFaxNumber(),
+                                address.getCountry());
+
+        ResearchGroupSaveInfo saveInfo =
+            new ResearchGroupSaveInfo(null,
+                                      rg.getName(),
+                                      rg.getNameShort(),
+                                      studyIds,
+                                      null,
+                                      addressInfo,
+                                      ActivityStatus.ACTIVE);
+
+        Integer rgId = exec(new ResearchGroupSaveAction(saveInfo)).getId();
+
+        ResearchGroup rgInDb = (ResearchGroup) session.createCriteria(ResearchGroup.class)
+            .add(Restrictions.eq("id", rgId))
+            .uniqueResult();
+
+        Assert.assertEquals(rg.getNameShort(), rgInDb.getNameShort());
+        Assert.assertTrue(rgInDb.getRequests().isEmpty());
+        Assert.assertTrue(rgInDb.getStudies().size() == 1);
+        Assert.assertEquals(rg.getActivityStatus(), rgInDb.getActivityStatus());
+        Assert.assertEquals(rg.getAddress().getCity(), rgInDb.getAddress().getCity());
+
+        for (Study rgStudy : rgInDb.getStudies()) {
+            Assert.assertEquals(study.getId(), rgStudy.getId());
+        }
+    }
+
+    @Test
+    public void researchGroupDelete() throws Exception {
+        session.beginTransaction();
+        ResearchGroup researchGroup = factory.createResearchGroup();
+        Request req = factory.createRequest();
+        session.getTransaction().commit();
+
         try {
-            exec(delete);
+            exec(new ResearchGroupDeleteAction(researchGroup));
             Assert.fail();
         } catch (ConstraintViolationException e) {
-            Assert.assertTrue(true);
+            Assert.assertTrue("delete action should fail", true);
         }
-        session.close();
-        session = openSession();
-        session.beginTransaction();
 
-        Request r = (Request) session.load(Request.class, rId);
-        for (RequestSpecimen rs : r.getRequestSpecimens()) {
+        session.beginTransaction();
+        for (RequestSpecimen rs : req.getRequestSpecimens()) {
             Specimen spec = rs.getSpecimen();
             session.delete(rs);
             session.delete(spec);
         }
-        r = (Request) session.load(Request.class, rId);
-        session.delete(r);
+        session.delete(req);
         session.getTransaction().commit();
 
-        exec(delete);
-        // should be fine
+        exec(new ResearchGroupDeleteAction(researchGroup));
+        Assert.assertTrue("delete action should not fail this time", true);
     }
 
     @Test
-    public void testComment() throws Exception {
-        AddressSaveInfo addressSaveInfo =
-            new AddressSaveInfo(null, "test", "test", "test", "test", "test",
-                "test", "test", "test", "test");
-        ResearchGroupSaveInfo save =
-            new ResearchGroupSaveInfo(null, getMethodNameR(), getMethodNameR(), "comment", addressSaveInfo, ActivityStatus.ACTIVE);
-        ResearchGroupSaveAction rgSave = new ResearchGroupSaveAction(save);
+    public void researchGroupComment() throws Exception {
+        session.beginTransaction();
+        ResearchGroup researchGroup = factory.createResearchGroup();
+        Set<Comment> comments = new HashSet<Comment>(Arrays.asList(factory.createComment(),
+                                                                  factory.createComment(),
+                                                                  factory.createComment()));
+        researchGroup.setComments(comments);
+        session.getTransaction().commit();
 
-        Integer rgId = exec(rgSave).getId();
-        ResearchGroupGetInfoAction reader =
-            new ResearchGroupGetInfoAction(rgId);
-        ResearchGroupReadInfo rg = exec(reader);
+        ResearchGroupReadInfo rg = exec(new ResearchGroupGetInfoAction(researchGroup.getId()));
 
-        save.id = rgId;
-
-        Assert.assertEquals(1, rg.getResearchGroup().getComments().size());
-        exec(rgSave);
-        rg = exec(reader);
-        Assert.assertEquals(2, rg.getResearchGroup().getComments().size());
-        exec(rgSave);
-        rg = exec(reader);
-        Assert.assertEquals(3, rg.getResearchGroup().getComments().size());
+        Assert.assertEquals(comments.size(), rg.getResearchGroup().getComments().size());
     }
 }

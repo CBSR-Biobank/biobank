@@ -23,8 +23,8 @@ import edu.ualberta.med.biobank.test.action.IActionExecutor;
 public class RequestHelper extends Helper {
 
     public static Integer createRequest(Session session,
-        IActionExecutor actionExecutor, ResearchGroup researchGroup) throws Exception {
-
+                                        IActionExecutor actionExecutor,
+                                        ResearchGroup researchGroup) throws Exception {
         session.beginTransaction();
         String name = Utils.getRandomString(5);
 

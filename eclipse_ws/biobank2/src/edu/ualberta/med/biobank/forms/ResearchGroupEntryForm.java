@@ -121,8 +121,8 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
     @Override
     protected void init() throws Exception {
         Assert.isTrue((adapter instanceof ResearchGroupAdapter),
-            "Invalid editor input: object of type "
-                + adapter.getClass().getName());
+                      "Invalid editor input: object of type "
+                      + adapter.getClass().getName());
         researchGroupAdapter = (ResearchGroupAdapter) adapter;
 
         setRgInfo(adapter.getId());
@@ -132,12 +132,12 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
             tabName = i18n.tr("New Research Group");
         } else
             tabName = i18n.tr("Research Group {0}",
-                researchGroup.getNameShort());
+                              researchGroup.getNameShort());
         setPartName(tabName);
 
         //OHSDEV
         if(researchGroup.getStudyCollection().isEmpty())
-		showStudyTitleMessage = true;
+            showStudyTitleMessage = true;
     }
 
     private void setRgInfo(Integer id) throws ApplicationException {
@@ -145,7 +145,7 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
             researchGroup.setWrappedObject(new ResearchGroup());
             researchGroup.setActivityStatus(ActivityStatus.ACTIVE);
         } else {
-		//OHSDEV - Set the Research Group data object for use in the class
+            //OHSDEV - Set the Research Group data object for use in the class
             rgInfo = SessionManager.getAppService().doAction(new ResearchGroupGetInfoAction(id));
             researchGroup.setWrappedObject(rgInfo.getResearchGroup());
         }
@@ -187,30 +187,30 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
         toolkit.paintBordersFor(client);
 
         setFirstControl(createBoundWidgetWithLabel(client, BgcBaseText.class,
-            SWT.NONE, HasName.PropertyName.NAME.toString(), null,
-            researchGroup,
-            ResearchGroupPeer.NAME.getName(), new NonEmptyStringValidator(
-                MSG_NO_RG_NAME)));
+                                                   SWT.NONE, HasName.PropertyName.NAME.toString(), null,
+                                                   researchGroup,
+                                                   ResearchGroupPeer.NAME.getName(), new NonEmptyStringValidator(
+                                                       MSG_NO_RG_NAME)));
 
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
-            HasNameShort.PropertyName.NAME_SHORT.toString(), null,
-            researchGroup,
-            ResearchGroupPeer.NAME_SHORT.getName(),
-            new NonEmptyStringValidator(MSG_NO_RG_NAME_SHORT));
+                                   HasNameShort.PropertyName.NAME_SHORT.toString(), null,
+                                   researchGroup,
+                                   ResearchGroupPeer.NAME_SHORT.getName(),
+                                   new NonEmptyStringValidator(MSG_NO_RG_NAME_SHORT));
 
         toolkit.paintBordersFor(client);
 
         activityStatusComboViewer = createComboViewer(client,
-            ActivityStatus.NAME.singular().toString(),
-            ActivityStatus.valuesList(), researchGroup.getActivityStatus(),
-            i18n.tr("Research Group must have an activity status"),
-            new ComboSelectionUpdate() {
-                @Override
-                public void doSelection(Object selectedObject) {
-                    researchGroup
-                        .setActivityStatus((ActivityStatus) selectedObject);
-                }
-            });
+                                                      ActivityStatus.NAME.singular().toString(),
+                                                      ActivityStatus.valuesList(), researchGroup.getActivityStatus(),
+                                                      i18n.tr("Research Group must have an activity status"),
+                                                      new ComboSelectionUpdate() {
+                                                          @Override
+                                                          public void doSelection(Object selectedObject) {
+                                                              researchGroup
+                                                                  .setActivityStatus((ActivityStatus) selectedObject);
+                                                          }
+                                                      });
 
         createCommentSection();
 
@@ -224,7 +224,7 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
 
         client.setLayout(gl);
         commentEntryTable = new CommentsInfoTable(client,
-            researchGroup.getCommentCollection(false));
+                                                  researchGroup.getCommentCollection(false));
         GridData gd = new GridData();
         gd.horizontalSpan = 2;
         gd.grabExcessHorizontalSpace = true;
@@ -232,8 +232,8 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
         commentEntryTable.setLayoutData(gd);
         commentWidget =
             (BgcBaseText) createBoundWidgetWithLabel(client, BgcBaseText.class,
-                SWT.MULTI,
-                i18n.tr("Add a comment"), null, comment, "message", null);
+                                                     SWT.MULTI,
+                                                     i18n.tr("Add a comment"), null, comment, "message", null);
 
     }
 
@@ -253,48 +253,48 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
 	String title = Study.NAME.plural().toString();
 
 	if(showStudyTitleMessage)
-		title = title + MSG_NO_STUDIES; //OHSDEV - Set the section header with a message in RED if a study is NOT associated
+            title = title + MSG_NO_STUDIES; //OHSDEV - Set the section header with a message in RED if a study is NOT associated
 
 	Section section = createSection(title);
 
 	if(showStudyTitleMessage)
-		section.setTitleBarForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED)); //OHSDEV - Set the section header with a message in RED if a study is NOT associated
+            section.setTitleBarForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED)); //OHSDEV - Set the section header with a message in RED if a study is NOT associated
 
         boolean superAdmin = SessionManager.getUser().isSuperAdmin();
         if (superAdmin) {
             addSectionToolbar(section, i18n.tr("Add Study "),
-                new SelectionAdapter() {
-                    @Override
-                    public void widgetSelected(SelectionEvent e) {
-                        studiesTable.createStudyDlg();
-                    }
-                }, ContactWrapper.class);
+                              new SelectionAdapter() {
+                                  @Override
+                                  public void widgetSelected(SelectionEvent e) {
+                                      studiesTable.createStudyDlg();
+                                  }
+                              }, ContactWrapper.class);
         }
         studiesTable = new ResearchGroupStudyAddInfoTable(section, researchGroup, superAdmin);
         studiesTable.adaptToToolkit(toolkit, true);
         studiesTable
             .addClickListener(new IInfoTableDoubleClickItemListener<StudyWrapper>() {
 
-                @Override
-                public void doubleClick(InfoTableEvent<StudyWrapper> event) {
-                    StudyWrapper s =
-                        ((StudyWrapper) ((InfoTableSelection) event
-                            .getSelection()).getObject());
-                    new StudyAdapter(null, s).openViewForm();
+                    @Override
+                    public void doubleClick(InfoTableEvent<StudyWrapper> event) {
+                        StudyWrapper s =
+                            ((StudyWrapper) ((InfoTableSelection) event
+                                             .getSelection()).getObject());
+                        new StudyAdapter(null, s).openViewForm();
 
-                }
-            });
+                    }
+                });
         studiesTable
             .addEditItemListener(new IInfoTableEditItemListener<StudyWrapper>() {
-                @Override
-                public void editItem(InfoTableEvent<StudyWrapper> event) {
-                    StudyWrapper s =
-                        ((StudyWrapper) ((InfoTableSelection) event
-                            .getSelection()).getObject());
-                    new StudyAdapter(null,
-                        s).openEntryForm();
-                }
-            });
+                    @Override
+                    public void editItem(InfoTableEvent<StudyWrapper> event) {
+                        StudyWrapper s =
+                            ((StudyWrapper) ((InfoTableSelection) event
+                                             .getSelection()).getObject());
+                        new StudyAdapter(null,
+                                         s).openEntryForm();
+                    }
+                });
         studiesTable.addSelectionChangedListener(listener);
         section.setClient(studiesTable);
     }
@@ -302,49 +302,47 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
     @SuppressWarnings("null")
     @Override
     public void saveForm() throws Exception
-    {
-        AddressSaveInfo addressInfo =
-            new AddressSaveInfo(
-			researchGroup.getAddress().getId(),
-			researchGroup.getAddress().getStreet1(),
-			researchGroup.getAddress().getStreet2(),
-			researchGroup.getAddress().getCity(),
-			researchGroup.getAddress().getProvince(),
-			researchGroup.getAddress().getPostalCode(),
-			researchGroup.getAddress().getEmailAddress(),
-			researchGroup.getAddress().getPhoneNumber(),
-			researchGroup.getAddress().getFaxNumber(),
-			researchGroup.getAddress().getCountry());
+        {
+            AddressSaveInfo addressInfo =
+                new AddressSaveInfo(
+                    researchGroup.getAddress().getId(),
+                    researchGroup.getAddress().getStreet1(),
+                    researchGroup.getAddress().getStreet2(),
+                    researchGroup.getAddress().getCity(),
+                    researchGroup.getAddress().getProvince(),
+                    researchGroup.getAddress().getPostalCode(),
+                    researchGroup.getAddress().getEmailAddress(),
+                    researchGroup.getAddress().getPhoneNumber(),
+                    researchGroup.getAddress().getFaxNumber(),
+                    researchGroup.getAddress().getCountry());
 
-        HashSet<Integer> studyIds = new HashSet<Integer>();
-        for (StudyWrapper study : researchGroup.getStudyCollection(false)) {
-            studyIds.add(study.getId());
-        }
+            HashSet<Integer> studyIds = new HashSet<Integer>();
+            for (StudyWrapper study : researchGroup.getStudyCollection(false)) {
+                studyIds.add(study.getId());
+            }
 
-        if(studyIds != null && studyIds.size() <= 0) {
+            if(studyIds != null && studyIds.size() <= 0) {
 		throw new ApplicationException(ERR_NO_STUDIES);
+            }
+
+            ResearchGroupSaveInfo saveInfo =
+                new ResearchGroupSaveInfo(researchGroup.getId(),
+                                          researchGroup.getName(),
+                                          researchGroup.getNameShort(),
+                                          studyIds
+                                          comment.getMessage() == null ? StringUtil.EMPTY_STRING : comment.getMessage(),
+                                          addressInfo,
+                                          researchGroup.getActivityStatus());
+
+            ResearchGroupSaveAction researchGroupSaveAction = new ResearchGroupSaveAction(saveInfo);
+            Integer id = SessionManager.getAppService().doAction(researchGroupSaveAction).getId();
+            ResearchGroupReadInfo read = SessionManager.getAppService().doAction(new ResearchGroupGetInfoAction(id));
+
+            researchGroup.setWrappedObject(read.getResearchGroup());
+
+            ((AdapterBase) adapter).setModelObject(researchGroup);
+            researchGroupAdapter.getParent().performExpand();
         }
-
-        ResearchGroupSaveInfo saveInfo = new ResearchGroupSaveInfo(
-															researchGroup.getId(),
-															researchGroup.getName(),
-															researchGroup.getNameShort(),
-															comment.getMessage() == null ? StringUtil.EMPTY_STRING : comment.getMessage(),
-															addressInfo,
-															researchGroup.getActivityStatus());
-
-
-	ResearchGroupSaveAction researchGroupSaveAction = new ResearchGroupSaveAction(saveInfo);
-        researchGroupSaveAction.setStudyIds(studyIds);
-
-        Integer id = SessionManager.getAppService().doAction(researchGroupSaveAction).getId();
-        ResearchGroupReadInfo read = SessionManager.getAppService().doAction(new ResearchGroupGetInfoAction(id));
-
-        researchGroup.setWrappedObject(read.getResearchGroup());
-
-        ((AdapterBase) adapter).setModelObject(researchGroup);
-        researchGroupAdapter.getParent().performExpand();
-    }
 
     @Override
     protected void doAfterSave() throws Exception {

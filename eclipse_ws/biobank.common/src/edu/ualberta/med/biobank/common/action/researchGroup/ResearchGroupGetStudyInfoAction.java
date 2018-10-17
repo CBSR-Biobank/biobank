@@ -18,7 +18,6 @@ import edu.ualberta.med.biobank.model.ResearchGroup;
 import edu.ualberta.med.biobank.model.Study;
 
 /**
- *
  * Action object that loads the Studies as associated with the Research Group from the database
  *
  * Code Changes -

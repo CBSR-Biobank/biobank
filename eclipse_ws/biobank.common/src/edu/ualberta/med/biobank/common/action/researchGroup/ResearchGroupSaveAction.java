@@ -29,8 +29,7 @@ import edu.ualberta.med.biobank.model.Study;
 public class ResearchGroupSaveAction implements Action<IdResult> {
 
     private static final long serialVersionUID = 1L;
-    private ResearchGroupSaveInfo rgInfo;
-    private Set<Integer> studyIds = new HashSet<Integer>(0);
+    private final ResearchGroupSaveInfo rgInfo;
 
     public ResearchGroupSaveAction(ResearchGroupSaveInfo rgInfo) {
         this.rgInfo = rgInfo;
@@ -42,7 +41,7 @@ public class ResearchGroupSaveAction implements Action<IdResult> {
             throw new IllegalArgumentException();
         }
 
-        this.studyIds = studyIds;
+        this.rgInfo.studyIds = new HashSet<>(studyIds);
     }
 
     @Override
@@ -52,16 +51,14 @@ public class ResearchGroupSaveAction implements Action<IdResult> {
 
     @Override
     public IdResult run(ActionContext context) throws ActionException {
-        ResearchGroup rg =
-            context
-                .get(ResearchGroup.class, rgInfo.id, new ResearchGroup());
+        ResearchGroup rg = context.get(ResearchGroup.class, rgInfo.id, new ResearchGroup());
 
         rg.setName(rgInfo.name);
         rg.setNameShort(rgInfo.nameShort);
         rg.setActivityStatus(rgInfo.activityStatus);
 
         //OHSDEV
-        Set<Study> studies = context.load(Study.class, studyIds);
+        Set<Study> studies = context.load(Study.class, rgInfo.studyIds);
         rg.getStudies().clear();
         rg.getStudies().addAll(studies);
 
@@ -81,9 +78,12 @@ public class ResearchGroupSaveAction implements Action<IdResult> {
 
         // This stuff could be extracted to a util method. need to think about
         // how
-        if (!rgInfo.comment.trim().isEmpty()) {
+        if ((rgInfo.comment != null) && !rgInfo.comment.trim().isEmpty()) {
             Set<Comment> comments = rg.getComments();
-            if (comments == null) comments = new HashSet<Comment>();
+            if (comments == null) {
+                comments = new HashSet<Comment>();
+            }
+
             Comment newComment = new Comment();
             newComment.setCreatedAt(new Date());
             newComment.setMessage(rgInfo.comment);

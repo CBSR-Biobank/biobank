@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.test;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
@@ -621,9 +622,7 @@ public class Factory {
         researchGroup.getAddress().setCity("testville");
         researchGroup.setName(name);
         researchGroup.setNameShort(name);
-        //researchGroup.setStudy(getDefaultStudy());
-        Set<Study> studies = new HashSet<Study>(0);
-        studies.add(getDefaultStudy());
+        Set<Study> studies = new HashSet<Study>(Arrays.asList(getDefaultStudy()));
         researchGroup.setStudies(studies);
         setDefaultCenter(researchGroup);
         setDefaultResearchGroup(researchGroup);
