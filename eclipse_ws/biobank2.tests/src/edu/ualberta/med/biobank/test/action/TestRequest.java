@@ -17,7 +17,6 @@ import edu.ualberta.med.biobank.common.action.info.RequestReadInfo;
 import edu.ualberta.med.biobank.common.action.request.RequestClaimAction;
 import edu.ualberta.med.biobank.common.action.request.RequestDeleteAction;
 import edu.ualberta.med.biobank.common.action.request.RequestGetInfoAction;
-import edu.ualberta.med.biobank.common.action.request.RequestGetSpecimenInfosAction;
 import edu.ualberta.med.biobank.common.action.request.RequestRetrievalAction;
 import edu.ualberta.med.biobank.common.action.request.RequestStateChangeAction;
 import edu.ualberta.med.biobank.common.action.request.RequestSubmitAction;
@@ -36,6 +35,7 @@ import edu.ualberta.med.biobank.test.action.helper.RequestHelper;
 
 public class TestRequest extends TestAction {
 
+    @SuppressWarnings("unused")
     private static final Logger log = LoggerFactory.getLogger(TestRequest.class);
 
     private ResearchGroup researchGroup;
@@ -132,19 +132,7 @@ public class TestRequest extends TestAction {
     @Test
     public void requestSubmit() throws Exception {
         for (SubmitActionType actionType: SubmitActionType.values()) {
-            List<String> specimenIds = new ArrayList<>();
-            session.beginTransaction();
-            Container container = factory.createContainer();
-            factory.createCollectionEvent();
-            for (int i = 0; i < 5; i++) {
-                Specimen specimen = factory.createParentSpecimen();
-                specimenIds.add(specimen.getInventoryId());
-                ContainerHelper.placeSpecimenInContainer(session, specimen, container);
-                session.update(specimen);
-                log.info("actionType" + actionType + ", specimen added: " + specimen.getInventoryId());
-            }
-            session.getTransaction().commit();
-
+            List<String> specimenIds = createSpecimensInContainer();
             Integer reqId = null;
 
             // request specimens
@@ -190,22 +178,6 @@ public class TestRequest extends TestAction {
     }
 
     @Test
-    public void requestGetSpecimenInfo() throws Exception {
-        Request request = RequestHelper.createRequest(session, factory, researchGroup);
-        List<Integer> specimenIds = getSpecimenIds(request);
-
-        List<Object[]> specData = exec(new RequestGetSpecimenInfosAction(request.getId())).getList();
-        for (Object[] specInfo : specData) {
-            RequestSpecimen spec = (RequestSpecimen) specInfo[0];
-            Assert.assertTrue(specimenIds.contains(spec.getSpecimen().getId()));
-            Assert.assertNotNull(spec.getSpecimen().getCollectionEvent());
-            Assert.assertNotNull(spec.getSpecimen().getSpecimenType());
-            Assert.assertNotNull(spec.getSpecimen().getSpecimenPosition());
-            Assert.assertNotNull(spec.getSpecimen().getSpecimenPosition().getContainer());
-        }
-    }
-
-    @Test
     public void requestRetrieval() throws Exception {
         session.beginTransaction();
         Site site = factory.createSite();
@@ -220,14 +192,21 @@ public class TestRequest extends TestAction {
         }
     }
 
-    private List<Integer> getSpecimenIds(Request request) {
-        List<Integer> ids = new ArrayList<Integer>(0);
-        for (RequestSpecimen rs : request.getRequestSpecimens()) {
-            ids.add(rs.getSpecimen().getId());
-        }
-        return ids;
-    }
+    private List<String> createSpecimensInContainer() {
+        List<String> specimenIds = new ArrayList<>();
 
+        session.beginTransaction();
+        Container container = factory.createContainer();
+        factory.createCollectionEvent();
+        for (int i = 0; i < 5; i++) {
+            Specimen specimen = factory.createParentSpecimen();
+            specimenIds.add(specimen.getInventoryId());
+            ContainerHelper.placeSpecimenInContainer(session, specimen, container);
+            session.update(specimen);
+        }
+        session.getTransaction().commit();
+        return specimenIds;
+    }
 
     private List<Integer> getRequestSpecimenIds(Request request) {
         List<Integer> ids = new ArrayList<Integer>(0);

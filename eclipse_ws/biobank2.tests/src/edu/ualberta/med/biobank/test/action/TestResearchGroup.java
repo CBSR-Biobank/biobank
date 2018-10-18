@@ -12,7 +12,6 @@ import org.hibernate.criterion.Restrictions;
 import org.junit.Assert;
 import org.junit.Test;
 
-import edu.ualberta.med.biobank.common.action.info.AddressSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.ResearchGroupReadInfo;
 import edu.ualberta.med.biobank.common.action.info.ResearchGroupSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.StudyCountInfo;
@@ -22,7 +21,6 @@ import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupGetInfo
 import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupGetStudyInfoAction;
 import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupSaveAction;
 import edu.ualberta.med.biobank.model.ActivityStatus;
-import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Request;
@@ -108,32 +106,9 @@ public class TestResearchGroup extends TestAction {
         rg.getAddress().setCity("testville");
         rg.setName(factory.getNameGenerator().next(Center.class));
         rg.setNameShort(factory.getNameGenerator().next(Center.class));
-        rg.setStudies(new HashSet<Study>(0));
+        rg.setStudies(new HashSet<>(Arrays.asList(study)));
 
-        Address address = rg.getAddress();
-
-        Set<Integer> studyIds = new HashSet<>(Arrays.asList(study.getId()));
-        AddressSaveInfo addressInfo =
-            new AddressSaveInfo(address.getId(),
-                                address.getStreet1(),
-                                address.getStreet2(),
-                                address.getCity(),
-                                address.getProvince(),
-                                address.getPostalCode(),
-                                address.getEmailAddress(),
-                                address.getPhoneNumber(),
-                                address.getFaxNumber(),
-                                address.getCountry());
-
-        ResearchGroupSaveInfo saveInfo =
-            new ResearchGroupSaveInfo(null,
-                                      rg.getName(),
-                                      rg.getNameShort(),
-                                      studyIds,
-                                      null,
-                                      addressInfo,
-                                      ActivityStatus.ACTIVE);
-
+        ResearchGroupSaveInfo saveInfo = ResearchGroupSaveInfo.createFromResearchGroup(rg);
         Integer rgId = exec(new ResearchGroupSaveAction(saveInfo)).getId();
 
         ResearchGroup rgInDb = (ResearchGroup) session.createCriteria(ResearchGroup.class)

@@ -322,14 +322,14 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
             }
 
             if(studyIds != null && studyIds.size() <= 0) {
-		throw new ApplicationException(ERR_NO_STUDIES);
+                throw new ApplicationException(ERR_NO_STUDIES);
             }
 
             ResearchGroupSaveInfo saveInfo =
                 new ResearchGroupSaveInfo(researchGroup.getId(),
                                           researchGroup.getName(),
                                           researchGroup.getNameShort(),
-                                          studyIds
+                                          studyIds,
                                           comment.getMessage() == null ? StringUtil.EMPTY_STRING : comment.getMessage(),
                                           addressInfo,
                                           researchGroup.getActivityStatus());

@@ -15,6 +15,7 @@ import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.i18n.Tr;
 import edu.ualberta.med.biobank.model.Request;
+import edu.ualberta.med.biobank.model.RequestSpecimen;
 
 /**
  *
@@ -76,8 +77,12 @@ public class RequestGetInfoAction implements Action<RequestReadInfo> {
         @SuppressWarnings("unchecked")
         List<Object> rows = query.list();
         if (rows.size() == 1) {
-            Object row = rows.get(0);
-            sInfo.request = (Request) row;
+            sInfo.request = (Request) rows.get(0);
+
+            // load required associations
+            for (RequestSpecimen rs : sInfo.request.getRequestSpecimens()) {
+                rs.getSpecimen().getCollectionEvent().getPatient().getStudy().getId();
+            }
         } else {
             throw new LocalizedException(REQUEST_NOT_FOUND.format(id));
         }

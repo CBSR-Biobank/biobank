@@ -120,11 +120,9 @@ public class RequestEntryForm extends BiobankViewForm {
     @SuppressWarnings("nls")
     @Override
     protected void createFormContent() throws Exception {
-        form.setText(i18n.tr(
-            "Requested on {0} {1}", DateFormatter
-                .formatAsDateTime(request.getSubmitted()),
-            request.getResearchGroup()
-                .getNameShort()));
+        form.setText(i18n.tr("Requested on {0} {1}",
+                             DateFormatter.formatAsDateTime(request.getSubmitted()),
+                             request.getResearchGroup().getNameShort()));
         page.setLayout(new GridLayout(1, false));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         createMainSection();

@@ -5,6 +5,8 @@ import java.util.Set;
 
 import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.ResearchGroup;
+import edu.ualberta.med.biobank.model.Study;
 
 /**
  *
@@ -37,8 +39,7 @@ public class ResearchGroupSaveInfo implements ActionResult
                                  Set<Integer> studyIds,
                                  String comment,
                                  AddressSaveInfo address,
-                                 ActivityStatus activityStatus)
-    {
+                                 ActivityStatus activityStatus) {
         this.id = id;
         this.name = name;
         this.nameShort = nameShort;
@@ -46,5 +47,20 @@ public class ResearchGroupSaveInfo implements ActionResult
         this.comment = comment;
         this.address = address;
         this.activityStatus = activityStatus;
+    }
+
+    public static ResearchGroupSaveInfo createFromResearchGroup(ResearchGroup rg) {
+        Set<Integer> studyIds = new HashSet<>(0);
+        for (Study study : rg.getStudies()) {
+            studyIds.add(study.getId());
+        }
+        return new ResearchGroupSaveInfo(null,
+                                         rg.getName(),
+                                         rg.getNameShort(),
+                                         studyIds,
+                                         null,
+                                         AddressSaveInfo.createFromAddress(rg.getAddress()),
+                                         ActivityStatus.ACTIVE);
+
     }
 }
