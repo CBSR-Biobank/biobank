@@ -640,7 +640,6 @@ public class Factory {
         session.save(address);
 
         request.setCreatedAt(new Date());
-        request.setSubmitted(new Date());
         request.setResearchGroup(getDefaultResearchGroup());
 
         setDefaultRequest(request);
