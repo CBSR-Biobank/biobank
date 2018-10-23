@@ -56,7 +56,7 @@ public class SpecimenGetPossibleTypesAction implements Action<SpecimenTypeData> 
             for (AliquotedSpecimen aliquotedSpecimen : study.getAliquotedSpecimens()) {
                 aliquotSpecimenTypes.add(aliquotedSpecimen.getSpecimenType());
             }
-            specimenTypes.removeAll(aliquotSpecimenTypes);
+            specimenTypes.addAll(aliquotSpecimenTypes);
         } else {
             for (AliquotedSpecimen aliquotedSpecimen : study.getAliquotedSpecimens()) {
                 SpecimenType specimenType = aliquotedSpecimen.getSpecimenType();
