@@ -90,6 +90,9 @@ public class RequestTableGroup extends TableGroup<RequestWrapper> {
 
                 for (Container c: containerTree) {
                     Integer containerId = c.getId();
+
+                    if (adapters.containsKey(containerId)) continue;
+
                     Integer topContainerId = c.getTopContainer().getId();
                     ContainerWrapper cw = new ContainerWrapper(SessionManager.getAppService(), c);
                     RequestContainerAdapter adapter = new RequestContainerAdapter(this, cw);
@@ -101,14 +104,16 @@ public class RequestTableGroup extends TableGroup<RequestWrapper> {
                         RequestContainerAdapter parent = adapters.get(parentContainerId);
                         parent.addChild(adapter);
                         adapter.setParent(parent);
-
                     }
-                    adapters.put(containerId, adapter);
 
-                    RequestSpecimenWrapper wrapper =
-                        new RequestSpecimenWrapper(SessionManager.getAppService(), ra);
-                    adapter.addChild(new TreeItemAdapter(adapter, wrapper));
+                    adapters.put(containerId, adapter);
                 }
+
+                RequestContainerAdapter adapter =
+                    adapters.get(ra.getSpecimen().getSpecimenPosition().getContainer().getId());
+                RequestSpecimenWrapper wrapper =
+                    new RequestSpecimenWrapper(SessionManager.getAppService(), ra);
+                adapter.addChild(new TreeItemAdapter(adapter, wrapper));
                 numSpecimens++;
             }
         } else {
