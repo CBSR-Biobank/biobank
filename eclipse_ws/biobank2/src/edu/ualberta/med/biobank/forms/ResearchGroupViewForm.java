@@ -206,40 +206,40 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
 
     @SuppressWarnings({ "nls" })
     public void saveRequest() throws Exception {
-        FileReader f = new FileReader(csvSelector.getFilePath());
-
-        //OHSDEV - Commenting out code that serves no purpose
-        //OHSDEV - Causes the EOF to be reached so not further processing happens
-        //int newLines = 0;
-        //while (f.ready() && newLines < 4) {
-        //    char c = (char) f.read();
-        //    if (c == '\n') newLines++;
-        //}
-
-        ICsvBeanReader reader =
-            new CsvBeanReader(f, CsvPreference.STANDARD_PREFERENCE);
+        ICsvBeanReader reader = new CsvBeanReader(new FileReader(csvSelector.getFilePath()),
+                                                  CsvPreference.EXCEL_PREFERENCE);
 
         final CellProcessor[] processors =
-            new CellProcessor[] { null, null,
-                new ParseDate("yyyy-MM-dd"), null, null, null };
+            new CellProcessor[] { null,
+                                  null,
+                                  new ParseDate("yyyy-MM-dd"),
+                                  null,
+                                  null,
+                                  null };
 
         List<RequestInput> requests = new ArrayList<RequestInput>();
 
         try {
             // Peer class not used because this refers to RequestInput fields
-            String[] header = new String[] { "pnumber", "inventoryID",
-                "dateDrawn", "specimenTypeNameShort", "location",
-                "activityStatus" };
+            String[] header = new String[] { "pnumber",
+                                             "inventoryID",
+                                             "dateDrawn",
+                                             "specimenTypeNameShort",
+                                             "location",
+                                             "activityStatus" };
             RequestInput srequest;
+            reader.getCSVHeader(true);
             while ((srequest =
                 reader.read(RequestInput.class, header, processors)) != null) {
-                if (!srequest.getInventoryID().isEmpty())
+                if (!srequest.getInventoryID().isEmpty()) {
                     requests.add(srequest);
+                }
             }
         } catch (SuperCSVException e) {
-            throw new Exception(i18n.tr("Parse error at line {0}",
+            throw new Exception(i18n.tr("Parse error:",
                 reader.getLineNumber())
-                + "\n" + e.getCsvContext());
+                + "\n" + e.getCsvContext()
+                + "\n" + e.getMessage());
         } finally {
             reader.close();
         }
