@@ -288,7 +288,12 @@
     <mkdir dir="${tomcat.server.location}/conf/Catalina/localhost" />
   </target>
 
-  <target name="deploy_tomcat" depends ="package-webapp">
+  <target name="tomcat.home.env">
+    <fail unless="env.CATALINA_HOME"
+          message="CATALINA_HOME environment variable not defined" />
+  </target>
+
+  <target name="deploy_tomcat" depends ="tomcat.home.env,package-webapp">
 
 	  <antcall target="create-biobank-conf-tomcat-dir"/>
 	  <antcall target="keystore-copy"/>
