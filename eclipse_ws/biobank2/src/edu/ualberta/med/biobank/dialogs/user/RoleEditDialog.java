@@ -107,6 +107,7 @@ public class RoleEditDialog extends AbstractSecurityEditDialog {
     @Override
     protected void okPressed() {
         try {
+            role.getPermissions().clear();
             role.getPermissions().addAll(tree.getCheckedElements());
 
             IdResult result = SessionManager.getAppService().doAction(
