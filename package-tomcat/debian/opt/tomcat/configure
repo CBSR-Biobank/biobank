@@ -1,0 +1,110 @@
+#!/bin/bash
+
+#
+# This script configures a Biobank server deployment.
+#
+#
+
+# TODO:
+# 1. modify console passwords
+
+TOMCAT_HOME="/opt/tomcat"
+CATALINA_HOME="$TOMCAT_HOME/apache-tomcat-8.5.30"
+
+if [[ ! -d "$CATALINA_HOME" ]]; then
+   echo "Error: Apache Tomcat directory not found in home directory."
+   exit 1
+fi
+
+mkdir -p "$CATALINA_HOME/conf/Catalina/localhost"
+
+BIOBANK_WAR="$CATALINA_HOME/webapps/biobank.war"
+
+if [[ ! -f "$BIOBANK_WAR" ]]; then
+   echo "Error: server WAR file not found: $BIOBANK_WAR."
+   exit 1
+fi
+
+ZIP="/usr/bin/zip"
+UNZIP="/usr/bin/unzip"
+SED="/bin/sed"
+DFLT_DBHOST="localhost"
+DFLT_DBNAME="biobank"
+DFLT_DB_DRIVER="com.mysql.jdbc.Driver"
+
+TEMPLATES=(
+    application-config.xml.template
+    biobank.csm.new.hibernate.cfg.xml.template
+    biobank.xml.template
+    empty_db.sql.template
+    log4j.xml.template
+    login.config.template)
+
+read -p "Enter host name for MySQL server: [$DFLT_DBHOST] " DBHOST
+DBHOST=${DBHOST:-$DFLT_DBHOST}
+
+read -p "Enter database name for the Biobank application: [$DFLT_DBNAME] " DBNAME
+DBNAME=${DBNAME:-$DFLT_DBNAME}
+
+read -p "Enter user name for MySQL server: " DBUSER
+
+read -s -p "Enter user's password: " DBPWD
+echo ""
+
+DBURL="jdbc:mysql:\/\/$DBHOST:3306\/$DBNAME"
+
+BIOBANK_WAR_UNZIP_DIR=biobank_war
+
+mkdir -p $BIOBANK_WAR_UNZIP_DIR
+unzip -o $BIOBANK_WAR -d $BIOBANK_WAR_UNZIP_DIR &> /dev/null
+
+for f in "${TEMPLATES[@]}"
+do
+    if [ ! -e "templates/$f" ]; then
+        echo "ERROR: file is missing: $f"
+        exit 0
+    fi
+
+
+   case $f in
+       application-config.xml.template)
+           DEST=$TOMCAT_HOME/biobank_war/WEB-INF/classes/application-config.xml
+           ;;
+       biobank.csm.new.hibernate.cfg.xml.template)
+           DEST=$TOMCAT_HOME/biobank_war/WEB-INF/classes/biobank.csm.new.hibernate.cfg.xml
+           ;;
+       biobank.xml.template)
+           DEST=$CATALINA_HOME/conf/Catalina/localhost/biobank.xml
+           ;;
+       empty_db.sql.template)
+           DEST=$TOMCAT_HOME/empty_db.sql
+           ;;
+       log4j.xml.template)
+           DEST=$TOMCAT_HOME/biobank_war/WEB-INF/classes/log4j.xml
+           ;;
+       login.config.template)
+           DEST=$CATALINA_HOME/conf/login.config
+           ;;
+   esac
+
+   # echo "file: $f, dest: $DEST"
+
+   $SED "s/@database.driver@/$DFLT_DB_DRIVER/g;s/@database.url@/$DBURL/g;s/@database.username@/$DBUSER/g;s/@database.password@/$DBPWD/g;s/@@web.console.password@@/$WEB_CONSOLE_PWD/g" "templates/$f" >$DEST
+
+done
+
+DBOUT=`MYSQL_PWD=$DBPWD mysql -h $DBHOST -u$DBUSER $DBNAME -B -e "select count(*) from information_schema.tables where table_schema='$DBNAME' and table_name='csm_application'"`
+DBOUT_ARR=(${DBOUT//;/ })
+
+if [ "${DBOUT_ARR[1]}" != "1" ]; then
+    read -p "Databse not fully initialized. Do you want to initialize it? [y/n] " CREATE
+    if [ "$CREATE"=="y" ]; then
+        mysql -h $DBHOST -u$DBUSER -p$DBPWD $DBNAME < empty_db.sql
+    fi
+fi
+
+cd $BIOBANK_WAR_UNZIP_DIR && zip -r $BIOBANK_WAR . &> /dev/null
+cd ..
+rm -rf $BIOBANK_WAR_UNZIP_DIR empty_db.sql
+
+echo "Biobank server is now ready to start"

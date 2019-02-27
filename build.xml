@@ -295,27 +295,27 @@
 
   <target name="deploy_tomcat" depends ="tomcat.home.env,package-webapp">
 
-	  <antcall target="create-biobank-conf-tomcat-dir"/>
-	  <antcall target="keystore-copy"/>
+    <antcall target="create-biobank-conf-tomcat-dir"/>
+    <antcall target="keystore-copy"/>
 
-	  <move file="${secu-log.dir}/tomcat/biobank.xml"
-			tofile="${tomcat.server.location}/conf/Catalina/localhost/biobank.xml"
-			overwrite="true" />
+    <move file="${secu-log.dir}/tomcat/biobank.xml"
+	  tofile="${tomcat.server.location}/conf/Catalina/localhost/biobank.xml"
+	  overwrite="true" />
 
-	  <move file="${secu-log.dir}/tomcat/login.config"
-			tofile="${tomcat.server.location}/conf/login.config"
-			overwrite="true" />
+    <move file="${secu-log.dir}/tomcat/login.config"
+	  tofile="${tomcat.server.location}/conf/login.config"
+	  overwrite="true" />
 
-	  <copy file="${secu-log.dir}/tomcat/catalina.properties"
-			tofile="${tomcat.server.location}/conf/catalina.properties"
-			overwrite="true" />
+    <copy file="${secu-log.dir}/tomcat/catalina.properties"
+	  tofile="${tomcat.server.location}/conf/catalina.properties"
+	  overwrite="true" />
 
-      <delete dir="${tomcat.server.location}/webapps/${app.name}"/>
-	  <delete file="${tomcat.server.location}/webapps/${app.name}.war"/>
+    <delete dir="${tomcat.server.location}/webapps/${app.name}"/>
+    <delete file="${tomcat.server.location}/webapps/${app.name}.war"/>
 
-	  <copy todir="${tomcat.server.location}/webapps">
-			<fileset file="${war.file}" />
-	  </copy>
+    <copy todir="${tomcat.server.location}/webapps">
+      <fileset file="${war.file}" />
+    </copy>
 
   </target>
 
@@ -711,7 +711,6 @@
              token="@VERSION@"
              value="${featureVersion}" />
 
-
     <!-- get current org.eclipse.equinox.launcher jar. If find more than one, will use the last one in the list (should be the last version)-->
     <fileset id="launcher.id.all"
              dir="${env.ECLIPSE_HOME}/plugins/"
@@ -749,7 +748,74 @@
     <delete dir="docs/doxygen/xml" />
   </target>
 
+  <target name="clean-package-biobank-server">
+    <delete dir="${package.tomcat.target.dir}" />
+    <delete dir="${package.tomcat.root.dir}/templates" />
+    <delete dir="${package.tomcat.root.dir}/tools" />
 
+    <delete file="biobank-server-*.deb"/>
+  </target>
 
+  <target name="package-biobank-server"
+	  depends="clean-package-biobank-server,deploy_tomcat"
+	  description="Generates an Ubuntu package file for the Biobank server.">
+
+    <!-- TEMPLATES START -->
+    <copy file="${secu-log.dir}/tomcat/application-config.xml.template"
+	  tofile="${package.tomcat.root.dir}/templates/application-config.xml.template"
+	  overwrite="true" />
+    <copy file="${secu-log.dir}/tomcat/biobank.csm.new.hibernate.cfg.xml.template"
+	  tofile="${package.tomcat.root.dir}/templates/biobank.csm.new.hibernate.cfg.xml.template"
+	  overwrite="true" />
+    <copy file="${secu-log.dir}/tomcat/biobank.xml.template"
+	  tofile="${tomcat.server.location}/templates/biobank.xml"
+	  overwrite="true" />
+    <copy file="db/empty_db.sql.template"
+	  tofile="${package.tomcat.root.dir}/templates/empty_db.sql.template"
+	  overwrite="true" />
+    <copy file="${secu-log.dir}/tomcat/log4j.xml.template"
+	  tofile="${package.tomcat.root.dir}/templates/log4j.xml.template"
+	  overwrite="true" />
+    <copy file="${secu-log.dir}/tomcat/login.config.template"
+	  tofile="${package.tomcat.root.dir}/templates/login.config.template"
+	  overwrite="true" />
+    <!-- TEMPLATES END -->
+
+    <!-- Use command line unzip to keep file permissions -->
+    <exec executable="unzip">
+      <arg line="-q -o ${env.CATALINA_HOME}/../apache-tomcat-8.5.30.zip -d ${package.tomcat.root.dir}" />
+    </exec>
+
+    <copy file="${secu-log.dir}/tomcat/biobank.xml.template"
+	  tofile="${package.tomcat.root.dir}/templates/biobank.xml.template"
+	  overwrite="true" verbose="true"/>
+
+    <copy file="${secu-log.dir}/tomcat/catalina.properties"
+	  tofile="${package.tomcat.target.dir}/conf/catalina.properties"
+	  overwrite="true" />
+
+    <copy file="${scripts.proj.dir}/ssl/cert.cnf.template"
+	  tofile="${package.tomcat.root.dir}/templates/cert.cnf.template"
+	  overwrite="true" />
+
+    <copy todir="${package.tomcat.target.dir}/webapps">
+      <fileset file="${war.file}" />
+    </copy>
+
+    <mkdir dir="${package.tomcat.root.dir}/tools"/>
+
+    <copy file="${scripts.proj.dir}/ssl/ImportKey.class"
+	  tofile="${package.tomcat.root.dir}/tools/ImportKey.class"
+	  overwrite="true" />
+
+    <exec executable="dpkg" dir="package-tomcat">
+      <arg line=" --build debian" />
+    </exec>
+
+    <move file="package-tomcat/debian.deb"
+	  tofile="biobank-server-${server.version.num}.deb"
+	  overwrite="true" />
+
+  </target>
 
 </project>

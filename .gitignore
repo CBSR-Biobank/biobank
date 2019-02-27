@@ -83,9 +83,6 @@ surefire-reports
 bin
 .metadata
 classes
-package-jboss/debian/opt/jboss/jboss-4.0.5.GA/
-package-jboss/debian/opt/jboss/templates/
-package-jboss/debian/opt/jboss/tools/
 cacerts
 decode.png
 *.sql.gz
@@ -96,3 +93,7 @@ testing/
 coverage/
 coverage.txt
 coverage.xml
+biobank*.deb
+package-tomcat/debian/opt/tomcat/apache-tomcat-8.5.30
+package-tomcat/debian/opt/tomcat/templates
+package-tomcat/debian/opt/tomcat/tools

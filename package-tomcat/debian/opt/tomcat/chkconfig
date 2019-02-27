@@ -1,0 +1,221 @@
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+use Getopt::Long;
+use File::Basename;
+use Term::ReadKey;
+use Data::Dumper;
+
+=head1 NAME
+
+chkconfig - Checks for a valid deployment configuration environment for a
+Biobank server.
+
+=head1 USAGE
+
+chkconfig [OPTIONS]
+
+=head1 OPTIONS
+
+  --database DBNAME  The name of the dataabse used by the Biobank applicatiion. Defaults
+                     to "biobank".
+  --host DBHOST      The hostname of the machine running the MySQL server. Defaults to
+                     localhost if not specified.
+  --user DBUSER      The user to use on the MySQL server.
+  --password PWD     The password to use on the MySQL server. If not specified the
+                     user will be prompted to enter it.
+  --help             Help text.
+  --man              Full documentation.
+
+=cut
+
+my $havePodUsage = eval { require Pod::Usage };
+no strict 'refs';
+my $TOMCAT_HOME = "/opt/tomcat";
+my $CATALINA_HOME="$TOMCAT_HOME/apache-tomcat-8.5.30";
+my $MYSQL = "/usr/bin/mysql";
+my $GREP = "/bin/grep";
+my $SED = "/bin/sed";
+my $DBHOST = "";
+my $DBNAME = "";
+my $DBUSER = "";
+my $DBPASSWORD = "";
+my $RESULT = 1;
+my $help = 0;
+my $man = 0;
+my @tests = ();
+
+my $parseCmdLine = GetOptions (
+                               'database=s' => \$DBNAME,
+                               'host=s' => \$DBHOST,
+                               'user=s' => \$DBUSER,
+                               'password=s' => \$DBPASSWORD,
+                               'man' => \$man,
+                               'help|?'   => \$help);
+
+if ($havePodUsage) {
+    Pod::Usage->import();
+    $parseCmdLine or pod2usage(2);
+    pod2usage(1) if $help;
+    pod2usage(-exitstatus => 0, -verbose => 2) if $man;
+}
+
+sub userInput {
+    my $msg = shift;
+    my $dflt = shift || '';
+    my $value;
+
+    print "$msg: ";
+
+    if ($dflt ne "") {
+        print "[$dflt] ";
+    }
+
+    $value = <>;
+    chomp $value;
+    if ($value eq "" && $dflt ne "") {
+        $value = $dflt;
+    }
+    return $value;
+}
+
+if ($DBHOST eq "") {
+    $DBHOST = userInput("Enter host name for MySQL server", "localhost");
+    if ($DBHOST eq "") {
+        die "ERROR: database host name not specified\n";
+    }
+}
+
+if ($DBNAME eq "") {
+    $DBNAME = userInput("Enter database name for the Biobank application", "biobank");
+    if ($DBNAME eq "") {
+        die "ERROR: database name not specified\n";
+    }
+}
+
+if ($DBUSER eq "") {
+    $DBUSER = userInput("Enter database executor's username (to execute database commands)");
+    if ($DBUSER eq "") {
+        die "ERROR: database user name not specified\n";
+    }
+}
+
+if ($DBPASSWORD eq "") {
+    print "Enter the MySQL password for user $DBUSER: ";
+    ReadMode 'noecho';
+    $DBPASSWORD = ReadLine 0;
+    chomp $DBPASSWORD;
+    ReadMode 'normal';
+    print "\n";
+}
+
+if ($DBPASSWORD eq "") {
+    die "ERROR: database user password not specified\n";
+}
+
+print "\n";
+
+sub createTestResult {
+    my $t = new TestResult->new(shift, shift);
+    push @tests, $t;
+    return $t;
+}
+
+sub mysqlCmd {
+    my $dbname = shift;
+    my $cmd = shift;
+
+    if (! defined($cmd)) { die "command is empty"; }
+    if (! defined($dbname)) { die "database name not specified"; }
+    return `MYSQL_PWD=$DBPASSWORD $MYSQL -h$DBHOST -u$DBUSER -B --skip-column-names -e \"$cmd\" $DBNAME`;
+}
+
+sub getNonInnoDbTables() {
+    my $cmd = "SELECT TABLE_NAME FROM information_schema.TABLES "
+        . "WHERE TABLE_SCHEMA = '$DBNAME' AND engine = 'InnoDB'";
+
+    my @innoTables = mysqlCmd($DBNAME, $cmd);
+    my @tables = mysqlCmd($DBNAME, 'SHOW TABLES');
+
+    my %inInnoTables = map { $_ => 1 } @innoTables;
+    my @nonInnoDbTables;
+
+    foreach (grep { not $inInnoTables{$_} } @tables ) {
+        chomp($_);
+        push (@nonInnoDbTables, $_);
+    }
+
+    return @nonInnoDbTables;
+}
+
+# check for InnoDB
+my $testResult = createTestResult("checking MySQL for InnoDB...", 1);
+$testResult->{'result'} = (`MYSQL_PWD=$DBPASSWORD  $MYSQL -h$DBHOST -u$DBUSER -e "show variables" $DBNAME |
+        $GREP -e "^default_storage_engine"` =~ /InnoDB/);
+
+# checkMysqlLowerCaseTableNames
+$testResult = createTestResult("checking MySQL for lower case table names...", 1);
+$testResult->{result} = (`MYSQL_PWD=$DBPASSWORD  $MYSQL -h$DBHOST -u$DBUSER -e "show variables" $DBNAME |
+        $GREP -e "^lower_case_table_names"` =~ /1$/);
+
+# checkKeystoreFile
+$testResult = createTestResult("checking for SSL certificate file...", 1);
+$testResult->{result} = (-f "$CATALINA_HOME/conf/biobank.keystore");
+
+# checkDbExists()
+$testResult = createTestResult("checking for databse $DBNAME...", 1);
+my $cmd = "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA "
+    . "WHERE SCHEMA_NAME = '$DBNAME'";
+$testResult->{result} = (mysqlCmd('biobank', $cmd) =~ /^$DBNAME$/);
+
+# checkDbTablesInnoDb and report the bad tables
+my @nonInnoDbTables = getNonInnoDbTables();
+$testResult = createTestResult("checking if database tables are InnoDB...", 1);
+$testResult->{result} =($#nonInnoDbTables < 0);
+foreach (@nonInnoDbTables)  {
+    push(@ {$testResult->{extraMsgs} }, "\ttable \"$_\" is not InnoDB");
+}
+
+#
+# display results
+#
+
+foreach (@tests) {
+    my $testResult = $_;
+
+    #print(Dumper($testResult));
+
+    (! $testResult->{required}) && print "OPTIONAL ";
+    printf("%-50s %9s\n", $testResult->{msg}, ($testResult->{result} ? "[PASS]" : "[FAIL]"));
+
+    foreach ( @{ $testResult->{extraMsgs} } ) {
+        print "\t", $_, "\n";
+    }
+
+    ($testResult->{required}) && ($RESULT &= defined($testResult->{result}));
+}
+
+(! $RESULT) && print "tests FAILED\n";
+exit !$RESULT;
+
+package TestResult;
+
+sub new {
+    my $proto = shift;
+    my $class = ref $proto || $proto;
+    my $self = {
+                msg => shift,
+                required => shift,
+                result => undef,
+                extraMsgs => [ ],
+                };
+    $self = bless $self, $class;
+
+    return $self;
+}
+
+
+# Local Variables:
+# compile-command: "cd $HOME/proj/cbsr/biobank && scripts/chkconfig"
+# End:
