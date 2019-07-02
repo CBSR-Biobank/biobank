@@ -6,7 +6,10 @@
          BioBank Client
 Version {0}
 
+Developed for the Canadian BioSample Repository by AICML .
+
 Canadian BioSample Repository: http://www.biosample.ca
+AICML: http://aicml.cs.ualberta.ca
       </text>
    </aboutInfo>
 
@@ -31,6 +34,7 @@ Canadian BioSample Repository: http://www.biosample.ca
          <bmp winSmallHigh="/biobank.gui.common/icons/biobank_launcher_16.bmp" winMediumHigh="/biobank.gui.common/icons/biobank_launcher_32.bmp"/>
       </win>
    </launcher>
+
 
    <vm>
       <linux include="true">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/OSGi%Minimum-1.0</linux>

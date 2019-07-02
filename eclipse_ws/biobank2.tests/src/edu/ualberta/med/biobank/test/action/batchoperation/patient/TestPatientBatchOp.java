@@ -23,9 +23,9 @@ import edu.ualberta.med.biobank.test.action.TestAction;
 import edu.ualberta.med.biobank.test.action.batchoperation.CsvUtil;
 
 /**
- * 
+ *
  * @author Nelson Loyola
- * 
+ *
  */
 @SuppressWarnings("nls")
 public class TestPatientBatchOp extends TestAction {
@@ -65,7 +65,7 @@ public class TestPatientBatchOp extends TestAction {
 
         try {
             PatientBatchOpAction importAction = new PatientBatchOpAction(
-                factory.getDefaultSite(), pojos, new File(CSV_NAME));
+                factory.getDefaultSite(), pojos, new File(CSV_NAME), false);
             exec(importAction);
         } catch (BatchOpErrorsException e) {
             CsvUtil.showErrorsInLog(log, e);
@@ -86,7 +86,7 @@ public class TestPatientBatchOp extends TestAction {
         // try with a study that does not exist
         try {
             PatientBatchOpAction importAction = new PatientBatchOpAction(
-                factory.getDefaultSite(), pojos, new File(CSV_NAME));
+                factory.getDefaultSite(), pojos, new File(CSV_NAME), false);
             exec(importAction);
             Assert.fail("should not be allowed to import with a study name that does not exist");
         } catch (BatchOpErrorsException e) {
@@ -111,13 +111,32 @@ public class TestPatientBatchOp extends TestAction {
         // try with a study that does not exist
         try {
             PatientBatchOpAction importAction = new PatientBatchOpAction(
-                factory.getDefaultSite(), pojos, new File(CSV_NAME));
+                factory.getDefaultSite(), pojos, new File(CSV_NAME), false);
             exec(importAction);
             Assert.fail("should not be allowed to import an existing patient");
         } catch (BatchOpErrorsException e) {
             // do nothing
         }
 
+    }
+
+    @Test(expected = Test.None.class /* no exception expected */)
+    public void existingPatientIgnoreDuplicates() throws Exception {
+        Patient patient = factory.createPatient();
+        session.getTransaction().commit();
+
+        Set<PatientBatchOpInputPojo> pojos = patientPojoHelper.createPatients(
+            factory.getDefaultStudy().getNameShort(), 1);
+
+        // give the pojo the same patient number as the patient added above
+        for (PatientBatchOpInputPojo pojo : pojos) {
+            pojo.setPatientNumber(patient.getPnumber());
+        }
+        PatientCsvWriter.write(CSV_NAME, pojos);
+
+        PatientBatchOpAction importAction = new PatientBatchOpAction(
+            factory.getDefaultSite(), pojos, new File(CSV_NAME), true);
+        exec(importAction);
     }
 
     @Test
@@ -135,7 +154,7 @@ public class TestPatientBatchOp extends TestAction {
         // try with a study that does not exist
         try {
             PatientBatchOpAction importAction = new PatientBatchOpAction(
-                factory.getDefaultSite(), pojos, new File(CSV_NAME));
+                factory.getDefaultSite(), pojos, new File(CSV_NAME), false);
             exec(importAction);
         } catch (BatchOpErrorsException e) {
             CsvUtil.showErrorsInLog(log, e);
@@ -179,7 +198,7 @@ public class TestPatientBatchOp extends TestAction {
         PatientCsvWriter.write(CSV_NAME, pojos);
 
         PatientBatchOpAction importAction = new PatientBatchOpAction(
-            factory.getDefaultSite(), pojos, new File(CSV_NAME));
+            factory.getDefaultSite(), pojos, new File(CSV_NAME), false);
         Integer batchOpId = exec(importAction).getId();
 
         checkPojosAgainstDb(pojos);

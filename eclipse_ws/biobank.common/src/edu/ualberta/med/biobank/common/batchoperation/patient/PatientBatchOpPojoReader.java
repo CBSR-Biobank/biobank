@@ -53,9 +53,12 @@ public class PatientBatchOpPojoReader implements
     private final Set<PatientBatchOpInputPojo> pojos =
         new LinkedHashSet<PatientBatchOpInputPojo>(0);
 
-    public PatientBatchOpPojoReader(Center workingCenter, String filename) {
+    private final boolean ignoreDuplicates;
+
+    public PatientBatchOpPojoReader(Center workingCenter, String filename, boolean ignoreDuplicates) {
         this.workingCenter = workingCenter;
         this.filename = filename;
+        this.ignoreDuplicates = ignoreDuplicates;
     }
 
     // cell processors have to be recreated every time the file is read
@@ -120,8 +123,7 @@ public class PatientBatchOpPojoReader implements
 
     @Override
     public Action<IdResult> getAction() throws NoSuchAlgorithmException, IOException {
-        return new PatientBatchOpAction(workingCenter, pojos,
-            new File(filename));
+        return new PatientBatchOpAction(workingCenter, pojos, new File(filename), ignoreDuplicates);
     }
 
 }
