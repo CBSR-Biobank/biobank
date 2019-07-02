@@ -48,6 +48,10 @@ public class PatientBatchOpPojoData implements IBatchOpPojoHelper {
         this.user = user;
     }
 
+    public String getPatientNumber() {
+        return pojo.getPatientNumber();
+    }
+
     @SuppressWarnings("nls")
     public Patient getNewPatient() {
         Patient patient = new Patient();

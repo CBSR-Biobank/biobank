@@ -34,8 +34,9 @@ public class PatientImportCommand extends Command {
 
     protected static final String USAGE =
         NAME
-            + " SITE_NAME_SHORT CSV_FILE"
-            + "SITE_NAME_SHORT is the short name of the working center you wish to use to import the file from.\n\n"
+            + " SITE_NAME_SHORT CSV_FILE [ignore-duplicates]"
+            + "\n\nSITE_NAME_SHORT is the short name of the working center you wish to use to import the file from.\n\n"
+            + "If \"ignore-duplicates\" is specified, patients with patient numbers already in the database are ignored.\n\n"
             + BatchOpUsage.USAGE;
 
     private Map<String, Site> sites;
@@ -48,13 +49,27 @@ public class PatientImportCommand extends Command {
 
     @Override
     public boolean runCommand(String[] args) {
-        if (args.length != 3) {
+        if ((args.length < 3) || (args.length > 4)) {
             System.out.println(USAGE);
             return false;
         }
 
         final String siteName = args[1];
         final String csvFile = args[2];
+        boolean ignoreDuplicates = false;
+
+        if (args.length > 3) {
+            if (args[3].equals("ignore-duplicates")) {
+                ignoreDuplicates = true;
+            } else {
+                System.out.println(USAGE);
+                return false;
+            }
+        }
+
+        if (ignoreDuplicates) {
+            LOG.info("ignoring duplicates");
+        }
 
         try {
             BiobankApplicationService appService = cliProvider.getAppService();
@@ -77,7 +92,7 @@ public class PatientImportCommand extends Command {
                 return false;
             }
 
-            pojoReader = new PatientBatchOpPojoReader(site, csvFile);
+            pojoReader = new PatientBatchOpPojoReader(site, csvFile, ignoreDuplicates);
 
             LOG.info("Reading CSV file: {}", csvFile);
             pojoReader.readPojos(reader);

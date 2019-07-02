@@ -6,6 +6,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -70,8 +71,12 @@ public class PatientBatchOpAction implements Action<IdResult> {
 
     private Center workingCenterOnServerSide;
 
+    private final boolean ignoreDuplicates;
+
+    private final List<String> patientsToIgnore = new ArrayList<String>();
+
     public PatientBatchOpAction(Center workingCenter,
-        Set<PatientBatchOpInputPojo> inputPojos, File inputFile)
+        Set<PatientBatchOpInputPojo> inputPojos, File inputFile, boolean ignoreDuplicates)
         throws IOException, NoSuchAlgorithmException {
 
         if (inputPojos.size() > SIZE_LIMIT) {
@@ -80,6 +85,7 @@ public class PatientBatchOpAction implements Action<IdResult> {
 
         this.workingCenterId = workingCenter.getId();
         this.fileData = FileData.fromFile(inputFile);
+        this.ignoreDuplicates = ignoreDuplicates;
 
         compressedList = new CompressedReference<ArrayList<PatientBatchOpInputPojo>>(
             new ArrayList<PatientBatchOpInputPojo>(inputPojos));
@@ -189,8 +195,12 @@ public class PatientBatchOpAction implements Action<IdResult> {
     private PatientBatchOpPojoData getDbInfo(ActionContext context, PatientBatchOpInputPojo pojo) {
         Patient patient = BatchOpActionUtil.getPatient(context.getSession(), pojo.getPatientNumber());
         if (patient != null) {
-            errorSet.addError(pojo.getLineNumber(), PATIENT_ALREADY_EXISTS_ERROR);
-            return null;
+            if (ignoreDuplicates) {
+                patientsToIgnore.add(pojo.getPatientNumber());
+            } else {
+                errorSet.addError(pojo.getLineNumber(), PATIENT_ALREADY_EXISTS_ERROR);
+                return null;
+            }
         }
 
         Study study = BatchOpActionUtil.getStudy(context.getSession(), pojo.getStudyName());
@@ -214,6 +224,11 @@ public class PatientBatchOpAction implements Action<IdResult> {
         if (workingCenterOnServerSide == null) {
             // workingCenterOnServerSide is assigned when isAllowed() is called
             throw new IllegalStateException("workingCenterOnServerSide is null");
+        }
+
+        if (ignoreDuplicates && patientsToIgnore.contains(pojoData.getPatientNumber())) {
+            log.info("patient ignored: {}", pojoData.getPatientNumber());
+            return;
         }
 
         Patient patient = pojoData.getNewPatient();
