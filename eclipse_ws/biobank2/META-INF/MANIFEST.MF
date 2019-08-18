@@ -22,7 +22,7 @@ Require-Bundle: org.eclipse.ui,org.eclipse.core.runtime,org.eclipse.co
  equinox.security.ui;bundle-version="1.1.0",org.eclipse.equinox.p2.cor
  e;bundle-version="2.1.0",biobank.mvp;bundle-version="1.0.0",org.eclip
  se.equinox.p2.metadata;bundle-version="2.1.0"
-Bundle-Version: 3.10.6.rc1
+Bundle-Version: 3.10.6
 Bundle-Vendor: AICML
 Bundle-Localization: plugin
 Export-Package: edu.ualberta.med.biobank
