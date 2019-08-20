@@ -20,7 +20,8 @@ public class ProcessingEventGetBriefInfoAction implements
             + " LEFT JOIN pe.specimens sourceSpecs"
             + " LEFT JOIN sourceSpecs.childSpecimens allAlqs"
             + " LEFT JOIN sourceSpecs.collectionEvent.patient.study study"
-            + " WHERE pe.id=?";
+            + " WHERE pe.id=?"
+            + " GROUP BY study.nameShort";
 
     private final Integer peventId;
 
