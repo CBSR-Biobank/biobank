@@ -19,7 +19,7 @@ AICML: http://aicml.cs.ualberta.ca
    <launcherArgs>
       <programArgs>-data @user.home/biobank2</programArgs>
       <programArgsLin>--launcher.GTK_version 2</programArgsLin>
-      <vmArgs>-Dosgi.requiredJavaVersion=1.7 -XX:MaxPermSize=256m -Xms512m -Xmx1024m</vmArgs>
+      <vmArgs>-Dosgi.requiredJavaVersion=1.7 -Dhttps.protocols=TLSv1.2 -XX:MaxPermSize=256m -Xms512m -Xmx1024m</vmArgs>
       <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts</vmArgsMac>
    </launcherArgs>
 
