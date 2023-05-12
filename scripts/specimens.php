@@ -1,7 +1,9 @@
 <?php
 
-//USAGE ${argv[0]} SITE_NAME [OUTPUT_DIR]
+declare(strict_types=1);
+
 $usage = <<<USAGE
+usage: {$argv[0]} SITE_NAME [OUTPUT_DIR]
 
 Downloads all the specimens in a Biobank database to a CSV file.
 USAGE;
@@ -34,14 +36,14 @@ QRY_SPECIMENS;
 
 
 $host = 'localhost';
-$db   = 'biobank';
+$dbname = 'biobank';
 $user = 'dumb_user';
 $pass = 'dumb_password';
 $charset = 'utf8mb4';
 
 $outputDir = $argv[1] ?? '.';
 
-$dsn = "mysql:host=$host;dbname=$db;charset=$charset";
+$dsn = "mysql:host=$host;dbname=$dbname;charset=$charset";
 $opt = [
     PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
@@ -51,7 +53,7 @@ $opt = [
 
 function runQuery($pdo, $outputDir) {
     global $query;
-    
+
     $filename = $outputDir . '/specimens-' . date('Y-m-d') . '.csv';
     $data = fopen($filename, 'w');
     $stmt = $pdo->query($query);
@@ -71,5 +73,3 @@ function runQuery($pdo, $outputDir) {
 $pdo = new PDO($dsn, $user, $pass, $opt);
 
 runQuery($pdo, $outputDir);
-
-
