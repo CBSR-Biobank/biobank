@@ -475,7 +475,7 @@
   </target>
 
   <target name="build-common-project"
-          depends="resolve,create-messages-jar,server-manifest">
+          depends="create-messages-jar,server-manifest">
     <copy file="${lib.dir}/messages.jar" todir="${eclipse.proj.dir.common}/lib/client" overwrite="true"/>
     <mkdir dir="${eclipse.proj.dir.common}/output" />
     <copy includeemptydirs="false" todir="${eclipse.proj.dir.common}/output" overwrite="false">

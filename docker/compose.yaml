@@ -1,0 +1,80 @@
+#
+# Run the docker compose command from the project's root folder to build / start.
+#
+# I.e:
+#    cd __project_root_dir
+#    docker compose --env-file .env -f docker/docker-compose.yaml --project-directory docker up --build
+#
+
+version: '3.8'
+services:
+    db:
+        image: mariadb:11.0.3-jammy
+        command: --default-authentication-plugin=mariadb_native_password --lower-case-table-names=1
+        ports:
+            - 3306:3306
+        volumes:
+            - ../database/lib:/var/lib/mysql
+            - ./my.cnf:/etc/mysql/my.cnf
+            - ../database/db_initial.sql.gz:/db_initial.sql.gz
+            - ../database/_init.sh:/docker-entrypoint-initdb.d/_init.sh
+        environment:
+            - MARIADB_CONTAINER_USER=${uid}
+            - MARIADB_CONTAINER_GROUP=${gid}
+            - MARIADB_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+            - MARIADB_USER=${DB_USER}
+            - MARIADB_PASSWORD=${DB_PASSWORD}
+            - MARIADB_DATABASE=${DB_NAME}
+        restart: unless-stopped
+
+    jboss:
+        #user: '${uid}:${gid}'
+        build:
+            context: ./
+            dockerfile: ./Dockerfile
+        image: nloyola/biobank:0.1
+        working_dir: '/opt/biobank'
+        volumes:
+            - ..:/opt/biobank
+        command: sh -c "/opt/jboss/bin/run.sh"
+        depends_on:
+            - db
+        environment:
+            - PATH=/opt/jdk/jdk1.6.0_45/bin:/opt/apache-ant-1.9.0/bin:${PATH}
+            - DB_HOST=db
+            - DB_PORT=${DB_PORT}
+            - DB_USER=${DB_USER}
+            - DB_PASSWORD=${DB_PASSWORD}
+            - DB_NAME=${DB_NAME}
+            - JBOSS_HOME=/opt/jboss
+            - JAVA_HOME=/opt/jdk/jdk1.6.0_45
+            - JAVA=/opt/jdk/jdk1.6.0_45/bin/java
+            - JBOSS_LOG_DIR=/var/log/jboss
+            - ANT_HOME=/opt/apache-ant-1.9.0
+        restart: unless-stopped
+
+    nginx:
+        image: nginx:1.25.2-alpine
+        volumes:
+            - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+            - ./ssl.conf:/etc/nginx/conf.d/ssl.conf
+            - ./nginx-selfsigned.crt:/etc/nginx/ssl/nginx-selfsigned.crt:ro
+            - ./nginx-selfsigned.key:/etc/nginx/ssl/nginx-selfsigned.key:ro
+            - ./openssl.cnf:/etc/ssl/openssl.cnf:ro
+            - ../logs/nginx:/var/log/nginx
+        depends_on:
+            - jboss
+        ports:
+            - 443:8443
+        restart: unless-stopped
+
+    # haproxy:
+    #     image: haproxy:2.8-alpine
+    #     volumes:
+    #         - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
+    #         - ./nginx-selfsigned.pem:/etc/haproxy/certs/nginx-selfsigned.pem:ro
+    #     depends_on:
+    #         - jboss
+    #     ports:
+    #         - 9000:9000
+    #         - 9443:9443

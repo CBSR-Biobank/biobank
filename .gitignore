@@ -1,6 +1,5 @@
 fake*bmp
 lib
-db.properties
 biobank-service
 biobank-webapp
 security-logs/jboss/biobank.keystore
@@ -94,3 +93,7 @@ decode.png
 *.sql.gz
 /eclipse_ws/Servers/
 BiobankCli*.zip
+docker/nginx-selfsigned.crt
+docker/nginx-selfsigned.key
+/.env
+/logs/
